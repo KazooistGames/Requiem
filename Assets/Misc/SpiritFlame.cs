@@ -63,7 +63,7 @@ public class SpiritFlame : MonoBehaviour
             if (boundObject)
             {
                 setFlamePreset(flamePreset);
-                Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
+                Character boundEntity = boundObject.gameObject.GetComponent<Character>();
                 Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
                 if (boundWeapon)
                 {
@@ -129,7 +129,7 @@ public class SpiritFlame : MonoBehaviour
         flameMode = Mode.Auto;
         setFlamePreset(flamePreset);
         transform.SetParent(boundObject.transform, false);
-        Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
+        Character boundEntity = boundObject.gameObject.GetComponent<Character>();
         Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
         if (boundEntity)
         {

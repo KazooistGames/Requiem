@@ -89,7 +89,7 @@ public class PlayerHUD : MonoBehaviour
             //statBar[1].GetComponent<Image>().color = Player.INSTANCE.HostEntity.posture >= Entity.Posture.Flow ? new Color(0.7f, 0.5f, 0) : new Color(0.6f, 0.5f, 0.3333f);
             statBar[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBar[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
-            statBar[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.posture > -1 ? (Player.INSTANCE.HostEntity.posture == Entity.Posture.Flow ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
+            statBar[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.posture > -1 ? (Player.INSTANCE.HostEntity.posture == Character.Posture.Flow ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
         }
         else
         {

@@ -67,7 +67,7 @@ public class PlayerCamera : MonoBehaviour
             float scale = (VerticalAngle - VerticalAngleMin) / (VerticalAngleMax - VerticalAngleMin);
             CamOffsetMag = Mathf.Lerp(camOffsetMin, camOffsetMax, scale);
             CamHeight = Mathf.Lerp(CamHeightMin, CamHeightMax, scale);
-            Vector3 CameraFocus = Player.INSTANCE.HostEntity.transform.position + (Vector3.up * Entity.Scale * CamHeight);
+            Vector3 CameraFocus = Player.INSTANCE.HostEntity.transform.position + (Vector3.up * Character.Scale * CamHeight);
             float leg = CamOffsetMag * Mathf.Cos(DegToRad(VerticalAngle));
             camOffsetActual = new Vector3(Mathf.Cos(DegToRad(HorizonatalOffsetAngle)) * leg, CamOffsetMag * Mathf.Sin(DegToRad(VerticalAngle)), Mathf.Sin(DegToRad(HorizonatalOffsetAngle)) * leg);
             transform.position = CameraFocus + camOffsetActual;

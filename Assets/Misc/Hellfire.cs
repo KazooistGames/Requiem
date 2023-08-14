@@ -184,7 +184,7 @@ public class Hellfire : MonoBehaviour
 
     void OnParticleCollision(GameObject other)
     {
-        Entity entity = other.GetComponent<Entity>();
+        Character entity = other.GetComponent<Character>();
         Rigidbody body = other.GetComponent<Rigidbody>();
         Vector3 disposition = (other.transform.position - transform.position);
         if (PrimaryTrigger)
@@ -309,7 +309,7 @@ public class Hellfire : MonoBehaviour
             if (Physics.SphereCast(castRay, castRadius, out castHit, primaryRange, (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall), QueryTriggerInteraction.Ignore))
             {
                 GameObject other = castHit.collider.gameObject;
-                Entity entity = other.GetComponent<Entity>();
+                Character entity = other.GetComponent<Character>();
                 if (entity ? entity.Allegiance != Wielder.HostEntity.Allegiance : false)
                 {
                     primaryHits.Add(other);
