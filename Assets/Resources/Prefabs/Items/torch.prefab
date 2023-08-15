@@ -129,11 +129,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1247586716013791906}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16f5140e4f30f5042b74e896f351047f, type: 3}
+  m_Script: {fileID: 11500000, guid: 674bfe67d7c7ec24996adf68484dd91e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Impaling: 0
-  Idling: 0
+  EventDropped:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+  EventThrown:
+    m_PersistentCalls:
+      m_Calls: []
+  ImpalingSomething: 0
+  Heft: 25
+  Idling: 1
   Rebuked: 0
   Wielder: {fileID: 0}
   Allegiance: 0
@@ -146,24 +156,14 @@ MonoBehaviour:
   Anim: {fileID: 0}
   Body: {fileID: 0}
   HitBox: {fileID: 0}
-  PhysicsBoxes:
-  - {fileID: 2855904932024321077}
+  PhysicsBoxes: []
   Filter: {fileID: 0}
   Renderer: {fileID: 0}
   MostRecentWielder: {fileID: 0}
   Telecommuting: 0
   Thrown: 0
-  equipType: 0
+  equipType: -1
   Lit: 0
-  maxFadeRange: 15
-  minFadeRange: 3
-  maxIntensity: 10
-  minIntensity: 7.5
-  maxLightRange: 1
-  minLightRange: 0.75
-  flickerRate: 0.1
-  incrementIntensity: 0.25
-  incrementRange: 0.025
 --- !u!65 &1883243850059599907
 BoxCollider:
   m_ObjectHideFlags: 0

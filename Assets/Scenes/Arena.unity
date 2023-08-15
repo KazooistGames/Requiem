@@ -226,7 +226,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 483834058}
-  - component: {fileID: 483834057}
   m_Layer: 0
   m_Name: GameObject (6)
   m_TagString: Untagged
@@ -234,73 +233,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &483834057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 483834056}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 843a1b5deb9140c4cae3ad9b62c0caff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EventDropped:
-    m_PersistentCalls:
-      m_Calls: []
-  EventPickedUp:
-    m_PersistentCalls:
-      m_Calls: []
-  EventThrown:
-    m_PersistentCalls:
-      m_Calls: []
-  ImpalingSomething: 0
-  Idling: 1
-  Rebuked: 0
-  Wielder: {fileID: 0}
-  Allegiance: 0
-  Wielded: 0
-  MountTarget: {fileID: 0}
-  Primary: 0
-  Secondary: 0
-  Tertiary: 0
-  ThrowTrigger: 0
-  Anim: {fileID: 0}
-  Body: {fileID: 0}
-  HitBox: {fileID: 0}
-  PhysicsBoxes: []
-  Filter: {fileID: 0}
-  Renderer: {fileID: 0}
-  MostRecentWielder: {fileID: 0}
-  Telecommuting: 0
-  Thrown: 0
-  equipType: 0
-  EventHitting:
-    m_PersistentCalls:
-      m_Calls: []
-  EventClashedWeapon:
-    m_PersistentCalls:
-      m_Calls: []
-  EventBlockedWeapon:
-    m_PersistentCalls:
-      m_Calls: []
-  EventParriedWeapon:
-    m_PersistentCalls:
-      m_Calls: []
-  EventSwinging:
-    m_PersistentCalls:
-      m_Calls: []
-  EventRebuked:
-    m_PersistentCalls:
-      m_Calls: []
-  ActionCurrentlyAnimated: 0
-  Throwing: 0
-  Range: 0
-  Power: 0
-  BasePower: 0
-  TrueStrike: 0
-  Heft: 0
 --- !u!4 &483834058
 Transform:
   m_ObjectHideFlags: 0
@@ -423,35 +355,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -461,6 +457,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!4 &563033735
@@ -585,35 +585,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -623,6 +687,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!4 &565993384
@@ -680,35 +748,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -718,6 +850,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &754642188
@@ -842,35 +978,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -880,7 +1080,14 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
+  mainHandFlame: {fileID: 0}
+  offHandFlame: {fileID: 0}
+  footFlame: {fileID: 0}
 --- !u!114 &1041402234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,35 +1210,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 0
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -1041,7 +1312,14 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
+  mainHandFlame: {fileID: 0}
+  offHandFlame: {fileID: 0}
+  footFlame: {fileID: 0}
 --- !u!4 &1058553887
 Transform:
   m_ObjectHideFlags: 0
@@ -1231,35 +1509,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -1269,6 +1611,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!4 &1125109875
@@ -1326,35 +1672,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -1364,6 +1774,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &1408322536
@@ -1564,35 +1978,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -1602,6 +2080,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &1942021965
@@ -1726,35 +2208,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -1764,6 +2310,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &1975653281
@@ -1888,35 +2438,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -1926,6 +2540,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &2012781464
@@ -2065,35 +2683,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 0
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -2103,7 +2785,14 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
+  mainHandFlame: {fileID: 0}
+  offHandFlame: {fileID: 0}
+  footFlame: {fileID: 0}
 --- !u!114 &2033592721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2211,35 +2900,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -2249,6 +3002,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &2051300365
@@ -2494,35 +3251,99 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  entity: {fileID: 0}
+  lastDirection: {x: 0, y: 0, z: 0}
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
+  meanderTimer: 0
+  meanderPeriod: 0
+  meanderAvoidMask: 0
+  patrolScanAngle: 90
+  patrolMask: 0
+  patrolCurrentAngle: 0
   sensoryAlerted: 0
+  sensoryAlertedTimer: 0
+  sensoryAlertedPeriod: 5
+  sensorySightDetection: 1
+  sensorySightMask: 0
+  sensoryBaseRange: 1
+  sensorySightRangeScalar: 1
+  sensorySightFOV: 120
+  sensoryAudioDetection: 1
+  sensoryAudioApproach: 0
+  sensoryAudioRangeScalar: 1.5
+  sensoryAudioTimer: 0
+  sensoryAudioPeriod: 3
+  sensoryAudioDirection: {x: 0, y: 0, z: 0}
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
   trackingTrailCold: 1
+  trackingTrailingEnabled: 1
+  trackingTrailingTimer: 0
+  trackingTrailingPeriod: 5
+  trackingLastKnownLocation: {x: 0, y: 0, z: 0}
+  trackingLastKnownDirection: {x: 0, y: 0, z: 0}
+  trackingObstructionMask: 0
+  grabEnabled: 0
+  grabSlowScalar: 1
   grabDPS: 15
+  grabLastVictim: {fileID: 0}
   tangoDeadbanded: 0
+  tangoDeadbandingEnabled: 1
+  tangoTargetDisposition: 0
+  tangoInnerRange: 0
+  tangoOuterRange: 1
+  tangoTimer: 0
+  tangoPeriod: 1
+  tangoPeriodScalar: 1
   tangoStrafeEnabled: 1
+  tangoStrafePauseFreq: 0.5
+  tangoStrafePaused: 0
+  tangoStrafeFlipFlop: 1
+  tangoNearStart: 0
+  tangoFarStart: 0
   martialCurrentState: 0
   martialPreferredState: 0
   martialReactiveAttack: 0
   martialReactiveThrow: 0
   martialReactiveDefend: 0
   martialReactiveDefendThrow: 0
+  martialStateTimer: 0
+  martialStatePeriod: 0
+  martialStateBouncing: 1
+  martialAttackingONS: 1
+  martialDefendingONS: 1
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
   dashingDodgeFoeDashOnly: 0
   dashingLunge: 0
   dashingInitiate: 0
+  dashingONS: 1
+  dashingCooldownPeriod: 1
+  dashingCooldownTimer: 0
+  dashingChargePeriod: 0
+  dashingChargeTimer: 0
+  dashingPower: 0
+  dashingDesiredDirection: {x: 0, y: 0, z: 0}
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
+  itemManagementSeeking: 0
+  itemManagementNoDoubles: 0
+  itemManagementNoSingles: 0
   itemManagementPreferredType: 0
+  itemManagementTarget: {fileID: 0}
+  itemManagementDelayTimer: 0
+  itemManagementDelayPeriod: 1
   followVIP: {fileID: 0}
   followRecall: 0
   followNutHug: 0
   followDistance: 0
+  followVIPlastCoordinates: {x: 0, y: 0, z: 0}
+  followInnerDeadband: 0
+  followOuterDeadband: 0
+  followLayerMask: 0
   waypointCoordinates: {x: 0, y: 0, z: 0}
   waypointCommanded: 0
   waypointDeadbanded: 0
@@ -2532,6 +3353,10 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstaclesMask: 0
+  wallCrawlAvoidAngle: 0
+  wallCrawlTimer: 0
+  wallCrawlPeriod: 3
   wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &8986751459948920945

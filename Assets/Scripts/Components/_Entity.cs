@@ -114,7 +114,7 @@ public class _Entity : MonoBehaviour
         else if (Simulation == SimulationMode.Kinematic)
         {
             kinematicVelocity = Vector3.MoveTowards(kinematicVelocity, desiredControlVector, controlIncrement);
-            transform.position += kinematicVelocity;
+            transform.position += kinematicVelocity * Time.fixedDeltaTime;
         }
     }
 
