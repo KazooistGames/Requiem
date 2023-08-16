@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class _Entity : MonoBehaviour
 {
-    
+
+    private static PhysicMaterial PHYSICS_MATERIAL;
+
     public enum ControlMode
     {
         off,
@@ -42,14 +44,27 @@ public class _Entity : MonoBehaviour
     private Vector3 kinematicAngularVelocity;
 
     public InteractionMode Interaction;
-    public Collider InteractionBox;
+    public List<Collider> PhysicsBoxes = new List<Collider>();
 
     private void Start()
     {
         physicsBody = GetComponent<Rigidbody>() ? GetComponent<Rigidbody>() : gameObject.AddComponent<Rigidbody>();
         physicsBody.drag = 0;
         physicsBody.angularDrag = 0;
-        InteractionBox = GetComponent<Collider>();
+        GetComponents(PhysicsBoxes);
+        if (!PHYSICS_MATERIAL)
+        {
+            PHYSICS_MATERIAL = new PhysicMaterial();
+            PHYSICS_MATERIAL.name = "EntityPhysicsMaterial";
+            PHYSICS_MATERIAL.staticFriction = 0;
+            PHYSICS_MATERIAL.dynamicFriction = 0;
+            PHYSICS_MATERIAL.bounciness = 0;
+            PHYSICS_MATERIAL.bounceCombine = PhysicMaterialCombine.Minimum;
+        }
+        foreach(Collider box in PhysicsBoxes)
+        {
+            box.material = PHYSICS_MATERIAL;
+        }
     }
 
     private void Update()
@@ -104,7 +119,7 @@ public class _Entity : MonoBehaviour
 
     private void fixedUpdateTranslationalProcessVector()
     {
-        Vector3 processSetpointDelta = TranslationalSetpoint - TranslationalProcessVector;
+        Vector3 processSetpointDelta = TranslationalControlMode == ControlMode.Position ? TranslationalSetpoint - TranslationalProcessVector : TranslationalSetpoint;
         Vector3 desiredControlVector = processSetpointDelta.normalized * TranslationalMagnitude;
         float controlIncrement = TranslationalAcceleration * Time.fixedDeltaTime;
         if (Simulation == SimulationMode.Physical)

@@ -32,7 +32,7 @@ public class StatBar : MonoBehaviour
             fill.anchoredPosition = new Vector2((1-hp)/2, fill.anchoredPosition.y);
             fill.sizeDelta = new Vector2(hp, fill.sizeDelta.y);
             fill.GetComponent<Image>().color = (int)Host.posture > -1 ? new Color(1, 0, 0, 0.5f) : new Color(1, 0, 0.75f, 0.5f);
-            float poiseMeter = Host.Poise / Host.Strength;
+            float poiseMeter = Host.Resolve / Host.Strength;
             border.anchoredPosition = new Vector2((1 - poiseMeter) / 2, border.anchoredPosition.y);
             border.sizeDelta = new Vector2(poiseMeter, border.sizeDelta.y);
             //border.GetComponent<Image>().color = Host.posture >= Entity.Posture.Flow ? new Color(0.7f, 0.5f, 0) : new Color(0.6f, 0.5f, 0.3333f);

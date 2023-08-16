@@ -85,7 +85,7 @@ public class PlayerHUD : MonoBehaviour
         if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
             //SpiritBar.GetComponentInChildren<Text>().text = Requiem.Instance.Director.Wave.ToString();
-            statBar[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBar[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Resolve / Player.INSTANCE.HostEntity.Strength, 1f);
             //statBar[1].GetComponent<Image>().color = Player.INSTANCE.HostEntity.posture >= Entity.Posture.Flow ? new Color(0.7f, 0.5f, 0) : new Color(0.6f, 0.5f, 0.3333f);
             statBar[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBar[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);

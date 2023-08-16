@@ -23,14 +23,14 @@ public abstract class Character : MonoBehaviour
     public Player requiemPlayer;
 
     public float Strength = 100f;
-    public float Resolve = 1.0f;
+    public float Spirit = 1.0f;
     public float Haste = 1.0f;
 
     public float Xp = 0f;
     public int Lvl = 0;
 
     public float Vitality;
-    public float Poise;
+    public float Resolve;
     public float Agility;
 
     public float Tempo { get; private set; } = 0;
@@ -196,7 +196,7 @@ public abstract class Character : MonoBehaviour
 
     protected virtual void Start()
     {
-        Resolve = 1;
+        Spirit = 1;
         scaleActual = Scale * scaleScalar;
         berthActual = Berth * berthScalar;
         heightActual = Height * heightScalar;
@@ -214,7 +214,7 @@ public abstract class Character : MonoBehaviour
         hurtBox.radius = berthActual;
         hurtBox.height = heightActual;
         Vitality = Strength;
-        Poise = Strength;
+        Resolve = Strength;
         TurnSpeed = DefaultTurnSpeed;
         statBar = Instantiate(statBarPrefab, transform);
         indicator = Instantiate(indicatorPrefab, transform).GetComponent<Projector>();
@@ -462,7 +462,7 @@ public abstract class Character : MonoBehaviour
 
     public virtual void Damage(float magnitude)
     {
-        float poiseDamage = Mathf.Min(Poise, magnitude);
+        float poiseDamage = Mathf.Min(Resolve, magnitude);
         alterPoise(-poiseDamage);
         float vitalityDamage = posture == Posture.Stiff ? magnitude : magnitude - poiseDamage;
         if (vitalityDamage > 0)
@@ -496,9 +496,9 @@ public abstract class Character : MonoBehaviour
             Rebuke(0.25f + 1.5f * (-value / Strength));
             return;
         }
-        float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
-        Poise += value;
-        Poise = Mathf.Clamp(Poise, -1, Strength);
+        float existingDelta = Resolve - POISE_RESTING_PERCENTAGE * Strength;
+        Resolve += value;
+        Resolve = Mathf.Clamp(Resolve, -1, Strength);
         if (value * existingDelta >= 0) 
         {
             poiseDebounceTimer = 0.0f;
@@ -724,11 +724,11 @@ public abstract class Character : MonoBehaviour
         {
             posture = Posture.Stiff;
         }
-        else if (Poise >= Strength)
+        else if (Resolve >= Strength)
         {
             posture = Posture.Flow;
         }
-        else if (Poise <= 0)
+        else if (Resolve <= 0)
         {
             posture = Posture.Stiff;
         }
@@ -748,7 +748,7 @@ public abstract class Character : MonoBehaviour
         Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
         if (Stunned)
         {
-            Poise = 0;
+            Resolve = 0;
         }
         else
         {
@@ -761,26 +761,26 @@ public abstract class Character : MonoBehaviour
                 Tempo = Mathf.MoveTowards(Tempo, TEMPO_RESTING_VALUE, Time.deltaTime / TEMPO_DRAIN_PERIOD);
 
             }
-            if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD / Resolve))
+            if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD / Spirit))
             {
-                float increment = Resolve * Time.deltaTime * Strength / POISE_REGEN_PERIOD;
+                float increment = Spirit * Time.deltaTime * Strength / POISE_REGEN_PERIOD;
                 float restingValue = POISE_RESTING_PERCENTAGE * Strength;
-                float delta = Poise - restingValue;
+                float delta = Resolve - restingValue;
                 if (Mathf.Abs(delta) <= increment)
                 {
-                    Poise = POISE_RESTING_PERCENTAGE * Strength;
+                    Resolve = POISE_RESTING_PERCENTAGE * Strength;
                 }
-                else if (Poise > restingValue)
+                else if (Resolve > restingValue)
                 {
-                    Poise -= increment;
+                    Resolve -= increment;
                 }
-                else if (Poise < restingValue)
+                else if (Resolve < restingValue)
                 {
-                    Poise += increment;
+                    Resolve += increment;
                 }
             }
         }
-        Poise = Mathf.Clamp(Poise, 0, Strength);
+        Resolve = Mathf.Clamp(Resolve, 0, Strength);
         Tempo = Mathf.Clamp(Tempo, 0, 1);
     }
     private void resolveDashHit(Collision collision, bool instant = false)
@@ -796,7 +796,7 @@ public abstract class Character : MonoBehaviour
             float actualMag = instant ? Mathf.Lerp(minMag, maxMag, DashPower) : Mathf.Min(collision.relativeVelocity.magnitude, maxMag);
             if (crash && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
-                float impactRatio = actualMag / dashMaxVelocity * Strength_Ratio(this, foe);
+                float impactRatio = Strength_Ratio(this, foe) * actualMag / dashMaxVelocity;
                 Vector3 ShoveVector = disposition.normalized * impactRatio * dashMaxVelocity;
                 ShoveVector *= 1.0f;
                 foe.Shove(ShoveVector);
@@ -903,7 +903,7 @@ public abstract class Character : MonoBehaviour
                 if (FinalDash)
                 {
                     scaledVelocity *= 2;
-                    alterPoise(-Poise);
+                    alterPoise(-Resolve);
                 }
                 Shove(dashDirection * scaledVelocity, true);
                 GameObject sound = Mullet.PlayAmbientSound(dashSound, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
