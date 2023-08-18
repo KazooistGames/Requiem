@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Torch : Item
+public class Torch : Wieldable
 {
     public bool Lit = false;
     public static float maxFadeRange = 15;

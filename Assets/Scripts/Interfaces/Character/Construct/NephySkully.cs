@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class NephySkully : Character
+public class NephySkully : Armor_Character
 {
     protected override void Awake()
     {
@@ -60,15 +60,15 @@ public class NephySkully : Character
         head.layer = gameObject.layer;
     }
 
-    protected override void Mutation()
+    protected override void Mutate()
     {
-        base.Mutation();
+        base.Mutate();
         for(int i = 0; i < 2; i++)
         {
             Character entity;
             entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Character>();
-            entity.Resolve = entity.Strength;
-            entity.Shove(AI.RandomDirection() * dashMinVelocity);
+            entity.Special = entity.Strength;
+            entity.Shove(AI.RandomDirection() * Min_Velocity_Of_Dash);
         }
         Destroy(head);
         Die();

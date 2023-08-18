@@ -9,47 +9,18 @@ public abstract class Character : MonoBehaviour
 {
     public static UnityEvent<Character> EntityVanquished = new UnityEvent<Character> { };
 
-    public static List<Type> StandardTypes = new List<Type>()
-    {
-        typeof(Skelly),
-        typeof(Nephalim),
-        typeof(Skully),
-        typeof(Wraith),
-    };
-
-    public bool Mutate = false;
-    public bool Mutated = false;
-
     public Player requiemPlayer;
 
     public float Strength = 100f;
-    public float Spirit = 1.0f;
+    public float Resolve = 1.0f;
     public float Haste = 1.0f;
 
     public float Xp = 0f;
     public int Lvl = 0;
 
     public float Vitality;
-    public float Resolve;
-    public float Agility;
-
-    public float Tempo { get; private set; } = 0;
-    public float TempoTarget = 0;
-
-    private static float POISE_REGEN_PERIOD = 3f;
-    private static float POISE_DEBOUNCE_PERIOD = 3f;
-    private static float POISE_RESTING_PERCENTAGE = 1f;
-    private float poiseDebounceTimer = 0.0f;
-
-    private static float TEMPO_DRAIN_PERIOD = 2f;
-    private static float TEMPO_DEBOUNCE_PERIOD = 2f;
-    private static float TEMPO_RESTING_VALUE = 0f;
-    private float tempoDebounceTimer = 0.0f;
-
-    public bool FinalDash { get; private set; } = false;
-    public static float dashMaxVelocity { get; private set; } = 3.0f;
-    public static float dashMinVelocity { get; private set; } = 1.0f;
-    private static float dashChargeTime = 0.25f;
+    public float Speed;
+    public float Special;
    
     public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
@@ -70,9 +41,10 @@ public abstract class Character : MonoBehaviour
     public float heightActual { get; private set; }
     public float hoverActual { get; private set; }
 
-    public UnityEvent Vanquished = new UnityEvent();
-    public UnityEvent<float> Wounded = new UnityEvent<float>();
-    public UnityEvent JustCrashed = new UnityEvent();
+    public UnityEvent EventVanquished = new UnityEvent();
+    public UnityEvent<float> EventWounded = new UnityEvent<float>();
+    public UnityEvent EventCrashed = new UnityEvent();
+    public UnityEvent<Character, float> EventDashHit = new UnityEvent<Character, float>();
 
     public Character Foe;
 
@@ -88,11 +60,11 @@ public abstract class Character : MonoBehaviour
     public float TurnSpeed;
     public Dictionary<string, float> modTurnSpeed = new Dictionary<string, float>();
 
-    public Item MainHand;
-    public Item OffHand;
-    public Item leftStorage;
-    public Item rightStorage;
-    public Item backStorage;
+    public Wieldable MainHand;
+    public Wieldable OffHand;
+    public Wieldable leftStorage;
+    public Wieldable rightStorage;
+    public Wieldable backStorage;
     public UnityEvent<Character> Pickup = new UnityEvent<Character> { };
     public UnityEvent<Character> Interact = new UnityEvent<Character> { };
  
@@ -108,30 +80,35 @@ public abstract class Character : MonoBehaviour
     private static GameObject statBarPrefab;
     private static GameObject bloodSplatter;
 
+
     public bool Shoved = false;
     public float shoveRecoveryPeriod = 0;
     private float shoveRecoveryTimer = 0;
 
-    public bool Rebuked = false;
-    public bool Stunned = false;
-    protected float stunPeriod = 0;
-    protected float stunTimer = 0;
+    public bool Staggered = false;
+    protected float staggerPeriod = 0;
+    protected float staggerTimer = 0;
 
-    public bool Defending = false;
-
+    /********** DASHING **********/
+    public static float Max_Velocity_Of_Dash { get; private set; } = 3.0f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 1.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
-    public float DashPower = 0.0f;
+    public float DashPower { get; private set; } = 0.0f;
+    public bool FinalDash { get; private set; } = false;
     public Vector3 dashDirection = Vector3.zero;
-    private static AudioClip dashSound;
+    private static AudioClip SOUND_OF_DASH;
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
+    protected bool CrashEnvironmentONS = true;
+
+    private static float FINALDASH_POWER_SCALAR = 1.5f;
+    private static float DASH_CHARGE_TIME = 0.25f;
+    private static float CRASH_DAMAGE = 25f;
+
 
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
-
-    protected bool CrashEnvironmentONS = true;
-    protected static float CRASH_DAMAGE = 25f;
     
-    public bool Running = false;
+    //public bool Running = false;
 
     public GameObject Location;
     public GameObject head;
@@ -171,6 +148,10 @@ public abstract class Character : MonoBehaviour
     //******************Functions*************************
     protected virtual void Awake()
     {
+        Strength = 100f;
+        Resolve = 10;
+        Haste = 1.0f;
+        BaseAcceleration = 8;
         hurtBox = gameObject.AddComponent<CapsuleCollider>();
         personalBox = gameObject.AddComponent<CapsuleCollider>();
         body = GetComponent<Rigidbody>() == null ? gameObject.AddComponent<Rigidbody>() : GetComponent<Rigidbody>();
@@ -188,15 +169,15 @@ public abstract class Character : MonoBehaviour
         {
             statBarPrefab = Resources.Load<GameObject>("Prefabs/UX/StatBar");
         }
-        if (!dashSound)
+        if (!SOUND_OF_DASH)
         {
-            dashSound = Game.getSound("Audio/weapons/deepSwing");
+            SOUND_OF_DASH = Game.getSound("Audio/weapons/deepSwing");
         }
     }
 
     protected virtual void Start()
     {
-        Spirit = 1;
+        Resolve = 1;
         scaleActual = Scale * scaleScalar;
         berthActual = Berth * berthScalar;
         heightActual = Height * heightScalar;
@@ -214,7 +195,6 @@ public abstract class Character : MonoBehaviour
         hurtBox.radius = berthActual;
         hurtBox.height = heightActual;
         Vitality = Strength;
-        Resolve = Strength;
         TurnSpeed = DefaultTurnSpeed;
         statBar = Instantiate(statBarPrefab, transform);
         indicator = Instantiate(indicatorPrefab, transform).GetComponent<Projector>();
@@ -228,8 +208,8 @@ public abstract class Character : MonoBehaviour
         flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
         flames.bindToObject(gameObject);
         flames.flamePreset = SpiritFlame.Preset.Magic;
-        StartCoroutine(routineDash());
-        StartCoroutine(routineTempoTarget());
+        Special = Strength;
+        StartCoroutine(routineDashHandler());
     }
 
     protected virtual void Update()
@@ -237,20 +217,12 @@ public abstract class Character : MonoBehaviour
         equipmentManagement();
         indicatorManagement();
         updateStats();
-        updatePosture();
         if (Vitality <= 0)
         {
             Physics.autoSimulation = false;
             Physics.Simulate(Time.deltaTime);
             Physics.autoSimulation = true;
-            if (Mutate)
-            {
-                Mutation();
-            }
-            else
-            {
-                Die();
-            }
+            Die();         
         }
         else
         {
@@ -297,10 +269,10 @@ public abstract class Character : MonoBehaviour
         //float baseSpeed = Mathf.Pow(Haste, 0.5f) * SpeedScalarGlobal;
         float baseSpeed = Haste * SpeedScalarGlobal;
         //modSpeed["flow"] = posture == Posture.Flow ? Resolve / 100 : 0;
-        modSpeed["dash"] = (DashPower > 0 && !Running) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
+        modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
         modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed ) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
-        SpeedActual = Agility * SpeedScalarGlobal;
+        SpeedActual = Speed * SpeedScalarGlobal;
         hurtBox.radius = Shoved ? berthActual * 0.8f : berthActual;
         if (Shoved)
         {
@@ -321,15 +293,15 @@ public abstract class Character : MonoBehaviour
             shoveRecoveryPeriod = 0;
             shoveRecoveryTimer = 0;
         }
-        if (Stunned)
+        if (Staggered)
         {
-            if (stunTimer >= stunPeriod)
+            if (staggerTimer >= staggerPeriod)
             {
-                Stunned = false;
+                Staggered = false;
             }
             else
             {
-                stunTimer += Time.fixedDeltaTime;
+                staggerTimer += Time.fixedDeltaTime;
             }
         }
         RaycastHit hoverHit;
@@ -343,7 +315,7 @@ public abstract class Character : MonoBehaviour
         transform.position = new Vector3(transform.position.x, floorHeight, transform.position.z);
         float effectiveAccel = (Shoved && !Dashing) ? AccelerationActual * 0.75f : AccelerationActual;
         Vector3 proposedVelocity;
-        bool stopping = (WalkDirection == Vector3.zero || Shoved || Stunned) && body.velocity.magnitude > 0;
+        bool stopping = (WalkDirection == Vector3.zero || Shoved || Staggered) && body.velocity.magnitude > 0;
         if (stopping)
         {
             Vector3 increment = body.velocity * Time.fixedDeltaTime * effectiveAccel;
@@ -353,7 +325,7 @@ public abstract class Character : MonoBehaviour
         else
         {
             proposedVelocity = body.velocity + (WalkDirection * Time.fixedDeltaTime * effectiveAccel);
-            if (new Vector2(proposedVelocity.x, proposedVelocity.z).magnitude > SpeedActual && !Shoved && !Stunned)
+            if (new Vector2(proposedVelocity.x, proposedVelocity.z).magnitude > SpeedActual && !Shoved && !Staggered)
             {
                 Vector3 normalized = proposedVelocity.normalized * SpeedActual;
                 body.velocity = new Vector3(normalized.x, body.velocity.y, normalized.z);
@@ -364,7 +336,7 @@ public abstract class Character : MonoBehaviour
             }
         }
 
-        if ((Shoved && !Dashing) || Stunned)
+        if ((Shoved && !Dashing) || Staggered)
         {
             body.freezeRotation = true;
         }
@@ -460,59 +432,7 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-    public virtual void Damage(float magnitude)
-    {
-        float poiseDamage = Mathf.Min(Resolve, magnitude);
-        alterPoise(-poiseDamage);
-        float vitalityDamage = posture == Posture.Stiff ? magnitude : magnitude - poiseDamage;
-        if (vitalityDamage > 0)
-        {
-            Vitality -= vitalityDamage;
-            Wounded.Invoke(vitalityDamage);        
-        }
-    }
-
-    public void alterTempo(float value)
-    {
-        float existingDelta = Tempo - TEMPO_RESTING_VALUE;
-        Tempo += value;
-        Tempo = Mathf.Clamp(Tempo, 0, 1);
-        if (value * existingDelta >= 0)
-        {
-            tempoDebounceTimer = 0.0f;
-        }
-        else
-        {
-            tempoDebounceTimer = TEMPO_DEBOUNCE_PERIOD;
-        }
-    }
-
-
-    public void alterPoise(float value)
-    {
-        bool reducingPoise = value <= 0;
-        if (reducingPoise && posture == Posture.Stiff)
-        {       
-            Rebuke(0.25f + 1.5f * (-value / Strength));
-            return;
-        }
-        float existingDelta = Resolve - POISE_RESTING_PERCENTAGE * Strength;
-        Resolve += value;
-        Resolve = Mathf.Clamp(Resolve, -1, Strength);
-        if (value * existingDelta >= 0) 
-        {
-            poiseDebounceTimer = 0.0f;
-        }
-        else
-        {
-            poiseDebounceTimer = POISE_DEBOUNCE_PERIOD;
-        }
-        updatePosture();
-        if (reducingPoise && posture == Posture.Stiff)
-        {
-            Rebuke(0.25f + 1.5f * (-value / Strength));
-        }
-    }
+    public abstract void Damage(float magnitude);
 
     public void Rebuke(float duration)
     {    
@@ -531,7 +451,7 @@ public abstract class Character : MonoBehaviour
 
     public void Disarm(float yeetMagnitude = 2)
     {
-        updatePosture();
+        //updatePosture();
         Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
         Weapon offWep = OffHand ? OffHand.GetComponent<Weapon>() : null;
         if (mainWep)
@@ -551,8 +471,19 @@ public abstract class Character : MonoBehaviour
         float forceDelta = VelocityChange.magnitude;
         shoveRecoveryPeriod += forceDelta / AccelerationActual;
     }
-    
+
     /***** PROTECTED *****/
+    protected abstract void updatePosture();
+
+
+    protected virtual void updateStats()
+    {
+        body.mass = Strength * scaleActual;
+        //Stunned = (MainHand ? MainHand.Rebuked : false) || (OffHand ? OffHand.Rebuked : false);
+        Vitality = Mathf.Clamp(Vitality, 0, Strength);
+        Speed = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
+    }
+
 
     protected virtual void Die()
     {
@@ -580,29 +511,8 @@ public abstract class Character : MonoBehaviour
         {
             OffHand.DropItem();
         }
-        Vanquished.Invoke();
+        EventVanquished.Invoke();
         Destroy(gameObject);
-    }
-
-    protected virtual void Mutation()
-    {
-        Mutated = true;
-        Mutate = false;
-        Stunned = false;
-        Vitality = Strength;
-        //Poise = Strength;
-        if (MainHand)
-        {
-            MainHand.Primary = false;
-            MainHand.Secondary = false;
-            MainHand.ThrowTrigger = false;
-        }
-        if (OffHand)
-        {
-            OffHand.Primary = false;
-            OffHand.Secondary = false;
-            OffHand.ThrowTrigger = false;
-        }
     }
 
 
@@ -628,7 +538,7 @@ public abstract class Character : MonoBehaviour
     private void animationControls()
     {
         anim.enabled = true;
-        anim.SetFloat("dashCharge", (DashCharging && !Dashing) ? DashPower : 0);
+        anim.SetFloat("dashCharge", Dashing ? 0 : DashPower);
         anim.SetBool("moving", body.velocity.magnitude > Haste * SpeedScalarGlobal / 20f ? true : false);
         anim.SetFloat("velocity", Mathf.Max(body.velocity.magnitude, Haste * SpeedScalarGlobal / 4f));
         Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AI.angleToDirection(AI.getAngle(LookDirection) - AI.getAngle(body.velocity) + 90);
@@ -681,7 +591,7 @@ public abstract class Character : MonoBehaviour
                 {
                     MainHand = rightStorage ? rightStorage : (leftStorage ? (leftStorage.Idling || !leftStorage.Wielded ? leftStorage : null) : null);
                 }
-                else if (MainHand.Wielder != this || MainHand.equipType == Item.EquipType.TwoHanded)
+                else if (MainHand.Wielder != this || MainHand.equipType == Wieldable.EquipType.TwoHanded)
                 {
                     MainHand = null;
                 }
@@ -718,71 +628,6 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-    private void updatePosture()
-    {
-        if (Stunned)
-        {
-            posture = Posture.Stiff;
-        }
-        else if (Resolve >= Strength)
-        {
-            posture = Posture.Flow;
-        }
-        else if (Resolve <= 0)
-        {
-            posture = Posture.Stiff;
-        }
-        else if (posture != Posture.Stiff)
-        {
-            posture = Posture.Warm;
-        }
-    }
-
-    private void updateStats()
-    {
-        body.mass = Strength * scaleActual;
-        Rebuked = (MainHand ? MainHand.Rebuked : false) || (OffHand ? OffHand.Rebuked : false);
-        Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
-        //Defending = (mainWep ? mainWep.Defending : false) || (OffHand ? OffHand.GetComponent<Weapon>() ? OffHand.GetComponent<Weapon>().Defending : false : false);
-        Vitality = Mathf.Clamp(Vitality, 0, Strength);
-        Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
-        if (Stunned)
-        {
-            Resolve = 0;
-        }
-        else
-        {
-            if (!mainWep)
-            {
-                Tempo = TEMPO_RESTING_VALUE;
-            }
-            else if ((tempoDebounceTimer += Time.deltaTime) >= TEMPO_DEBOUNCE_PERIOD)
-            {
-                Tempo = Mathf.MoveTowards(Tempo, TEMPO_RESTING_VALUE, Time.deltaTime / TEMPO_DRAIN_PERIOD);
-
-            }
-            if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD / Spirit))
-            {
-                float increment = Spirit * Time.deltaTime * Strength / POISE_REGEN_PERIOD;
-                float restingValue = POISE_RESTING_PERCENTAGE * Strength;
-                float delta = Resolve - restingValue;
-                if (Mathf.Abs(delta) <= increment)
-                {
-                    Resolve = POISE_RESTING_PERCENTAGE * Strength;
-                }
-                else if (Resolve > restingValue)
-                {
-                    Resolve -= increment;
-                }
-                else if (Resolve < restingValue)
-                {
-                    Resolve += increment;
-                }
-            }
-        }
-        Resolve = Mathf.Clamp(Resolve, 0, Strength);
-        Tempo = Mathf.Clamp(Tempo, 0, 1);
-    }
     private void resolveDashHit(Collision collision, bool instant = false)
     {
         GameObject other = collision.gameObject;
@@ -790,17 +635,17 @@ public abstract class Character : MonoBehaviour
         if (foe ? foe.Allegiance != Allegiance : false)
         {
             Vector3 disposition = foe.transform.position - transform.position;
-            float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, dashMinVelocity, 0.5f);
-            float maxMag = FinalDash ? dashMaxVelocity * 2 : dashMaxVelocity;
+            float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
+            float maxMag = FinalDash ? Max_Velocity_Of_Dash * FINALDASH_POWER_SCALAR : Max_Velocity_Of_Dash;
             bool crash = instant || collision.relativeVelocity.magnitude >= minMag;       
             float actualMag = instant ? Mathf.Lerp(minMag, maxMag, DashPower) : Mathf.Min(collision.relativeVelocity.magnitude, maxMag);
             if (crash && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
-                float impactRatio = Strength_Ratio(this, foe) * actualMag / dashMaxVelocity;
-                Vector3 ShoveVector = disposition.normalized * impactRatio * dashMaxVelocity;
+                float impactRatio = Strength_Ratio(this, foe) * actualMag / Max_Velocity_Of_Dash;
+                Vector3 ShoveVector = disposition.normalized * impactRatio * Max_Velocity_Of_Dash;
                 ShoveVector *= 1.0f;
                 foe.Shove(ShoveVector);
-                foe.JustCrashed.Invoke();
+                foe.EventCrashed.Invoke();
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
@@ -810,11 +655,11 @@ public abstract class Character : MonoBehaviour
                 {                
                     if (FinalDash)
                     {
-                        foe.Rebuke(actualMag / maxMag);
+                        foe.Rebuke(actualMag / maxMag);                    
+                        float damage = CRASH_DAMAGE * actualMag / maxMag;
+                        foe.Damage(damage);
+                        EventDashHit.Invoke(foe, damage);
                     }
-                    float damage = CRASH_DAMAGE * actualMag / maxMag;
-                    foe.Damage(damage);
-                    alterPoise(0);
                 }
                 Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);           
             }
@@ -823,14 +668,13 @@ public abstract class Character : MonoBehaviour
     }
 
 
-
     private void resolveCrash(Collision collision)
     {
         if (!Shoved)
         {
             return;
         }
-        else if (collision.relativeVelocity.magnitude < dashMinVelocity)
+        else if (collision.relativeVelocity.magnitude < Min_Velocity_Of_Dash)
         {
             return;
         }
@@ -840,7 +684,7 @@ public abstract class Character : MonoBehaviour
         if(cleanHit)
         {
             Character otherEntity = collision.gameObject.GetComponent<Character>();
-            float velocityRatio = (collision.relativeVelocity.magnitude - dashMinVelocity) / (dashMaxVelocity - dashMinVelocity);
+            float velocityRatio = (collision.relativeVelocity.magnitude - Min_Velocity_Of_Dash) / (Max_Velocity_Of_Dash - Min_Velocity_Of_Dash);
             if ((otherEntity ? !otherEntity.Dashing : false) && !dashAlreadyHit.Contains(collision.gameObject))
             {
                 float impactToFoe = Strength_Ratio(this, otherEntity) * velocityRatio / 2;
@@ -849,7 +693,7 @@ public abstract class Character : MonoBehaviour
                 float impactToSelf = Strength_Ratio(otherEntity, this) * velocityRatio / 2;
                 Shove(collision.relativeVelocity.normalized * impactToSelf);
                 Damage(impactToSelf * CRASH_DAMAGE);
-                JustCrashed.Invoke();
+                EventCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
                 Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
@@ -864,7 +708,7 @@ public abstract class Character : MonoBehaviour
                 if (!Dashing)
                 {
                     Damage(velocityRatio * CRASH_DAMAGE);
-                    JustCrashed.Invoke();
+                    EventCrashed.Invoke();
                 }
                 CrashEnvironmentONS = false;
                 Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
@@ -873,40 +717,58 @@ public abstract class Character : MonoBehaviour
     }
 
 
-
-
-    /***** ROUTINES *****/
-    private IEnumerator routineDash()
+    private IEnumerator routineDashHandler()
     {
         string key = "dash";
+        bool directionIsUndetermined;
+        bool heldChargeUntilCutoff;
+        float finalDashCutoffCharge = 0.9f;
         while (true)
         {
             FinalDash = false;
-            yield return new WaitUntil(() => DashCharging && !Stunned);
-            bool underterminedDirection = dashDirection == Vector3.zero;
-            while (DashCharging)
+            yield return new WaitUntil(() => DashCharging && !Staggered);
+            directionIsUndetermined = dashDirection == Vector3.zero;
+            heldChargeUntilCutoff = true;
+            while (DashPower < 1.0)
             {
-                //DashPower = FinalDash ? 1.0f : Mathf.Clamp(DashPower + Time.deltaTime / (dashChargeTime * (1 + weaponHeft)), 0, 1);
-                float increment = Time.deltaTime * Haste / dashChargeTime;
-                DashPower = FinalDash ? 1.0f : Mathf.Clamp(DashPower + increment, 0, 1);
-                if (underterminedDirection)
+                float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
+                DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
+                if (directionIsUndetermined)
                 {
                     dashDirection = WalkDirection == Vector3.zero ? dashDirection : WalkDirection;
                 }
+                if(DashPower < finalDashCutoffCharge)
+                {
+                    heldChargeUntilCutoff = heldChargeUntilCutoff && DashCharging;
+                }
+                else if(heldChargeUntilCutoff)
+                {
+                    FinalDash = !DashCharging && dashDirection == Vector3.zero;
+                }
+
                 yield return null;
             }
             dashAlreadyHit = new List<GameObject>();
-            float scaledVelocity = dashMaxVelocity * DashPower;
-            if (!Stunned && dashDirection != Vector3.zero && scaledVelocity > dashMinVelocity)
+            float scaledVelocity = Max_Velocity_Of_Dash * DashPower;
+            if (Staggered)
             {
-                Dashing = true;
+
+            }
+            else if (scaledVelocity <= Min_Velocity_Of_Dash)
+            {
+
+            }
+            else
+            {
                 if (FinalDash)
                 {
-                    scaledVelocity *= 2;
-                    alterPoise(-Resolve);
-                }
+                    scaledVelocity *= FINALDASH_POWER_SCALAR;
+                    dashDirection = LookDirection;
+                }           
+                if(FinalDash || dashDirection != Vector3.zero)
+                Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);
-                GameObject sound = Mullet.PlayAmbientSound(dashSound, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
+                GameObject sound = Mullet.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
                 sound.transform.SetParent(transform);
                 yield return new WaitWhile(() => Shoved);
@@ -915,19 +777,6 @@ public abstract class Character : MonoBehaviour
             Dashing = false;
             DashPower = 0.0f;
             dashDirection = Vector3.zero;
-        }
-    }
-
-    private IEnumerator routineTempoTarget()
-    {
-        Vector2 limits = new Vector2(0.5f, 0.8f);
-        float speed = 0.1f;
-        while (true)
-        {
-            TempoTarget = limits.x;
-            yield return new WaitUntil(() => { TempoTarget += Time.deltaTime * speed; return TempoTarget >= limits.y; });
-            TempoTarget = limits.y;
-            yield return new WaitUntil(() => { TempoTarget -= Time.deltaTime * speed; return TempoTarget <= limits.x; });
         }
     }
 

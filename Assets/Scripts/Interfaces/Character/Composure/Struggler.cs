@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Struggler : Character
+public class Struggler : Composure_Character
 {
     protected MeshFilter[] bodyparts;
     //protected GameObject head;
@@ -24,7 +24,7 @@ public class Struggler : Character
         base.Start();
         createProfile();
         gameObject.name = "Struggler";
-        Wounded.AddListener(BLEED);
+        EventWounded.AddListener(BLEED);
         if (!bloodSplatter)
         {
             bloodSplatter = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");

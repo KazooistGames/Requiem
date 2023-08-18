@@ -66,7 +66,7 @@ public class Janitor : AI
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        Item item = other.GetComponent<Item>();
+        Wieldable item = other.GetComponent<Wieldable>();
         if(item ? item.GetComponent<Weapon>() || (item.GetType() == typeof(Bone) && item != Idol.INSTANCE): false)
         {
             Vector3 playerDispo = item.transform.position - Player.INSTANCE.transform.position;

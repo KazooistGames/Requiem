@@ -72,7 +72,7 @@ public class SpiritFlame : MonoBehaviour
                 if (boundEntity)
                 {
                     emissionModule.enabled = boundWeapon ? boundWeapon.TrueStrike : boundEntity.FinalDash;
-                    PowerLevel = boundEntity.Spirit * 10;
+                    PowerLevel = boundEntity.Resolve * 10;
                     emissionModule.rateOverTime = Mathf.Lerp(emissionOverTimeMin, emissionOverTimeMax, PowerLevel);
                     emissionModule.rateOverDistance = Mathf.Lerp(emissionOverDistanceMax, emissionOverDistanceMin, PowerLevel);
                     particleLight.intensity = Mathf.Lerp(lightIntensityMin, lightIntensityMax, PowerLevel);

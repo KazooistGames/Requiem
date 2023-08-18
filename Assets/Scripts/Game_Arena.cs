@@ -53,7 +53,7 @@ public class Game_Arena : Game
         yield return gameInitLandmarks();
         yield return gameInitCrypts();
         new GameObject().AddComponent<Player>();
-        Idol Idol = Instantiate(Resources.Load<GameObject>("Prefabs/Items/Idol")).GetComponent<Idol>();
+        Idol Idol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
         Hextile randomTile = TileRings[TileRings.Count - 1][UnityEngine.Random.Range(0, TileRings[TileRings.Count - 1].Count)];
         Idol.transform.position = RAND_POS_IN_TILE(randomTile);
         randomTile = TileRings[TileRings.Count - 1][UnityEngine.Random.Range(0, TileRings[TileRings.Count - 1].Count)];
@@ -171,14 +171,14 @@ public class Game_Arena : Game
         MobSpawner.PeriodicSpawnSize = 3;
         MobSpawner.OnSpawned = (listOfNewInstances) =>
         {
-            foreach(GameObject mob in listOfNewInstances)
-            {
-                Character entity = mob.GetComponent<Character>();
-                if(UnityEngine.Random.value <= (0.1f * Difficulty))
-                {
-                    entity.Mutate = true;
-                }
-            }
+            //foreach(GameObject mob in listOfNewInstances)
+            //{
+            //    Construct_Character entity = mob.GetComponent<Construct_Character>();
+            //    if(UnityEngine.Random.value <= (0.1f * Difficulty))
+            //    {
+            //        entity.isMutatingOnDeath = true;
+            //    }
+            //}
             Hextile randomTile = AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)];
             MobSpawner.SpawnPosition = randomTile.transform.position + Vector3.up;
         };

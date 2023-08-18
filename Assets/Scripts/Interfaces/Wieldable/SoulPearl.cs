@@ -3,9 +3,9 @@ using System.Linq;
 using UnityEngine;
 
 
-public class SoulPearl : Item
+public class SoulPearl : Wieldable
 {
-    public Item Phylactery;
+    public Wieldable Phylactery;
     private SpiritFlame spiritFlame;
     private SphereCollider physicsSphere;
 
@@ -61,7 +61,7 @@ public class SoulPearl : Item
         {
             if (Phylactery.Wielder)
             {
-                Phylactery.Wielder.alterPoise(Phylactery.Wielder.Strength);
+                //Phylactery.Wielder.alterPoise(Phylactery.Wielder.Strength);
             }
             else
             {

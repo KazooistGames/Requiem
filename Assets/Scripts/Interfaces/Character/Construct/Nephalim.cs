@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Nephalim : Character
+public class Nephalim : Armor_Character
 {
     protected MeshFilter[] bones;
     protected GameObject ribs;
@@ -25,7 +25,7 @@ public class Nephalim : Character
         base.Start();
         createSkeleton();
         gameObject.name = "Nephy";  
-        Wounded.AddListener(CRUMBLE);
+        EventWounded.AddListener(CRUMBLE);
     }
 
     protected override void Update()
@@ -71,9 +71,9 @@ public class Nephalim : Character
         }
     }
 
-    protected override void Mutation()
+    protected override void Mutate()
     {
-        base.Mutation();
+        base.Mutate();
         Debone(head);
         Haste *= 1.25f;
         Strength *= 0.75f;

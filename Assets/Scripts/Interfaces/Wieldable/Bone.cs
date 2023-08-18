@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Bone : Item
+public class Bone : Wieldable
 {
     public float pitchScalar = 1.0f;
     public float NoiseImpulse = 0.015f;

@@ -3,36 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wraith : Character
+public class Ghosty : Composure_Character
 {
-    //StandardAI = typeof(AI_Revanent);
 
     protected MeshFilter[] bodyparts;
-    //protected GameObject head;
     protected GameObject torso;
-    protected GameObject waist;
     protected GameObject leg1;
     protected GameObject leg2;
+
+    private ParticleSystem profileParticles;
+    private ParticleSystem.ShapeModule shapeModule;
 
     protected override void Awake()
     {
         base.Awake();
         anim = GetComponent<Animator>() == null ? gameObject.AddComponent<Animator>() : GetComponent<Animator>();
         Strength = 100f;
-        Haste = 1.0f;
-        BaseAcceleration = 8;
+        Haste = 0.7f;
     }
 
     protected override void Start()
     {
         base.Start();
-        createSkeleton();
-        gameObject.name = "Nemesis";
+        createProfile();
+        gameObject.name = "Ghosty";
+        EventVanquished.AddListener(Dematerialize);
     }
 
     protected override void Update()
     {
         base.Update();
+        if(!MainHand && !OffHand)
+        {
+            Vitality = 0;
+        }
+        if (!Foe)
+        {
+            Vitality = 0;
+        }
     }
 
     protected override void FixedUpdate()
@@ -46,24 +54,24 @@ public class Wraith : Character
     }
 
     //CUSTOM FUNCTIONS!!!!!!!!!!!!!
+
     public override void Damage(float damage)
     {
         base.Damage(damage);
-        Mullet.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, Mullet.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
     }
-
-    private void createSkeleton()
+    private void createProfile()
     {
-        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/wraithBody"));
+        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/ghostBody"));
         model.gameObject.name = "Model";
         model.transform.SetParent(transform, false);
         model.transform.localPosition = Vector3.zero;
+        profileParticles = model.GetComponent<ParticleSystem>();
+        shapeModule = profileParticles.shape;
         bodyparts = model.GetComponentsInChildren<MeshFilter>();
         head = bodyparts[0].gameObject;
         torso = bodyparts[1].gameObject;
-        waist = bodyparts[2].gameObject;
-        leg1 = bodyparts[3].gameObject;
-        leg2 = bodyparts[4].gameObject;
+        leg1 = bodyparts[2].gameObject;
+        leg2 = bodyparts[3].gameObject;
         foreach (MeshFilter bone in bodyparts)
         {
             bone.gameObject.layer = gameObject.layer;
@@ -74,15 +82,26 @@ public class Wraith : Character
         }
     }
 
-    protected override void Die()
+    public void Dematerialize()
     {
-        foreach (MeshFilter bone in bodyparts)
+        SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
+        pearl.transform.position = transform.position;
+        if (MainHand)
         {
-            if (bone)
-            {
-                Debone(bone.gameObject);
-            }
+            pearl.Phylactery = MainHand;
         }
-        base.Die();
+        if (leftStorage)
+        {
+            leftStorage.DropItem(yeet: true);
+        }
+        if (rightStorage)
+        {
+            rightStorage.DropItem(yeet: true);
+        }
+        if (backStorage)
+        {
+            backStorage.DropItem(yeet: true);
+        }   
     }
+
 }

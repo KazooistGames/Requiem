@@ -41,7 +41,7 @@ public class Landmark_Pillar : Landmark
         //body.freezeRotation = true;
         Vector3 temp = transform.localEulerAngles;
         transform.localEulerAngles = new Vector3(0, temp.y, 0);
-        torch = Instantiate(Resources.Load<GameObject>("Prefabs/Items/torch")).GetComponent<Torch>();
+        torch = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/torch")).GetComponent<Torch>();
         if(model.tag == "Broken")
         {
             torch.transform.position = transform.position + new Vector3(0, 0.35f, 0.07f);

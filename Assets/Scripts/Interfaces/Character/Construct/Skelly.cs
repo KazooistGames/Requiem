@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Skelly : Character
+public class Skelly : Armor_Character
 {
     protected MeshFilter[] bodyParts;
     //protected GameObject head;
@@ -22,7 +22,7 @@ public class Skelly : Character
         base.Start();
         createSkeleton();
         gameObject.name = "Skelly";
-        Wounded.AddListener(CRUMBLE);
+        EventWounded.AddListener(CRUMBLE);
     }
 
     protected override void Update()
@@ -68,9 +68,9 @@ public class Skelly : Character
         }
     }
 
-    protected override void Mutation()
+    protected override void Mutate()
     {
-        base.Mutation();
+        base.Mutate();
         Debone(head);
         Haste *= 1.25f;
         Strength *= 0.75f;

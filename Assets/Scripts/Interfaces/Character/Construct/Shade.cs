@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shade : Character
+public class Shade : Armor_Character
 {
     static RuntimeAnimatorController shadeAnimations;
 
@@ -27,7 +27,7 @@ public class Shade : Character
             shadeAnimations = Resources.Load<RuntimeAnimatorController>("Animation/Shade/shadeAnimation");
         }
         anim.runtimeAnimatorController = shadeAnimations;
-        Vanquished.AddListener(Dissipate);
+        EventVanquished.AddListener(Dissipate);
     }
 
     protected override void Update()

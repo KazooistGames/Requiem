@@ -65,17 +65,23 @@ public class PlayerHUD : MonoBehaviour
     {
         if(Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
-            if (Player.INSTANCE.HostEntity.MainHand)
+            if (!Player.INSTANCE.HostEntity.MainHand)
             {
-                TempoBar.SetActive(true);
-                tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.HostEntity.Tempo, 1f);
-                tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Tempo, 1f);
-                tempoBarTransforms[2].anchorMin = new Vector2(Player.INSTANCE.HostEntity.TempoTarget, 1f);
-                tempoBarTransforms[2].anchorMax = new Vector2(Player.INSTANCE.HostEntity.TempoTarget, 1f);
+                TempoBar.SetActive(false);
+            }
+            else if (!Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>())
+            {
+                TempoBar.SetActive(false);
             }
             else
             {
-                TempoBar.SetActive(false);
+                Weapon weapon = Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>();
+                TempoBar.SetActive(true);
+                tempoBarTransforms[3].anchorMin = new Vector2(weapon.Tempo, 1f);
+                tempoBarTransforms[3].anchorMax = new Vector2(weapon.Tempo, 1f);
+                tempoBarTransforms[2].anchorMin = new Vector2(weapon.TempoTargetCenter, 1f);
+                tempoBarTransforms[2].anchorMax = new Vector2(weapon.TempoTargetCenter, 1f);
+                tempoBarTransforms[2].sizeDelta = new Vector2(weapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
             }
         }
     }
@@ -85,7 +91,7 @@ public class PlayerHUD : MonoBehaviour
         if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
             //SpiritBar.GetComponentInChildren<Text>().text = Requiem.Instance.Director.Wave.ToString();
-            statBar[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Resolve / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBar[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Special / Player.INSTANCE.HostEntity.Strength, 1f);
             //statBar[1].GetComponent<Image>().color = Player.INSTANCE.HostEntity.posture >= Entity.Posture.Flow ? new Color(0.7f, 0.5f, 0) : new Color(0.6f, 0.5f, 0.3333f);
             statBar[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBar[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);

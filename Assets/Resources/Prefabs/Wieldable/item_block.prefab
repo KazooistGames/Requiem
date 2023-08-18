@@ -158,30 +158,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 6992131925933887381}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfaddf2edf148994cad4cfe2494ea0ce, type: 3}
+  m_Script: {fileID: 11500000, guid: 628dc2eacc83d0245bd7aa3e53ef17a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Impaling: 0
+  EventDropped:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+  EventThrown:
+    m_PersistentCalls:
+      m_Calls: []
+  ImpalingSomething: 0
+  Heft: 25
   Idling: 1
   Rebuked: 0
   Wielder: {fileID: 0}
-  Allegiance: 1
+  Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
   Primary: 0
   Secondary: 0
   Tertiary: 0
   ThrowTrigger: 0
-  Anim: {fileID: 1373723435178343212}
-  Body: {fileID: 6378344923530249510}
+  Anim: {fileID: 0}
+  Body: {fileID: 0}
   HitBox: {fileID: 0}
-  PhysicsBoxes:
-  - {fileID: 1118139354825364352}
+  PhysicsBoxes: []
   Filter: {fileID: 0}
-  Renderer: {fileID: 6992131925933886648}
+  Renderer: {fileID: 0}
+  MostRecentWielder: {fileID: 0}
   Telecommuting: 0
   Thrown: 0
-  equipType: 3
+  equipType: -1
 --- !u!95 &1373723435178343212
 Animator:
   serializedVersion: 4

@@ -221,22 +221,22 @@ public class Player : MonoBehaviour
     {
         if (HostEntity.MainHand || HostEntity.OffHand)
         {
-            Item mainWep = null;
-            Item offWep = null;
+            Wieldable mainWep = null;
+            Wieldable offWep = null;
             if (HostEntity.MainHand)
             {
                 mainWep = HostEntity.MainHand;
-                mainWep.Primary = CurrentMouse.leftButton.isPressed;
+                mainWep.PrimaryTrigger = CurrentMouse.leftButton.isPressed;
                 mainWep.Secondary = CurrentKeyboard.leftShiftKey.isPressed;
                 mainWep.Tertiary = CurrentMouse.rightButton.isPressed;
             }
             if (HostEntity.OffHand)
             {
                 offWep = HostEntity.OffHand;
-                offWep.Primary = CurrentMouse.rightButton.isPressed;
+                offWep.PrimaryTrigger = CurrentMouse.rightButton.isPressed;
                 offWep.Secondary = CurrentKeyboard.leftShiftKey.isPressed;
             }
-            Item throwWep = HostEntity.OffHand ? HostEntity.OffHand : HostEntity.MainHand;
+            Wieldable throwWep = HostEntity.OffHand ? HostEntity.OffHand : HostEntity.MainHand;
             throwWep.ThrowTrigger = CurrentKeyboard.leftCtrlKey.isPressed;
         }
 

@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Item : MonoBehaviour
+public class Wieldable : MonoBehaviour
 {    
     public static RuntimeAnimatorController defaultAnimController;
     public static RuntimeAnimatorController defaultAnimController2H;
@@ -28,7 +28,7 @@ public class Item : MonoBehaviour
     public bool Wielded = false;
     public GameObject MountTarget;
 
-    public bool Primary = false;
+    public bool PrimaryTrigger = false;
     public bool Secondary = false;
     public bool Tertiary = false;
     public bool ThrowTrigger = false;
@@ -332,7 +332,7 @@ public class Item : MonoBehaviour
             Body.isKinematic = false;
             Body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             Body.angularDrag = 0f;
-            Primary = false;
+            PrimaryTrigger = false;
             Secondary = false;
             Tertiary = false;
             Wielded = false;
@@ -345,12 +345,12 @@ public class Item : MonoBehaviour
         }
     }
 
-    public void Telecommute(GameObject target, float telecommuteScalar, Action<Item> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
+    public void Telecommute(GameObject target, float telecommuteScalar, Action<Wieldable> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
     {
         StartCoroutine(telecommuteRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
 
-    private IEnumerator telecommuteRoutine(GameObject target, float teleScalar,  Action<Item> callback, bool enablePhysics, bool useScalarAsSpeed)
+    private IEnumerator telecommuteRoutine(GameObject target, float teleScalar,  Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
         telecommuteTarget = target;
         Telecommuting = true;

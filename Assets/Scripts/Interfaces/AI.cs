@@ -230,7 +230,7 @@ public class AI : MonoBehaviour
         patrolMask = 1 << Game.layerWall + (1 << Game.layerObstacle);
         StartCoroutine(Think());
         StartCoroutine(stateHandler());
-        entity.Wounded.AddListener((float damage) => sensoryAlerted = true);
+        entity.EventWounded.AddListener((float damage) => sensoryAlerted = true);
     }
 
     protected virtual void Update()
@@ -319,7 +319,7 @@ public class AI : MonoBehaviour
     //BEHAVIOURS!!!
     protected void meander(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && !entity.Staggered)
         {
             meanderTimer += ReflexRate;
             if (meanderTimer >= meanderPeriod || Physics.Raycast(transform.position, DesiredDirection, entity.personalBox.radius, layerMask: meanderAvoidMask, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
@@ -353,7 +353,7 @@ public class AI : MonoBehaviour
 
     protected void patrol(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && !entity.Staggered)
         {
             float startAngle = Mathf.Lerp(LookAngle, actualMovementAngle, 0.5f);
             float bestAngle = startAngle;
@@ -392,7 +392,7 @@ public class AI : MonoBehaviour
 
     protected void sensory(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && !entity.Staggered)
         {
             if (entity.Foe)
             {
@@ -509,7 +509,7 @@ public class AI : MonoBehaviour
                     }
                 }          
             }
-            if ((sensoryAudioTimer += ReflexRate) > sensoryAudioPeriod || entity.Stunned || entity.Foe || sensoryAudioDirection == Vector3.zero)
+            if ((sensoryAudioTimer += ReflexRate) > sensoryAudioPeriod || entity.Staggered || entity.Foe || sensoryAudioDirection == Vector3.zero)
             {
                 sensoryAudioTimer = 0;
                 sensoryAudioDirection = Vector3.zero;
@@ -532,7 +532,7 @@ public class AI : MonoBehaviour
     protected void pursue(BehaviourType key)
     {
 
-        if (behaviourParams[key].Item1 && !entity.Stunned && entity.Foe)
+        if (behaviourParams[key].Item1 && !entity.Staggered && entity.Foe)
         {
             Vector3 outputDirection;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -557,7 +557,7 @@ public class AI : MonoBehaviour
 
     protected void tracking(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && !entity.Staggered)
         {
             Vector3 actualDispo = entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero;
             Vector3 trailDispo =  (entity.Foe && trackingEyesOnTarget? entity.Foe.transform.position : trackingLastKnownLocation) - transform.position;
@@ -600,7 +600,7 @@ public class AI : MonoBehaviour
 
     protected void grab(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && entity.Foe && !entity.Shoved && !entity.Stunned)
+        if (behaviourParams[key].Item1 && entity.Foe && !entity.Shoved && !entity.Staggered)
         {
             grabLastVictim = entity.Foe;
             Vector3 disposition = grabLastVictim.transform.position - transform.position;
@@ -630,7 +630,7 @@ public class AI : MonoBehaviour
 
     protected void tango(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && entity.Foe && !entity.Stunned)
+        if (behaviourParams[key].Item1 && entity.Foe && !entity.Staggered)
         {
             Vector3 outputDirection;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -843,7 +843,7 @@ public class AI : MonoBehaviour
 
     protected void dashing(BehaviourType key) 
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && !entity.Staggered)
         {
             if (entity.Foe)
             {
@@ -876,7 +876,7 @@ public class AI : MonoBehaviour
 
     protected void itemManagement(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned && !entity.Shoved)
+        if (behaviourParams[key].Item1 && !entity.Staggered && !entity.Shoved)
         {
             if (itemManagementTarget ? !itemManagementTarget.Wielder : false)
             {
@@ -923,7 +923,7 @@ public class AI : MonoBehaviour
                                 }
                                 if (potentialWeapon && minDistance < closestDistance)
                                 {
-                                    bool match = (potentialWeapon.equipType == Item.EquipType.OneHanded && singlesOpen) || (potentialWeapon.equipType == Item.EquipType.TwoHanded && doublesOpen);
+                                    bool match = (potentialWeapon.equipType == Wieldable.EquipType.OneHanded && singlesOpen) || (potentialWeapon.equipType == Wieldable.EquipType.TwoHanded && doublesOpen);
                                     if (match && !potentialWeapon.Wielder)
                                     {
                                         closestWeapon = potentialWeapon;
@@ -934,7 +934,7 @@ public class AI : MonoBehaviour
                         }
                         if (closestWeapon)
                         {
-                            if ((closestWeapon.equipType == Item.EquipType.OneHanded && singlesOpen) || (closestWeapon.equipType == Item.EquipType.TwoHanded && doublesOpen))
+                            if ((closestWeapon.equipType == Wieldable.EquipType.OneHanded && singlesOpen) || (closestWeapon.equipType == Wieldable.EquipType.TwoHanded && doublesOpen))
                             {
                                 itemManagementTarget = closestWeapon;
                             }
@@ -980,7 +980,7 @@ public class AI : MonoBehaviour
 
     protected void follow(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned && followVIP)
+        if (behaviourParams[key].Item1 && !entity.Staggered && followVIP)
         {
             followLayerMask = (1 << followVIP.layer) + (1 << Game.layerWall) + (1 << Game.layerObstacle);
             followInnerDeadband = entity.personalBox.radius * entity.scaleActual * 1.5f;
@@ -1008,7 +1008,7 @@ public class AI : MonoBehaviour
 
     protected void waypoint(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && !entity.Staggered)
         {
             float minimumDisposition = waypointDeadbanded ? waypointOuterLimit : entity.personalBox.radius * entity.scaleActual * waypointDeadbandingScalar;
             Vector3 dispo = (waypointCoordinates - transform.position);
@@ -1028,7 +1028,7 @@ public class AI : MonoBehaviour
     protected void wallCrawl(BehaviourType key)
     {
         wallCrawlObstaclesMask = (1 << Game.layerWall) + (1 << Game.layerObstacle) + (wallCrawlCrowding ? 0 : (1 << Game.layerEntity));
-        if (behaviourParams[key].Item1 && wallCrawlObstacles.Count > 0 && !entity.Stunned)
+        if (behaviourParams[key].Item1 && wallCrawlObstacles.Count > 0 && !entity.Staggered)
         {
             float trueRadius = (entity.personalBox.radius - entity.berthActual) * entity.scaleActual;
             bool obstaclesPresent = false;
@@ -1184,7 +1184,7 @@ public class AI : MonoBehaviour
                                     tangoOuterRange = wep.Range * 2.0f;
                                     break;
                                 case martialState.throwing:
-                                    bool ranged = wep ? wep.equipType == Item.EquipType.OneHanded : false;
+                                    bool ranged = wep ? wep.equipType == Wieldable.EquipType.OneHanded : false;
                                     tangoInnerRange = ranged ? wep.Range * 3.0f : wep.Range * 1.5f;
                                     tangoOuterRange = ranged ? sensoryBaseRange * sensorySightRangeScalar * 0.75f : wep.Range * 2.0f;
                                     break;
@@ -1275,7 +1275,7 @@ public class AI : MonoBehaviour
         if (mainHand)
         {
             timer = 0;
-            mainHand.Primary = true;
+            mainHand.PrimaryTrigger = true;
             martialStateBouncing = true;
             yield return new WaitUntil(() => mainHand.currentAnimation.IsTag("Hold") || mainHand.currentAnimation.IsTag("Rebuked"));
             inRange = false;
@@ -1286,7 +1286,7 @@ public class AI : MonoBehaviour
                 timesUp = (timer += Time.deltaTime) > 1 - Intelligence;
                 if (mainHand.currentAnimation.IsTag("Rebuked"))
                 {                
-                    mainHand.Primary = false;
+                    mainHand.PrimaryTrigger = false;
                     yield return exit();
                 }
                 else if (entity ? entity.Foe : false)
@@ -1301,7 +1301,7 @@ public class AI : MonoBehaviour
                     yield return null;
                 }
             }
-            mainHand.Primary = false;
+            mainHand.PrimaryTrigger = false;
             if (!entity.Foe)
             {
                 yield return exit();
@@ -1310,7 +1310,7 @@ public class AI : MonoBehaviour
         if (offHand)
         {
             timer = 0;
-            offHand.Primary = true;
+            offHand.PrimaryTrigger = true;
             martialStateBouncing = true;
             yield return new WaitUntil(() => offHand.currentAnimation.IsTag("Hold") || offHand.currentAnimation.IsTag("Rebuked"));
             inRange = false;
@@ -1321,7 +1321,7 @@ public class AI : MonoBehaviour
                 timesUp = (timer += Time.deltaTime) > 1 - Intelligence;
                 if (offHand.currentAnimation.IsTag("Rebuked"))
                 {                
-                    offHand.Primary = false;
+                    offHand.PrimaryTrigger = false;
                     yield return exit();
                 }
                 else if (entity ? entity.Foe : false)
@@ -1338,7 +1338,7 @@ public class AI : MonoBehaviour
                 }
 
             }
-            offHand.Primary = false;
+            offHand.PrimaryTrigger = false;
         }
         yield return exit();
     }    
@@ -1390,7 +1390,7 @@ public class AI : MonoBehaviour
         dashingONS = false;
         dashingDesiredDirection = Vector3.zero;
         float cachedPeriod = dashingChargePeriod;
-        while (entity.Foe && !entity.Stunned && (dashingDodgeAim || dashingDodgeAttacks || dashingDodgeFoe || dashingLunge || dashingInitiate))
+        while (entity.Foe && !entity.Staggered && (dashingDodgeAim || dashingDodgeAttacks || dashingDodgeFoe || dashingLunge || dashingInitiate))
         {
             if(dashingDesiredDirection == Vector3.zero)
             {
@@ -1428,7 +1428,7 @@ public class AI : MonoBehaviour
                 Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
                 float personalRange = (2.5f * entity.personalBox.radius * entity.scaleActual);
                 bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain && !dashingDodgeFoeDashOnly ? matchupMain.Range : personalRange, matchupOff && !dashingDodgeFoeDashOnly ? matchupOff.Range : personalRange) * 1.20f;
-                if (foeInRange && !entity.Foe.Stunned && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
+                if (foeInRange && !entity.Foe.Staggered && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
                 {
                     temp = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
                 }

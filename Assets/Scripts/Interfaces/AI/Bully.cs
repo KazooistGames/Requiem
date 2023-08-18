@@ -59,8 +59,8 @@ public class Bully : AI
                     bool inRange = entity.Foe && mainWep ? (mainWep.Range) >= (entity.Foe.transform.position - transform.position).magnitude : false;
                     //bool defending = mainWep ? mainWep.Defending : false;
                     //dashingInitiate = (defending && inRange) || entity.Mutated || entity.DashCharging;
-                    dashingCooldownPeriod = entity.Mutated ? 1.0f : 2.0f;
-                    martialPreferredState = entity.Mutated ? martialState.attacking : martialState.none;
+                    //dashingCooldownPeriod = entity.Mutated ? 1.0f : 2.0f;
+                    //martialPreferredState = entity.Mutated ? martialState.attacking : martialState.none;
                 }
                 break;
 

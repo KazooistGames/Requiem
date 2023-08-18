@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Devil : Character
+public class Devil : Passion_Character
 {
 
     protected MeshFilter[] bodyparts;
@@ -23,7 +23,7 @@ public class Devil : Character
         base.Start();
         createProfile();
         gameObject.name = "Devil";
-        Wounded.AddListener(BLEED);
+        EventWounded.AddListener(BLEED);
 
     }
 
