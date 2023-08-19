@@ -5,16 +5,16 @@ using UnityEngine;
 public class Revanent : AI
 {
 
-    private SpiritFlame mainHandFlame;
-    private SpiritFlame offHandFlame;
-    private SpiritFlame footFlame;
+    private _Flames mainHandFlame;
+    private _Flames offHandFlame;
+    private _Flames footFlame;
 
     protected override void Awake()
     {
         base.Awake();
-        mainHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
-        offHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
-        footFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
+        mainHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        offHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        footFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
     }
     protected override void Start()
     {

@@ -19,8 +19,8 @@ public abstract class Armor_Character : Character
     /***** PUBLIC *****/
     public override void Damage(float magnitude)
     {
-        float armorDamage = Mathf.Min(Special, magnitude);
-        Special -= armorDamage;   
+        float armorDamage = Mathf.Min(Poise, magnitude);
+        Poise -= armorDamage;   
         float vitalityDamage = posture == Posture.Stiff ? magnitude : magnitude - armorDamage;
         if (vitalityDamage > 0)
         {
@@ -49,7 +49,7 @@ public abstract class Armor_Character : Character
     {
         isMutatingOnDeath = false;
         Vitality = Strength;
-        Special = Strength;
+        Poise = Strength;
     }
 
     protected override void updatePosture()
@@ -58,11 +58,11 @@ public abstract class Armor_Character : Character
         {
             posture = Posture.Stiff;
         }
-        else if (Special >= Strength)
+        else if (Poise >= Strength)
         {
             posture = Posture.Flow;
         }
-        else if (Special <= 0)
+        else if (Poise <= 0)
         {
             posture = Posture.Stiff;
         }

@@ -67,7 +67,7 @@ public class NephySkully : Armor_Character
         {
             Character entity;
             entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Character>();
-            entity.Special = entity.Strength;
+            entity.Poise = entity.Strength;
             entity.Shove(AI.RandomDirection() * Min_Velocity_Of_Dash);
         }
         Destroy(head);

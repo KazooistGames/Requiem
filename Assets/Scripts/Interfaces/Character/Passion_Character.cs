@@ -36,11 +36,11 @@ public abstract class Passion_Character : Character
         {
             posture = Posture.Stiff;
         }
-        else if (Special >= Strength)
+        else if (Poise >= Strength)
         {
             posture = Posture.Flow;
         }
-        else if (Special <= 0)
+        else if (Poise <= 0)
         {
             posture = Posture.Stiff;
         }

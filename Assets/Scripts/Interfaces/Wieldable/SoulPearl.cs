@@ -6,7 +6,7 @@ using UnityEngine;
 public class SoulPearl : Wieldable
 {
     public Wieldable Phylactery;
-    private SpiritFlame spiritFlame;
+    private _Flames spiritFlame;
     private SphereCollider physicsSphere;
 
     private float timeWanderingSeconds = 0;
@@ -21,13 +21,13 @@ public class SoulPearl : Wieldable
         physicsSphere.center = Vector3.zero;
         physicsSphere.radius = 0.025f;
         PhysicsBoxes.Add(physicsSphere);
-        spiritFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
+        spiritFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
         spiritFlame.transform.SetParent(transform);
         spiritFlame.transform.localPosition = Vector3.zero;
         spiritFlame.shapeModule.shapeType = ParticleSystemShapeType.Circle;
         spiritFlame.shapeModule.radius = 0.001f;
         spiritFlame.shapeModule.scale = Vector3.one * 0.001f;
-        spiritFlame.setFlamePreset(SpiritFlame.Preset.Soulless);
+        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Soulless);
         spiritFlame.particleLight.range /= 2;
         spiritFlame.particleLight.intensity /= 2;
     }

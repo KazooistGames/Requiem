@@ -20,7 +20,7 @@ public class PlayerHUD : MonoBehaviour
     public Slider SoundSlider;
     public Dictionary<string, Text> StatusIndicators = new Dictionary<string, Text>();
 
-    private RectTransform[] statBar;
+    private RectTransform[] statBarTransforms;
     private RectTransform[] tempoBarTransforms;
 
     private void Start()
@@ -30,7 +30,7 @@ public class PlayerHUD : MonoBehaviour
         Message.SetActive(false);
         //MainMenuButton.onClick.AddListener(Requiem.Instance.gotoTitle);        
         MainMenuButton.onClick.AddListener(Game.INSTANCE.QuitGame);
-        statBar = StatBar.GetComponentsInChildren<RectTransform>();
+        statBarTransforms = StatBar.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms = TempoBar.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms[3].sizeDelta = new Vector2(10, 25);
         tempoBarTransforms[3].anchoredPosition = new Vector2(0, -10);        
@@ -41,30 +41,17 @@ public class PlayerHUD : MonoBehaviour
     {
         Player.INSTANCE.mouseSpeedScalar = MouseSlider.value;
         Mullet.SOUND_MASTER_VOLUME = SoundSlider.value;
-        updateInfo();
-        updateStats();
-        updateTempo();
-        updateIndicators();
-        if (Game.INSTANCE.Paused)
+        Text[] metrics = Info.GetComponentsInChildren<Text>();
+        metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
+        metrics[1].text = "Kills:  " + Game.KillCount.ToString();
+        metrics[2].text = "Time:   " + Game.INSTANCE.GameClock.ToString("0.00");
+        if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
-            PauseMenu.SetActive(true);
-        }
-        else
-        {
-            PauseMenu.SetActive(false);
-        }
-        if (Player.INSTANCE.Dead)
-        {
-            Message.SetActive(true);
-            Message.GetComponent<Text>().text = "Dead..";
-        }
-    }
+            statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
+            statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.posture > -1 ? (Player.INSTANCE.HostEntity.posture == Character.Posture.Flow ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
 
-    /**********PRIVATE **********/
-    private void updateTempo()
-    {
-        if(Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
-        {
             if (!Player.INSTANCE.HostEntity.MainHand)
             {
                 TempoBar.SetActive(false);
@@ -77,6 +64,14 @@ public class PlayerHUD : MonoBehaviour
             {
                 Weapon weapon = Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>();
                 TempoBar.SetActive(true);
+                if(weapon.ActionCurrentlyAnimated == Weapon.Action.Coiling)
+                {
+                    fadeTransforms(tempoBarTransforms, 0.75f, 10f);
+                }
+                else
+                {
+                    fadeTransforms(tempoBarTransforms, 0, 1);
+                }
                 tempoBarTransforms[3].anchorMin = new Vector2(weapon.Tempo, 1f);
                 tempoBarTransforms[3].anchorMax = new Vector2(weapon.Tempo, 1f);
                 tempoBarTransforms[2].anchorMin = new Vector2(weapon.TempoTargetCenter, 1f);
@@ -84,37 +79,11 @@ public class PlayerHUD : MonoBehaviour
                 tempoBarTransforms[2].sizeDelta = new Vector2(weapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
             }
         }
-    }
-
-    private void updateStats()
-    {
-        if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
-        {
-            //SpiritBar.GetComponentInChildren<Text>().text = Requiem.Instance.Director.Wave.ToString();
-            statBar[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Special / Player.INSTANCE.HostEntity.Strength, 1f);
-            //statBar[1].GetComponent<Image>().color = Player.INSTANCE.HostEntity.posture >= Entity.Posture.Flow ? new Color(0.7f, 0.5f, 0) : new Color(0.6f, 0.5f, 0.3333f);
-            statBar[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
-            statBar[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
-            statBar[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.posture > -1 ? (Player.INSTANCE.HostEntity.posture == Character.Posture.Flow ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
-        }
         else
         {
-            statBar[1].anchorMax = new Vector2(0, 1f);
-            statBar[3].anchorMax = new Vector2(0, 1f);
+            statBarTransforms[1].anchorMax = new Vector2(0, 1f);
+            statBarTransforms[3].anchorMax = new Vector2(0, 1f);
         }
-        
-    }
-
-    private void updateInfo()
-    {
-        Text[] metrics = Info.GetComponentsInChildren<Text>();
-        metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
-        metrics[1].text = "Kills:  " + Game.KillCount.ToString();
-        metrics[2].text = "Time:   " + Game.INSTANCE.GameClock.ToString("0.00");
-    }
-
-    private void updateIndicators()
-    {
         int i = 0;
         foreach (Text indicator in StatusIndicators.Values)
         {
@@ -133,9 +102,22 @@ public class PlayerHUD : MonoBehaviour
                 i++;
             }
         }
+        if (Game.INSTANCE.Paused)
+        {
+            PauseMenu.SetActive(true);
+        }
+        else
+        {
+            PauseMenu.SetActive(false);
+        }
+        if (Player.INSTANCE.Dead)
+        {
+            Message.SetActive(true);
+            Message.GetComponent<Text>().text = "Dead..";
+        }
     }
-
-    public Text getSetIndicator(string key)
+    /***** PUBLIC *****/
+    public Text setIndicatorOnHUD(string key)
     {
         Text indicator;
         if (StatusIndicators.ContainsKey(key))
@@ -150,6 +132,23 @@ public class PlayerHUD : MonoBehaviour
         }
         return indicator;
     }
+
+    /***** PROTECTED *****/
    
+    /***** PRIVATE *****/
+
+    private void fadeTransforms(Transform[] transforms, float alphaValue, float rate)
+    {
+        foreach (Transform transform in transforms)
+        {
+            Image image = transform.GetComponent<Image>();
+            if (image)
+            {
+                Color color = image.color;
+                image.color = new Color(color.r, color.g, color.b, Mathf.MoveTowards(color.a, alphaValue, Time.deltaTime * rate));
+            }
+        }
+    }
+
 
 }

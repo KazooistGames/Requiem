@@ -29,7 +29,7 @@ public class Struggler : Composure_Character
         {
             bloodSplatter = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");
         }
-        flames.flamePreset = SpiritFlame.Preset.Magic;
+        flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
     }
 
     protected override void Update()

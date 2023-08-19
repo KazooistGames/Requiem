@@ -25,7 +25,7 @@ public class PlayerProgression : MonoBehaviour
             ["Strength"] = (
             BuffDescriptionBuilder("Strength Boost", Player.INSTANCE.HostEntity.Strength-100, 10, "%"),
             () => {
-                Player.INSTANCE.HostEntity.Strength *= 1.1f; Player.INSTANCE.HostEntity.Vitality *= 1.1f; Player.INSTANCE.HostEntity.Special *= 1.1f; ;
+                Player.INSTANCE.HostEntity.Strength *= 1.1f; Player.INSTANCE.HostEntity.Vitality *= 1.1f; Player.INSTANCE.HostEntity.Poise *= 1.1f; ;
                 PowerupList["Strength"] = (
                 BuffDescriptionBuilder("Strength Boost", Player.INSTANCE.HostEntity.Strength-100, 10, "%"),
                 PowerupList["Strength"].Item2);

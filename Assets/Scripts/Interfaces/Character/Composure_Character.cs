@@ -24,7 +24,7 @@ public abstract class Composure_Character : Character
     /***** PUBLIC *****/
     public override void Damage(float magnitude)
     {
-        float poiseDamage = Mathf.Min(Special, magnitude);
+        float poiseDamage = Mathf.Min(Poise, magnitude);
         alterComposure(-poiseDamage);
         float vitalityDamage = posture == Posture.Stiff ? magnitude : magnitude - poiseDamage;
         if (vitalityDamage > 0)
@@ -43,9 +43,9 @@ public abstract class Composure_Character : Character
             Rebuke(0.25f + 1.5f * (-value / Strength));
             return;
         }
-        float existingDelta = Special - COMPOSURE_RESTING_PERCENTAGE * Strength;
-        Special += value;
-        Special = Mathf.Clamp(Special, -1, Strength);
+        float existingDelta = Poise - COMPOSURE_RESTING_PERCENTAGE * Strength;
+        Poise += value;
+        Poise = Mathf.Clamp(Poise, -1, Strength);
         if (value * existingDelta >= 0)
         {
             composureDebounceTimer = 0.0f;
@@ -68,7 +68,7 @@ public abstract class Composure_Character : Character
         base.updateStats();
         if (Staggered)
         {
-            Special = 0;
+            Poise = 0;
         }
         else
         {
@@ -76,22 +76,22 @@ public abstract class Composure_Character : Character
             {
                 float increment = Resolve * Time.deltaTime * Strength / COMPOSURE_REGEN_PERIOD;
                 float restingValue = COMPOSURE_RESTING_PERCENTAGE * Strength;
-                float delta = Special - restingValue;
+                float delta = Poise - restingValue;
                 if (Mathf.Abs(delta) <= increment)
                 {
-                    Special = COMPOSURE_RESTING_PERCENTAGE * Strength;
+                    Poise = COMPOSURE_RESTING_PERCENTAGE * Strength;
                 }
-                else if (Special > restingValue)
+                else if (Poise > restingValue)
                 {
-                    Special -= increment;
+                    Poise -= increment;
                 }
-                else if (Special < restingValue)
+                else if (Poise < restingValue)
                 {
-                    Special += increment;
+                    Poise += increment;
                 }
             }
         }
-        Special = Mathf.Clamp(Special, 0, Strength);
+        Poise = Mathf.Clamp(Poise, 0, Strength);
     }
 
     protected override void updatePosture()
@@ -100,11 +100,11 @@ public abstract class Composure_Character : Character
         {
             posture = Posture.Stiff;
         }
-        else if (Special >= Strength)
+        else if (Poise >= Strength)
         {
             posture = Posture.Flow;
         }
-        else if (Special <= 0)
+        else if (Poise <= 0)
         {
             posture = Posture.Stiff;
         }

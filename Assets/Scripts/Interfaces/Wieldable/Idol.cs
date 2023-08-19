@@ -8,7 +8,7 @@ public class Idol : Bone
 {
     public static Idol INSTANCE;
 
-    public SpiritFlame spiritFlame;
+    public _Flames spiritFlame;
 
     private GameObject prompt;
     private GameObject currentBlurb;
@@ -63,7 +63,7 @@ public class Idol : Bone
         INSTANCE = this;
         equipType = EquipType.Burdensome;
         pitchScalar = 0.6f;
-        spiritFlame = GetComponentInChildren<SpiritFlame>();
+        spiritFlame = GetComponentInChildren<_Flames>();
         StartCoroutine(banter());
         Body.mass = 3f;
     }
@@ -102,7 +102,7 @@ public class Idol : Bone
     private IEnumerator banter()
     {
         yield return new WaitUntil(() => Player.INSTANCE);
-        spiritFlame.setFlamePreset(SpiritFlame.Preset.Magic);
+        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Magic);
         float timeOfLastBlurb = 0;
         yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
         timeOfLastBlurb = sayShit(greetings);

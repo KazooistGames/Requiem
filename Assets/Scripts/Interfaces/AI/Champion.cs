@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Champion : AI
 {
-    private SpiritFlame mainHandFlame;
-    private SpiritFlame offHandFlame;
-    private SpiritFlame footFlame;
+    private _Flames mainHandFlame;
+    private _Flames offHandFlame;
+    private _Flames footFlame;
 
     protected override void Awake()
     {
         base.Awake();
-        mainHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
-        offHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
-        footFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
+        mainHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        offHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        footFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
     }
     protected override void Start()
     {
@@ -36,7 +36,7 @@ public class Champion : AI
     protected override void Update()
     {
         base.Update();
-        updateFlames(SpiritFlame.Preset.Inferno);
+        updateFlames(_Flames.FlameStyles.Inferno);
         switch (State)
         {
             case AIState.none:
@@ -84,7 +84,7 @@ public class Champion : AI
         base.OnTriggerExit(other);
     }
 
-    private void updateFlames(SpiritFlame.Preset flameLevel)
+    private void updateFlames(_Flames.FlameStyles flameLevel)
     {
         if (footFlame.transform.parent != entity.transform)
         {
@@ -94,7 +94,7 @@ public class Champion : AI
         }
         else
         {
-            footFlame.setFlamePreset(flameLevel);
+            footFlame.SetFlamePresentation(flameLevel);
         }
 
         if (entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : false)
@@ -117,7 +117,7 @@ public class Champion : AI
         else
         {
             mainHandFlame.transform.SetParent(transform);
-            mainHandFlame.setFlamePreset(0);
+            mainHandFlame.SetFlamePresentation(0);
         }
 
         if (entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : false)
@@ -141,7 +141,7 @@ public class Champion : AI
         else
         {
             offHandFlame.transform.SetParent(transform);
-            offHandFlame.setFlamePreset(0);
+            offHandFlame.SetFlamePresentation(0);
         }
     }
 

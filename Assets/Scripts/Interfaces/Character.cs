@@ -19,8 +19,8 @@ public abstract class Character : MonoBehaviour
     public int Lvl = 0;
 
     public float Vitality;
-    public float Speed;
-    public float Special;
+    public float Agility;
+    public float Poise;
    
     public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
@@ -143,7 +143,7 @@ public abstract class Character : MonoBehaviour
     }
     public Loyalty Allegiance = Loyalty.neutral;
 
-    protected SpiritFlame flames;
+    protected _Flames flames;
 
     //******************Functions*************************
     protected virtual void Awake()
@@ -205,10 +205,10 @@ public abstract class Character : MonoBehaviour
         indicator.orthographicSize = berthActual * scaleActual;
         indicator.transform.parent = transform;
         indicator.enabled = false;
-        flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
+        flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
         flames.bindToObject(gameObject);
-        flames.flamePreset = SpiritFlame.Preset.Magic;
-        Special = Strength;
+        flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
+        Poise = Strength;
         StartCoroutine(routineDashHandler());
     }
 
@@ -272,7 +272,7 @@ public abstract class Character : MonoBehaviour
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
         modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed ) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
-        SpeedActual = Speed * SpeedScalarGlobal;
+        SpeedActual = Agility * SpeedScalarGlobal;
         hurtBox.radius = Shoved ? berthActual * 0.8f : berthActual;
         if (Shoved)
         {
@@ -481,7 +481,7 @@ public abstract class Character : MonoBehaviour
         body.mass = Strength * scaleActual;
         //Stunned = (MainHand ? MainHand.Rebuked : false) || (OffHand ? OffHand.Rebuked : false);
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
-        Speed = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
+        Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
     }
 
 

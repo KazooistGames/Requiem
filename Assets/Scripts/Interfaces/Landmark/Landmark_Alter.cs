@@ -82,12 +82,12 @@ public class Landmark_Alter : Landmark
         float pentagramRadius = (Hextile.Radius * 2) * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount-1);
         float pentagramHeight = (Hextile.Thickness / 2) + (StepCount + 1) * StepHeight;
         Vector3 flameScale = new Vector3(0.05f, 0.1f, 0.05f);
-        SpiritFlame ritualFlame;
-        ritualFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
+        _Flames ritualFlame;
+        ritualFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
         ritualFlame.transform.SetParent(Tile.gameObject.transform, false);
         ritualFlame.shapeModule.shapeType = ParticleSystemShapeType.Donut;
         ritualFlame.shapeModule.scale = flameScale;
-        ritualFlame.setFlamePreset(0);
+        ritualFlame.SetFlamePresentation(0);
         ritualFlame.particleLight.intensity = 1f;
         LineRenderer Lines;
         Lines = gameObject.AddComponent<LineRenderer>();
@@ -105,13 +105,13 @@ public class Landmark_Alter : Landmark
             AI.angleToDirection(342) * 0.4f * pentagramRadius,
             AI.angleToDirection(198) * 0.4f * pentagramRadius,
         };
-        SpiritFlame.Preset flamePreset = SpiritFlame.Preset.Magic;
+        _Flames.FlameStyles flamePreset = _Flames.FlameStyles.Magic;
         while (true)
         {
             float drawTimer = 0.0f;
             float timerRatio;
             Used = false;
-            ritualFlame.setFlamePreset(flamePreset);
+            ritualFlame.SetFlamePresentation(flamePreset);
             ritualFlame.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
             yield return new WaitUntil(() => Energized);
             ritualFlame.shapeModule.scale = flameScale;
@@ -140,9 +140,9 @@ public class Landmark_Alter : Landmark
                 yield return null;
             }
             ritualFlame.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
-            ritualFlame.setFlamePreset(flamePreset);
+            ritualFlame.SetFlamePresentation(flamePreset);
             Used = true;
-            ritualFlame.setFlamePreset(0);
+            ritualFlame.SetFlamePresentation(0);
             yield return new WaitWhile(() => Energized);
             float fadeOutTimer = 0;
             float fadeOutPeriod = 3;

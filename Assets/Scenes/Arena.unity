@@ -123,6 +123,105 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &74375184
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74375186}
+  - component: {fileID: 74375185}
+  m_Layer: 0
+  m_Name: halberd
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &74375185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74375184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1c1ed294b22014c92da3fa25c9c2c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EventDropped:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+  EventThrown:
+    m_PersistentCalls:
+      m_Calls: []
+  ImpalingSomething: 0
+  Heft: 25
+  Idling: 1
+  Rebuked: 0
+  Wielder: {fileID: 0}
+  Allegiance: 0
+  Wielded: 0
+  MountTarget: {fileID: 0}
+  PrimaryTrigger: 0
+  Secondary: 0
+  Tertiary: 0
+  ThrowTrigger: 0
+  Anim: {fileID: 0}
+  Body: {fileID: 0}
+  HitBox: {fileID: 0}
+  PhysicsBoxes: []
+  Filter: {fileID: 0}
+  Renderer: {fileID: 0}
+  MostRecentWielder: {fileID: 0}
+  Telecommuting: 0
+  Thrown: 0
+  equipType: -1
+  EventHitting:
+    m_PersistentCalls:
+      m_Calls: []
+  EventClashedWeapon:
+    m_PersistentCalls:
+      m_Calls: []
+  EventBlockedWeapon:
+    m_PersistentCalls:
+      m_Calls: []
+  EventParriedWeapon:
+    m_PersistentCalls:
+      m_Calls: []
+  EventSwinging:
+    m_PersistentCalls:
+      m_Calls: []
+  EventRebuked:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionCurrentlyAnimated: 0
+  Throwing: 0
+  Range: 0
+  Power: 0
+  BasePower: 0
+  TrueStrike: 0
+--- !u!4 &74375186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74375184}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &479332496
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +327,7 @@ GameObject:
   - component: {fileID: 483834058}
   - component: {fileID: 483834059}
   m_Layer: 0
-  m_Name: GameObject (6)
+  m_Name: spear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -278,7 +377,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
-  Primary: 0
+  PrimaryTrigger: 0
   Secondary: 0
   Tertiary: 0
   ThrowTrigger: 0

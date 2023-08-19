@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpiritFlame : MonoBehaviour
+public class _Flames : MonoBehaviour
 {
     protected ParticleSystem particles;
     public Light particleLight;
@@ -11,26 +11,18 @@ public class SpiritFlame : MonoBehaviour
     public ParticleSystem.ShapeModule shapeModule;
     public ParticleSystem.ColorOverLifetimeModule colorModule;
 
-    public float PowerLevel = 1.0f;
+    public float PowerLevel = 100f;
 
     private static List<Gradient> gradients = new List<Gradient>();
     private static List<Color> colors = new List<Color>();
-    public enum Preset
+    public enum FlameStyles
     {
-        Off = 0,
         Inferno = 1,
         Soulless = 2,
         Magic = 3
     }
-    public Preset flamePreset = 0;
+    public FlameStyles FlamePresentationStyle = FlameStyles.Magic;
 
-    public enum Mode
-    {
-        Off = 0,
-        Manual = 1,
-        Auto = 2
-    }
-    public Mode flameMode = Mode.Manual;
     public GameObject boundObject;
 
     private float lightIntensityMin = 3f;
@@ -53,72 +45,74 @@ public class SpiritFlame : MonoBehaviour
 
     private void Start()
     {
-        buildGradients(); 
+        buildGradients();
+        //emissionModule.rateOverTime = 200;
+        //emissionModule.rateOverDistance = 200;
+        //particleLight.intensity = Mathf.Lerp(lightIntensityMin, lightIntensityMax, PowerLevel);
+        //particleLight.range = Mathf.Lerp(lightRangeMin, lightRangeMax, PowerLevel);
+
     }
 
     private void Update()
     {
-        if(flameMode == Mode.Auto)
+        if (boundObject)
         {
-            if (boundObject)
+            //setFlamePreset(FlameStyle);
+            Character boundEntity = boundObject.gameObject.GetComponent<Character>();
+            Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
+            if (boundWeapon)
             {
-                setFlamePreset(flamePreset);
-                Character boundEntity = boundObject.gameObject.GetComponent<Character>();
-                Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
-                if (boundWeapon)
+                emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.ActionCurrentlyAnimated == Weapon.Action.Parrying;
+                if (boundWeapon.TrueStrike)
                 {
-                    boundEntity = boundWeapon.MostRecentWielder;
+                    SetFlamePresentation(FlameStyles.Inferno);
                 }
-                if (boundEntity)
+                else if (boundWeapon.ActionCurrentlyAnimated == Weapon.Action.Parrying)
                 {
-                    emissionModule.enabled = boundWeapon ? boundWeapon.TrueStrike : boundEntity.FinalDash;
-                    PowerLevel = boundEntity.Resolve * 10;
-                    emissionModule.rateOverTime = Mathf.Lerp(emissionOverTimeMin, emissionOverTimeMax, PowerLevel);
-                    emissionModule.rateOverDistance = Mathf.Lerp(emissionOverDistanceMax, emissionOverDistanceMin, PowerLevel);
-                    particleLight.intensity = Mathf.Lerp(lightIntensityMin, lightIntensityMax, PowerLevel);
-                    particleLight.range = Mathf.Lerp(lightRangeMin, lightRangeMax, PowerLevel);
+                    SetFlamePresentation(FlameStyles.Soulless);
                 }
             }
-            else
+            else if (boundEntity)
             {
-                emissionModule.enabled = false;
+                emissionModule.enabled = boundEntity.FinalDash;
+            }
+            if (emissionModule.enabled)
+            {
+                //emissionModule.rateOverTime = Mathf.Lerp(emissionOverTimeMin, emissionOverTimeMax, PowerLevel);
+                //emissionModule.rateOverDistance = Mathf.Lerp(emissionOverDistanceMin, emissionOverDistanceMax, PowerLevel);
+                //particleLight.intensity = Mathf.Lerp(lightIntensityMin, lightIntensityMax, PowerLevel);
+                //particleLight.range = Mathf.Lerp(lightRangeMin, lightRangeMax, PowerLevel);
             }
         }
+        else
+        {
+            emissionModule.enabled = false;
+        }        
     }
-    /********** custom functions ************/
-    public void setFlamePreset(Preset preset)
+
+    /***** PUBLIC *****/
+    public void SetFlamePresentation(FlameStyles preset)
     {
+        if(preset == FlamePresentationStyle) { return; }
         ParticleSystem.MinMaxGradient flameGradient = colorModule.color;
-        //particleLight.intensity = 7.5f;
-        //particleLight.range = 0.5f;
-        if (flameMode == Mode.Manual)
-        {
-            emissionModule.enabled = true;
-        }
         switch (preset)
         {
-            case Preset.Off:
-                if(flameMode == Mode.Manual)
-                {
-                    emissionModule.enabled = false;
-                }
-                break;
-            case Preset.Inferno:
+            case FlameStyles.Inferno:
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
-            case Preset.Soulless:
+            case FlameStyles.Soulless:
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
-            case Preset.Magic:
+            case FlameStyles.Magic:
                 flameGradient.mode = ParticleSystemGradientMode.TwoGradients;
                 flameGradient.gradientMin = gradients[0];
                 flameGradient.gradientMax = gradients[1];
                 break;
         }
         colorModule.color = flameGradient;
-        flamePreset = preset;    
+        FlamePresentationStyle = preset;    
     }
 
     public void bindToObject(GameObject bindingObject)
@@ -126,8 +120,7 @@ public class SpiritFlame : MonoBehaviour
         if (!bindingObject) { return; }
         boundObject = bindingObject;
         buildGradients();
-        flameMode = Mode.Auto;
-        setFlamePreset(flamePreset);
+        SetFlamePresentation(FlamePresentationStyle);
         transform.SetParent(boundObject.transform, false);
         Character boundEntity = boundObject.gameObject.GetComponent<Character>();
         Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
@@ -148,6 +141,7 @@ public class SpiritFlame : MonoBehaviour
         }
     }
 
+    /***** PRIVATE *****/
     private void buildGradients()
     {
         if (colors.Count == 0)
@@ -209,6 +203,6 @@ public class SpiritFlame : MonoBehaviour
             );
             gradients.Add(gradientThree);
         }
-        setFlamePreset(flamePreset);
+        SetFlamePresentation(FlamePresentationStyle);
     }
 }

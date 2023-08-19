@@ -74,7 +74,7 @@ public abstract class Weapon : Wieldable
     protected float defendRadius = 0.1f;
     protected Collider blade;
 
-    protected SpiritFlame flames;
+    protected _Flames flames;
 
     private GameObject impaledObject;
 
@@ -132,9 +132,9 @@ public abstract class Weapon : Wieldable
                 blade = box;
             }
         }
-        flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<SpiritFlame>();
+        flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
         flames.bindToObject(gameObject);
-        flames.flamePreset = SpiritFlame.Preset.Magic;
+        flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         gameObject.AddComponent<WeaponRangeFinder>();
         StartCoroutine(routineTempo());
     }
@@ -196,7 +196,6 @@ public abstract class Weapon : Wieldable
                         {
                             TrueStrike = true;
                         }
-                        //modPower["Tempo"] = Wielder.Tempo * BasePower;
                         EventSwinging.Invoke();
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
@@ -207,6 +206,10 @@ public abstract class Weapon : Wieldable
                     }
                     modifyWielderSpeed(swingValue: heftSlowModifier);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
+                }
+                else if (ActionCurrentlyAnimated == Action.Recovering)
+                {
+                    modifyWielderSpeed(swingValue: 0);
                 }
                 else if (ActionCurrentlyAnimated == Action.Guarding)
                 {
