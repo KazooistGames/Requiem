@@ -9,12 +9,13 @@ public abstract class Weapon : Wieldable
 {
     public static UnityEvent<Weapon> On_Weapon_Hit = new UnityEvent<Weapon> { };
 
-    public UnityEvent<Character> EventHitting = new UnityEvent<Character>();
-    public UnityEvent<Weapon> EventClashedWeapon = new UnityEvent<Weapon>();
-    public UnityEvent<Weapon> EventBlockedWeapon = new UnityEvent<Weapon>();
-    public UnityEvent<Weapon> EventParriedWeapon = new UnityEvent<Weapon>();
-    public UnityEvent EventSwinging = new UnityEvent();
-    public UnityEvent EventRebuked = new UnityEvent();
+    public UnityEvent<Weapon, Character> EventHitting = new UnityEvent<Weapon, Character>();
+    public UnityEvent<Weapon, Weapon> EventClashedWeapon = new UnityEvent<Weapon, Weapon>();
+    public UnityEvent<Weapon, Weapon> EventBlockedWeapon = new UnityEvent<Weapon, Weapon>();
+    public UnityEvent<Weapon, Weapon> EventParriedWeapon = new UnityEvent<Weapon, Weapon>();
+    public UnityEvent<Weapon, Weapon> EventWasParried = new UnityEvent<Weapon, Weapon>();
+    public UnityEvent<Weapon> EventSwinging = new UnityEvent<Weapon>();
+    public UnityEvent<Weapon> EventRebuked = new UnityEvent<Weapon>();
 
     public enum Action
     {
@@ -51,8 +52,8 @@ public abstract class Weapon : Wieldable
 
     public bool TrueStrike = false;
     public float Tempo { get; private set; }
-    public float TempoTargetCenter { get; private set; } = 0.925f;
-    public float TempoTargetWidth { get; private set; } = 0.15f;
+    public float TempoTargetCenter { get; private set; } = 0.90f;
+    public float TempoTargetWidth { get; private set; } = 0.2f;
 
 
     protected string swingClip;
@@ -166,7 +167,7 @@ public abstract class Weapon : Wieldable
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
-                    modifyWielderSpeed(swingValue: Mathf.Lerp(0, -1, (rebukePeriod - rebukeTimer) * 3));
+                    //modifyWielderSpeed(swingValue: Mathf.Lerp(0, -1, (rebukePeriod - rebukeTimer) * 3));
                     setHighlightColor(Color.gray);
                 }
                 else if (ActionCurrentlyAnimated == Action.Idle)
@@ -196,7 +197,7 @@ public abstract class Weapon : Wieldable
                         {
                             TrueStrike = true;
                         }
-                        EventSwinging.Invoke();
+                        EventSwinging.Invoke(this);
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
                         HitBox.isTrigger = true;
@@ -237,10 +238,10 @@ public abstract class Weapon : Wieldable
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
 
-                Anim.SetBool("primary", PrimaryTrigger && !Rebuked);
-                Anim.SetBool("secondary", Secondary && !Rebuked);
-                Anim.SetBool("tertiary", Tertiary && !Rebuked);
-                Anim.SetBool("rebuked", Rebuked);
+                Anim.SetBool("primary", PrimaryTrigger && !Recoiling);
+                Anim.SetBool("secondary", SecondaryTrigger && !Recoiling);
+                Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
+                Anim.SetBool("rebuked", Recoiling);
                 Anim.Update(0);
             }
             else
@@ -274,7 +275,7 @@ public abstract class Weapon : Wieldable
             Character foe = collision.gameObject.GetComponent<Character>();
             if (foe ? foe.Allegiance != MostRecentWielder.Allegiance : false)
             {
-                if (RESOLVE_STRIKE(this, foe))
+                if (RESOLVE_HIT(this, foe))
                 {
                     StartCoroutine(ImpaleRoutine(collision));
                 }
@@ -328,7 +329,7 @@ public abstract class Weapon : Wieldable
                     {
                         if (ActionCurrentlyAnimated == Action.Attacking)
                         {
-                            RESOLVE_STRIKE(this, foe);
+                            RESOLVE_HIT(this, foe);
                         }
                         else
                         {
@@ -365,16 +366,16 @@ public abstract class Weapon : Wieldable
 
     /**********PUBLIC**************/
 
-    public void Rebuke(float recoveryTime, bool postureAgnostic = false)
-    {
-        if (recoveryTime >= rebukePeriod - rebukeTimer)
-        {
-            rebukeTimer = 0;
-            rebukePeriod = recoveryTime;
-            Rebuked = true;
-            HitBox.enabled = false;
-        }
-    }
+    //public void Recoil(float recoveryTime)
+    //{
+    //    if (recoveryTime >= rebukePeriod - rebukeTimer)
+    //    {
+    //        rebukeTimer = 0;
+    //        rebukePeriod = recoveryTime;
+    //        Recoiling = true;
+    //        HitBox.enabled = false;
+    //    }
+    //}
 
     /**********PROTECTED**************/
 
@@ -383,37 +384,37 @@ public abstract class Weapon : Wieldable
     /**********PRIVATE**************/
 
 
-    private static void RESOLVE_PARRY(Weapon Parried, Weapon Parrier)
+    private static void RESOLVE_PARRY(Weapon Attacker, Weapon Parrier)
     {
-        if (Parried.Wielder)
+        if (Attacker.Wielder)
         {
             //float parryMagnitude = Mathf.Sqrt(Parried.Heft * Parrier.Heft);
-            Parried.Wielder.Rebuke(Parried.Heft / Parried.Wielder.Strength);
-            if (Parried.Wielder.posture == Character.Posture.Stiff)
+            Attacker.Wielder.Stagger(Attacker.Heft / Attacker.Wielder.Strength);
+            if (Attacker.Wielder.posture == Character.Posture.Weak)
             {
                 //Parried.Wielder.alterPoise(-Parried.Power);
-                Parried.Wielder.Disarm();
+                Attacker.Wielder.Disarm();
             }
             else
             {
                 //Parried.Wielder.alterPoise(-Parried.Power);
             }
-            Parried.playClang(1.0f);
+            Attacker.playClang(1.0f);
         }
-        else if (Parried.Thrown)
+        else if (Attacker.Thrown)
         {
-            Parried.Body.velocity = -Parried.Body.velocity;
-            Parried.MostRecentWielder = Parrier.Wielder;
+            Attacker.Body.velocity = -Attacker.Body.velocity;
+            Attacker.MostRecentWielder = Parrier.Wielder;
         }
-        Parrier.EventParriedWeapon.Invoke(Parried);
-        Parrier.itemCollisionONS(Parried);
+        Attacker.EventWasParried.Invoke(Attacker, Parrier);
+        Parrier.EventParriedWeapon.Invoke(Parrier, Attacker);
+        Parrier.itemCollisionONS(Attacker);
     }
 
     private static void RESOLVE_BLOCK(Weapon Attacker, Weapon Blocker)
     {
-        Blocker.EventBlockedWeapon.Invoke(Attacker);
-        Attacker.EventClashedWeapon.Invoke(Blocker);
-        //Blocker.Wielder.alterPoise(-Attacker.Power * Attacker.Heft / Blocker.Wielder.Strength);
+        Blocker.EventBlockedWeapon.Invoke(Blocker, Attacker);
+        Attacker.EventClashedWeapon.Invoke(Attacker, Blocker);
         APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: 0.5f);
         Attacker.playClang(2.0f);        
     }
@@ -434,7 +435,6 @@ public abstract class Weapon : Wieldable
         {
             Attacker.itemCollisionONS(Defender);
             Attacker.playClang(1.0f);
-            Defender.Wielder.Disarm();
             return;
         }
         Attacker.entityCollisionONS(Defender.Wielder);
@@ -448,38 +448,30 @@ public abstract class Weapon : Wieldable
         }   
     }
 
-    private static bool RESOLVE_STRIKE(Weapon weapon, Character entity)
+    private static bool RESOLVE_HIT(Weapon weapon, Character entity)
     {
-        if (entity.Allegiance != weapon.Allegiance)
+        if(entity.Allegiance == weapon.Allegiance) {  return false; }
+        weapon.entityCollisionONS(entity);
+        GameObject obstruction = testObstructionBetweenEntities(entity, weapon.MostRecentWielder);
+        if (!obstruction)
         {
-            weapon.entityCollisionONS(entity);
-            GameObject obstruction = testObstructionBetweenEntities(entity, weapon.MostRecentWielder);
-            if (obstruction)
-            {
-                Weapon entityWeapon = obstruction.GetComponent<Weapon>();
-                if(!entityWeapon)
-                {
-                    weapon.entityCollisionONS(entity);
-                    return false;
-                }
-                else 
-                {
-                    if (!weapon.TrueStrike)
-                    {
-                        RESOLVE_CLASH(weapon, entityWeapon);
-                        return false;
-                    }
-                }
-            }
-            weapon.EventHitting.Invoke(entity);
+            weapon.EventHitting.Invoke(weapon, entity);
             entity.Damage(weapon.Power);
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, entity);
             weapon.playSlap(entity.transform.position);
             weapon.entityCollisionONS(entity);
             On_Weapon_Hit.Invoke(weapon);
-            return true;                        
+            return true;
         }
-        return false;       
+        else if (!obstruction.GetComponent<Weapon>())
+        {
+            weapon.entityCollisionONS(entity);
+        }
+        //else if (!weapon.TrueStrike)
+        //{
+        //    RESOLVE_CLASH(weapon, obstruction.GetComponent<Weapon>());
+        //}
+        return false;      
     }
 
 
@@ -517,7 +509,7 @@ public abstract class Weapon : Wieldable
             }
             if (foe)
             {
-                foe.Pickup.AddListener(PickupItem);
+                foe.EventAttemptPickup.AddListener(PickupItem);
                 string key = "impaled" + gameObject.GetHashCode().ToString();
                 if (foe.Vitality > 0)
                 {
@@ -527,7 +519,7 @@ public abstract class Weapon : Wieldable
                     foe.EventVanquished.AddListener(impale_release);
                     foe.modSpeed[key] = -(Power/foe.Strength);
                     foe.BleedingWounds[key] = (Power / 5, float.PositiveInfinity);
-                    yield return new WaitWhile(() => foe ? foe.posture <= Character.Posture.Flow : false);
+                    yield return new WaitWhile(() => foe ? foe.posture <= Character.Posture.Strong : false);
                     if (foe)
                     {
                         impale_release();
@@ -650,13 +642,12 @@ public abstract class Weapon : Wieldable
     private void resetWeapon()
     {
         PrimaryTrigger = false;
-        Secondary = false;
-        Tertiary = false;
+        SecondaryTrigger = false;
+        TertiaryTrigger = false;
         Anim.SetBool("primary", false);
         Anim.SetBool("secondary", false);
         Anim.SetBool("tertiary", false);
         Anim.SetBool("rebuked", false);
-        Rebuked = false;
         if (Wielder)
         {
             modifyWielderSpeed(0, 0);

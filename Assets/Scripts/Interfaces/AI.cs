@@ -1345,16 +1345,16 @@ public class AI : MonoBehaviour
 
     private IEnumerator martialDefendCycle(Weapon mainHand, Weapon offHand)
     {
-        mainHand.Secondary = false;
+        mainHand.SecondaryTrigger = false;
         if (offHand)
         {
-            offHand.Secondary = false;
+            offHand.SecondaryTrigger = false;
         }
         yield return new WaitForSeconds(1 - Intelligence);
-        mainHand.Secondary = true;
+        mainHand.SecondaryTrigger = true;
         if (offHand)
         {
-            offHand.Secondary = true;
+            offHand.SecondaryTrigger = true;
         }
         yield break;
     }

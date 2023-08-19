@@ -25,14 +25,14 @@ public class _Flames : MonoBehaviour
 
     public GameObject boundObject;
 
-    private float lightIntensityMin = 3f;
-    private float lightIntensityMax = 5.0f;
-    private float lightRangeMin = 0.5f;
-    private float lightRangeMax = 0.8f;
-    private float emissionOverTimeMin = 0;
-    private float emissionOverTimeMax = 250;
-    private float emissionOverDistanceMin = 0;
-    private float emissionOverDistanceMax = 1000;
+    //private float lightIntensityMin = 3f;
+    //private float lightIntensityMax = 5.0f;
+    //private float lightRangeMin = 0.5f;
+    //private float lightRangeMax = 0.8f;
+    //private float emissionOverTimeMin = 0;
+    //private float emissionOverTimeMax = 250;
+    //private float emissionOverDistanceMin = 0;
+    //private float emissionOverDistanceMax = 1000;
 
     private void Awake()
     {

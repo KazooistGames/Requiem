@@ -23,49 +23,14 @@ public class Devil : Passion_Character
         base.Start();
         createProfile();
         gameObject.name = "Devil";
-        EventWounded.AddListener(BLEED);
+        EventWounded.AddListener(fleshWound);
 
     }
 
-    protected override void Update()
-    {
-        base.Update();
-    }
 
-    protected override void FixedUpdate()
-    {
-        base.FixedUpdate();
-    }
+    /***** PUBLIC *****/
 
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-
-    //CUSTOM FUNCTIONS!!!!!!!!!!!!!
-
-
-    private void createProfile()
-    {
-        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/devilBody"));
-        model.gameObject.name = "Model";
-        model.transform.SetParent(transform, false);
-        model.transform.localPosition = Vector3.zero;
-        bodyparts = model.GetComponentsInChildren<MeshFilter>();
-        head = bodyparts[0].gameObject;
-        torso = bodyparts[1].gameObject;
-        leg1 = bodyparts[2].gameObject;
-        leg2 = bodyparts[3].gameObject;
-        foreach (MeshFilter bone in bodyparts)
-        {
-            bone.gameObject.layer = gameObject.layer;
-            if (bone.gameObject.GetComponent<MeshRenderer>())
-            {
-                bone.gameObject.GetComponent<MeshRenderer>().enabled = true;
-            }
-        }
-    }
-
+    /***** PROTECTED *****/
     protected override void Die()
     {
         if (model)
@@ -90,6 +55,45 @@ public class Devil : Passion_Character
         }
         Mullet.PlayAmbientSound(Game.deathSounds[UnityEngine.Random.Range(0, Game.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         base.Die();
+    }
+
+
+    /***** PRIVATE *****/
+    private void fleshWound(float damage)
+    {
+        if (Vitality > 0)
+        {
+            Mullet.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 1.0f, 0.5f).layer = gameObject.layer;
+        }
+        if (!BLOOD_SPLATTER_PREFAB)
+        {
+            BLOOD_SPLATTER_PREFAB = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");
+        }
+        GameObject splatter = Instantiate(BLOOD_SPLATTER_PREFAB);
+        splatter.transform.position = transform.position;
+        splatter.transform.eulerAngles = new Vector3(45, UnityEngine.Random.value * 360f, 45);
+        splatter.GetComponent<Projector>().orthographicSize = Mathf.Lerp(0.05f, 0.70f, (damage / 100));
+    }
+
+    private void createProfile()
+    {
+        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/devilBody"));
+        model.gameObject.name = "Model";
+        model.transform.SetParent(transform, false);
+        model.transform.localPosition = Vector3.zero;
+        bodyparts = model.GetComponentsInChildren<MeshFilter>();
+        head = bodyparts[0].gameObject;
+        torso = bodyparts[1].gameObject;
+        leg1 = bodyparts[2].gameObject;
+        leg2 = bodyparts[3].gameObject;
+        foreach (MeshFilter bone in bodyparts)
+        {
+            bone.gameObject.layer = gameObject.layer;
+            if (bone.gameObject.GetComponent<MeshRenderer>())
+            {
+                bone.gameObject.GetComponent<MeshRenderer>().enabled = true;
+            }
+        }
     }
 
 }

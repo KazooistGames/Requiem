@@ -10,18 +10,18 @@ public class Wieldable : MonoBehaviour
     public static RuntimeAnimatorController defaultAnimController;
     public static RuntimeAnimatorController defaultAnimController2H;
 
-    public UnityEvent EventDropped = new UnityEvent();
-    public UnityEvent EventPickedUp = new UnityEvent();
-    public UnityEvent EventThrown = new UnityEvent();
+    public UnityEvent<Wieldable> EventDropped = new UnityEvent<Wieldable>();
+    public UnityEvent<Wieldable> EventPickedUp = new UnityEvent<Wieldable>();
+    public UnityEvent<Wieldable> EventThrown = new UnityEvent<Wieldable>();
 
     public bool ImpalingSomething = false;
 
     public float Heft = 25;
 
     public bool Idling = true;
-    public bool Rebuked = false;
-    protected float rebukeTimer = 0f;
-    protected float rebukePeriod = 0.0f;
+    public bool Recoiling = false;
+    //protected float rebukeTimer = 0f;
+    //protected float rebukePeriod = 0.0f;
 
     public Character Wielder;
     public Character.Loyalty Allegiance = Character.Loyalty.neutral;
@@ -29,8 +29,8 @@ public class Wieldable : MonoBehaviour
     public GameObject MountTarget;
 
     public bool PrimaryTrigger = false;
-    public bool Secondary = false;
-    public bool Tertiary = false;
+    public bool SecondaryTrigger = false;
+    public bool TertiaryTrigger = false;
     public bool ThrowTrigger = false;
 
     public Animator Anim;
@@ -50,13 +50,11 @@ public class Wieldable : MonoBehaviour
 
     public enum EquipType
     {
-        Unequippable = -1,
-        Consummable = 0,
         OneHanded = 1,
         TwoHanded = 2,  
         Burdensome = 3,
     }
-    public EquipType equipType = EquipType.Unequippable;
+    public EquipType equipType;
 
     protected virtual void Awake()
     {
@@ -82,21 +80,22 @@ public class Wieldable : MonoBehaviour
 
     protected virtual void Update()
     {
+        Recoiling = Wielder ? Wielder.Staggered : false;
         if (Wielder)
         {
-            if (Rebuked)
-            {
-                if (rebukeTimer >= rebukePeriod)
-                {
-                    Rebuked = false;
-                    rebukeTimer = 0;
-                    rebukePeriod = 0;
-                }
-                else
-                {
-                    rebukeTimer += Time.deltaTime;
-                }
-            }
+            //if (Rebuked)
+            //{
+            //    if (rebukeTimer >= rebukePeriod)
+            //    {
+            //        Rebuked = false;
+            //        rebukeTimer = 0;
+            //        rebukePeriod = 0;
+            //    }
+            //    else
+            //    {
+            //        rebukeTimer += Time.deltaTime;
+            //    }
+            //}
             MostRecentWielder = Wielder;
             if (!Anim.runtimeAnimatorController)
             {
@@ -116,8 +115,8 @@ public class Wieldable : MonoBehaviour
             nextAnimation = Anim.GetNextAnimatorStateInfo(0);
             if (Anim.enabled)
             {
-                Idling = currentAnimation.IsTag("Idle") && !Rebuked;
-                Anim.SetBool("throwTrigger", ThrowTrigger && !Rebuked && equipType != EquipType.Burdensome);
+                Idling = currentAnimation.IsTag("Idle") && !Recoiling;
+                Anim.SetBool("throwTrigger", ThrowTrigger && !Recoiling && equipType != EquipType.Burdensome);
                 Anim.SetBool("wielded", Wielded);
                 if (equipType == EquipType.OneHanded)
                 {
@@ -149,7 +148,6 @@ public class Wieldable : MonoBehaviour
         {
             Anim.enabled = false;
             Wielded = false;
-            Rebuked = false;
         }
     }
 
@@ -167,15 +165,15 @@ public class Wieldable : MonoBehaviour
         if (other)
         {
             Character entity = other.gameObject.GetComponent<Character>();
-            if (entity && !Wielder && !Thrown && !MountTarget && equipType != EquipType.Consummable)
+            if (entity && !Wielder && !Thrown && !MountTarget)
             {
                 if(equipType == EquipType.Burdensome)
                 {
-                    entity.Interact.AddListener(PickupItem);
+                    entity.EventAttemptInteraction.AddListener(PickupItem);
                 }
                 else
                 {
-                    entity.Pickup.AddListener(PickupItem);
+                    entity.EventAttemptPickup.AddListener(PickupItem);
                 }
             }
         }
@@ -184,15 +182,15 @@ public class Wieldable : MonoBehaviour
     protected virtual void OnTriggerExit(Collider other)
     {
         Character entity = other.gameObject.GetComponent<Character>();
-        if (entity && !Wielder && !Thrown && equipType != EquipType.Consummable)
+        if (entity && !Wielder && !Thrown)
         {
             if (equipType == EquipType.Burdensome)
             {
-                entity.Interact.RemoveListener(PickupItem);
+                entity.EventAttemptInteraction.RemoveListener(PickupItem);
             }
             else
             {
-                entity.Pickup.RemoveListener(PickupItem);
+                entity.EventAttemptPickup.RemoveListener(PickupItem);
             }
 
             //setHighlightColor(Color.black);
@@ -204,7 +202,17 @@ public class Wieldable : MonoBehaviour
         StopAllCoroutines();
     }
 
-    /********** Item functions ************/
+    /***** PUBLIC *****/
+    public void Mount(GameObject obj, Vector3 localPosition)
+    {
+        StartCoroutine(mountHandler(obj, localPosition));
+    }
+
+    public void PickupItem(Character newOwner)
+    {
+        StartCoroutine(pickupHandler(newOwner));
+    }
+
     protected void setHighlightColor(Color highlight)
     {
         if (Renderer ? Renderer.sharedMaterial : false)
@@ -217,96 +225,8 @@ public class Wieldable : MonoBehaviour
         }
     }
 
-    public void PickupItem(Character newOwner)
-    {
-        StartCoroutine(pickupHandler(newOwner));
-    }
 
-    protected virtual IEnumerator pickupHandler(Character newOwner)
-    {
-        Thrown = false;
-        yield return null;
 
-        if (Wielder || !newOwner)
-        {
-            yield break;
-        }
-        Wielder = newOwner;
-        EventPickedUp.Invoke();
-        if(equipType == EquipType.Burdensome)
-        {
-            if(newOwner.wieldMode == Character.WieldMode.Burdened)
-            {
-                yield break;
-            }
-            else
-            {
-                newOwner.Interact.RemoveListener(PickupItem);
-            }
-        }
-        else
-        {
-            newOwner.Pickup.RemoveListener(PickupItem);
-
-        }
-        if (!Wielder.leftStorage && !Wielder.rightStorage && !Wielder.backStorage)
-        {
-            Wielder.wieldMode = Character.WieldMode.OneHanders;
-        }
-        if (equipType == EquipType.OneHanded)
-        {
-            if (Wielder.rightStorage && Wielder.leftStorage)
-            {
-                Wielder.rightStorage.DropItem();
-            }
-            if (Wielder.leftStorage)
-            {
-                Wielder.rightStorage = Wielder.leftStorage;
-            }
-            Wielder.leftStorage = this;  
-        }
-        else if (equipType == EquipType.TwoHanded)
-        {
-            if (Wielder.backStorage)
-            {
-                Wielder.backStorage.DropItem();
-            }
-            Wielder.backStorage = this;
-        }
-        else if (equipType == EquipType.Burdensome)
-        {
-            Wielder.wieldMode = Character.WieldMode.Burdened;
-            Wielder.MainHand = this;
-            //Wielder.modSpeed["burdensome" + GetHashCode().ToString()] = -0.25f;
-        }
-        else if(equipType == EquipType.Consummable)
-        {
-            consume(Wielder);
-            yield break;
-        }
-        if (Body)
-        {
-            Body.isKinematic = true;
-        }
-        togglePhysicsBox(false);
-        Allegiance = Wielder.Allegiance;
-        transform.SetParent(Wielder.transform);
-        Anim.enabled = true;
-        if (gameObject.activeSelf)
-        {
-            Anim.Rebind();
-            Anim.Update(0);
-        }
-        if(Wielder.leftStorage ? Wielder.leftStorage == Wielder.rightStorage : false)
-        {
-            Wielder.rightStorage = null;
-        }
-        yield break;
-    }
-
-    protected virtual void consume(Character consumer)
-    {
-    }
 
     public void DropItem(bool yeet = false, Vector3 direction = new Vector3(), float magnitude = 2)
     {
@@ -326,15 +246,15 @@ public class Wieldable : MonoBehaviour
             }
             Wielded = false;
             Wielder = null;
-            EventDropped.Invoke();
+            EventDropped.Invoke(this);
             togglePhysicsBox(true);
             Body.useGravity = true;
             Body.isKinematic = false;
             Body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             Body.angularDrag = 0f;
             PrimaryTrigger = false;
-            Secondary = false;
-            Tertiary = false;
+            SecondaryTrigger = false;
+            TertiaryTrigger = false;
             Wielded = false;
             setHighlightColor(Color.black);
         }
@@ -350,11 +270,143 @@ public class Wieldable : MonoBehaviour
         StartCoroutine(telecommuteRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
 
-    private IEnumerator telecommuteRoutine(GameObject target, float teleScalar,  Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
+    /***** PROTECTED *****/
+    protected virtual IEnumerator pickupHandler(Character newOwner)
+    {
+        Thrown = false;
+        yield return null;
+
+        if (Wielder || !newOwner)
+        {
+            yield break;
+        }
+        Wielder = newOwner;
+        Wielder.EventPickedUpWieldable.Invoke(this);
+        EventPickedUp.Invoke(this);
+        if (equipType == EquipType.Burdensome)
+        {
+            if (newOwner.wieldMode == Character.WieldMode.Burdened)
+            {
+                yield break;
+            }
+            else
+            {
+                newOwner.EventAttemptInteraction.RemoveListener(PickupItem);
+            }
+        }
+        else
+        {
+            newOwner.EventAttemptPickup.RemoveListener(PickupItem);
+
+        }
+        if (!Wielder.leftStorage && !Wielder.rightStorage && !Wielder.backStorage)
+        {
+            Wielder.wieldMode = Character.WieldMode.OneHanders;
+        }
+        if (equipType == EquipType.OneHanded)
+        {
+            if (Wielder.rightStorage && Wielder.leftStorage)
+            {
+                Wielder.rightStorage.DropItem();
+            }
+            if (Wielder.leftStorage)
+            {
+                Wielder.rightStorage = Wielder.leftStorage;
+            }
+            Wielder.leftStorage = this;
+        }
+        else if (equipType == EquipType.TwoHanded)
+        {
+            if (Wielder.backStorage)
+            {
+                Wielder.backStorage.DropItem();
+            }
+            Wielder.backStorage = this;
+        }
+        else if (equipType == EquipType.Burdensome)
+        {
+            Wielder.wieldMode = Character.WieldMode.Burdened;
+            Wielder.MainHand = this;
+        }
+        if (Body)
+        {
+            Body.isKinematic = true;
+        }
+        togglePhysicsBox(false);
+        Allegiance = Wielder.Allegiance;
+        transform.SetParent(Wielder.transform);
+        Anim.enabled = true;
+        if (gameObject.activeSelf)
+        {
+            Anim.Rebind();
+            Anim.Update(0);
+        }
+        if (Wielder.leftStorage ? Wielder.leftStorage == Wielder.rightStorage : false)
+        {
+            Wielder.rightStorage = null;
+        }
+        yield break;
+    }
+
+    protected IEnumerator throwHandler()
+    {
+        while (true)
+        {
+            yield return new WaitUntil(() => Thrown && Wielder && equipType != EquipType.Burdensome);
+            EventThrown.Invoke(this);
+            setHighlightColor(Color.gray);
+            float magnitude = 150/Heft;
+            Vector3 direction = Wielder.LookDirection;
+            direction.y = 0;
+            DropItem(true, direction, magnitude);
+            setHighlightColor(Color.red);
+            Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
+            yield return new WaitWhile(() =>!Thrown);
+            yield return new WaitUntil(() => Wielder);
+        }
+    }
+
+    protected void togglePhysicsBox(bool newValue)
+    {
+        PhysicsBoxes.RemoveAll(x => !x);
+        if (PhysicsBoxes.Count > 0)
+        {
+            foreach (Collider box in PhysicsBoxes.Where(x => x))
+            {
+                box.enabled = newValue;
+            }
+        }
+    }
+
+    /***** PRIVATE *****/
+    private IEnumerator mountHandler(GameObject mountedTo, Vector3 localPosition)
+    {
+        MountTarget = mountedTo;
+        if (Wielder)
+        {
+            DropItem();
+            yield return null;
+        }
+        Body.isKinematic = true;
+        togglePhysicsBox(false);
+        transform.SetParent(mountedTo.transform, true);
+        transform.localPosition = localPosition;
+        yield return new WaitWhile(() => !Wielder && MountTarget);
+        MountTarget = null;
+        if (!Wielder && mountedTo)
+        {
+            transform.SetParent(mountedTo.transform.parent, true);
+        }
+        Body.isKinematic = false;
+        togglePhysicsBox(true);
+        yield break;
+    }
+
+    private IEnumerator telecommuteRoutine(GameObject target, float teleScalar, Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
         telecommuteTarget = target;
         Telecommuting = true;
-        float timer = 0.0f;                                          
+        float timer = 0.0f;
         Vector3 origin = transform.position;
         bool previousPhysicsBoxState = PhysicsBoxes.Count > 0 ? PhysicsBoxes[0].enabled : false;
         bool previousGravity = Body.useGravity;
@@ -404,65 +456,6 @@ public class Wieldable : MonoBehaviour
         cancelCommute();
         yield break;
     }
-
-    protected IEnumerator throwHandler()
-    {
-        while (true)
-        {
-            yield return new WaitUntil(() => Thrown && Wielder && equipType != EquipType.Burdensome);
-            EventThrown.Invoke();
-            setHighlightColor(Color.gray);
-            float magnitude = 150/Heft;
-            Vector3 direction = Wielder.LookDirection;
-            direction.y = 0;
-            DropItem(true, direction, magnitude);
-            setHighlightColor(Color.red);
-            Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
-            yield return new WaitWhile(() =>!Thrown);
-            yield return new WaitUntil(() => Wielder);
-        }
-    }
-
-    public void Mount(GameObject obj, Vector3 localPosition)
-    {
-        StartCoroutine(mountHandler(obj, localPosition));    
-    }
-
-    protected IEnumerator mountHandler(GameObject mountedTo, Vector3 localPosition)
-    {
-        MountTarget = mountedTo;
-        if (Wielder)
-        {
-            DropItem();
-            yield return null;
-        }
-        Body.isKinematic = true;
-        togglePhysicsBox(false);
-        transform.SetParent(mountedTo.transform, true);
-        transform.localPosition = localPosition;
-        yield return new WaitWhile(() => !Wielder && MountTarget);
-        MountTarget = null;
-        if (!Wielder && mountedTo)
-        {
-            transform.SetParent(mountedTo.transform.parent, true);
-        }
-        Body.isKinematic = false;
-        togglePhysicsBox(true);
-        yield break;
-    }
-
-    protected void togglePhysicsBox(bool newValue)
-    {
-        PhysicsBoxes.RemoveAll(x => !x);
-        if (PhysicsBoxes.Count > 0)
-        {
-            foreach (Collider box in PhysicsBoxes.Where(x => x))
-            {
-                box.enabled = newValue;
-            }
-        }
-    }
-
 
 
 }

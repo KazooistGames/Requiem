@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+using Newtonsoft.Json.Linq;
 
 public abstract class Character : MonoBehaviour
 {
@@ -18,10 +19,12 @@ public abstract class Character : MonoBehaviour
     public float Xp = 0f;
     public int Lvl = 0;
 
+
     public float Vitality;
     public float Agility;
     public float Poise;
-   
+    public float Passion;
+
     public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
     public static float Berth { get; private set; } = 0.25f;
@@ -44,7 +47,8 @@ public abstract class Character : MonoBehaviour
     public UnityEvent EventVanquished = new UnityEvent();
     public UnityEvent<float> EventWounded = new UnityEvent<float>();
     public UnityEvent EventCrashed = new UnityEvent();
-    public UnityEvent<Character, float> EventDashHit = new UnityEvent<Character, float>();
+    public UnityEvent<Character, float> EventLandedDashHit = new UnityEvent<Character, float>();
+    public UnityEvent<Wieldable> EventPickedUpWieldable = new UnityEvent<Wieldable>();
 
     public Character Foe;
 
@@ -65,9 +69,9 @@ public abstract class Character : MonoBehaviour
     public Wieldable leftStorage;
     public Wieldable rightStorage;
     public Wieldable backStorage;
-    public UnityEvent<Character> Pickup = new UnityEvent<Character> { };
-    public UnityEvent<Character> Interact = new UnityEvent<Character> { };
- 
+    public UnityEvent<Character> EventAttemptPickup = new UnityEvent<Character> { };
+    public UnityEvent<Character> EventAttemptInteraction = new UnityEvent<Character> { };
+
     public CapsuleCollider personalBox;
     protected GameObject model;
     protected CapsuleCollider hurtBox;
@@ -76,9 +80,9 @@ public abstract class Character : MonoBehaviour
     public GameObject statBar;
     protected Animator anim;
 
-    private static GameObject indicatorPrefab;
-    private static GameObject statBarPrefab;
-    private static GameObject bloodSplatter;
+    private static GameObject INDICATOR_PREFAB;
+    private static GameObject STATBAR_PREFAB;
+    protected static GameObject BLOOD_SPLATTER_PREFAB;
 
 
     public bool Shoved = false;
@@ -105,9 +109,14 @@ public abstract class Character : MonoBehaviour
     private static float DASH_CHARGE_TIME = 0.25f;
     private static float CRASH_DAMAGE = 25f;
 
+    private static float POISE_REGEN_PERIOD = 3f;
+    private static float POISE_DEBOUNCE_PERIOD = 3f;
+    private static float POISE_RESTING_PERCENTAGE = 1f;
+    private float poiseDebounceTimer = 0.0f;
+
 
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
-    
+
     //public bool Running = false;
 
     public GameObject Location;
@@ -116,11 +125,10 @@ public abstract class Character : MonoBehaviour
 
     public enum Posture
     {
-        Stiff = -1,
-        Warm = 0,
-        Flow = 1,
+        Weak = -1,
+        Strong = 1,
     }
-    public Posture posture = Posture.Warm;
+    public Posture posture = Posture.Strong;
 
     public enum WieldMode
     {
@@ -161,13 +169,13 @@ public abstract class Character : MonoBehaviour
         {
             DefaultAnimController = Resources.Load<RuntimeAnimatorController>("Animation/entities/EntityDefault/entityDefaultAnimation");
         }
-        if (!indicatorPrefab)
+        if (!INDICATOR_PREFAB)
         {
-            indicatorPrefab = Resources.Load<GameObject>("Prefabs/UX/Indicator");
+            INDICATOR_PREFAB = Resources.Load<GameObject>("Prefabs/UX/Indicator");
         }
-        if (!statBarPrefab)
+        if (!STATBAR_PREFAB)
         {
-            statBarPrefab = Resources.Load<GameObject>("Prefabs/UX/StatBar");
+            STATBAR_PREFAB = Resources.Load<GameObject>("Prefabs/UX/StatBar");
         }
         if (!SOUND_OF_DASH)
         {
@@ -196,8 +204,8 @@ public abstract class Character : MonoBehaviour
         hurtBox.height = heightActual;
         Vitality = Strength;
         TurnSpeed = DefaultTurnSpeed;
-        statBar = Instantiate(statBarPrefab, transform);
-        indicator = Instantiate(indicatorPrefab, transform).GetComponent<Projector>();
+        statBar = Instantiate(STATBAR_PREFAB, transform);
+        indicator = Instantiate(INDICATOR_PREFAB, transform).GetComponent<Projector>();
         Material newMaterial = new Material(Shader.Find("Custom/Projection"));
         newMaterial.SetTexture("_ShadowTex", Resources.Load<Texture>("Textures/IndicatorSimple"));
         indicator.material = newMaterial;
@@ -210,26 +218,51 @@ public abstract class Character : MonoBehaviour
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         Poise = Strength;
         StartCoroutine(routineDashHandler());
+        EventWounded.AddListener((damage) => Passion += damage / 1000);
+        EventPickedUpWieldable.AddListener(handleWeaponPickedUp);
     }
 
     protected virtual void Update()
     {
         equipmentManagement();
         indicatorManagement();
-        updateStats();
+        body.mass = Strength * scaleActual;
+        if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD / Resolve))
+        {
+            float increment = Resolve * Time.deltaTime * Strength / POISE_REGEN_PERIOD;
+            float restingValue = POISE_RESTING_PERCENTAGE * Strength;
+            float delta = Poise - restingValue;
+            if (Mathf.Abs(delta) <= increment)
+            {
+                Poise = POISE_RESTING_PERCENTAGE * Strength;
+            }
+            else if (Poise > restingValue)
+            {
+                Poise -= increment;
+            }
+            else if (Poise < restingValue)
+            {
+                Poise += increment;
+            }
+        }        
+        Passion = Mathf.Clamp(Passion, 0, 1);
+        Vitality = Mathf.Clamp(Vitality, 0, Strength);
+        Poise = Mathf.Clamp(Poise, 0, Strength);
+        Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
+        updatePosture();
         if (Vitality <= 0)
         {
             Physics.autoSimulation = false;
             Physics.Simulate(Time.deltaTime);
             Physics.autoSimulation = true;
-            Die();         
+            Die();
         }
         else
         {
             List<string> keys = BleedingWounds.Keys.ToList();
-            foreach(string key in keys)
+            foreach (string key in keys)
             {
-                if(BleedingWounds[key].Item2 <= 0)
+                if (BleedingWounds[key].Item2 <= 0)
                 {
                     BleedingWounds.Remove(key);
                 }
@@ -260,7 +293,13 @@ public abstract class Character : MonoBehaviour
         }
         else
         {
-            animationControls();
+            anim.enabled = true;
+            anim.SetFloat("dashCharge", Dashing ? 0 : DashPower);
+            anim.SetBool("moving", body.velocity.magnitude > Haste * SpeedScalarGlobal / 20f ? true : false);
+            anim.SetFloat("velocity", Mathf.Max(body.velocity.magnitude, Haste * SpeedScalarGlobal / 4f));
+            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AI.angleToDirection(AI.getAngle(LookDirection) - AI.getAngle(body.velocity) + 90);
+            anim.SetFloat("x", Shoved ? -relativeDirection.x : relativeDirection.x);
+            anim.SetFloat("z", Shoved ? -relativeDirection.z : relativeDirection.z);
         }
     }
 
@@ -270,7 +309,8 @@ public abstract class Character : MonoBehaviour
         float baseSpeed = Haste * SpeedScalarGlobal;
         //modSpeed["flow"] = posture == Posture.Flow ? Resolve / 100 : 0;
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
-        modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed ) : 0;
+        modSpeed["staggered"] = Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 3);
+        modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
         SpeedActual = Agility * SpeedScalarGlobal;
         hurtBox.radius = Shoved ? berthActual * 0.8f : berthActual;
@@ -349,7 +389,7 @@ public abstract class Character : MonoBehaviour
             scaledTarget = scaledTarget > 180 ? scaledTarget - 360 : scaledTarget;
             float difference = (scaledTarget - scaledY);
             float degMax = TurnSpeed * Time.fixedDeltaTime;
-            difference = Mathf.Clamp(Mathf.Abs(difference) >= 180 ? difference - (Mathf.Sign(difference) * 360) : difference, -1*degMax, degMax);
+            difference = Mathf.Clamp(Mathf.Abs(difference) >= 180 ? difference - (Mathf.Sign(difference) * 360) : difference, -1 * degMax, degMax);
             transform.RotateAround(transform.position, Vector3.up, difference);
         }
     }
@@ -367,7 +407,7 @@ public abstract class Character : MonoBehaviour
             {
                 resolveCrash(collision);
             }
-        }        
+        }
     }
 
     protected virtual void OnCollisionStay(Collision collision)
@@ -432,21 +472,37 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-    public abstract void Damage(float magnitude);
+    public virtual void Damage(float magnitude)
+    {
+        float poiseDamage = Mathf.Min(Poise, magnitude);
+        alterPoise(-poiseDamage);
+        float vitalityDamage = posture == Posture.Weak ? magnitude : magnitude - poiseDamage;
+        if (vitalityDamage > 0)
+        {
+            Vitality -= vitalityDamage;
+            EventWounded.Invoke(vitalityDamage);
+        }
+    }
 
-    public void Rebuke(float duration)
-    {    
-        Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
-        Weapon offWep = OffHand ? OffHand.GetComponent<Weapon>() : null;
-        if (mainWep)
+
+    public void Stagger(float duration)
+    {
+        if (duration > staggerPeriod - staggerTimer)
         {
-            mainWep.Rebuke(duration, true);
+            staggerPeriod = duration;
+            staggerTimer = 0;
+            Staggered = true;
+            //Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
+            //Weapon offWep = OffHand ? OffHand.GetComponent<Weapon>() : null;
+            //if (mainWep)
+            //{
+            //    mainWep.Recoil(duration);
+            //}
+            //if (offWep)
+            //{
+            //    offWep.Recoil(duration);
+            //}
         }
-        if (offWep)
-        {
-            offWep.Rebuke(duration, true);
-        }
-        
     }
 
     public void Disarm(float yeetMagnitude = 2)
@@ -461,7 +517,7 @@ public abstract class Character : MonoBehaviour
         if (offWep)
         {
             offWep.DropItem(yeet: true, magnitude: yeetMagnitude);
-        }      
+        }
     }
 
     public void Shove(Vector3 VelocityChange, bool Dash = false)
@@ -473,17 +529,17 @@ public abstract class Character : MonoBehaviour
     }
 
     /***** PROTECTED *****/
-    protected abstract void updatePosture();
-
-
-    protected virtual void updateStats()
+    protected virtual void updatePosture()
     {
-        body.mass = Strength * scaleActual;
-        //Stunned = (MainHand ? MainHand.Rebuked : false) || (OffHand ? OffHand.Rebuked : false);
-        Vitality = Mathf.Clamp(Vitality, 0, Strength);
-        Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
+        if (Poise >= Strength)
+        {
+            posture = Posture.Strong;
+        }
+        else if (Poise <= 0)
+        {
+            posture = Posture.Weak;
+        }
     }
-
 
     protected virtual void Die()
     {
@@ -516,35 +572,25 @@ public abstract class Character : MonoBehaviour
     }
 
 
-    protected void BLEED(float damage)
-    {
-        if (Vitality > 0)
-        {
-            Mullet.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 1.0f, 0.5f).layer = gameObject.layer;
-        }
-        if (!bloodSplatter)
-        {
-            bloodSplatter = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");
-        }
-        GameObject splatter = Instantiate(bloodSplatter);
-        splatter.transform.position = transform.position;
-        splatter.transform.eulerAngles = new Vector3(45, UnityEngine.Random.value * 360f, 45);
-        splatter.GetComponent<Projector>().orthographicSize = Mathf.Lerp(0.05f, 0.70f, (damage / 100));
-    }
 
 
     /*** PRIVATE ***/
 
-    private void animationControls()
+    private void alterPoise(float value)
     {
-        anim.enabled = true;
-        anim.SetFloat("dashCharge", Dashing ? 0 : DashPower);
-        anim.SetBool("moving", body.velocity.magnitude > Haste * SpeedScalarGlobal / 20f ? true : false);
-        anim.SetFloat("velocity", Mathf.Max(body.velocity.magnitude, Haste * SpeedScalarGlobal / 4f));
-        Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AI.angleToDirection(AI.getAngle(LookDirection) - AI.getAngle(body.velocity) + 90);
-        anim.SetFloat("x", Shoved ? -relativeDirection.x : relativeDirection.x);
-        anim.SetFloat("z", Shoved ? -relativeDirection.z : relativeDirection.z);
-        
+        bool reduction = value <= 0;
+        float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
+        Poise += value;
+        Poise = Mathf.Clamp(Poise, -1, Strength);
+        if (value * existingDelta >= 0)
+        {
+            poiseDebounceTimer = 0.0f;
+        }
+        //else
+        //{
+        //    poiseDebounceTimer = POISE_DEBOUNCE_PERIOD;
+        //}
+        updatePosture();
     }
 
     private void indicatorManagement()
@@ -637,7 +683,7 @@ public abstract class Character : MonoBehaviour
             Vector3 disposition = foe.transform.position - transform.position;
             float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
             float maxMag = FinalDash ? Max_Velocity_Of_Dash * FINALDASH_POWER_SCALAR : Max_Velocity_Of_Dash;
-            bool crash = instant || collision.relativeVelocity.magnitude >= minMag;       
+            bool crash = instant || collision.relativeVelocity.magnitude >= minMag;
             float actualMag = instant ? Mathf.Lerp(minMag, maxMag, DashPower) : Mathf.Min(collision.relativeVelocity.magnitude, maxMag);
             if (crash && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
@@ -652,16 +698,16 @@ public abstract class Character : MonoBehaviour
                     //alterPoise(Strength);
                 }
                 else
-                {                
+                {
                     if (FinalDash)
                     {
-                        foe.Rebuke(actualMag / maxMag);                    
+                        foe.Stagger(actualMag / maxMag);
                         float damage = CRASH_DAMAGE * actualMag / maxMag;
                         foe.Damage(damage);
-                        EventDashHit.Invoke(foe, damage);
+                        EventLandedDashHit.Invoke(foe, damage);
                     }
                 }
-                Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);           
+                Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
             }
         }
         dashAlreadyHit.Add(other);
@@ -681,7 +727,7 @@ public abstract class Character : MonoBehaviour
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
         bool cleanHit = dot > 0.5f;
-        if(cleanHit)
+        if (cleanHit)
         {
             Character otherEntity = collision.gameObject.GetComponent<Character>();
             float velocityRatio = (collision.relativeVelocity.magnitude - Min_Velocity_Of_Dash) / (Max_Velocity_Of_Dash - Min_Velocity_Of_Dash);
@@ -716,7 +762,6 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-
     private IEnumerator routineDashHandler()
     {
         string key = "dash";
@@ -737,11 +782,11 @@ public abstract class Character : MonoBehaviour
                 {
                     dashDirection = WalkDirection == Vector3.zero ? dashDirection : WalkDirection;
                 }
-                if(DashPower < finalDashCutoffCharge)
+                if (DashPower < finalDashCutoffCharge)
                 {
                     heldChargeUntilCutoff = heldChargeUntilCutoff && DashCharging;
                 }
-                else if(heldChargeUntilCutoff)
+                else if (heldChargeUntilCutoff)
                 {
                     FinalDash = !DashCharging && dashDirection == Vector3.zero;
                 }
@@ -764,9 +809,9 @@ public abstract class Character : MonoBehaviour
                 {
                     scaledVelocity *= FINALDASH_POWER_SCALAR;
                     dashDirection = LookDirection;
-                }           
-                if(FinalDash || dashDirection != Vector3.zero)
-                Dashing = true;
+                }
+                if (FinalDash || dashDirection != Vector3.zero)
+                    Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);
                 GameObject sound = Mullet.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
@@ -779,6 +824,80 @@ public abstract class Character : MonoBehaviour
             dashDirection = Vector3.zero;
         }
     }
+
+    private void handleWeaponPickedUp(Wieldable wieldable)
+    {
+        Weapon weapon = wieldable.GetComponent<Weapon>();
+        if (weapon)
+        {
+            weapon.EventSwinging.AddListener(handleWeaponSwing);
+            weapon.EventClashedWeapon.AddListener(handleWeaponClash);
+            weapon.EventBlockedWeapon.AddListener(handleWeaponBlock);
+            weapon.EventParriedWeapon.AddListener(handleWeaponParry);
+            weapon.EventWasParried.AddListener(handleWeaponParried);
+            weapon.EventHitting.AddListener(handleWeaponHit);
+            weapon.EventDropped.AddListener(handleWeaponDropped);
+        }
+    }
+
+    private void handleWeaponSwing(Weapon weapon)
+    {
+        alterPoise(-weapon.Heft / 2);
+    }
+
+    private void handleWeaponClash(Weapon mine, Weapon theirs)
+    {
+        if (mine.TrueStrike) 
+        {
+            Passion += mine.Heft / 1000;
+        }
+        else if (posture == Posture.Weak)
+        {
+            Stagger(0.25f + 1.5f * (mine.Heft / Strength));
+        }
+    }
+
+    private void handleWeaponBlock(Weapon mine, Weapon theirs)
+    {
+        alterPoise(-theirs.Heft / 2);
+        if (posture == Posture.Weak)
+        {
+            Stagger(0.25f + 1.5f * (theirs.Heft / Strength));
+        }
+    }
+
+    private void handleWeaponParry(Weapon mine, Weapon theirs)
+    {
+        Passion += theirs.Heft / 1000;
+
+    }
+
+    private void handleWeaponParried(Weapon mine, Weapon theirs)
+    {
+        if(posture == Posture.Weak)
+        {
+            Disarm();
+        }
+    }
+
+    private void handleWeaponHit(Weapon mine, Character foe)
+    {
+        Passion += mine.Power / 1000;
+    }
+
+    private void handleWeaponDropped(Wieldable wieldable)
+    {
+        Weapon weapon = wieldable.GetComponent<Weapon>();
+        if (weapon)
+        {
+            weapon.EventSwinging.RemoveListener(handleWeaponSwing);
+            weapon.EventClashedWeapon.RemoveListener(handleWeaponClash);
+            weapon.EventBlockedWeapon.RemoveListener(handleWeaponBlock);
+            weapon.EventParriedWeapon.RemoveListener(handleWeaponParry);
+            weapon.EventWasParried.RemoveListener(handleWeaponParried);
+        }
+    }
+    
 
 }
 

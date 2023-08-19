@@ -15,7 +15,6 @@ public class SoulPearl : Wieldable
     protected override void Start()
     {
         gameObject.name = "SoulPearl";
-        equipType = EquipType.Consummable;
         awarenessRadius = Hextile.Radius * 1.5f;
         physicsSphere = gameObject.AddComponent<SphereCollider>();
         physicsSphere.center = Vector3.zero;

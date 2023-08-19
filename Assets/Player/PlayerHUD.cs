@@ -50,7 +50,7 @@ public class PlayerHUD : MonoBehaviour
             statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
             statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
-            statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.posture > -1 ? (Player.INSTANCE.HostEntity.posture == Character.Posture.Flow ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
+            statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.posture > -1 ? (Player.INSTANCE.HostEntity.posture == Character.Posture.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
 
             if (!Player.INSTANCE.HostEntity.MainHand)
             {

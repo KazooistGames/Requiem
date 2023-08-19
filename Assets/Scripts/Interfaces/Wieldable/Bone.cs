@@ -13,7 +13,6 @@ public class Bone : Wieldable
         base.Awake();
         PhysicsBoxes.Add(GetComponent<BoxCollider>() ? GetComponent<BoxCollider>() : gameObject.AddComponent<BoxCollider>());
         Renderer = GetComponent<MeshRenderer>() ? GetComponent<MeshRenderer>() : gameObject.AddComponent<MeshRenderer>();
-        equipType = EquipType.Consummable;
     }
 
     protected override void Start()

@@ -159,7 +159,7 @@ public class Player : MonoBehaviour
         }
         if (CurrentKeyboard.fKey.wasPressedThisFrame)
         {
-            HostEntity.Interact.Invoke(HostEntity);
+            HostEntity.EventAttemptInteraction.Invoke(HostEntity);
         }
         if (CurrentKeyboard.tabKey.isPressed || CurrentKeyboard.tabKey.wasReleasedThisFrame) //cycle equipped item
         {
@@ -205,8 +205,8 @@ public class Player : MonoBehaviour
         }
         else if (CurrentKeyboard.eKey.wasPressedThisFrame)
         {
-            HostEntity.Pickup.Invoke(HostEntity);
-            HostEntity.Pickup.RemoveAllListeners();
+            HostEntity.EventAttemptPickup.Invoke(HostEntity);
+            HostEntity.EventAttemptPickup.RemoveAllListeners();
         }
         else if (CurrentKeyboard.qKey.wasPressedThisFrame)
         {
@@ -227,14 +227,14 @@ public class Player : MonoBehaviour
             {
                 mainWep = HostEntity.MainHand;
                 mainWep.PrimaryTrigger = CurrentMouse.leftButton.isPressed;
-                mainWep.Secondary = CurrentKeyboard.leftShiftKey.isPressed;
-                mainWep.Tertiary = CurrentMouse.rightButton.isPressed;
+                mainWep.SecondaryTrigger = CurrentKeyboard.leftShiftKey.isPressed;
+                mainWep.TertiaryTrigger = CurrentMouse.rightButton.isPressed;
             }
             if (HostEntity.OffHand)
             {
                 offWep = HostEntity.OffHand;
                 offWep.PrimaryTrigger = CurrentMouse.rightButton.isPressed;
-                offWep.Secondary = CurrentKeyboard.leftShiftKey.isPressed;
+                offWep.SecondaryTrigger = CurrentKeyboard.leftShiftKey.isPressed;
             }
             Wieldable throwWep = HostEntity.OffHand ? HostEntity.OffHand : HostEntity.MainHand;
             throwWep.ThrowTrigger = CurrentKeyboard.leftCtrlKey.isPressed;
