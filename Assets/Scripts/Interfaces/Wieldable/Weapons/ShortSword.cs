@@ -24,7 +24,7 @@ public class ShortSword : Weapon
         wHitBox.height = 0.6f;
         equipType = EquipType.OneHanded;
         Range = 0.32f;
-        BasePower = 25f;
+        Sharpness = 25f;
         //EventHitting.AddListener((x) => { if (Wielder) { Wielder.alterTempo(Power / 100); } });
         //EventParriedWeapon.AddListener((weapon) => { if (Wielder) { Wielder.alterTempo(weapon.Power / 100); } });
         base.Start();

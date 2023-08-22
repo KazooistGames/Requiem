@@ -26,7 +26,7 @@ public class Dagger : Weapon
         //wPhysicsBox.center = new Vector3(0, 0.3f, 0);
         //wPhysicsBox.size = new Vector3(0.1f, 0.6f, 0.1f);
         Range = 0.15f;
-        BasePower = 15f;
+        Sharpness = 15f;
         equipType = EquipType.OneHanded;
         base.Start();
     }

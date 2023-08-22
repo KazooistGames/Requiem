@@ -47,7 +47,7 @@ public abstract class Weapon : Wieldable
 
     public float Range = 0f;
     public float Power = 0f;
-    public float BasePower = 0f;
+    public float Sharpness = 0f;
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
 
     public bool TrueStrike = false;
@@ -108,14 +108,14 @@ public abstract class Weapon : Wieldable
             box.isTrigger = false;
         }
         swingClip = (equipType == EquipType.TwoHanded) ? "Audio/Weapons/deepSwing" : "Audio/Weapons/midSwing";
-        swingPitch = (equipType == EquipType.TwoHanded ? 50 : 20) / BasePower;
+        swingPitch = (equipType == EquipType.TwoHanded ? 50 : 20) / Sharpness;
         clashClip = "Audio/Weapons/clang";
-        clashPitch = 60 / BasePower;
+        clashPitch = 60 / Sharpness;
         clashVolume = 0.075f;
-        tinkPitch = 20 / BasePower;
+        tinkPitch = 20 / Sharpness;
         if(Heft == 0)
         {
-            Heft = BasePower;
+            Heft = Sharpness;
         }
         //heftTurnSlow = -Heft / 100f;
         heftSwingKey = "heftSwing" + gameObject.GetHashCode().ToString();
@@ -143,14 +143,14 @@ public abstract class Weapon : Wieldable
     protected override void Update()
     {
         base.Update();
-        Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+        Power = Mathf.Max(modPower.Values.Aggregate(Sharpness, (result, increment) => result += increment), 0);
         if (Wielder)
         {
             ActionCurrentlyAnimated = getActionFromCurrentAnimationState();
             togglePhysicsBox(false);
             heftSlowModifier = -Heft / Wielder.Strength;
-            modPower["TrueStrike"] = TrueStrike ? BasePower * Wielder.Strength/100 : 0;
-            modPower["momentum"] = Vector3.Project(Wielder.body.velocity, Wielder.LookDirection).magnitude * BasePower / Character.Max_Velocity_Of_Dash;
+            modPower["TrueStrike"] = TrueStrike ? Sharpness * Wielder.Strength/100 : 0;
+            modPower["momentum"] = Vector3.Project(Wielder.body.velocity, Wielder.LookDirection).magnitude * Sharpness / Character.Max_Velocity_Of_Dash;
             if (transform.parent != Wielder.transform)
             {
                 transform.SetParent(Wielder.transform, true);
@@ -297,7 +297,7 @@ public abstract class Weapon : Wieldable
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+        Power = Mathf.Max(modPower.Values.Aggregate(Sharpness, (result, increment) => result += increment), 0);
         if (other)
         {
             if (!alreadyHit.Contains(other.gameObject))
@@ -823,7 +823,7 @@ public abstract class Weapon : Wieldable
 
     private void playShing(float pichScalar = 1.0f)
     {
-        Mullet.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / BasePower, 0.25f, Mullet.Instance.DefaultAudioRange / 4, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        Mullet.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Sharpness, 0.25f, Mullet.Instance.DefaultAudioRange / 4, onSoundSpawn: sound => sound.layer = gameObject.layer);
     }
 
     private void playSlap(Vector3 position)
