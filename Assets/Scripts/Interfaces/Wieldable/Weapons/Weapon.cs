@@ -20,28 +20,35 @@ public abstract class Weapon : Wieldable
     public enum Action
     {
         error,
+
         Recoiling,
         Sheathed,
         Idle,
-        Coiling,
-        Windup,
-        Attacking,
+
+        QuickCoil,
+        QuickAttack,
+
+        StrongWindup,
+        StrongAttack,
+
         Recovering,
+
         Guarding,
         Parrying,
+
         Aiming,
         Throwing,
     }
     public Action ActionCurrentlyAnimated = Action.error;
 
-    public enum DamageType
-    {
-        none,
-        Stab,
-        Slash,
-        Smash
-    }
-    public DamageType damageType { get; private set; } = DamageType.none;
+    //public enum DamageType
+    //{
+    //    none,
+    //    Stab,
+    //    Slash,
+    //    Smash
+    //}
+    //public DamageType damageType { get; private set; } = DamageType.none;
 
     public bool Throwing = false;
 
@@ -157,11 +164,11 @@ public abstract class Weapon : Wieldable
             }
             if (Wielded)
             {
-                if (ActionCurrentlyAnimated != Action.Attacking && ActionCurrentlyAnimated != Action.Recovering && ActionCurrentlyAnimated != Action.Coiling)
+                if (ActionCurrentlyAnimated != Action.StrongAttack && ActionCurrentlyAnimated != Action.Recovering && ActionCurrentlyAnimated != Action.StrongWindup)
                 {
                     TrueStrike = false;
                 }
-                damageType = getDamageTypeFromCurrentAnimationState();
+                //damageType = getDamageTypeFromCurrentAnimationState();
                 if (ActionCurrentlyAnimated == Action.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
@@ -178,25 +185,21 @@ public abstract class Weapon : Wieldable
                     modifyWielderSpeed(0, 0);
                     setHighlightColor(Color.gray);
                 }
-                else if (ActionCurrentlyAnimated == Action.Coiling)
+                else if (ActionCurrentlyAnimated == Action.StrongWindup)
                 {                
                     attackONS = true;
                     modifyWielderSpeed(swingValue: heftSlowModifier);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
-                else if(ActionCurrentlyAnimated == Action.Windup)
+                else if(ActionCurrentlyAnimated == Action.QuickCoil)
                 {
                     modifyWielderSpeed(swingValue: 0);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
-                else if (ActionCurrentlyAnimated == Action.Attacking)
+                else if (ActionCurrentlyAnimated == Action.StrongAttack)
                 {
                     if (attackONS)
                     {
-                        if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth/2)
-                        {
-                            TrueStrike = true;
-                        }
                         EventSwinging.Invoke(this);
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
@@ -249,12 +252,10 @@ public abstract class Weapon : Wieldable
                 setHighlightColor(Color.black);
                 resetWeapon();
                 HitBox.enabled = false;
-                TrueStrike = false;
             }
         }
         else
         {
-            TrueStrike = Thrown ? TrueStrike : false;
             if (MostRecentWielder)
             {
                 modifyWielderSpeed(0, 0);
@@ -309,7 +310,7 @@ public abstract class Weapon : Wieldable
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
                     {
-                        if (ActionCurrentlyAnimated == Action.Attacking)
+                        if (ActionCurrentlyAnimated == Action.StrongAttack)
                         {
                             RESOLVE_CLASH(this, foeWeapon);
                         }
@@ -327,7 +328,7 @@ public abstract class Weapon : Wieldable
                     }
                     else if (foe && !other.isTrigger)
                     {
-                        if (ActionCurrentlyAnimated == Action.Attacking)
+                        if (ActionCurrentlyAnimated == Action.StrongAttack)
                         {
                             RESOLVE_HIT(this, foe);
                         }
@@ -336,7 +337,7 @@ public abstract class Weapon : Wieldable
                             entityCollisionONS(foe);
                         }
                     }
-                    else if (obstacle && ActionCurrentlyAnimated == Action.Attacking)
+                    else if (obstacle && ActionCurrentlyAnimated == Action.StrongAttack)
                     {
                         resolveObstacleHit(other.gameObject);
                     }
@@ -366,16 +367,7 @@ public abstract class Weapon : Wieldable
 
     /**********PUBLIC**************/
 
-    //public void Recoil(float recoveryTime)
-    //{
-    //    if (recoveryTime >= rebukePeriod - rebukeTimer)
-    //    {
-    //        rebukeTimer = 0;
-    //        rebukePeriod = recoveryTime;
-    //        Recoiling = true;
-    //        HitBox.enabled = false;
-    //    }
-    //}
+
 
     /**********PROTECTED**************/
 
@@ -467,10 +459,10 @@ public abstract class Weapon : Wieldable
         {
             weapon.entityCollisionONS(entity);
         }
-        //else if (!weapon.TrueStrike)
-        //{
-        //    RESOLVE_CLASH(weapon, obstruction.GetComponent<Weapon>());
-        //}
+        else
+        {
+            RESOLVE_CLASH(weapon, obstruction.GetComponent<Weapon>());
+        }
         return false;      
     }
 
@@ -703,39 +695,24 @@ public abstract class Weapon : Wieldable
         while (true)
         {
 
-            yield return new WaitUntil(() => Wielder && ActionCurrentlyAnimated == Action.Coiling);
-            while (PrimaryTrigger && ActionCurrentlyAnimated == Action.Coiling)
+            yield return new WaitUntil(() => Wielder && ActionCurrentlyAnimated == Action.StrongWindup);
+            while (TertiaryTrigger && ActionCurrentlyAnimated == Action.StrongWindup)
             {
-                Tempo = Mathf.Pow(Anim.GetAnimatorTransitionInfo(0).normalizedTime, 2);
+                Tempo = Mathf.Pow(currentAnimation.normalizedTime, 2);
                 yield return null;
             }
-            if (PrimaryTrigger && ActionCurrentlyAnimated != Action.Coiling)
+            yield return new WaitUntil(() => ActionCurrentlyAnimated == Action.StrongAttack);
+            if (TertiaryTrigger)
             {
                 Tempo = 0;
+                TrueStrike = false;
             }
-            //yield return new WaitUntil(() => { if (!Wielder || ActionCurrentlyAnimated != Action.Windup) return true; Tempo += Mathf.Pow(currentAnimation.normalizedTime * currentAnimation.length, exponent) * Time.deltaTime * scalar; return Tempo >= 1; });
-            //yield return new WaitUntil(() => { if (!Wielder || ActionCurrentlyAnimated != Action.Windup) return true; Tempo -= Mathf.Pow(currentAnimation.normalizedTime * currentAnimation.length, exponent) * Time.deltaTime * scalar; return Tempo <= 0; });
-            yield return new WaitWhile(() => ActionCurrentlyAnimated == Action.Coiling);
-        }
-    }
-
-    private DamageType getDamageTypeFromCurrentAnimationState()
-    {
-        if (currentAnimation.IsTag("Slash"))
-        {
-            return DamageType.Slash;
-        }
-        else if (currentAnimation.IsTag("Smash"))
-        {
-            return DamageType.Smash;
-        }
-        else if (currentAnimation.IsTag("Stab"))
-        {
-            return DamageType.Stab;
-        }
-        else
-        {
-            return DamageType.none;
+            else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
+            {
+                TrueStrike = true;
+            }
+            yield return new WaitUntil(() => ActionCurrentlyAnimated == Action.Idle && !Thrown);
+            TrueStrike = false;
         }
     }
 
@@ -755,9 +732,9 @@ public abstract class Weapon : Wieldable
             {
                 return Action.Parrying;
             }
-            else if (nextAnimation.IsTag("Windup"))
+            else if (nextAnimation.IsTag("QuickCoil"))
             {
-                return Action.Coiling;
+                return Action.QuickCoil;
             }
             else
             {
@@ -770,24 +747,20 @@ public abstract class Weapon : Wieldable
             {
                 return Action.Recovering;
             }
-            else if (nextAnimation.IsTag("Windup"))
-            {
-                return Action.Coiling;
-            }
             else
             {
                 return Action.Guarding;
             }
         }
-        else if (currentAnimation.IsTag("Coiling") || nextAnimation.IsTag("Windup"))
-        {
-            return Action.Coiling;
-        }
         else if (currentAnimation.IsTag("Windup"))
         {
-            return Action.Windup;
+            return Action.StrongWindup;
         }
-        else if (getDamageTypeFromCurrentAnimationState() != DamageType.none)
+        else if (currentAnimation.IsTag("QuickCoil"))
+        {
+            return Action.QuickCoil;
+        }
+        else if (currentAnimation.IsTag("QuickAttack"))
         {
             if (nextAnimation.IsTag("Guard"))
             {
@@ -795,9 +768,21 @@ public abstract class Weapon : Wieldable
             }
             else
             {
-                return Action.Attacking;
+                return Action.QuickAttack;
             }
         }
+        else if (currentAnimation.IsTag("StrongAttack"))
+        {
+            if (nextAnimation.IsTag("Guard"))
+            {
+                return Action.Recovering;
+            }
+            else
+            {
+                return Action.StrongAttack;
+            }
+        }
+
         else if (currentAnimation.IsTag("Recovering"))
         {
             return Action.Recovering;

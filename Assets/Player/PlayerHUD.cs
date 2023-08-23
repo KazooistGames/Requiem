@@ -64,7 +64,7 @@ public class PlayerHUD : MonoBehaviour
             {
                 Weapon weapon = Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>();
                 TempoBar.SetActive(true);
-                if(weapon.ActionCurrentlyAnimated == Weapon.Action.Coiling)
+                if(weapon.ActionCurrentlyAnimated == Weapon.Action.StrongWindup)
                 {
                     fadeTransforms(tempoBarTransforms, 0.75f, 10f);
                 }

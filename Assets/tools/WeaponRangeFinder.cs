@@ -32,9 +32,9 @@ public class WeaponRangeFinder : MonoBehaviour
         while (true)
         {
             yield return new WaitUntil(() => transform.parent);
-            yield return new WaitUntil(() => weapon.ActionCurrentlyAnimated == Weapon.Action.Attacking);
+            yield return new WaitUntil(() => weapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack);
             float maxDistance = 0;
-            while (weapon.ActionCurrentlyAnimated == Weapon.Action.Attacking)
+            while (weapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
             {
                 // Get the mesh filter component
                 MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();

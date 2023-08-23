@@ -1402,7 +1402,7 @@ public class AI : MonoBehaviour
             {
                 Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
                 Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-                bool foeAttacking = (matchupMain ? matchupMain.ActionCurrentlyAnimated == Weapon.Action.Attacking || matchupMain.ActionCurrentlyAnimated == Weapon.Action.Windup : false) || (matchupOff ? matchupOff.ActionCurrentlyAnimated == Weapon.Action.Attacking || matchupOff.ActionCurrentlyAnimated == Weapon.Action.Windup : false);
+                bool foeAttacking = (matchupMain ? matchupMain.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || matchupMain.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false) || (matchupOff ? matchupOff.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || matchupOff.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false);
                 bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
                 bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
                 if (foeAttacking && foeInRange && foeFacing)
@@ -1437,7 +1437,7 @@ public class AI : MonoBehaviour
             {
                 Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                 Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-                if ((mainHand ? mainHand.ActionCurrentlyAnimated == Weapon.Action.Attacking || mainHand.ActionCurrentlyAnimated == Weapon.Action.Windup : false) || (offHand ? offHand.ActionCurrentlyAnimated == Weapon.Action.Attacking || offHand.ActionCurrentlyAnimated == Weapon.Action.Windup : false))
+                if ((mainHand ? mainHand.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || mainHand.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false) || (offHand ? offHand.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || offHand.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false))
                 {
                     temp = disposition.normalized;
                     //entity.DashPower = 1.0f;
