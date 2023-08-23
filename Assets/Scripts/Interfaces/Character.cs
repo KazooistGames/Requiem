@@ -474,13 +474,12 @@ public abstract class Character : MonoBehaviour
 
     public virtual void Damage(float magnitude)
     {
-        float poiseDamage = Mathf.Min(Poise, magnitude);
-        alterPoise(-poiseDamage);
-        float vitalityDamage = posture == Posture.Weak ? magnitude : magnitude - poiseDamage;
-        if (vitalityDamage > 0)
+        if (magnitude > 0)
         {
-            Vitality -= vitalityDamage;
-            EventWounded.Invoke(vitalityDamage);
+            float poiseDamage = Mathf.Min(Poise, magnitude);
+            alterPoise(-poiseDamage);
+            Vitality -= magnitude;
+            EventWounded.Invoke(magnitude);
         }
     }
 
@@ -492,22 +491,11 @@ public abstract class Character : MonoBehaviour
             staggerPeriod = duration;
             staggerTimer = 0;
             Staggered = true;
-            //Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
-            //Weapon offWep = OffHand ? OffHand.GetComponent<Weapon>() : null;
-            //if (mainWep)
-            //{
-            //    mainWep.Recoil(duration);
-            //}
-            //if (offWep)
-            //{
-            //    offWep.Recoil(duration);
-            //}
         }
     }
 
     public void Disarm(float yeetMagnitude = 2)
     {
-        //updatePosture();
         Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
         Weapon offWep = OffHand ? OffHand.GetComponent<Weapon>() : null;
         if (mainWep)
@@ -525,7 +513,7 @@ public abstract class Character : MonoBehaviour
         Shoved = true;
         body.AddForce(VelocityChange, ForceMode.VelocityChange);
         float forceDelta = VelocityChange.magnitude;
-        shoveRecoveryPeriod += forceDelta / AccelerationActual;
+        shoveRecoveryPeriod += forceDelta / (AccelerationActual * 0.75f);
     }
 
     /***** PROTECTED *****/
@@ -586,10 +574,6 @@ public abstract class Character : MonoBehaviour
         {
             poiseDebounceTimer = 0.0f;
         }
-        //else
-        //{
-        //    poiseDebounceTimer = POISE_DEBOUNCE_PERIOD;
-        //}
         updatePosture();
     }
 
@@ -840,49 +824,73 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-    private void handleWeaponSwing(Weapon weapon)
+    private void handleWeaponSwing(Weapon myWeapon)
     {
-        alterPoise(-weapon.Heft / 2);
+        if(myWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
+        {
+            alterPoise(-myWeapon.Heft / 2);
+        }
     }
 
-    private void handleWeaponClash(Weapon mine, Weapon theirs)
+    private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (mine.TrueStrike) 
+        if (myWeapon.TrueStrike) 
         {
-            Passion += mine.Heft / 1000;
+            Passion += myWeapon.Heft / 1000;
         }
         else if (posture == Posture.Weak)
         {
-            Stagger(0.25f + 1.5f * (mine.Heft / Strength));
+            Stagger(0.25f + 1.5f * (myWeapon.Heft / Strength));
         }
     }
 
-    private void handleWeaponBlock(Weapon mine, Weapon theirs)
+    private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        alterPoise(-theirs.Heft / 2);
-        if (posture == Posture.Weak)
+        
+        if (theirWeapon.TrueStrike)
         {
-            Stagger(0.25f + 1.5f * (theirs.Heft / Strength));
+            Stagger(0.25f + 1.5f * (theirWeapon.Heft / Strength));
+            alterPoise(-theirWeapon.Heft / 2);
         }
-    }
-
-    private void handleWeaponParry(Weapon mine, Weapon theirs)
-    {
-        Passion += theirs.Heft / 1000;
-
-    }
-
-    private void handleWeaponParried(Weapon mine, Weapon theirs)
-    {
-        if(posture == Posture.Weak)
+        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
         {
-            Disarm();
+            alterPoise(-theirWeapon.Heft / 2);
+        }
+        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.QuickAttack)
+        {
+
         }
     }
 
-    private void handleWeaponHit(Weapon mine, Character foe)
+    private void handleWeaponParry(Weapon myWeapon, Weapon theirWeapon)
     {
-        Passion += mine.Power / 1000;
+        Passion += theirWeapon.Heft / 1000;
+        if (theirWeapon.TrueStrike)
+        {
+
+        }
+        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
+        {
+            theirWeapon.Wielder.alterPoise(theirWeapon.Heft / 2);
+        }
+        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.QuickAttack)
+        {
+            theirWeapon.Wielder.alterPoise(theirWeapon.Heft / 2);
+            Stagger(0.25f + 1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
+        }
+    }
+
+    private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
+    {
+        //if(posture == Posture.Weak)
+        //{
+        //    Disarm();
+        //}
+    }
+
+    private void handleWeaponHit(Weapon myWeapon, Character foe)
+    {
+        Passion += myWeapon.Power / 1000;
     }
 
     private void handleWeaponDropped(Wieldable wieldable)

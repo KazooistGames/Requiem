@@ -1,34 +1,37 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Devil : Passion_Character
+public class Struggler : Character
 {
-
     protected MeshFilter[] bodyparts;
+    //protected GameObject head;
     protected GameObject torso;
     protected GameObject leg1;
     protected GameObject leg2;
+
+    private static GameObject bloodSplatter;
+
+
     protected override void Awake()
     {
         base.Awake();
-        Strength = 300f;
-        Haste = 1.4f;
     }
 
     protected override void Start()
     {
         base.Start();
         createProfile();
-        gameObject.name = "Devil";
+        gameObject.name = "Struggler";
         EventWounded.AddListener(fleshWound);
-
+        if (!bloodSplatter)
+        {
+            bloodSplatter = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");
+        }
+        flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
     }
 
-
-    /***** PUBLIC *****/
 
     /***** PROTECTED *****/
     protected override void Die()
@@ -49,14 +52,13 @@ public class Devil : Passion_Character
             model.GetComponent<Rigidbody>().velocity = body.velocity;
             if (Shoved)
             {
-                Vector3 direction = Foe ? Foe.transform.position - transform.position : new Vector3(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f);
+                Vector3 direction = Foe ? Foe.transform.position - transform.position : new Vector3(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f);
                 model.GetComponent<Rigidbody>().AddForce(-direction.normalized * 1, ForceMode.VelocityChange);
             }
         }
-        Mullet.PlayAmbientSound(Game.deathSounds[UnityEngine.Random.Range(0, Game.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
+        Mullet.PlayAmbientSound(Game.deathSounds[Random.Range(0, Game.deathSounds.Length)], transform.position, 1, 0.5f).layer = gameObject.layer;
         base.Die();
     }
-
 
     /***** PRIVATE *****/
     private void fleshWound(float damage)
@@ -74,10 +76,9 @@ public class Devil : Passion_Character
         splatter.transform.eulerAngles = new Vector3(45, UnityEngine.Random.value * 360f, 45);
         splatter.GetComponent<Projector>().orthographicSize = Mathf.Lerp(0.05f, 0.70f, (damage / 100));
     }
-
     private void createProfile()
     {
-        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/devilBody"));
+        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/fleshBody"));
         model.gameObject.name = "Model";
         model.transform.SetParent(transform, false);
         model.transform.localPosition = Vector3.zero;
@@ -95,5 +96,4 @@ public class Devil : Passion_Character
             }
         }
     }
-
 }

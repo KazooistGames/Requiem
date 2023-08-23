@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Nephalim : Armor_Character
+public class Nephalim : Character
 {
     protected MeshFilter[] bones;
     protected GameObject ribs;
@@ -71,9 +71,8 @@ public class Nephalim : Armor_Character
         }
     }
 
-    protected override void Mutate()
+    protected void Mutate()
     {
-        base.Mutate();
         Debone(head);
         Haste *= 1.25f;
         Strength *= 0.75f;

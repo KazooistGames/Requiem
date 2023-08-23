@@ -25,6 +25,7 @@ public abstract class Weapon : Wieldable
         Sheathed,
         Idle,
 
+        QuickWindup,
         QuickCoil,
         QuickAttack,
 
@@ -54,7 +55,8 @@ public abstract class Weapon : Wieldable
 
     public float Range = 0f;
     public float Power = 0f;
-    public float Sharpness = 0f;
+    public float BasePower = 0f;
+
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
 
     public bool TrueStrike = false;
@@ -74,8 +76,7 @@ public abstract class Weapon : Wieldable
     protected bool attackONS = true;
 
     protected float heftSlowModifier;
-    protected string heftSwingKey;
-    protected string heftGuardKey;
+    protected string heftSlowKey;
     protected static float HEFT_SLOW_RAMP_SPEED = 3;
 
     protected float hitRadius = 0.1f;
@@ -115,18 +116,16 @@ public abstract class Weapon : Wieldable
             box.isTrigger = false;
         }
         swingClip = (equipType == EquipType.TwoHanded) ? "Audio/Weapons/deepSwing" : "Audio/Weapons/midSwing";
-        swingPitch = (equipType == EquipType.TwoHanded ? 50 : 20) / Sharpness;
+        swingPitch = (equipType == EquipType.TwoHanded ? 50 : 20) / BasePower;
         clashClip = "Audio/Weapons/clang";
-        clashPitch = 60 / Sharpness;
+        clashPitch = 60 / BasePower;
         clashVolume = 0.075f;
-        tinkPitch = 20 / Sharpness;
+        tinkPitch = 20 / BasePower;
         if(Heft == 0)
         {
-            Heft = Sharpness;
+            Heft = BasePower;
         }
-        //heftTurnSlow = -Heft / 100f;
-        heftSwingKey = "heftSwing" + gameObject.GetHashCode().ToString();
-        heftGuardKey = "heftGuard" + gameObject.GetHashCode().ToString();
+        heftSlowKey = "heft" + gameObject.GetHashCode().ToString();
         Mesh mesh = GetComponent<MeshFilter>().mesh;
         for (int i = 0; i < mesh.subMeshCount-1; i++)
         {
@@ -150,24 +149,20 @@ public abstract class Weapon : Wieldable
     protected override void Update()
     {
         base.Update();
-        Power = Mathf.Max(modPower.Values.Aggregate(Sharpness, (result, increment) => result += increment), 0);
+        Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
         if (Wielder)
         {
             ActionCurrentlyAnimated = getActionFromCurrentAnimationState();
             togglePhysicsBox(false);
             heftSlowModifier = -Heft / Wielder.Strength;
-            modPower["TrueStrike"] = TrueStrike ? Sharpness * Wielder.Strength/100 : 0;
-            modPower["momentum"] = Vector3.Project(Wielder.body.velocity, Wielder.LookDirection).magnitude * Sharpness / Character.Max_Velocity_Of_Dash;
+            //modPower["TrueStrike"] = TrueStrike ? BasePower * Wielder.Strength/100 : 0;
+            //modPower["momentum"] = Vector3.Project(Wielder.body.velocity, Wielder.LookDirection).magnitude * Sharpness / Character.Max_Velocity_Of_Dash;
             if (transform.parent != Wielder.transform)
             {
                 transform.SetParent(Wielder.transform, true);
             }
             if (Wielded)
             {
-                if (ActionCurrentlyAnimated != Action.StrongAttack && ActionCurrentlyAnimated != Action.Recovering && ActionCurrentlyAnimated != Action.StrongWindup)
-                {
-                    TrueStrike = false;
-                }
                 //damageType = getDamageTypeFromCurrentAnimationState();
                 if (ActionCurrentlyAnimated == Action.Recoiling)
                 {
@@ -182,21 +177,28 @@ public abstract class Weapon : Wieldable
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
-                    modifyWielderSpeed(0, 0);
+                    modifyWielderSpeed(0);
                     setHighlightColor(Color.gray);
                 }
                 else if (ActionCurrentlyAnimated == Action.StrongWindup)
                 {                
                     attackONS = true;
-                    modifyWielderSpeed(swingValue: heftSlowModifier);
+                    modifyWielderSpeed(heftSlowModifier/2);
+                    setHighlightColor(new Color(1, 0.1f, 0.1f));
+                }
+                else if(ActionCurrentlyAnimated == Action.QuickWindup)
+                {
+                    attackONS = true;
+                    modifyWielderSpeed(heftSlowModifier/2);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if(ActionCurrentlyAnimated == Action.QuickCoil)
                 {
-                    modifyWielderSpeed(swingValue: 0);
+                    attackONS = true;
+                    modifyWielderSpeed(0);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
-                else if (ActionCurrentlyAnimated == Action.StrongAttack)
+                else if (ActionCurrentlyAnimated == Action.StrongAttack || ActionCurrentlyAnimated == Action.QuickAttack)
                 {
                     if (attackONS)
                     {
@@ -208,31 +210,31 @@ public abstract class Weapon : Wieldable
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         playSwing();
                     }
-                    modifyWielderSpeed(swingValue: heftSlowModifier);
+                    modifyWielderSpeed(heftSlowModifier);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionCurrentlyAnimated == Action.Recovering)
                 {
-                    modifyWielderSpeed(swingValue: 0);
+                    modifyWielderSpeed(0);
+                    alreadyHit = new List<GameObject>();
+                    attackONS = true;
                 }
                 else if (ActionCurrentlyAnimated == Action.Guarding)
                 {
-                    alreadyHit = new List<GameObject>();
-                    attackONS = true;
                     HitBox.enabled = !nextAnimation.IsTag("Rebuked");
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
-                    modifyWielderSpeed(heftSlowModifier, 0);
+                    modifyWielderSpeed(heftSlowModifier/2);
                     setHighlightColor(new Color(0.1f, 0.1f, 1));
                 }
                 else if (ActionCurrentlyAnimated == Action.Aiming)
                 {
-                    modifyWielderSpeed(swingValue: heftSlowModifier);
+                    modifyWielderSpeed(heftSlowModifier);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionCurrentlyAnimated == Action.Throwing)
                 {
                     alreadyHit = new List<GameObject>();
-                    modifyWielderSpeed(0, 0);
+                    modifyWielderSpeed(0);
                 }
                 else if (ActionCurrentlyAnimated == Action.Parrying)
                 {
@@ -258,7 +260,7 @@ public abstract class Weapon : Wieldable
         {
             if (MostRecentWielder)
             {
-                modifyWielderSpeed(0, 0);
+                modifyWielderSpeed(0);
             }
             if (!MountTarget)
             {
@@ -298,7 +300,7 @@ public abstract class Weapon : Wieldable
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        Power = Mathf.Max(modPower.Values.Aggregate(Sharpness, (result, increment) => result += increment), 0);
+        Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
         if (other)
         {
             if (!alreadyHit.Contains(other.gameObject))
@@ -310,7 +312,7 @@ public abstract class Weapon : Wieldable
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
                     {
-                        if (ActionCurrentlyAnimated == Action.StrongAttack)
+                        if (ActionCurrentlyAnimated == Action.StrongAttack || ActionCurrentlyAnimated == Action.QuickAttack)
                         {
                             RESOLVE_CLASH(this, foeWeapon);
                         }
@@ -328,7 +330,7 @@ public abstract class Weapon : Wieldable
                     }
                     else if (foe && !other.isTrigger)
                     {
-                        if (ActionCurrentlyAnimated == Action.StrongAttack)
+                        if (ActionCurrentlyAnimated == Action.StrongAttack || ActionCurrentlyAnimated == Action.QuickAttack)
                         {
                             RESOLVE_HIT(this, foe);
                         }
@@ -337,7 +339,7 @@ public abstract class Weapon : Wieldable
                             entityCollisionONS(foe);
                         }
                     }
-                    else if (obstacle && ActionCurrentlyAnimated == Action.StrongAttack)
+                    else if (obstacle && (ActionCurrentlyAnimated == Action.StrongAttack || ActionCurrentlyAnimated == Action.QuickAttack))
                     {
                         resolveObstacleHit(other.gameObject);
                     }
@@ -361,46 +363,34 @@ public abstract class Weapon : Wieldable
         base.OnDestroy();
         if (Wielder)
         {
-            modifyWielderSpeed(0, 0);
+            modifyWielderSpeed(0);
         }
     }
 
     /**********PUBLIC**************/
 
 
-
     /**********PROTECTED**************/
 
 
-
     /**********PRIVATE**************/
-
 
     private static void RESOLVE_PARRY(Weapon Attacker, Weapon Parrier)
     {
         if (Attacker.Wielder)
         {
-            //float parryMagnitude = Mathf.Sqrt(Parried.Heft * Parrier.Heft);
-            Attacker.Wielder.Stagger(Attacker.Heft / Attacker.Wielder.Strength);
-            if (Attacker.Wielder.posture == Character.Posture.Weak)
-            {
-                //Parried.Wielder.alterPoise(-Parried.Power);
-                Attacker.Wielder.Disarm();
-            }
-            else
-            {
-                //Parried.Wielder.alterPoise(-Parried.Power);
-            }
-            Attacker.playClang(1.0f);
+
         }
         else if (Attacker.Thrown)
         {
             Attacker.Body.velocity = -Attacker.Body.velocity;
             Attacker.MostRecentWielder = Parrier.Wielder;
         }
+        Parrier.playClang(2.0f);
         Attacker.EventWasParried.Invoke(Attacker, Parrier);
         Parrier.EventParriedWeapon.Invoke(Parrier, Attacker);
         Parrier.itemCollisionONS(Attacker);
+        Attacker.entityCollisionONS(Parrier.Wielder);
     }
 
     private static void RESOLVE_BLOCK(Weapon Attacker, Weapon Blocker)
@@ -408,7 +398,8 @@ public abstract class Weapon : Wieldable
         Blocker.EventBlockedWeapon.Invoke(Blocker, Attacker);
         Attacker.EventClashedWeapon.Invoke(Attacker, Blocker);
         APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: 0.5f);
-        Attacker.playClang(2.0f);        
+        Blocker.playTink();
+        Attacker.entityCollisionONS(Blocker.Wielder);
     }
 
     private static void RESOLVE_CLASH(Weapon Attacker, Weapon Defender)
@@ -419,45 +410,59 @@ public abstract class Weapon : Wieldable
             return;
         }
         GameObject obstruction = testObstructionBetweenEntities(Defender.Wielder, Attacker.MostRecentWielder);
+        if (Attacker.TrueStrike)
+        {
+            Attacker.playClang(1.0f);
+        }
+        else
+        {
+            Attacker.playTink();
+        }
         if (obstruction ? obstruction != Defender.gameObject : false)
         {
             return;
         }
-        if (Attacker.TrueStrike)
-        {
-            Attacker.itemCollisionONS(Defender);
-            Attacker.playClang(1.0f);
-            return;
-        }
-        Attacker.entityCollisionONS(Defender.Wielder);
         if (Defender.ActionCurrentlyAnimated == Action.Parrying)
         {
             RESOLVE_PARRY(Attacker, Defender);
         }
-        else
+        else if(Defender.ActionCurrentlyAnimated == Action.Guarding)
         {
             RESOLVE_BLOCK(Attacker, Defender);
-        }   
+        }
+        else
+        {
+            Attacker.itemCollisionONS(Defender);
+        }
     }
 
-    private static bool RESOLVE_HIT(Weapon weapon, Character entity)
+    private static bool RESOLVE_HIT(Weapon weapon, Character character)
     {
-        if(entity.Allegiance == weapon.Allegiance) {  return false; }
-        weapon.entityCollisionONS(entity);
-        GameObject obstruction = testObstructionBetweenEntities(entity, weapon.MostRecentWielder);
+        if(character.Allegiance == weapon.Allegiance) {  return false; }
+        weapon.entityCollisionONS(character);
+        GameObject obstruction = testObstructionBetweenEntities(character, weapon.MostRecentWielder);
         if (!obstruction)
         {
-            weapon.EventHitting.Invoke(weapon, entity);
-            entity.Damage(weapon.Power);
-            APPLY_WEAPON_SHOVE_TO_FOE(weapon, entity);
-            weapon.playSlap(entity.transform.position);
-            weapon.entityCollisionONS(entity);
+            float appliedDamage = weapon.Power;
+            if(weapon.ActionCurrentlyAnimated == Action.QuickAttack && character.posture != Character.Posture.Weak)
+            {
+                appliedDamage -= character.Resolve;
+            }
+            else if(weapon.TrueStrike && weapon.Wielder.posture != Character.Posture.Weak)
+            {
+                appliedDamage += weapon.Wielder.Resolve;
+            }
+            character.Damage(appliedDamage);
+            weapon.EventHitting.Invoke(weapon, character);
+            APPLY_WEAPON_SHOVE_TO_FOE(weapon, character);
+            weapon.playSlap(character.transform.position);
+            weapon.entityCollisionONS(character);
             On_Weapon_Hit.Invoke(weapon);
             return true;
         }
         else if (!obstruction.GetComponent<Weapon>())
         {
-            weapon.entityCollisionONS(entity);
+            weapon.entityCollisionONS(character);
         }
         else
         {
@@ -469,7 +474,14 @@ public abstract class Weapon : Wieldable
 
     private void resolveObstacleHit(GameObject obstacle)
     {
-        playTink();
+        if (TrueStrike)
+        {
+            playClang(1.0f);
+        }
+        else
+        {
+            playTink();
+        }
         alreadyHit.Add(obstacle);
     }
 
@@ -509,8 +521,8 @@ public abstract class Weapon : Wieldable
                     alreadyHit.Add(foe.gameObject);
                     foe.EventCrashed.AddListener(impale_doupleDipDamage);
                     foe.EventVanquished.AddListener(impale_release);
-                    foe.modSpeed[key] = -(Power/foe.Strength);
-                    foe.BleedingWounds[key] = (Power / 5, float.PositiveInfinity);
+                    foe.modSpeed[key] = -(Heft/foe.Strength);
+                    foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
                     yield return new WaitWhile(() => foe ? foe.posture <= Character.Posture.Strong : false);
                     if (foe)
                     {
@@ -640,13 +652,9 @@ public abstract class Weapon : Wieldable
         Anim.SetBool("secondary", false);
         Anim.SetBool("tertiary", false);
         Anim.SetBool("rebuked", false);
-        if (Wielder)
+        if (MostRecentWielder)
         {
-            modifyWielderSpeed(0, 0);
-        }
-        else
-        {
-            modPower["Resolve"] = 0;
+            modifyWielderSpeed(0);
         }
         if (!Thrown)
         {
@@ -654,44 +662,25 @@ public abstract class Weapon : Wieldable
         }
     }
 
-    private void modifyWielderSpeed(float guardValue = float.MaxValue, float swingValue = float.MaxValue)
+    private void modifyWielderSpeed(float value)
     {
-        if (!MostRecentWielder)
+        if (MostRecentWielder)
         {
-            return;
-        }
-        if(guardValue != float.MaxValue)
-        {
-            if (!MostRecentWielder.modTurnSpeed.ContainsKey(heftGuardKey))
+            if (!MostRecentWielder.modTurnSpeed.ContainsKey(heftSlowKey))
             {
-                MostRecentWielder.modTurnSpeed[heftGuardKey] = 0;
+                MostRecentWielder.modTurnSpeed[heftSlowKey] = 0;
             }
-            if (!MostRecentWielder.modSpeed.ContainsKey(heftGuardKey))
+            if (!MostRecentWielder.modSpeed.ContainsKey(heftSlowKey))
             {
-                MostRecentWielder.modSpeed[heftGuardKey] = 0;
+                MostRecentWielder.modSpeed[heftSlowKey] = 0;
             }
-            MostRecentWielder.modTurnSpeed[heftGuardKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftGuardKey], guardValue, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
-            MostRecentWielder.modSpeed[heftGuardKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftGuardKey], guardValue, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
-        }
-        if (swingValue != float.MaxValue)
-        {
-            if (!MostRecentWielder.modTurnSpeed.ContainsKey(heftSwingKey))
-            {
-                MostRecentWielder.modTurnSpeed[heftSwingKey] = 0;
-            }
-            if (!MostRecentWielder.modSpeed.ContainsKey(heftSwingKey))
-            {
-                MostRecentWielder.modSpeed[heftSwingKey] = 0;
-            }
-            MostRecentWielder.modTurnSpeed[heftSwingKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSwingKey], swingValue, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
-            MostRecentWielder.modSpeed[heftSwingKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSwingKey], swingValue, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
+            MostRecentWielder.modTurnSpeed[heftSlowKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSlowKey], value, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
+            MostRecentWielder.modSpeed[heftSlowKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSlowKey], value, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
         }
     }
 
     private IEnumerator routineTempo()
     {
-        //float scalar = 50 / Heft;
-        //float exponent = 1f;
         while (true)
         {
 
@@ -734,7 +723,7 @@ public abstract class Weapon : Wieldable
             }
             else if (nextAnimation.IsTag("QuickCoil"))
             {
-                return Action.QuickCoil;
+                return Action.QuickWindup;
             }
             else
             {
@@ -808,7 +797,7 @@ public abstract class Weapon : Wieldable
 
     private void playShing(float pichScalar = 1.0f)
     {
-        Mullet.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Sharpness, 0.25f, Mullet.Instance.DefaultAudioRange / 4, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        Mullet.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Heft, 0.25f, Mullet.Instance.DefaultAudioRange / 4, onSoundSpawn: sound => sound.layer = gameObject.layer);
     }
 
     private void playSlap(Vector3 position)

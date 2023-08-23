@@ -4,16 +4,15 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class NephySkully : Armor_Character
+public class Skully : Character
 {
     protected override void Awake()
     {
         base.Awake();
-        Strength = 50f;
+        Strength = 25f;
         berthScalar = 0.80f;
-        Haste = 1.5f;
+        Haste = 2.0f;
         BaseAcceleration = 4f;
-        scaleScalar = 1.2f;
     }
 
     protected override void Start()
@@ -21,7 +20,7 @@ public class NephySkully : Armor_Character
         base.Start();
         createSkeleton();
         anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animation/entities/skully/skullyAnimation");
-        gameObject.name = "NephySkully";
+        gameObject.name = "Skully";
         hurtBox.height = 0;
         hurtBox.center = Vector3.up * 0.2f;
     }
@@ -50,7 +49,7 @@ public class NephySkully : Armor_Character
 
     private void createSkeleton()
     {
-        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/nephySkullyBody"));
+        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/skullyBody"));
         model.gameObject.name = "Model";
         model.transform.SetParent(transform, false);
         head = head ? head : model.GetComponentInChildren<MeshFilter>().gameObject;
@@ -60,19 +59,6 @@ public class NephySkully : Armor_Character
         head.layer = gameObject.layer;
     }
 
-    protected override void Mutate()
-    {
-        base.Mutate();
-        for(int i = 0; i < 2; i++)
-        {
-            Character entity;
-            entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Character>();
-            entity.Poise = entity.Strength;
-            entity.Shove(AI.RandomDirection() * Min_Velocity_Of_Dash);
-        }
-        Destroy(head);
-        Die();
-    }
     protected override void Die()
     {
         Debone(head);

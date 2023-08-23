@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shade : Armor_Character
+public class Shade : Character
 {
     static RuntimeAnimatorController shadeAnimations;
 
