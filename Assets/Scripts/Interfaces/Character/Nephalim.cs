@@ -11,6 +11,8 @@ public class Nephalim : Character
     protected GameObject leg1;
     protected GameObject leg2;
 
+    private _Martial _martial;
+
     protected override void Awake()
     {
         base.Awake();
@@ -26,6 +28,8 @@ public class Nephalim : Character
         createSkeleton();
         gameObject.name = "Nephy";  
         EventWounded.AddListener(CRUMBLE);
+        _martial = GetComponent<_Martial>() ? GetComponent<_Martial>() : gameObject.AddComponent<_Martial>();
+        _martial.CompletedTask.AddListener(martialCompletedActionHandler);
     }
 
     protected override void Update()
@@ -43,8 +47,36 @@ public class Nephalim : Character
         base.OnDestroy();
     }
 
-    //CUSTOM FUNCTIONS!!!!!!!!!!!!!
-    protected void CRUMBLE(float damage)
+
+    /***** PUBLIC *****/
+
+
+    /***** PROTECTED *****/
+    protected override void Die()
+    {
+        foreach (MeshFilter bone in bones)
+        {
+            if (bone && !bone.GetComponent<Rigidbody>())
+            {
+                Debone(bone.gameObject);
+            }
+        }
+        head = null;
+        ribs = null;
+        pelvis = null;
+        leg1 = null;
+        leg2 = null;
+        base.Die();
+    }
+
+
+    /***** PRIVATE *****/
+    private void martialCompletedActionHandler()
+    {
+        _martial.QueueTask(_Martial.Action.Primary, 1f);
+    }
+
+    private void CRUMBLE(float damage)
     {
         Mullet.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.4f + 0.5f * UnityEngine.Random.value * 0.7f, 0.5f, Mullet.Instance.DefaultAudioRange / 2);
     }
@@ -71,27 +103,4 @@ public class Nephalim : Character
         }
     }
 
-    protected void Mutate()
-    {
-        Debone(head);
-        Haste *= 1.25f;
-        Strength *= 0.75f;
-    }
-
-    protected override void Die()
-    {
-        foreach (MeshFilter bone in bones)
-        {
-            if (bone && !bone.GetComponent<Rigidbody>())
-            {
-                Debone(bone.gameObject);
-            }
-        }
-        head = null;
-        ribs = null;
-        pelvis = null;
-        leg1 = null;
-        leg2 = null;    
-        base.Die();
-    }
 }

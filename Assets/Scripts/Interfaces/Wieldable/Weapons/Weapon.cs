@@ -371,7 +371,12 @@ public abstract class Weapon : Wieldable
 
 
     /**********PROTECTED**************/
-
+    protected override IEnumerator pickupHandler(Character newOwner)
+    {
+        yield return null;
+        playShing();
+        yield return base.pickupHandler(newOwner);
+    }
 
     /**********PRIVATE**************/
 
@@ -582,12 +587,6 @@ public abstract class Weapon : Wieldable
         DropItem(yeet: true, magnitude: 1);
     }
 
-    protected override IEnumerator pickupHandler(Character newOwner)
-    {
-        yield return null;
-        playShing();    
-        yield return base.pickupHandler(newOwner);
-    }
 
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Character foe, float scalar = 1.0f)
     {
@@ -597,7 +596,7 @@ public abstract class Weapon : Wieldable
         foe.Shove(velocityChange);
     }
 
-    protected void entityCollisionONS(Character entity)
+    private void entityCollisionONS(Character entity)
     {
         if (entity)
         {
@@ -771,7 +770,6 @@ public abstract class Weapon : Wieldable
                 return Action.StrongAttack;
             }
         }
-
         else if (currentAnimation.IsTag("Recovering"))
         {
             return Action.Recovering;
@@ -802,7 +800,7 @@ public abstract class Weapon : Wieldable
 
     private void playSlap(Vector3 position)
     {
-        Mullet.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Clamp(20f / Power, 0.4f, 1.6f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        Mullet.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Clamp(10f / Power, 0.4f, 1.6f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
     }
 
     private void playTink()

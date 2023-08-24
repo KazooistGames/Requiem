@@ -5,19 +5,21 @@ using UnityEngine.Events;
 
 public class _Martial : MonoBehaviour
 {
+    private Character me;
+    private Weapon myWeapon;
+    private Weapon FoeWeapon;
 
-    public Weapon MyWeapon;
-    public Character Foe;
-    public Weapon FoeWeapon;
     public float ReflexPeriod = 0.1f;
 
+    public UnityEvent CompletedTask = new UnityEvent();
     public UnityEvent EventInRange = new UnityEvent();
     public UnityEvent EventFoeInRange = new UnityEvent();
     public UnityEvent EventOutOfRange = new UnityEvent();
     public UnityEvent EventFoeOutOfRange = new UnityEvent();
 
-    public Task ActiveTask { get; private set; }
-    public Task QueuedTask { get; private set; }
+    public Task TaskActive { get; private set; }
+    public Task TaskQueued { get; private set; }
+
 
     public enum Action
     {
@@ -31,10 +33,7 @@ public class _Martial : MonoBehaviour
     {
         public Action action;
         public float duration;
-        public TaskAbortion abortion;
     }
-
-    public delegate bool TaskAbortion();
 
     private float taskTimer = 0;
     private float reflexTimer  = 0;
@@ -46,59 +45,66 @@ public class _Martial : MonoBehaviour
 
     void Start()
     {
-        ActiveTask = EMPTY_TASK;
-        QueuedTask = EMPTY_TASK;
+        TaskActive = EMPTY_TASK;
+        TaskQueued = EMPTY_TASK;
+        me = GetComponent<Character>();
+        if (!me)
+        {
+            Destroy(this);
+        }
     }
 
     void Update()
     {
-        if (!MyWeapon) { return; } //no weapon means nothing to control
-        if ((taskTimer += Time.deltaTime) >= ActiveTask.duration)
+        myWeapon = me.MainHand ? me.MainHand.GetComponent<Weapon>() : null;
+        if (!myWeapon) { return; } //no weapon means nothing to control
+        if ((taskTimer += Time.deltaTime) >= TaskActive.duration)
         {
-            taskTimer -= ActiveTask.duration;
-            MyWeapon.PrimaryTrigger = false;
-            MyWeapon.SecondaryTrigger = false;
-            MyWeapon.TertiaryTrigger = false;
-            ActiveTask = QueuedTask;
-            QueuedTask = EMPTY_TASK;
+            taskTimer -= TaskActive.duration;
+            myWeapon.PrimaryTrigger = false;
+            myWeapon.SecondaryTrigger = false;
+            myWeapon.TertiaryTrigger = false;
+            TaskActive = TaskQueued;
+            TaskQueued = EMPTY_TASK;
+            CompletedTask.Invoke();
         }
         else
         {
-            switch (ActiveTask.action)
+            switch (TaskActive.action)
             {
                 case Action.Idle:
-                    MyWeapon.PrimaryTrigger = false;
-                    MyWeapon.SecondaryTrigger = false;
-                    MyWeapon.TertiaryTrigger = false;
+                    myWeapon.PrimaryTrigger = false;
+                    myWeapon.SecondaryTrigger = false;
+                    myWeapon.TertiaryTrigger = false;
                     break;
                 case Action.Primary:
-                    MyWeapon.PrimaryTrigger = true;
+                    myWeapon.PrimaryTrigger = true;
                     break;
                 case Action.Secondary:
-                    MyWeapon.SecondaryTrigger = true;
+                    myWeapon.SecondaryTrigger = true;
                     break;
                 case Action.Tertiary:
-                    MyWeapon.TertiaryTrigger = true;
+                    myWeapon.TertiaryTrigger = true;
                     break;
             }
         }
-        if(!Foe) { return; } //assumes we have a foe assigned to duel
-        FoeWeapon = Foe.MainHand ? Foe.MainHand.GetComponent<Weapon>() : null;
+        if(!me.Foe) { return; } //assumes we have a foe assigned to duel
+        FoeWeapon = me.Foe.MainHand ? me.Foe.MainHand.GetComponent<Weapon>() : null;
         if ((reflexTimer += Time.deltaTime) >= ReflexPeriod)
         {
             reflexTimer -= ReflexPeriod;    
-            float rangeNeeded = (Foe.transform.position - transform.position).magnitude;
-            if (inRange && rangeNeeded > MyWeapon.Range)
+            float rangeNeeded = (me.Foe.transform.position - transform.position).magnitude;
+            if (inRange && rangeNeeded > myWeapon.Range)
             {
                 EventOutOfRange.Invoke();
             }
-            else if (!inRange && rangeNeeded <= MyWeapon.Range)
+            else if (!inRange && rangeNeeded <= myWeapon.Range)
             {
                 EventInRange.Invoke();
             }
             if (FoeWeapon)
             {
-                float foeRangeNeeded = (transform.position - Foe.transform.position).magnitude;
+                float foeRangeNeeded = (transform.position - me.Foe.transform.position).magnitude;
                 if (foeInRange && foeRangeNeeded > FoeWeapon.Range)
                 {
                     EventFoeOutOfRange.Invoke();
@@ -116,15 +122,28 @@ public class _Martial : MonoBehaviour
 
     /***** PUBLIC *****/
 
-    public void OverrideTask(Task task)
+    public void OverrideTask(Action action, float duration)
     {
-        ActiveTask = task;
+        Task task = new Task() { action = action, duration = duration};
+        TaskActive = task;
     }
 
-    public void QueueTask(Task task)
+    public void QueueTask(Action action, float duration)
     {
-        QueuedTask = task;
+        Task task = new Task() { action = action, duration = duration};
+        TaskQueued = task;
     }
+
+    public void AbortTask()
+    {
+        taskTimer = TaskActive.duration;
+    }
+
+
+    /***** PROTECTED *****/
+
+
+    /***** PRIVATE *****/
 
 
 }
