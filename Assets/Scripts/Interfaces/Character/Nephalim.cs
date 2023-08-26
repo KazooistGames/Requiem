@@ -11,7 +11,6 @@ public class Nephalim : Character
     protected GameObject leg1;
     protected GameObject leg2;
 
-    private _Martial _martial;
 
     protected override void Awake()
     {
@@ -28,13 +27,27 @@ public class Nephalim : Character
         createSkeleton();
         gameObject.name = "Nephy";  
         EventWounded.AddListener(CRUMBLE);
-        _martial = GetComponent<_Martial>() ? GetComponent<_Martial>() : gameObject.AddComponent<_Martial>();
-        _martial.CompletedTask.AddListener(martialCompletedActionHandler);
+
     }
 
     protected override void Update()
     {
         base.Update();
+        Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
+        if (mainWep)
+        {
+            if (!Foe)
+            {
+                _Martial.OverrideActionQueueForWeapon(mainWep, Weapon.Action.Idle);
+            }
+            else if(!_Martial.WeaponActionQueues.ContainsKey(mainWep))
+            {
+                _Martial.QueueActionForWeapon(mainWep, Weapon.Action.QuickAttack);
+                _Martial.QueueActionForWeapon(mainWep, Weapon.Action.Guarding);
+                _Martial.QueueActionForWeapon(mainWep, Weapon.Action.StrongAttack);
+            }
+        }
+
     }
 
     protected override void FixedUpdate()
@@ -71,10 +84,6 @@ public class Nephalim : Character
 
 
     /***** PRIVATE *****/
-    private void martialCompletedActionHandler()
-    {
-        _martial.QueueTask(_Martial.Action.Primary, 1f);
-    }
 
     private void CRUMBLE(float damage)
     {

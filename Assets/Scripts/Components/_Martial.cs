@@ -1,149 +1,119 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class _Martial : MonoBehaviour
 {
-    private Character me;
-    private Weapon myWeapon;
-    private Weapon FoeWeapon;
+    public static _Martial Instance { get; private set; }
 
-    public float ReflexPeriod = 0.1f;
-
-    public UnityEvent CompletedTask = new UnityEvent();
-    public UnityEvent EventInRange = new UnityEvent();
-    public UnityEvent EventFoeInRange = new UnityEvent();
-    public UnityEvent EventOutOfRange = new UnityEvent();
-    public UnityEvent EventFoeOutOfRange = new UnityEvent();
-
-    public Task TaskActive { get; private set; }
-    public Task TaskQueued { get; private set; }
-
-
-    public enum Action
-    {
-        Idle,
-        Primary,
-        Secondary,
-        Tertiary,
-    }
-
-    public struct Task
-    {
-        public Action action;
-        public float duration;
-    }
-
-    private float taskTimer = 0;
-    private float reflexTimer  = 0;
-
-    private bool inRange = false;
-    private bool foeInRange = false;
-
-    private static Task EMPTY_TASK = new Task() { action = Action.Idle, duration = 0};
+    public static Dictionary<Weapon, Queue<Weapon.Action>> WeaponActionQueues { get; private set; }
+    private static List<Weapon> keysDequeuedThisFrame = new List<Weapon>();
 
     void Start()
     {
-        TaskActive = EMPTY_TASK;
-        TaskQueued = EMPTY_TASK;
-        me = GetComponent<Character>();
-        if (!me)
+        if (Instance)
         {
-            Destroy(this);
+            Destroy(Instance);
         }
+        Instance = this;
+        WeaponActionQueues = new Dictionary<Weapon, Queue<Weapon.Action>>();
     }
 
     void Update()
     {
-        myWeapon = me.MainHand ? me.MainHand.GetComponent<Weapon>() : null;
-        if (!myWeapon) { return; } //no weapon means nothing to control
-        if ((taskTimer += Time.deltaTime) >= TaskActive.duration)
+        keysDequeuedThisFrame.Clear();
+        foreach (KeyValuePair<Weapon, Queue<Weapon.Action>> kvp in WeaponActionQueues)
         {
-            taskTimer -= TaskActive.duration;
-            myWeapon.PrimaryTrigger = false;
-            myWeapon.SecondaryTrigger = false;
-            myWeapon.TertiaryTrigger = false;
-            TaskActive = TaskQueued;
-            TaskQueued = EMPTY_TASK;
-            CompletedTask.Invoke();
-        }
-        else
-        {
-            switch (TaskActive.action)
+            Weapon thisWeapon = kvp.Key;
+            Weapon.Action desiredActionForThisWeapon = kvp.Value.Peek();
+            if (applyWeaponControlsNeededForDesiredAction(thisWeapon, desiredActionForThisWeapon))
             {
-                case Action.Idle:
-                    myWeapon.PrimaryTrigger = false;
-                    myWeapon.SecondaryTrigger = false;
-                    myWeapon.TertiaryTrigger = false;
-                    break;
-                case Action.Primary:
-                    myWeapon.PrimaryTrigger = true;
-                    break;
-                case Action.Secondary:
-                    myWeapon.SecondaryTrigger = true;
-                    break;
-                case Action.Tertiary:
-                    myWeapon.TertiaryTrigger = true;
-                    break;
+                Weapon.Action actionCompletedThisFrame = WeaponActionQueues[thisWeapon].Dequeue();
+                keysDequeuedThisFrame.Add(thisWeapon);
             }
         }
-        if(!me.Foe) { return; } //assumes we have a foe assigned to duel
-        FoeWeapon = me.Foe.MainHand ? me.Foe.MainHand.GetComponent<Weapon>() : null;
-        if ((reflexTimer += Time.deltaTime) >= ReflexPeriod)
+        foreach(Weapon weaponKey in keysDequeuedThisFrame)
         {
-            reflexTimer -= ReflexPeriod;    
-            float rangeNeeded = (me.Foe.transform.position - transform.position).magnitude;
-            if (inRange && rangeNeeded > myWeapon.Range)
+            if(WeaponActionQueues[weaponKey].Count == 0)
             {
-                EventOutOfRange.Invoke();
-            }
-            else if (!inRange && rangeNeeded <= myWeapon.Range)
-            {
-                EventInRange.Invoke();
-            }
-            if (FoeWeapon)
-            {
-                float foeRangeNeeded = (transform.position - me.Foe.transform.position).magnitude;
-                if (foeInRange && foeRangeNeeded > FoeWeapon.Range)
-                {
-                    EventFoeOutOfRange.Invoke();
-                }
-                else if (!foeInRange && foeRangeNeeded <= FoeWeapon.Range)
-                {
-                    EventFoeInRange.Invoke();
-                }
+                WeaponActionQueues.Remove(weaponKey);
             }
         }
     }
-
-
-
 
     /***** PUBLIC *****/
-
-    public void OverrideTask(Action action, float duration)
+    public static void QueueActionForWeapon(Weapon weapon, Weapon.Action actionToQueue)
     {
-        Task task = new Task() { action = action, duration = duration};
-        TaskActive = task;
+        if (!WeaponActionQueues.ContainsKey(weapon))
+        {
+            WeaponActionQueues[weapon] = new Queue<Weapon.Action>();
+        }
+        WeaponActionQueues[weapon].Enqueue(actionToQueue);
     }
 
-    public void QueueTask(Action action, float duration)
+    public static void OverrideActionQueueForWeapon(Weapon weapon, Weapon.Action actionToQueue)
     {
-        Task task = new Task() { action = action, duration = duration};
-        TaskQueued = task;
-    }
-
-    public void AbortTask()
-    {
-        taskTimer = TaskActive.duration;
+        WeaponActionQueues.Remove(weapon);
+        QueueActionForWeapon(weapon, actionToQueue);
     }
 
 
     /***** PROTECTED *****/
 
 
-    /***** PRIVATE *****/
 
+    /***** PRIVATE *****/
+    private static bool applyWeaponControlsNeededForDesiredAction(Weapon weapon, Weapon.Action desiredAction)
+    {
+        (bool, bool, bool) triggerControlValues;
+        switch (desiredAction)
+        {
+            case Weapon.Action.Idle:
+                triggerControlValues = (false, false, false);
+                break;
+            case Weapon.Action.QuickCoil:
+                triggerControlValues = (true, false, false);
+                break;
+            case Weapon.Action.QuickAttack:
+                if (weapon.ActionCurrentlyAnimated == Weapon.Action.QuickCoil)
+                {
+                    triggerControlValues = (true, false, true);
+                }
+                else
+                {
+                    triggerControlValues = (true, false, false);
+                }
+                break;
+            case Weapon.Action.StrongAttack:
+                triggerControlValues = (false, false, true);
+                break;
+            case Weapon.Action.Guarding:
+                triggerControlValues = (false, true, false);
+                break;
+            case Weapon.Action.Parrying:
+                if (weapon.ActionCurrentlyAnimated == Weapon.Action.Guarding) 
+                {
+                    triggerControlValues = (false, false, false);
+                }
+                else
+                {
+                    triggerControlValues = (false, true, false);
+                }
+                break;
+            default:
+                triggerControlValues = (false, false, false);
+                break;
+        }
+        weapon.PrimaryTrigger = triggerControlValues.Item1;
+        weapon.SecondaryTrigger = triggerControlValues.Item2;
+        weapon.TertiaryTrigger = triggerControlValues.Item3;
+        if(weapon.ActionCurrentlyAnimated == desiredAction)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 }
