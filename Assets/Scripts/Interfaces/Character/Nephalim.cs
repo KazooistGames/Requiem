@@ -38,13 +38,21 @@ public class Nephalim : Character
         {
             if (!Foe)
             {
-                _Martial.OverrideActionQueueForWeapon(mainWep, Weapon.Action.Idle);
+                _Martial.Override_Queue(mainWep, Weapon.Action.Idle);
             }
-            else if(!_Martial.WeaponActionQueues.ContainsKey(mainWep))
+            else if(_Martial.Action_Queues[mainWep].Count == 0)
             {
-                _Martial.QueueActionForWeapon(mainWep, Weapon.Action.QuickAttack);
-                _Martial.QueueActionForWeapon(mainWep, Weapon.Action.Guarding);
-                _Martial.QueueActionForWeapon(mainWep, Weapon.Action.StrongAttack);
+                float disposition = (Foe.transform.position - transform.position).magnitude;
+                if(mainWep.Range >= disposition)
+                {
+                    _Martial.Queue_Action(mainWep, Weapon.Action.QuickAttack);
+                    _Martial.Queue_Action(mainWep, Weapon.Action.Guarding, 2);
+                    _Martial.Queue_Action(mainWep, Weapon.Action.StrongAttack);
+                }
+                else
+                {
+                    _Martial.Queue_Action(mainWep, Weapon.Action.QuickCoil);
+                }
             }
         }
 

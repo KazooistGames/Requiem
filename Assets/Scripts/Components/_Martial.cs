@@ -3,10 +3,20 @@ using UnityEngine;
 
 public class _Martial : MonoBehaviour
 {
-    public static _Martial Instance { get; private set; }
+    private static _Martial Instance;
 
-    public static Dictionary<Weapon, Queue<Weapon.Action>> WeaponActionQueues { get; private set; }
-    private static List<Weapon> keysDequeuedThisFrame = new List<Weapon>();
+    public struct MartialJob
+    {
+        public Weapon.Action Action;
+        public float Debounce;
+    }
+
+    public static Dictionary<Weapon, MartialJob> Weapon_Actions { get; private set; } = new Dictionary<Weapon, MartialJob>();
+    public static Dictionary<Weapon, Queue<MartialJob>> Action_Queues { get; private set; } = new Dictionary<Weapon, Queue<MartialJob>>();
+    public static Dictionary<Weapon, float> Debounce_Timers { get; private set; } = new Dictionary<Weapon, float>();
+
+    private static List<Weapon> KEYS_TO_DEQUEUE_THIS_FRAME = new List<Weapon>();
+
 
     void Start()
     {
@@ -15,45 +25,77 @@ public class _Martial : MonoBehaviour
             Destroy(Instance);
         }
         Instance = this;
-        WeaponActionQueues = new Dictionary<Weapon, Queue<Weapon.Action>>();
     }
 
     void Update()
     {
-        keysDequeuedThisFrame.Clear();
-        foreach (KeyValuePair<Weapon, Queue<Weapon.Action>> kvp in WeaponActionQueues)
+        KEYS_TO_DEQUEUE_THIS_FRAME.Clear();
+        foreach (KeyValuePair<Weapon, MartialJob> kvp in Weapon_Actions)
         {
-            Weapon thisWeapon = kvp.Key;
-            Weapon.Action desiredActionForThisWeapon = kvp.Value.Peek();
-            if (applyWeaponControlsNeededForDesiredAction(thisWeapon, desiredActionForThisWeapon))
+            Weapon weapon = kvp.Key;
+            Weapon.Action desiredAction = kvp.Value.Action;
+            float debounce = kvp.Value.Debounce;
+            if (!weapon)
             {
-                Weapon.Action actionCompletedThisFrame = WeaponActionQueues[thisWeapon].Dequeue();
-                keysDequeuedThisFrame.Add(thisWeapon);
+                removeWeaponKey(weapon);
+            }
+            else if (Debounce_Timers[weapon] > 0)
+            {
+                if (Debounce_Timers[weapon] > debounce)
+                {
+                    Debounce_Timers[weapon] = 0;
+                    KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
+                }
+                else
+                {
+                    Debounce_Timers[weapon] += Time.deltaTime;
+                }
+            }
+            else if (attemptToExecuteDesiredActionWithWeapon(weapon, desiredAction))
+            {
+                Debounce_Timers[weapon] += Time.deltaTime;
             }
         }
-        foreach(Weapon weaponKey in keysDequeuedThisFrame)
+        foreach (Weapon weapon in KEYS_TO_DEQUEUE_THIS_FRAME)
         {
-            if(WeaponActionQueues[weaponKey].Count == 0)
+            if (Action_Queues[weapon].Count > 0)
             {
-                WeaponActionQueues.Remove(weaponKey);
+                Weapon_Actions[weapon] = Action_Queues[weapon].Dequeue();
             }
         }
+
     }
 
     /***** PUBLIC *****/
-    public static void QueueActionForWeapon(Weapon weapon, Weapon.Action actionToQueue)
+    public static void Queue_Action(Weapon weapon, Weapon.Action action, float debounce = 0)
     {
-        if (!WeaponActionQueues.ContainsKey(weapon))
+        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce };
+        if (!Weapon_Actions.ContainsKey(weapon))
         {
-            WeaponActionQueues[weapon] = new Queue<Weapon.Action>();
+            Weapon_Actions[weapon] = newJob;
+            Action_Queues[weapon] = new Queue<MartialJob>();
+            Debounce_Timers[weapon] = 0;
         }
-        WeaponActionQueues[weapon].Enqueue(actionToQueue);
+        else
+        {
+            Action_Queues[weapon].Enqueue(newJob);
+        }
     }
 
-    public static void OverrideActionQueueForWeapon(Weapon weapon, Weapon.Action actionToQueue)
+    public static void Override_Queue(Weapon weapon, Weapon.Action action)
     {
-        WeaponActionQueues.Remove(weapon);
-        QueueActionForWeapon(weapon, actionToQueue);
+        if (Action_Queues.ContainsKey(weapon))
+        {
+            Action_Queues[weapon].Clear();
+        }
+        Queue_Action(weapon, action);
+    }
+
+    public static void Override_Action(Weapon weapon, Weapon.Action action, float debounce = 0)
+    {
+        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce };
+        Weapon_Actions[weapon] = newJob;
+        Debounce_Timers[weapon] = 0;
     }
 
 
@@ -62,7 +104,25 @@ public class _Martial : MonoBehaviour
 
 
     /***** PRIVATE *****/
-    private static bool applyWeaponControlsNeededForDesiredAction(Weapon weapon, Weapon.Action desiredAction)
+
+    private static void removeWeaponKey(Weapon weapon)
+    {
+        if (Weapon_Actions.ContainsKey(weapon))
+        {
+            Weapon_Actions.Remove(weapon);
+        }
+        if (Action_Queues.ContainsKey(weapon))
+        {
+            Action_Queues.Remove(weapon);
+        }
+        if (Debounce_Timers.ContainsKey(weapon))
+        {
+            Debounce_Timers.Remove(weapon);
+        }
+
+    }
+
+    private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.Action desiredAction)
     {
         (bool, bool, bool) triggerControlValues;
         switch (desiredAction)

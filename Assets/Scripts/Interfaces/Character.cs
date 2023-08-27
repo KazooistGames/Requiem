@@ -871,11 +871,11 @@ public abstract class Character : MonoBehaviour
         }
         else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
         {
-            theirWeapon.Wielder.alterPoise(theirWeapon.Heft / 2);
+            theirWeapon.Wielder.alterPoise(-theirWeapon.Heft / 2);
         }
         else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.QuickAttack)
         {
-            theirWeapon.Wielder.alterPoise(theirWeapon.Heft / 2);
+            theirWeapon.Wielder.alterPoise(-theirWeapon.Heft / 2);
             theirWeapon.Wielder.Stagger(0.25f + 1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
         }
     }
