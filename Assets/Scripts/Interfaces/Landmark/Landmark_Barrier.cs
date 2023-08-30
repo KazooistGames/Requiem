@@ -83,7 +83,7 @@ public class Landmark_Barrier : Landmark
             }
 
             positions.Add((position, offsetAngle));            
-            model.transform.localPosition = model.transform.localPosition = new Vector3(Mathf.Sin(Mullet.DegToRad(angle)), 1, Mathf.Cos(Mullet.DegToRad(angle))) * positionScalar;
+            model.transform.localPosition = model.transform.localPosition = new Vector3(Mathf.Sin(Mathf.Deg2Rad * angle), 1, Mathf.Cos(Mathf.Deg2Rad * angle)) * positionScalar;
             Rigidbody body = model.GetComponent<Rigidbody>() ? model.GetComponent<Rigidbody>() : model.AddComponent<Rigidbody>();
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
             body.freezeRotation = true;

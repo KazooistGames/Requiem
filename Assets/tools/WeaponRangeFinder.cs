@@ -32,9 +32,9 @@ public class WeaponRangeFinder : MonoBehaviour
         while (true)
         {
             yield return new WaitUntil(() => transform.parent);
-            yield return new WaitUntil(() => weapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack);
+            yield return new WaitUntil(() => weapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack);
             float maxDistance = 0;
-            while (weapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
+            while (weapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
             {
                 // Get the mesh filter component
                 MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
@@ -58,7 +58,7 @@ public class WeaponRangeFinder : MonoBehaviour
                     // Calculate the distance from each corner to the transform position
                     foreach (Vector3 corner in corners)
                     {
-                        float distance = Vector3.Distance(Mullet.Vec3Mult(corner + transform.localPosition, transform.lossyScale), Vector3.zero);
+                        float distance = Vector3.Distance(Vector3.Scale(corner + transform.localPosition, transform.lossyScale), Vector3.zero);
                         if (distance > maxDistance)
                         {
                             maxDistance = distance;

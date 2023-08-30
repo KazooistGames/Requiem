@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static _MartialController;
 
-public class _Martial : MonoBehaviour
+public class _MartialController : MonoBehaviour
 {
-    private static _Martial Instance;
+    private static _MartialController Instance;
 
     public struct MartialJob
     {
-        public Weapon.Action Action;
+        public Weapon.ActionAnimation Action;
         public float Debounce;
     }
 
@@ -25,6 +26,10 @@ public class _Martial : MonoBehaviour
             Destroy(Instance);
         }
         Instance = this;
+        Weapon_Actions = new Dictionary<Weapon, MartialJob>();
+        Action_Queues = new Dictionary<Weapon, Queue<MartialJob>>();
+        Debounce_Timers = new Dictionary<Weapon, float>();
+        KEYS_TO_DEQUEUE_THIS_FRAME = new List<Weapon>();
     }
 
     void Update()
@@ -33,11 +38,11 @@ public class _Martial : MonoBehaviour
         foreach (KeyValuePair<Weapon, MartialJob> kvp in Weapon_Actions)
         {
             Weapon weapon = kvp.Key;
-            Weapon.Action desiredAction = kvp.Value.Action;
+            Weapon.ActionAnimation desiredAction = kvp.Value.Action;
             float debounce = kvp.Value.Debounce;
             if (!weapon)
             {
-                removeWeaponKey(weapon);
+                Cancel_Actions(weapon);
             }
             else if (Debounce_Timers[weapon] > 0)
             {
@@ -67,7 +72,7 @@ public class _Martial : MonoBehaviour
     }
 
     /***** PUBLIC *****/
-    public static void Queue_Action(Weapon weapon, Weapon.Action action, float debounce = 0)
+    public static void Queue_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)
     {
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce };
         if (!Weapon_Actions.ContainsKey(weapon))
@@ -82,7 +87,7 @@ public class _Martial : MonoBehaviour
         }
     }
 
-    public static void Override_Queue(Weapon weapon, Weapon.Action action)
+    public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action)
     {
         if (Action_Queues.ContainsKey(weapon))
         {
@@ -91,21 +96,14 @@ public class _Martial : MonoBehaviour
         Queue_Action(weapon, action);
     }
 
-    public static void Override_Action(Weapon weapon, Weapon.Action action, float debounce = 0)
+    public static void Override_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)
     {
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce };
         Weapon_Actions[weapon] = newJob;
         Debounce_Timers[weapon] = 0;
     }
 
-
-    /***** PROTECTED *****/
-
-
-
-    /***** PRIVATE *****/
-
-    private static void removeWeaponKey(Weapon weapon)
+    public static void Cancel_Actions(Weapon weapon)
     {
         if (Weapon_Actions.ContainsKey(weapon))
         {
@@ -119,22 +117,29 @@ public class _Martial : MonoBehaviour
         {
             Debounce_Timers.Remove(weapon);
         }
-
     }
 
-    private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.Action desiredAction)
+    /***** PROTECTED *****/
+
+
+
+    /***** PRIVATE *****/
+
+
+
+    private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.ActionAnimation desiredAction)
     {
         (bool, bool, bool) triggerControlValues;
         switch (desiredAction)
         {
-            case Weapon.Action.Idle:
+            case Weapon.ActionAnimation.Idle:
                 triggerControlValues = (false, false, false);
                 break;
-            case Weapon.Action.QuickCoil:
+            case Weapon.ActionAnimation.QuickCoil:
                 triggerControlValues = (true, false, false);
                 break;
-            case Weapon.Action.QuickAttack:
-                if (weapon.ActionCurrentlyAnimated == Weapon.Action.QuickCoil)
+            case Weapon.ActionAnimation.QuickAttack:
+                if (weapon.ActionAnimated == Weapon.ActionAnimation.QuickCoil)
                 {
                     triggerControlValues = (true, false, true);
                 }
@@ -143,14 +148,14 @@ public class _Martial : MonoBehaviour
                     triggerControlValues = (true, false, false);
                 }
                 break;
-            case Weapon.Action.StrongAttack:
+            case Weapon.ActionAnimation.StrongAttack:
                 triggerControlValues = (false, false, true);
                 break;
-            case Weapon.Action.Guarding:
+            case Weapon.ActionAnimation.Guarding:
                 triggerControlValues = (false, true, false);
                 break;
-            case Weapon.Action.Parrying:
-                if (weapon.ActionCurrentlyAnimated == Weapon.Action.Guarding) 
+            case Weapon.ActionAnimation.Parrying:
+                if (weapon.ActionAnimated == Weapon.ActionAnimation.Guarding) 
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -166,7 +171,7 @@ public class _Martial : MonoBehaviour
         weapon.PrimaryTrigger = triggerControlValues.Item1;
         weapon.SecondaryTrigger = triggerControlValues.Item2;
         weapon.TertiaryTrigger = triggerControlValues.Item3;
-        if(weapon.ActionCurrentlyAnimated == desiredAction)
+        if(weapon.ActionAnimated == desiredAction)
         {
             return true;
         }

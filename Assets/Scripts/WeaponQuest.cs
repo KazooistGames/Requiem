@@ -12,16 +12,16 @@ public class WeaponQuest : Quest
 
     void Start()
     {
-        Weapon.On_Weapon_Hit.AddListener(incrementProgress);
+        Weapon.Weapon_Hit.AddListener(incrementProgress);
         string progressMessage = WeaponType.ToString() + " Damage " + GoalProgress.ToString() + "/" + Goal.ToString();
-        MessageBlurb = Mullet.createBlurb(gameObject, progressMessage, Color.yellow);
+        MessageBlurb = _BlurbService.createBlurb(gameObject, progressMessage, Color.yellow);
         MessageBlurb.SetActive(false);
     }
 
     private void OnDestroy()
     {
         StopAllCoroutines();
-        Weapon.On_Weapon_Hit.RemoveListener(incrementProgress);
+        Weapon.Weapon_Hit.RemoveListener(incrementProgress);
     }
 
     void incrementProgress(Weapon weapon)
@@ -42,9 +42,9 @@ public class WeaponQuest : Quest
         float progress = 0;
         int goal = UnityEngine.Random.Range(750, 1500);
 
-        Weapon.On_Weapon_Hit.AddListener(incrementProgress);
+        Weapon.Weapon_Hit.AddListener(incrementProgress);
         string progressMessage = weaponType.ToString() + " Damage " + progress.ToString() + "/" + goal.ToString();
-        GameObject messageBlurb = Mullet.createBlurb(stage.GateIn.model, progressMessage, Color.yellow);
+        GameObject messageBlurb = _BlurbService.createBlurb(stage.GateIn.model, progressMessage, Color.yellow);
         messageBlurb.SetActive(false);
         while (!completed)
         {
@@ -63,7 +63,7 @@ public class WeaponQuest : Quest
             }
             yield return null;
         }
-        Weapon.On_Weapon_Hit.RemoveListener(incrementProgress);
+        Weapon.Weapon_Hit.RemoveListener(incrementProgress);
         yield break;
     }
 

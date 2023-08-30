@@ -16,6 +16,7 @@ public class Nephalim : Character
     {
         base.Awake();
         Strength = 200f;
+        Resolve = 20f;
         Haste = 1.0f;
         hoverScalar = 1.125f;
         scaleScalar = 1.20f;
@@ -38,20 +39,20 @@ public class Nephalim : Character
         {
             if (!Foe)
             {
-                _Martial.Override_Queue(mainWep, Weapon.Action.Idle);
+                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
             }
-            else if(_Martial.Action_Queues[mainWep].Count == 0)
+            else if(_MartialController.Action_Queues[mainWep].Count == 0)
             {
                 float disposition = (Foe.transform.position - transform.position).magnitude;
                 if(mainWep.Range >= disposition)
                 {
-                    _Martial.Queue_Action(mainWep, Weapon.Action.QuickAttack);
-                    _Martial.Queue_Action(mainWep, Weapon.Action.Guarding, 2);
-                    _Martial.Queue_Action(mainWep, Weapon.Action.StrongAttack);
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
                 }
                 else
                 {
-                    _Martial.Queue_Action(mainWep, Weapon.Action.QuickCoil);
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil);
                 }
             }
         }
@@ -95,7 +96,7 @@ public class Nephalim : Character
 
     private void CRUMBLE(float damage)
     {
-        Mullet.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.4f + 0.5f * UnityEngine.Random.value * 0.7f, 0.5f, Mullet.Instance.DefaultAudioRange / 2);
+        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.4f + 0.5f * UnityEngine.Random.value * 0.7f, 0.5f, _SoundService.Instance.DefaultAudioRange / 2);
     }
 
     private void createSkeleton()

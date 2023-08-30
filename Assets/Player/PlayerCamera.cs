@@ -47,7 +47,7 @@ public class PlayerCamera : MonoBehaviour
         Eyes.nearClipPlane = 0.01f;
         Eyes.farClipPlane = 10f;
         Eyes.fieldOfView = 80f;
-        Mullet.Instance.blurbCamera = Eyes;
+        _BlurbService.Instance.blurbCamera = Eyes;
     }
 
  
@@ -77,7 +77,7 @@ public class PlayerCamera : MonoBehaviour
             transform.localEulerAngles = temp;
 
         }
-        Mullet.Instance.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
+        _BlurbService.Instance.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)

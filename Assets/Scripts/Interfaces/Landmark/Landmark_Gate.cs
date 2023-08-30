@@ -51,7 +51,7 @@ public class Landmark_Gate : Landmark
     public void SetPositionOnTile(Hextile.HexPosition newPosition)
     {
         if (newPosition == Hextile.HexPosition.error || !Initialized) return;
-        float rads = Mullet.DegToRad(60f * (int)newPosition - 30);
+        float rads = Mathf.Deg2Rad * (60f * (int)newPosition - 30);
         float scaledRadius = Hextile.Radius * Mathf.Sin(Mathf.PI/3);
         model.transform.localPosition = new Vector3(Mathf.Cos(rads) * scaledRadius, Hextile.Thickness/2, Mathf.Sin(rads) * scaledRadius);
         model.transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 30 - 60 * (int)newPosition, transform.localEulerAngles.z);

@@ -53,7 +53,7 @@ public class Devil : Character
                 model.GetComponent<Rigidbody>().AddForce(-direction.normalized * 1, ForceMode.VelocityChange);
             }
         }
-        Mullet.PlayAmbientSound(Game.deathSounds[UnityEngine.Random.Range(0, Game.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Game.deathSounds[UnityEngine.Random.Range(0, Game.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         base.Die();
     }
 
@@ -63,7 +63,7 @@ public class Devil : Character
     {
         if (Vitality > 0)
         {
-            Mullet.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 1.0f, 0.5f).layer = gameObject.layer;
+            _SoundService.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 1.0f, 0.5f).layer = gameObject.layer;
         }
         if (!BLOOD_SPLATTER_PREFAB)
         {

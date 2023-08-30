@@ -40,7 +40,7 @@ public class PlayerHUD : MonoBehaviour
     void Update()
     {
         Player.INSTANCE.mouseSpeedScalar = MouseSlider.value;
-        Mullet.SOUND_MASTER_VOLUME = SoundSlider.value;
+        _SoundService.SOUND_MASTER_VOLUME = SoundSlider.value;
         Text[] metrics = Info.GetComponentsInChildren<Text>();
         metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
         metrics[1].text = "Kills:  " + Game.KillCount.ToString();
@@ -64,7 +64,7 @@ public class PlayerHUD : MonoBehaviour
             {
                 Weapon weapon = Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>();
                 TempoBar.SetActive(true);
-                if(weapon.ActionCurrentlyAnimated == Weapon.Action.StrongWindup)
+                if(weapon.ActionAnimated == Weapon.ActionAnimation.StrongWindup)
                 {
                     fadeTransforms(tempoBarTransforms, 0.75f, 10f);
                 }

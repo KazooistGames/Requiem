@@ -43,7 +43,7 @@ public class Skelly : Character
     //CUSTOM FUNCTIONS!!!!!!!!!!!!!
     protected void CRUMBLE(float damage)
     {
-        Mullet.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.5f, Mullet.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.5f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
     }
 
     private void createSkeleton()

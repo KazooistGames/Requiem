@@ -219,8 +219,8 @@ public class Game_Arena : Game
                 progress += triggeringWeapon.Power;
             }
         }
-        Weapon.On_Weapon_Hit.AddListener(increment);
-        GameObject messageBlurb = Mullet.createBlurb(stage.GateIn.model, weaponType.ToString() + " Damage " + progress.ToString() + "/" + goal.ToString(), Color.yellow);
+        Weapon.Weapon_Hit.AddListener(increment);
+        GameObject messageBlurb = _BlurbService.createBlurb(stage.GateIn.model, weaponType.ToString() + " Damage " + progress.ToString() + "/" + goal.ToString(), Color.yellow);
         messageBlurb.SetActive(false);
         while (!completed)
         {
@@ -241,7 +241,7 @@ public class Game_Arena : Game
             }
             yield return null;
         }
-        Weapon.On_Weapon_Hit.RemoveListener(increment);
+        Weapon.Weapon_Hit.RemoveListener(increment);
         yield break;
     }
 
@@ -260,7 +260,7 @@ public class Game_Arena : Game
             }
         }
         Character.EntityVanquished.AddListener(increment);
-        GameObject messageBlurb = Mullet.createBlurb(stage.GateIn.model, entityType.ToString() + " kills " + progress.ToString() + "/" + goal.ToString(), Color.yellow);
+        GameObject messageBlurb = _BlurbService.createBlurb(stage.GateIn.model, entityType.ToString() + " kills " + progress.ToString() + "/" + goal.ToString(), Color.yellow);
         messageBlurb.SetActive(false);
         while (!completed)
         {

@@ -183,28 +183,31 @@ MonoBehaviour:
   Telecommuting: 0
   Thrown: 0
   equipType: -1
-  EventHitting:
+  Hitting:
     m_PersistentCalls:
       m_Calls: []
-  EventClashedWeapon:
+  Clashing:
     m_PersistentCalls:
       m_Calls: []
-  EventBlockedWeapon:
+  Blocking:
     m_PersistentCalls:
       m_Calls: []
-  EventParriedWeapon:
+  Parrying:
     m_PersistentCalls:
       m_Calls: []
-  EventWasParried:
+  GettingParried:
     m_PersistentCalls:
       m_Calls: []
-  EventSwinging:
+  Swinging:
     m_PersistentCalls:
       m_Calls: []
-  EventRebuked:
+  Rebuked:
     m_PersistentCalls:
       m_Calls: []
-  ActionCurrentlyAnimated: 0
+  ChangingActionAnimations:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionAnimated: 0
   Throwing: 0
   Range: 0
   Power: 0
@@ -394,28 +397,31 @@ MonoBehaviour:
   Telecommuting: 0
   Thrown: 0
   equipType: -1
-  EventHitting:
+  Hitting:
     m_PersistentCalls:
       m_Calls: []
-  EventClashedWeapon:
+  Clashing:
     m_PersistentCalls:
       m_Calls: []
-  EventBlockedWeapon:
+  Blocking:
     m_PersistentCalls:
       m_Calls: []
-  EventParriedWeapon:
+  Parrying:
     m_PersistentCalls:
       m_Calls: []
-  EventWasParried:
+  GettingParried:
     m_PersistentCalls:
       m_Calls: []
-  EventSwinging:
+  Swinging:
     m_PersistentCalls:
       m_Calls: []
-  EventRebuked:
+  Rebuked:
     m_PersistentCalls:
       m_Calls: []
-  ActionCurrentlyAnimated: 0
+  ChangingActionAnimations:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionAnimated: 0
   Throwing: 0
   Range: 0
   Power: 0
@@ -509,7 +515,7 @@ GameObject:
   - component: {fileID: 2059821367}
   - component: {fileID: 2059821366}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: nephy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -671,6 +677,9 @@ GameObject:
   - component: {fileID: 2128541361}
   - component: {fileID: 2128541362}
   - component: {fileID: 2128541363}
+  - component: {fileID: 2128541364}
+  - component: {fileID: 2128541366}
+  - component: {fileID: 2128541365}
   m_Layer: 0
   m_Name: ARENA
   m_TagString: Untagged
@@ -705,15 +714,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7afd2ce169b49343a5504843d858969, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundLayer: 30
-  DefaultAudioRange: 5
-  blurbCanvas: {fileID: 0}
-  blurbFont: {fileID: 12800000, guid: ab323bd8e5da3b046b8d12ba1f787d50, type: 3}
-  blurbFontSize: 30
-  blurbLayer: 5
-  blurbCamera: {fileID: 0}
-  blurbScalar: 1
-  blurbOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &2128541362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -747,3 +747,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 145db41e0e72a3549a6306f13d68db07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2128541364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5137648eac4e8ed429ec6e14c249caa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2128541365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4307a7d4f29d85547a5a59b4fbe73e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundLayer: 30
+  DefaultAudioRange: 5
+--- !u!114 &2128541366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9fdb259ba6b7cb47bea870ab72d7904, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blurbCanvas: {fileID: 0}
+  blurbFont: {fileID: 12800000, guid: f0fae15a96a2de0488c2eae9070c7915, type: 3}
+  blurbFontSize: 30
+  blurbLayer: 5
+  blurbCamera: {fileID: 0}
+  blurbScalar: 1
+  blurbOffset: {x: 0, y: 0, z: 0}

@@ -691,7 +691,7 @@ public abstract class Character : MonoBehaviour
                         EventLandedDashHit.Invoke(foe, damage);
                     }
                 }
-                Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+                _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
             }
         }
         dashAlreadyHit.Add(other);
@@ -726,7 +726,7 @@ public abstract class Character : MonoBehaviour
                 EventCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
-                Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+                _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
             }
             else if (CrashEnvironmentONS)
             {
@@ -741,7 +741,7 @@ public abstract class Character : MonoBehaviour
                     EventCrashed.Invoke();
                 }
                 CrashEnvironmentONS = false;
-                Mullet.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, Mullet.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+                _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
             }
         }
     }
@@ -797,7 +797,7 @@ public abstract class Character : MonoBehaviour
                 if (FinalDash || dashDirection != Vector3.zero)
                     Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);
-                GameObject sound = Mullet.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
+                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
                 sound.transform.SetParent(transform);
                 yield return new WaitWhile(() => Shoved);
@@ -814,21 +814,21 @@ public abstract class Character : MonoBehaviour
         Weapon weapon = wieldable.GetComponent<Weapon>();
         if (weapon)
         {
-            weapon.EventSwinging.AddListener(handleWeaponSwing);
-            weapon.EventClashedWeapon.AddListener(handleWeaponClash);
-            weapon.EventBlockedWeapon.AddListener(handleWeaponBlock);
-            weapon.EventParriedWeapon.AddListener(handleWeaponParry);
-            weapon.EventWasParried.AddListener(handleWeaponParried);
-            weapon.EventHitting.AddListener(handleWeaponHit);
+            weapon.Swinging.AddListener(handleWeaponSwing);
+            weapon.Clashing.AddListener(handleWeaponClash);
+            weapon.Blocking.AddListener(handleWeaponBlock);
+            weapon.Parrying.AddListener(handleWeaponParry);
+            weapon.GettingParried.AddListener(handleWeaponParried);
+            weapon.Hitting.AddListener(handleWeaponHit);
             weapon.EventDropped.AddListener(handleWeaponDropped);
         }
     }
 
     private void handleWeaponSwing(Weapon myWeapon)
     {
-        if(myWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
+        if(myWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
         {
-            alterPoise(-myWeapon.Heft / 2);
+            alterPoise(-myWeapon.Heft / 4);
         }
     }
 
@@ -852,11 +852,11 @@ public abstract class Character : MonoBehaviour
             Stagger(0.25f + 1.5f * (theirWeapon.Heft / Strength));
             alterPoise(-theirWeapon.Heft / 2);
         }
-        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
+        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
         {
             alterPoise(-theirWeapon.Heft / 2);
         }
-        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.QuickAttack)
+        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
         {
 
         }
@@ -869,11 +869,11 @@ public abstract class Character : MonoBehaviour
         {
 
         }
-        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.StrongAttack)
+        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
         {
-            theirWeapon.Wielder.alterPoise(-theirWeapon.Heft / 2);
+            theirWeapon.Wielder.Stagger(0.25f + 1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
         }
-        else if(theirWeapon.ActionCurrentlyAnimated == Weapon.Action.QuickAttack)
+        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
         {
             theirWeapon.Wielder.alterPoise(-theirWeapon.Heft / 2);
             theirWeapon.Wielder.Stagger(0.25f + 1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
@@ -898,11 +898,11 @@ public abstract class Character : MonoBehaviour
         Weapon weapon = wieldable.GetComponent<Weapon>();
         if (weapon)
         {
-            weapon.EventSwinging.RemoveListener(handleWeaponSwing);
-            weapon.EventClashedWeapon.RemoveListener(handleWeaponClash);
-            weapon.EventBlockedWeapon.RemoveListener(handleWeaponBlock);
-            weapon.EventParriedWeapon.RemoveListener(handleWeaponParry);
-            weapon.EventWasParried.RemoveListener(handleWeaponParried);
+            weapon.Swinging.RemoveListener(handleWeaponSwing);
+            weapon.Clashing.RemoveListener(handleWeaponClash);
+            weapon.Blocking.RemoveListener(handleWeaponBlock);
+            weapon.Parrying.RemoveListener(handleWeaponParry);
+            weapon.GettingParried.RemoveListener(handleWeaponParried);
         }
     }
     

@@ -1402,7 +1402,7 @@ public class AI : MonoBehaviour
             {
                 Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
                 Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-                bool foeAttacking = (matchupMain ? matchupMain.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || matchupMain.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false) || (matchupOff ? matchupOff.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || matchupOff.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false);
+                bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongAttack || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongAttack || matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false);
                 bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
                 bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
                 if (foeAttacking && foeInRange && foeFacing)
@@ -1416,7 +1416,7 @@ public class AI : MonoBehaviour
                 Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
                 Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
                 bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
-                bool foeThrowing = (matchupMain ? matchupMain.ActionCurrentlyAnimated == Weapon.Action.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionCurrentlyAnimated == Weapon.Action.Aiming || matchupOff.Thrown : false);
+                bool foeThrowing = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupOff.Thrown : false);
                 if (foeThrowing && !foeInRange)
                 {
                     temp = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
@@ -1437,7 +1437,7 @@ public class AI : MonoBehaviour
             {
                 Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                 Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-                if ((mainHand ? mainHand.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || mainHand.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false) || (offHand ? offHand.ActionCurrentlyAnimated == Weapon.Action.StrongAttack || offHand.ActionCurrentlyAnimated == Weapon.Action.QuickCoil : false))
+                if ((mainHand ? mainHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || mainHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (offHand ? offHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || offHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false))
                 {
                     temp = disposition.normalized;
                     //entity.DashPower = 1.0f;

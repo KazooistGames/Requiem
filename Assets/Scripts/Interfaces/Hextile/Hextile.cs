@@ -199,7 +199,7 @@ public class Hextile : MonoBehaviour
         {
             newExtendedTile = new GameObject().AddComponent<Hextile>();
             newExtendedTile.transform.SetParent(transform.parent);
-            float rads = Mullet.DegToRad(60f * (int)direction - 30);
+            float rads = Mathf.Deg2Rad * (60f * (int)direction - 30);
             float scaledRadius = 2 * Radius * Mathf.Sin(Mathf.PI / 3);
             Vector3 increment = new Vector3(Mathf.Cos(rads) * scaledRadius, 0, Mathf.Sin(rads) * scaledRadius);
             newExtendedTile.transform.position = transform.position + increment;

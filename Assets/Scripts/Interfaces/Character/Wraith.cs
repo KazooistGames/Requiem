@@ -49,7 +49,7 @@ public class Wraith : Character
     public override void Damage(float damage)
     {
         base.Damage(damage);
-        Mullet.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, Mullet.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
     }
 
     private void createSkeleton()

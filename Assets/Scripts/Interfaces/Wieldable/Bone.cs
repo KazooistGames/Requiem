@@ -38,7 +38,7 @@ public class Bone : Wieldable
     {
         base.OnCollisionEnter(collision);
 
-        Mullet.PlayAmbientSound(Game.boneSounds[Random.Range(0, Game.boneSounds.Length)], transform.position, (0.5f + 0.5f * Random.value) * pitchScalar, 0.1f, Mullet.Instance.DefaultAudioRange/2).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Game.boneSounds[Random.Range(0, Game.boneSounds.Length)], transform.position, (0.5f + 0.5f * Random.value) * pitchScalar, 0.1f, _SoundService.Instance.DefaultAudioRange/2).layer = gameObject.layer;
     }
 
 

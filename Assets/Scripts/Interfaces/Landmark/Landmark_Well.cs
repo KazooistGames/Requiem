@@ -98,11 +98,11 @@ public class Landmark_Well : Landmark
 
     private void playSlurp()
     {
-        Mullet.PlayAmbientSound("Audio/well/slurp", transform.position, 1, 0.75f, Mullet.Instance.DefaultAudioRange / 4);
+        _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
     }
     private void playChant()
     {
-        Mullet.PlayAmbientSound("Audio/well/low", transform.position, 1, 0.75f, Mullet.Instance.DefaultAudioRange / 4);
+        _SoundService.PlayAmbientSound("Audio/well/low", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
         //Mullet.PlayAmbientSound("Audio/well/high", transform.position, 1, 0.25f, Mullet.Instance.DefaultAudioRange / 4);
     }
 

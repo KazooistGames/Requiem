@@ -95,7 +95,7 @@ public class Idol : Bone
         }
         string message = messages[Random.Range(0, messages.Count)];
         float duration = Mathf.CeilToInt(1 + message.Length * 0.1f);
-        currentBlurb = Mullet.createBlurb(gameObject, message, Color.Lerp(Color.white, Color.red, 0.75f), duration, 1.0f);
+        currentBlurb = _BlurbService.createBlurb(gameObject, message, Color.Lerp(Color.white, Color.red, 0.75f), duration, 1.0f);
         return Time.time;
     }
 
