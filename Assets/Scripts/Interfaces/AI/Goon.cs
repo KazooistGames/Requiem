@@ -51,8 +51,39 @@ public class Goon : AI
                 }
                 else
                 {
+                    Weapon mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
+                    if (mainWep)
+                    {
+                        if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
+                        {
+                            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+                        }
+                        else if (_MartialController.Action_Queues[mainWep].Count == 0)
+                        {
+                            float disposition = (entity.Foe.transform.position - transform.position).magnitude;
+                            if (mainWep.Range >= disposition)
+                            {
+                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
+                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+                                if (Random.value >= 0.5f)
+                                {
+                                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
+                                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+                                }
+                                else
+                                {
+                                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
+                                }
+                            }
+                            else
+                            {
+                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle);
+                            }
+                        }
+                    }
+                    ReflexRate = 0.05f;
                     tangoStrafePauseFreq = 0.5f;
-                    tangoStrafeEnabled = martialCurrentState == martialState.attacking;                 
+                    tangoStrafeEnabled = true;           
                 }
                 break;
             case AIState.seek:

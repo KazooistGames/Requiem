@@ -83,19 +83,6 @@ public class Wieldable : MonoBehaviour
         Recoiling = Wielder ? Wielder.Staggered : false;
         if (Wielder)
         {
-            //if (Rebuked)
-            //{
-            //    if (rebukeTimer >= rebukePeriod)
-            //    {
-            //        Rebuked = false;
-            //        rebukeTimer = 0;
-            //        rebukePeriod = 0;
-            //    }
-            //    else
-            //    {
-            //        rebukeTimer += Time.deltaTime;
-            //    }
-            //}
             MostRecentWielder = Wielder;
             if (!Anim.runtimeAnimatorController)
             {
@@ -327,6 +314,7 @@ public class Wieldable : MonoBehaviour
         {
             Wielder.wieldMode = Character.WieldMode.Burdened;
             Wielder.MainHand = this;
+            togglePhysicsBox(false);
         }
         if (Body)
         {
@@ -381,6 +369,7 @@ public class Wieldable : MonoBehaviour
     /***** PRIVATE *****/
     private IEnumerator mountHandler(GameObject mountedTo, Vector3 localPosition)
     {
+        yield return null;
         MountTarget = mountedTo;
         if (Wielder)
         {

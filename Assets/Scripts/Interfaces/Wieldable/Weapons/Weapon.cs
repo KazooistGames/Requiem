@@ -19,7 +19,6 @@ public abstract class Weapon : Wieldable
 
     public UnityEvent<ActionAnimation, ActionAnimation> ChangingActionAnimations = new UnityEvent<ActionAnimation, ActionAnimation>();
 
-
     public enum ActionAnimation
     {
         error,
@@ -57,6 +56,7 @@ public abstract class Weapon : Wieldable
 
     public bool TrueStrike = false;
     public float Tempo { get; private set; }
+    private bool tempoChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.90f;
     public float TempoTargetWidth { get; private set; } = 0.2f;
 
@@ -139,7 +139,7 @@ public abstract class Weapon : Wieldable
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         gameObject.AddComponent<WeaponRangeFinder>();
-        StartCoroutine(routineTempo());
+        //StartCoroutine(routineTempo());
     }
 
     protected override void Update()
@@ -156,21 +156,17 @@ public abstract class Weapon : Wieldable
             actionPreviouslyAnimated = ActionAnimated;
             togglePhysicsBox(false);
             heftSlowModifier = -Heft / Wielder.Strength;
-            //modPower["TrueStrike"] = TrueStrike ? BasePower * Wielder.Strength/100 : 0;
-            //modPower["momentum"] = Vector3.Project(Wielder.body.velocity, Wielder.LookDirection).magnitude * Sharpness / Character.Max_Velocity_Of_Dash;
             if (transform.parent != Wielder.transform)
             {
                 transform.SetParent(Wielder.transform, true);
             }
             if (Wielded)
             {
-                //damageType = getDamageTypeFromCurrentAnimationState();
                 if (ActionAnimated == ActionAnimation.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
-                    //modifyWielderSpeed(swingValue: Mathf.Lerp(0, -1, (rebukePeriod - rebukeTimer) * 3));
                     setHighlightColor(Color.gray);
                 }
                 else if (ActionAnimated == ActionAnimation.Idle)
@@ -178,11 +174,20 @@ public abstract class Weapon : Wieldable
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
+                    TrueStrike = false;
                     modifyWielderSpeed(0);
                     setHighlightColor(Color.gray);
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
-                {                
+                {
+                    if (TertiaryTrigger && tempoChargeONS)
+                    {
+                        Tempo = Mathf.Pow(currentAnimation.normalizedTime, 3);
+                    }
+                    else
+                    {
+                        tempoChargeONS = false;
+                    }
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier/2);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
@@ -203,12 +208,21 @@ public abstract class Weapon : Wieldable
                 {
                     if (attackONS)
                     {
-                        Swinging.Invoke(this);
+                        tempoChargeONS = true;
+                        if (TertiaryTrigger)
+                        {
+                            Tempo = 0;
+                        }
+                        else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
+                        {
+                            TrueStrike = true;
+                        }
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
                         HitBox.isTrigger = true;
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
+                        Swinging.Invoke(this);
                         playSwing();
                     }
                     modifyWielderSpeed(heftSlowModifier);
@@ -219,6 +233,7 @@ public abstract class Weapon : Wieldable
                     modifyWielderSpeed(0);
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
+                    Tempo = 0;
                 }
                 else if (ActionAnimated == ActionAnimation.Guarding)
                 {
@@ -449,16 +464,7 @@ public abstract class Weapon : Wieldable
         GameObject obstruction = testObstructionBetweenEntities(character, weapon.MostRecentWielder);
         if (!obstruction)
         {
-            float appliedDamage = weapon.Power;
-            if(weapon.ActionAnimated == ActionAnimation.QuickAttack && character.posture != Character.Posture.Weak)
-            {
-                appliedDamage -= character.Resolve;
-            }
-            else if(weapon.TrueStrike && weapon.Wielder.posture != Character.Posture.Weak)
-            {
-                appliedDamage += weapon.Wielder.Resolve;
-            }
-            character.Damage(appliedDamage);
+
             weapon.Hitting.Invoke(weapon, character);
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, character);
             weapon.playSlap(character.transform.position);
@@ -529,7 +535,7 @@ public abstract class Weapon : Wieldable
                     foe.EventVanquished.AddListener(impale_release);
                     foe.modSpeed[key] = -(Heft/foe.Strength);
                     foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
-                    yield return new WaitWhile(() => foe ? foe.posture <= Character.Posture.Strong : false);
+                    yield return new WaitWhile(() => foe ? foe.Posture <= Character.PostureStrength.Strong : false);
                     if (foe)
                     {
                         impale_release();
@@ -591,6 +597,7 @@ public abstract class Weapon : Wieldable
 
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Character foe, float scalar = 1.0f)
     {
+        if (!foe) { return; }
         Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
         Vector3 disposition = foe.transform.position - origin;
         Vector3 velocityChange = disposition.normalized * (weapon.Heft / 25f) * Character.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
@@ -752,6 +759,10 @@ public abstract class Weapon : Wieldable
         else if (currentAnimation.IsTag("QuickAttack"))
         {
             if (nextAnimation.IsTag("Guard"))
+            {
+                return ActionAnimation.Recovering;
+            }
+            else if (nextAnimation.IsTag("Idle"))
             {
                 return ActionAnimation.Recovering;
             }

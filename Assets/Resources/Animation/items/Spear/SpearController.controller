@@ -173,7 +173,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 348f2dc1e9a81b24ab8ec7e5593ec842, type: 2}
-  m_Tag: Windup
+  m_Tag: QuickCoil
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -358,7 +358,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: bb16d9a29e88b6f46874228a24de8b35, type: 2}
-  m_Tag: Smash
+  m_Tag: StrongAttack
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -772,7 +772,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 13e1246a237f862488760066075dbd99, type: 2}
-  m_Tag: Stab
+  m_Tag: QuickAttack
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 

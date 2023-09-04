@@ -19,6 +19,7 @@ public class Wraith : Character
         base.Awake();
         anim = GetComponent<Animator>() == null ? gameObject.AddComponent<Animator>() : GetComponent<Animator>();
         Strength = 100f;
+        Resolve = 20f;
         Haste = 1.0f;
         BaseAcceleration = 8;
     }

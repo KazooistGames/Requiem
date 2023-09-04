@@ -34,28 +34,6 @@ public class Nephalim : Character
     protected override void Update()
     {
         base.Update();
-        Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
-        if (mainWep)
-        {
-            if (!Foe)
-            {
-                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
-            }
-            else if(_MartialController.Action_Queues[mainWep].Count == 0)
-            {
-                float disposition = (Foe.transform.position - transform.position).magnitude;
-                if(mainWep.Range >= disposition)
-                {
-                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
-                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
-                }
-                else
-                {
-                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil);
-                }
-            }
-        }
 
     }
 

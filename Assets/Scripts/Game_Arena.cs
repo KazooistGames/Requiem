@@ -7,33 +7,34 @@ using System;
 
 public class Game_Arena : Game
 {
-    int RadiusOfTiles = 2;
+    private int RadiusOfTiles = 1;
     private List<List<Hextile>> TileRings = new List<List<Hextile>>();
     List<Hextile> AllTiles = new List<Hextile>();
     private Hextile centerTile;
     private Landmark_Well well;
+    private Landmark_Alter alter;
+    private Idol idol;
 
     public enum GameState
     {
         Liminal,
-        Arena,
-        Crypt,
+        Wave,
+        Boss,
         Finale,
     }
     public GameState State = GameState.Liminal;
 
     private Spawner MobSpawner;
     private Spawner EliteSpawner;
+    private Spawner BossSpawner;
 
     public int Difficulty = 0;
-    public Stage CryptCurrentlyActive;
-    public List<Stage> Crypts;
-    public List<Landmark_Gate> CryptGates;
+
 
     protected override void Start()
     {
         base.Start();
-        StartCoroutine(gameInit());
+        StartCoroutine(BuildMap());
     }
 
     protected override void Update()
@@ -42,7 +43,7 @@ public class Game_Arena : Game
         gameObject.name = "ARENA";
     }
 
-    protected IEnumerator gameInit()
+    protected IEnumerator BuildMap()
     {
         yield return null;
         centerTile = Hextile.GenerateRootTile();
@@ -51,11 +52,12 @@ public class Game_Arena : Game
         yield return new WaitForSecondsRealtime(0.5f);
         AllTiles = TileRings.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList());
         yield return gameInitLandmarks();
-        yield return gameInitCrypts();
+        //yield return gameInitCrypts();
         new GameObject().AddComponent<Player>();
-        Idol Idol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
+        idol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
         Hextile randomTile = TileRings[TileRings.Count - 1][UnityEngine.Random.Range(0, TileRings[TileRings.Count - 1].Count)];
-        Idol.transform.position = RAND_POS_IN_TILE(randomTile);
+        idol.transform.position = RAND_POS_IN_TILE(randomTile);
+        alter.DesiredOffering = idol.gameObject;
         randomTile = TileRings[TileRings.Count - 1][UnityEngine.Random.Range(0, TileRings[TileRings.Count - 1].Count)];
         SPAWN(typeof(Shade), typeof(Janitor), RAND_POS_IN_TILE(randomTile));
         configureSpawners();
@@ -70,218 +72,84 @@ public class Game_Arena : Game
             switch (ringNum)
             {
                 case 0:
-                    well = new GameObject().AddComponent<Landmark_Well>();
-                    well.AssignToTile(centerTile);
+
+                    alter = new GameObject().AddComponent<Landmark_Alter>();
+                    alter.AssignToTile(centerTile);
+
                     break;
                 case 1:
+                    well = new GameObject().AddComponent<Landmark_Well>();
+                    well.AssignToTile(ring[UnityEngine.Random.Range(0, ring.Count)]);
                     foreach (Hextile tile in ring)
                     {
                         if (tile ? (tile.Landmarks.Count == 0) : false)
                         {
-                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
+                            //new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                             new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
                         }
                         yield return new WaitForFixedUpdate();
                         yield return null;
                     }
                     break;
-                case 2:
-                    foreach (Hextile tile in ring)
-                    {
-                        if (tile ? (tile.Landmarks.Count == 0) : false)
-                        {
-
-                            if (tile.AdjacentTiles.Count >= 4)
-                            {
-
-                                new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
-                                new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
-                            }
-                            else
-                            {
-                                new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
-                                Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
-                                newGate.AssignToTile(tile);
-                                newGate.SetPositionOnTile((Hextile.HexPosition)((360 + AI.getAngle(tile.transform.position - centerTile.transform.position) % 360) / 60 + 1));
-                                CryptGates.Add(newGate);
-                            }
-                        }
-                        yield return new WaitForFixedUpdate();
-                        yield return null;
-                    }
-                    break;
             }
         }
     }
-    private IEnumerator gameInitCrypts()
-    {
-        yield return null;
-        foreach(Landmark_Gate gate in CryptGates)
-        {
-            Stage newStage = new GameObject().AddComponent<Stage>();
-            newStage.GateIn = gate;
-            newStage.GateOut = gate;
-            Crypts.Add(newStage);
-            yield return new WaitUntil(() => newStage.Initialized);           
-            //CreateCryptQuest(newStage);
-        }  
-        yield break;
-    }
+
+
     protected IEnumerator gameLoop()
     {
+        
         State = GameState.Liminal;
-        Difficulty = 0;
+        Difficulty = 1;
         yield return new WaitUntil(() => Commissioned);
-        //Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)]);
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTiles[0]);
+        bool allMobsSpawned = false;
+        MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => allMobsSpawned = true);
+        bool allElitesSpawned = false;
+        EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => allElitesSpawned = true);
         while (Difficulty < 6)
         {
             State = GameState.Liminal;
-            MobSpawner.PeriodicSpawningEnabled = false;
-
-            yield return new WaitUntil(() => well.Used);
-            MobSpawner.maxConcurrentInstances = 6 + (2 * Difficulty);
-            MobSpawner.PeriodicSpawningEnabled = true;
-            State = GameState.Arena;
-            yield return new WaitUntil(() => { CryptCurrentlyActive = Crypts.FirstOrDefault(x => x.PlayerInStage); return CryptCurrentlyActive ? true : false; });
-            State = GameState.Crypt;
-            CryptCurrentlyActive.GateIn.CloseDoor();
-            EliteSpawner.SpawnPosition = CryptCurrentlyActive.CenterTile.transform.position;
-            EliteSpawner.SpawnObjects(Difficulty + 1);
-            yield return new WaitUntil(() => EliteSpawner.listofSpawnedInstances.Count(x => x != null) == 0);
-            CryptCurrentlyActive.GateOut.OpenDoor();
-            yield return new WaitUntil(() => !CryptCurrentlyActive.PlayerInStage);
-            CryptCurrentlyActive.GateOut.CloseDoor();
-            well.ResetLiquid();
+            allMobsSpawned = false;
+            yield return new WaitUntil(() => alter.Used);
+            State = GameState.Wave;
+            int MobsThisWave = 6 * Difficulty;
+            MobSpawner.PeriodicallySpawn(15, Difficulty, 2 * Difficulty, 3 * Difficulty);
+            EliteSpawner.PeriodicallySpawn(30, 1, Difficulty, Difficulty);
+            yield return new WaitUntil(() => allMobsSpawned && allElitesSpawned);
+            State = GameState.Boss;
+            allElitesSpawned = false;
+            List<GameObject> wraiths = BossSpawner.InstantSpawn(Difficulty);
+            yield return new WaitUntil(() => wraiths.Count(x=>x!= null) == 0);
             Difficulty++;
-            Crypts.Remove(CryptCurrentlyActive);
-            Destroy(CryptCurrentlyActive.gameObject);
+            well.Refill(50);             
         }
         State = GameState.Finale;
+        Game.SPAWN(typeof(Devil), typeof(Champion), centerTile.transform.position);
     }
   
 
     private void configureSpawners()
     {
         MobSpawner = gameObject.AddComponent<Spawner>();
-        MobSpawner.listOfSpawnComponents.Add(typeof(Skelly));
-        MobSpawner.listOfSpawnComponents.Add(typeof(Goon));
+        MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skelly));
+        MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Goon));
         MobSpawner.transform.position = centerTile.transform.position + Vector3.up;
-        MobSpawner.PeriodicSpawnFrequency = 30f;
-        MobSpawner.PeriodicSpawnSize = 3;
-        MobSpawner.OnSpawned = (listOfNewInstances) =>
-        {
-            //foreach(GameObject mob in listOfNewInstances)
-            //{
-            //    Construct_Character entity = mob.GetComponent<Construct_Character>();
-            //    if(UnityEngine.Random.value <= (0.1f * Difficulty))
-            //    {
-            //        entity.isMutatingOnDeath = true;
-            //    }
-            //}
-            Hextile randomTile = AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)];
-            MobSpawner.SpawnPosition = randomTile.transform.position + Vector3.up;
-        };
+        MobSpawner.Spawned.AddListener(listOfNewInstances =>
+            {
+                Hextile randomTile = AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)];
+                MobSpawner.transform.position = randomTile.transform.position + Vector3.up;
+            }
+        );
         Hextile randomTile = AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)];
-        MobSpawner.SpawnPosition = randomTile.transform.position + Vector3.up;
         EliteSpawner = gameObject.AddComponent<Spawner>();
-        EliteSpawner.listOfSpawnComponents.Add(typeof(Wraith));
-        EliteSpawner.listOfSpawnComponents.Add(typeof(Revanent));
-        EliteSpawner.PeriodicSpawningEnabled = false;
+        EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Nephalim));
+        EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Bully));
+        EliteSpawner.transform.position = centerTile.transform.position + Vector3.up;
+        BossSpawner = gameObject.AddComponent<Spawner>();
+        BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Wraith));
+        BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Revanent));
+        BossSpawner.transform.position = centerTile.transform.position + Vector3.up;
     }
 
-    //private void CreateCryptQuest(Stage stage)
-    //{
-    //    if(UnityEngine.Random.value > 0.5f)
-    //    {
-    //        Type weaponType = Weapon.StandardTypes[UnityEngine.Random.Range(0, Weapon.StandardTypes.Count)];
-    //        StartCoroutine(weaponQuest(stage, weaponType));
-    //    }
-    //    else
-    //    {
-    //        Type entityType = Entity.StandardTypes[UnityEngine.Random.Range(0, Entity.StandardTypes.Count)];
-    //        StartCoroutine(foeQuest(stage, entityType));
-    //    }
-
-    //}
-
-    private IEnumerator weaponQuest(Stage stage, Type weaponType)
-    {
-        bool completed = false;
-        float progress = 0;
-        int goal = UnityEngine.Random.Range(750, 1500);
-        void increment(Weapon triggeringWeapon)
-        {
-            Type match = weaponType;
-            Type triggerType = triggeringWeapon.GetType();
-            if(triggerType == match)
-            {
-                progress += triggeringWeapon.Power;
-            }
-        }
-        Weapon.Weapon_Hit.AddListener(increment);
-        GameObject messageBlurb = _BlurbService.createBlurb(stage.GateIn.model, weaponType.ToString() + " Damage " + progress.ToString() + "/" + goal.ToString(), Color.yellow);
-        messageBlurb.SetActive(false);
-        while (!completed)
-        {
-            completed = progress >= goal;
-            if (completed)
-            {
-                stage.GateIn.OpenDoor();
-                stage.Interactable = true;
-            }
-            else if (stage.GateIn.PlayerAtDoor && !stage.PlayerInStage)
-            {
-                messageBlurb.GetComponent<Text>().text = weaponType.ToString() + " Damage " + progress.ToString() + "/" + goal.ToString();
-                messageBlurb.SetActive(true);
-            }
-            else
-            {
-                messageBlurb.SetActive(false);
-            }
-            yield return null;
-        }
-        Weapon.Weapon_Hit.RemoveListener(increment);
-        yield break;
-    }
-
-    private IEnumerator foeQuest(Stage stage, Type entityType)
-    {
-        bool completed = false;
-        int progress = 0;
-        int goal = UnityEngine.Random.Range(5, 15);
-        void increment(Character triggeringEntity)
-        {
-            Type match = entityType;
-            Type triggerType = triggeringEntity.GetType();
-            if (triggerType == match)
-            {
-                progress++;
-            }
-        }
-        Character.EntityVanquished.AddListener(increment);
-        GameObject messageBlurb = _BlurbService.createBlurb(stage.GateIn.model, entityType.ToString() + " kills " + progress.ToString() + "/" + goal.ToString(), Color.yellow);
-        messageBlurb.SetActive(false);
-        while (!completed)
-        {
-            completed = progress >= goal;
-            if (completed)
-            {
-                stage.GateIn.OpenDoor();
-                stage.Interactable = true;
-            }
-            else if (stage.GateIn.PlayerAtDoor && !stage.PlayerInStage)
-            {
-                messageBlurb.GetComponent<Text>().text = entityType.ToString() + " kills " + progress.ToString() + "/" + goal.ToString();
-                messageBlurb.SetActive(true);
-            }
-            else
-            {
-                messageBlurb.SetActive(false);
-            }
-            yield return null;
-        }
-        Character.EntityVanquished.RemoveListener(increment);
-        yield break;
-    }
 }

@@ -141,7 +141,7 @@ public class _MartialController : MonoBehaviour
             case Weapon.ActionAnimation.QuickAttack:
                 if (weapon.ActionAnimated == Weapon.ActionAnimation.QuickCoil)
                 {
-                    triggerControlValues = (true, false, true);
+                    triggerControlValues = (false, false, false);
                 }
                 else
                 {

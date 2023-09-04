@@ -61,7 +61,7 @@ public class Champion : AI
                     //bool defensive = (wep ? wep.Defending : true);
                     //bool offensive = (wep ? wep.WindingUp || wep.WindingUp : false);
                     //dashingInitiate = defensive && inRange;
-                    dashingDodgeAttacks = entity.posture != Character.Posture.Strong;
+                    dashingDodgeAttacks = entity.Posture != Character.PostureStrength.Strong;
                     martialReactiveDefend = !dashingDodgeAttacks;
                     dashingLunge = true;
                     dashingPower = dashingLunge ? 0.25f : 1.0f;

@@ -22,7 +22,7 @@ public class HandAxe : Weapon
         wHitBox.height = 0.6f;
         equipType = EquipType.OneHanded;
         Range = 0.3f;
-        BasePower = 40f;
+        BasePower = 20f;
         //EventSwinging.AddListener(() => { if (Wielder) { Wielder.alterTempo(-Wielder.Tempo); } });
         base.Start();
     }

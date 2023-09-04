@@ -31,7 +31,7 @@ public class StatBar : MonoBehaviour
             float hp = Host.Vitality / Host.Strength;
             fill.anchoredPosition = new Vector2((1-hp)/2, fill.anchoredPosition.y);
             fill.sizeDelta = new Vector2(hp, fill.sizeDelta.y);
-            fill.GetComponent<Image>().color = (int)Host.posture > -1 ? new Color(1, 0, 0, 0.5f) : new Color(1, 0, 0.75f, 0.5f);
+            fill.GetComponent<Image>().color = (int)Host.Posture > -1 ? new Color(1, 0, 0, 0.5f) : new Color(1, 0, 0.75f, 0.5f);
             float poiseMeter = Host.Poise / Host.Strength;
             border.anchoredPosition = new Vector2((1 - poiseMeter) / 2, border.anchoredPosition.y);
             border.sizeDelta = new Vector2(poiseMeter, border.sizeDelta.y);

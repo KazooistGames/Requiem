@@ -64,8 +64,11 @@ public class Idol : Bone
         equipType = EquipType.Burdensome;
         pitchScalar = 0.6f;
         spiritFlame = GetComponentInChildren<_Flames>();
+        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Inferno);
+        spiritFlame.boundObject = gameObject;
         StartCoroutine(banter());
         Body.mass = 3f;
+        PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
     }
 
     protected override void Update()

@@ -69,19 +69,16 @@ public class _Flames : MonoBehaviour
                 }
                 else if (boundWeapon.ActionAnimated == Weapon.ActionAnimation.Parrying)
                 {
-                    SetFlamePresentation(FlameStyles.Soulless);
+                    SetFlamePresentation(FlameStyles.Inferno);
                 }
             }
             else if (boundEntity)
             {
                 emissionModule.enabled = boundEntity.FinalDash;
             }
-            if (emissionModule.enabled)
+            else
             {
-                //emissionModule.rateOverTime = Mathf.Lerp(emissionOverTimeMin, emissionOverTimeMax, PowerLevel);
-                //emissionModule.rateOverDistance = Mathf.Lerp(emissionOverDistanceMin, emissionOverDistanceMax, PowerLevel);
-                //particleLight.intensity = Mathf.Lerp(lightIntensityMin, lightIntensityMax, PowerLevel);
-                //particleLight.range = Mathf.Lerp(lightRangeMin, lightRangeMax, PowerLevel);
+                emissionModule.enabled = true;
             }
         }
         else
@@ -123,7 +120,7 @@ public class _Flames : MonoBehaviour
         SetFlamePresentation(FlamePresentationStyle);
         transform.SetParent(boundObject.transform, false);
         Character boundEntity = boundObject.gameObject.GetComponent<Character>();
-        Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
+        Wieldable boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
         if (boundEntity)
         {
             shapeModule.shapeType = ParticleSystemShapeType.Donut;

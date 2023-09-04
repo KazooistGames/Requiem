@@ -3,65 +3,95 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Events;
+using System.Drawing;
 
 public class Spawner : MonoBehaviour
 {
-    public float PeriodicSpawnFrequency = 20.0f;
-    public int PeriodicSpawnSize = 2;
-    public bool PeriodicSpawningEnabled = false;
-    public Vector3 SpawnPosition = Vector3.zero;
-    public List<Type> listOfSpawnComponents = new List<Type>();
-    public List<GameObject> listofSpawnedInstances { get; internal set; } = new List<GameObject>();
-    public int maxConcurrentInstances = 10;
+    public UnityEvent<List<GameObject>> Spawned = new UnityEvent<List<GameObject>>();
+    public UnityEvent<List<GameObject>> FinishedPeriodicSpawning = new UnityEvent<List<GameObject>>();
+    public List<Type> ListOfComponentsAddedToSpawnedObjects = new List<Type>();
 
-    public delegate void SpawnedDelegate(List<GameObject> listOfNewInstances);
-    public SpawnedDelegate OnSpawned;
 
     void Start()
     {
-        StartCoroutine(routinePeriodicSpawning());
+
     }
 
     void OnDestroy()
     {
-        StopCoroutine(routinePeriodicSpawning());
+        StopAllCoroutines();
     }
 
-    private IEnumerator routinePeriodicSpawning()
+
+    /***** PUBLIC *****/
+    public List<GameObject> InstantSpawn(int groupSize)
     {
-        while (true)
+        if(groupSize <= 0)
         {
-            if (PeriodicSpawningEnabled)
-            {
-                SpawnObjects(PeriodicSpawnSize);
-                yield return new WaitForSeconds(PeriodicSpawnFrequency);
-            }
-            else
-            {
-                yield return null;
-            }
+            return new List<GameObject>();
         }
-    }
-
-    public void SpawnObjects(int count)
-    {
         List<GameObject> listOfNewInstances = new List<GameObject>();
-        for (int i = 0; i < count && listofSpawnedInstances.Count(x => x != null) < maxConcurrentInstances; i++)
+        for (int i = 0; i < groupSize; i++)
         {
             GameObject spawned = new GameObject();
-            spawned.transform.position = SpawnPosition;
-            listofSpawnedInstances.Add(spawned);
-            foreach (Type componentType in listOfSpawnComponents)
+            spawned.transform.position = transform.position;
+            foreach (Type componentType in ListOfComponentsAddedToSpawnedObjects)
             {
                 spawned.AddComponent(componentType);
             }
             listOfNewInstances.Add(spawned);
         }
-        if (OnSpawned != null)
+        if (Spawned != null)
         {
-            OnSpawned.Invoke(listOfNewInstances);
+            Spawned.Invoke(listOfNewInstances);
         }
+        return listOfNewInstances;
     }
+
+    public void PeriodicallySpawn(float frequency, int groupSize = 1, int maxConcurrentInstances = -1, int totalInstancesToSpawn = -1)
+    {
+        if(groupSize <= 0) { return; }
+        StopAllCoroutines();
+        StartCoroutine(routinePeriodicSpawning(frequency, groupSize, maxConcurrentInstances, totalInstancesToSpawn));
+    }
+
+    public void StopPeriodicSpawning()
+    {
+        StopAllCoroutines();
+    }
+
+    /***** PROTECTED *****/
+
+
+    /***** PRIVATE *****/
+
+
+    private IEnumerator routinePeriodicSpawning(float frequency, int groupSize = 1, int maxConcurrentInstances = -1, int totalInstancesToSpawn = -1)
+    {
+        if(groupSize <= 0) { yield break; }
+ 
+        List<GameObject> instancesSpawnedThisCycle = new List<GameObject>();
+        while (instancesSpawnedThisCycle.Count < totalInstancesToSpawn && totalInstancesToSpawn > 0)
+        {
+            if(maxConcurrentInstances > 0)
+            {
+                int delta = 0;
+                yield return new WaitUntil(() => { delta = maxConcurrentInstances - instancesSpawnedThisCycle.Count(x => x != null); return delta > 0; });
+                instancesSpawnedThisCycle.AddRange(InstantSpawn(Mathf.Min(delta, groupSize)));
+            }       
+            else
+            {
+                int permissableGroupSize = Mathf.Min(groupSize, totalInstancesToSpawn - instancesSpawnedThisCycle.Count);
+                instancesSpawnedThisCycle.AddRange(InstantSpawn(permissableGroupSize));
+            }
+            yield return new WaitForSeconds(frequency);
+        }
+        FinishedPeriodicSpawning.Invoke(instancesSpawnedThisCycle);
+        yield break;
+    }
+
+
 
 
 }

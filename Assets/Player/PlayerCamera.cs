@@ -10,7 +10,7 @@ public class PlayerCamera : MonoBehaviour
 
     public Vector3 camOffsetActual = new Vector3(3, 3, 0);
     public float VerticalAngle = 30f;
-    public float VerticalAngleMin = 15f;
+    public float VerticalAngleMin = 30f;
     public float VerticalAngleMax = 45f;
     public float HorizonatalOffsetAngle = 0;
 
@@ -18,7 +18,7 @@ public class PlayerCamera : MonoBehaviour
     public float camOffsetMin = 0.5f;
     public float CamOffsetMag = 0.75f;
     public float CamHeight = 0.5f;
-    public float CamHeightMin = 0.75f;
+    public float CamHeightMin = 1f;
     public float CamHeightMax = 1.0f;
     public float minFOV = 50f;
     public float maxFOV = 70f;

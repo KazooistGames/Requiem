@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 using Newtonsoft.Json.Linq;
+using static Weapon;
+using UnityEngine.TextCore.Text;
 
 public abstract class Character : MonoBehaviour
 {
@@ -13,7 +15,7 @@ public abstract class Character : MonoBehaviour
     public Player requiemPlayer;
 
     public float Strength = 100f;
-    public float Resolve = 1.0f;
+    public float Resolve = 10.0f;
     public float Haste = 1.0f;
 
     public float Xp = 0f;
@@ -88,6 +90,7 @@ public abstract class Character : MonoBehaviour
     public bool Shoved = false;
     public float shoveRecoveryPeriod = 0;
     private float shoveRecoveryTimer = 0;
+    private float shoveAccelScalar = 0.75f;
 
     public bool Staggered = false;
     protected float staggerPeriod = 0;
@@ -109,8 +112,8 @@ public abstract class Character : MonoBehaviour
     private static float DASH_CHARGE_TIME = 0.25f;
     private static float CRASH_DAMAGE = 25f;
 
-    private static float POISE_REGEN_PERIOD = 3f;
-    private static float POISE_DEBOUNCE_PERIOD = 3f;
+    private static float POISE_REGEN_PERIOD = 2f;
+    private static float POISE_DEBOUNCE_PERIOD = 4f;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebounceTimer = 0.0f;
 
@@ -123,12 +126,13 @@ public abstract class Character : MonoBehaviour
     public GameObject head;
 
 
-    public enum Posture
+    public enum PostureStrength
     {
         Weak = -1,
+        Normal = 0,
         Strong = 1,
     }
-    public Posture posture = Posture.Strong;
+    public PostureStrength Posture = PostureStrength.Strong;
 
     public enum WieldMode
     {
@@ -185,7 +189,6 @@ public abstract class Character : MonoBehaviour
 
     protected virtual void Start()
     {
-        Resolve = 1;
         scaleActual = Scale * scaleScalar;
         berthActual = Berth * berthScalar;
         heightActual = Height * heightScalar;
@@ -227,7 +230,11 @@ public abstract class Character : MonoBehaviour
         equipmentManagement();
         indicatorManagement();
         body.mass = Strength * scaleActual;
-        if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD / Resolve))
+        if ((poiseDebounceTimer += Time.deltaTime) < (POISE_DEBOUNCE_PERIOD / Resolve))
+        {
+
+        }  
+        else if (MainHand ? MainHand.GetComponent<Weapon>() ? MainHand.GetComponent<Weapon>().ActionAnimated == Weapon.ActionAnimation.Idle : false : true )
         {
             float increment = Resolve * Time.deltaTime * Strength / POISE_REGEN_PERIOD;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
@@ -244,7 +251,8 @@ public abstract class Character : MonoBehaviour
             {
                 Poise += increment;
             }
-        }        
+        }
+
         Passion = Mathf.Clamp(Passion, 0, 1);
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
         Poise = Mathf.Clamp(Poise, 0, Strength);
@@ -353,9 +361,9 @@ public abstract class Character : MonoBehaviour
             Location = hoverHit.collider.gameObject;
         }
         transform.position = new Vector3(transform.position.x, floorHeight, transform.position.z);
-        float effectiveAccel = (Shoved && !Dashing) ? AccelerationActual * 0.75f : AccelerationActual;
+        float effectiveAccel = AccelerationActual;
         Vector3 proposedVelocity;
-        bool stopping = (WalkDirection == Vector3.zero || Shoved || Staggered) && body.velocity.magnitude > 0;
+        bool stopping = (WalkDirection == Vector3.zero || Shoved) && body.velocity.magnitude > 0;
         if (stopping)
         {
             Vector3 increment = body.velocity * Time.fixedDeltaTime * effectiveAccel;
@@ -365,7 +373,7 @@ public abstract class Character : MonoBehaviour
         else
         {
             proposedVelocity = body.velocity + (WalkDirection * Time.fixedDeltaTime * effectiveAccel);
-            if (new Vector2(proposedVelocity.x, proposedVelocity.z).magnitude > SpeedActual && !Shoved && !Staggered)
+            if (new Vector2(proposedVelocity.x, proposedVelocity.z).magnitude > SpeedActual && !Shoved)
             {
                 Vector3 normalized = proposedVelocity.normalized * SpeedActual;
                 body.velocity = new Vector3(normalized.x, body.velocity.y, normalized.z);
@@ -376,7 +384,7 @@ public abstract class Character : MonoBehaviour
             }
         }
 
-        if ((Shoved && !Dashing) || Staggered)
+        if ((Shoved && !Dashing))
         {
             body.freezeRotation = true;
         }
@@ -478,6 +486,11 @@ public abstract class Character : MonoBehaviour
         {
             float poiseDamage = Mathf.Min(Poise, magnitude);
             alterPoise(-poiseDamage);
+            updatePosture();
+            if (Posture == PostureStrength.Weak)
+            {
+                Stagger(2f * (magnitude - poiseDamage) / Strength);
+            }
             Vitality -= magnitude;
             EventWounded.Invoke(magnitude);
         }
@@ -513,19 +526,24 @@ public abstract class Character : MonoBehaviour
         Shoved = true;
         body.AddForce(VelocityChange, ForceMode.VelocityChange);
         float forceDelta = VelocityChange.magnitude;
-        shoveRecoveryPeriod += forceDelta / (AccelerationActual * 0.75f);
+        shoveRecoveryPeriod += forceDelta / (AccelerationActual * shoveAccelScalar);
     }
 
     /***** PROTECTED *****/
     protected virtual void updatePosture()
     {
-        if (Poise >= Strength)
+        if (Poise <= 0)
         {
-            posture = Posture.Strong;
+            Posture = PostureStrength.Weak;
         }
-        else if (Poise <= 0)
+        else if(Poise >= Strength)
         {
-            posture = Posture.Weak;
+            Posture = PostureStrength.Strong;
+        }
+        else
+        {
+            Posture = PostureStrength.Normal;
+
         }
     }
 
@@ -566,7 +584,6 @@ public abstract class Character : MonoBehaviour
 
     private void alterPoise(float value)
     {
-        bool reduction = value <= 0;
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
         Poise += value;
         Poise = Mathf.Clamp(Poise, -1, Strength);
@@ -676,20 +693,24 @@ public abstract class Character : MonoBehaviour
                 ShoveVector *= 1.0f;
                 foe.Shove(ShoveVector);
                 foe.EventCrashed.Invoke();
+                float damage = CRASH_DAMAGE * actualMag / maxMag;
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
                     //alterPoise(Strength);
                 }
-                else
+                else 
                 {
-                    if (FinalDash)
+                    if (foe.Posture == PostureStrength.Weak)
                     {
-                        foe.Stagger(actualMag / maxMag);
-                        float damage = CRASH_DAMAGE * actualMag / maxMag;
                         foe.Damage(damage);
-                        EventLandedDashHit.Invoke(foe, damage);
                     }
+                    else
+                    {
+                        foe.alterPoise(-damage);
+                    }
+
+                    EventLandedDashHit.Invoke(foe, damage);              
                 }
                 _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
             }
@@ -755,7 +776,7 @@ public abstract class Character : MonoBehaviour
         while (true)
         {
             FinalDash = false;
-            yield return new WaitUntil(() => DashCharging && !Staggered);
+            yield return new WaitUntil(() => DashCharging);
             directionIsUndetermined = dashDirection == Vector3.zero;
             heldChargeUntilCutoff = true;
             while (DashPower < 1.0)
@@ -779,11 +800,7 @@ public abstract class Character : MonoBehaviour
             }
             dashAlreadyHit = new List<GameObject>();
             float scaledVelocity = Max_Velocity_Of_Dash * DashPower;
-            if (Staggered)
-            {
-
-            }
-            else if (scaledVelocity <= Min_Velocity_Of_Dash)
+            if (scaledVelocity <= Min_Velocity_Of_Dash)
             {
 
             }
@@ -826,10 +843,11 @@ public abstract class Character : MonoBehaviour
 
     private void handleWeaponSwing(Weapon myWeapon)
     {
-        if(myWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
-        {
-            alterPoise(-myWeapon.Heft / 4);
-        }
+        //if(myWeapon.TrueStrike)
+        //{
+            //alterPoise(-myWeapon.Heft / 4);
+        //}
+
     }
 
     private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)
@@ -838,27 +856,43 @@ public abstract class Character : MonoBehaviour
         {
             Passion += myWeapon.Heft / 1000;
         }
-        else if (posture == Posture.Weak)
+        else if (Posture == PostureStrength.Weak)
         {
-            Stagger(0.25f + 1.5f * (myWeapon.Heft / Strength));
+            Stagger(1.5f * (myWeapon.Heft / Strength));
         }
     }
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        
+        if (theirWeapon.Wielder)
+        {
+            theirWeapon.Wielder.alterPoise(Resolve);
+        }
+
         if (theirWeapon.TrueStrike)
         {
-            Stagger(0.25f + 1.5f * (theirWeapon.Heft / Strength));
-            alterPoise(-theirWeapon.Heft / 2);
+            Disarm();
+            alterPoise(-Poise);
         }
-        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
+        else if (theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
         {
-            alterPoise(-theirWeapon.Heft / 2);
+            Stagger(theirWeapon.Heft / Strength);
+            alterPoise(-theirWeapon.MostRecentWielder.Poise);
         }
-        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
+        else if (theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
         {
-
+            alterPoise(Resolve);
+        }
+        if (Posture == PostureStrength.Weak)
+        {
+            if (theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
+            {
+                Disarm();
+            }
+            else
+            {
+                Stagger(1.5f * (theirWeapon.Heft / Strength));
+            }
         }
     }
 
@@ -871,12 +905,12 @@ public abstract class Character : MonoBehaviour
         }
         else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
         {
-            theirWeapon.Wielder.Stagger(0.25f + 1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
+            theirWeapon.Wielder.Stagger(1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
         }
         else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
         {
-            theirWeapon.Wielder.alterPoise(-theirWeapon.Heft / 2);
-            theirWeapon.Wielder.Stagger(0.25f + 1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
+            theirWeapon.Wielder.alterPoise(-Poise);
+            theirWeapon.Wielder.Stagger(1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
         }
     }
 
@@ -891,6 +925,16 @@ public abstract class Character : MonoBehaviour
     private void handleWeaponHit(Weapon myWeapon, Character foe)
     {
         Passion += myWeapon.Power / 1000;
+        float appliedDamage = myWeapon.Power;
+        if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack && Posture != PostureStrength.Weak)
+        {
+            appliedDamage -= foe.Resolve;
+        }
+        else if (myWeapon.TrueStrike && Posture != PostureStrength.Weak)
+        {
+            appliedDamage += Resolve;
+        }
+        foe.Damage(appliedDamage);
     }
 
     private void handleWeaponDropped(Wieldable wieldable)

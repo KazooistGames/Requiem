@@ -111,8 +111,8 @@ public class Player : MonoBehaviour
         float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Character.DefaultTurnSpeed, 1.0f, 0.25f);
         float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
         bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
-        Cam.VerticalAngle -= (increment / 2 * CurrentMouse.delta.ReadValue().y);
-        Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 180) * Cam.ZoomSensitivity;
+        Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
+        Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 360) * Cam.ZoomSensitivity;
         if (differenceCap == 0)
         {
 

@@ -19,13 +19,13 @@ public class Landmark_Alter : Landmark
     public float RitualDurationSeconds = 5;
 
     private List<GameObject> steps = new List<GameObject>();
-    private CapsuleCollider offeringDetector;
+    private CapsuleCollider offeringDetectionCollider;
 
     private void Update()
     {
         if (DesiredOffering)
         {
-            Energized = offeringDetector.bounds.Contains(DesiredOffering.transform.position);
+            Energized = offeringDetectionCollider.bounds.Contains(DesiredOffering.transform.position);
         }
     }
 
@@ -56,10 +56,10 @@ public class Landmark_Alter : Landmark
         //create podium for idol
         //createCenterPodium();
 
-        offeringDetector = gameObject.AddComponent<CapsuleCollider>();
-        offeringDetector.isTrigger = true;
-        offeringDetector.radius = Hextile.Radius * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount);
-        offeringDetector.height = Hextile.Thickness * 2 + StepHeight*StepCount;
+        offeringDetectionCollider = gameObject.AddComponent<CapsuleCollider>();
+        offeringDetectionCollider.isTrigger = true;
+        offeringDetectionCollider.radius = Hextile.Radius * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount);
+        offeringDetectionCollider.height = Hextile.Thickness * 2 + StepHeight*StepCount;
 
         StartCoroutine(RitualCycler());
     }

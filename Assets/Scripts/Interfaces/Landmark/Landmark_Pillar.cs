@@ -42,12 +42,12 @@ public class Landmark_Pillar : Landmark
         Vector3 temp = transform.localEulerAngles;
         transform.localEulerAngles = new Vector3(0, temp.y, 0);
         torch = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/torch")).GetComponent<Torch>();
-        if(model.tag == "Broken")
+        if (model.tag == "Broken")
         {
             torch.transform.position = transform.position + new Vector3(0, 0.35f, 0.07f);
             GameObject otherHalf = Instantiate(model);
-            otherHalf.transform.position = model.transform.position;
-            otherHalf.transform.Rotate(new Vector3(180, 0, 0));
+            otherHalf.transform.position = model.transform.position + Vector3.up;
+            otherHalf.transform.Rotate(new Vector3(Random.value * 180, Random.value * 180, Random.value * 180));
             Rigidbody body = otherHalf.AddComponent<Rigidbody>();
             body.mass = model.tag == "Broken" ? 100 : 150;
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
@@ -55,9 +55,9 @@ public class Landmark_Pillar : Landmark
         }
         else
         {
-            torch.Mount(gameObject, new Vector3(0, 0.35f, 0.07f));         
+            torch.Mount(gameObject, new Vector3(0, 0.35f, 0.07f));
         }
-        torch.transform.localEulerAngles = new Vector3(45,0, 0);
+        torch.transform.localEulerAngles = new Vector3(45, 0, 0);
         torch.Lit = false;
     }
 }
