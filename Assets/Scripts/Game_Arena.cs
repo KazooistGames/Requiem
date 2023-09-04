@@ -114,7 +114,7 @@ public class Game_Arena : Game
             yield return new WaitUntil(() => alter.Used);
             State = GameState.Wave;
             int MobsThisWave = 6 * Difficulty;
-            MobSpawner.PeriodicallySpawn(15, Difficulty, 2 * Difficulty, 3 * Difficulty);
+            MobSpawner.PeriodicallySpawn(10, Difficulty, 2 * Difficulty, 3 * Difficulty);
             EliteSpawner.PeriodicallySpawn(30, 1, Difficulty, Difficulty);
             yield return new WaitUntil(() => allMobsSpawned && allElitesSpawned);
             State = GameState.Boss;

@@ -230,13 +230,13 @@ public abstract class Character : MonoBehaviour
         equipmentManagement();
         indicatorManagement();
         body.mass = Strength * scaleActual;
-        if ((poiseDebounceTimer += Time.deltaTime) < (POISE_DEBOUNCE_PERIOD / Resolve))
+        if ((poiseDebounceTimer += Time.deltaTime) < (POISE_DEBOUNCE_PERIOD))
         {
 
         }  
         else if (MainHand ? MainHand.GetComponent<Weapon>() ? MainHand.GetComponent<Weapon>().ActionAnimated == Weapon.ActionAnimation.Idle : false : true )
         {
-            float increment = Resolve * Time.deltaTime * Strength / POISE_REGEN_PERIOD;
+            float increment = Time.deltaTime * Strength / POISE_REGEN_PERIOD;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
             if (Mathf.Abs(delta) <= increment)
@@ -874,18 +874,19 @@ public abstract class Character : MonoBehaviour
             Disarm();
             alterPoise(-Poise);
         }
-        else if (theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
+        else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
             Stagger(theirWeapon.Heft / Strength);
             alterPoise(-theirWeapon.MostRecentWielder.Poise);
         }
-        else if (theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
+        else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
-            alterPoise(Resolve);
+            alterPoise(-theirWeapon.MostRecentWielder.Resolve);
+            theirWeapon.Wielder.alterPoise(-Resolve);
         }
         if (Posture == PostureStrength.Weak)
         {
-            if (theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
+            if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
             {
                 Disarm();
             }
