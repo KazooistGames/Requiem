@@ -102,13 +102,13 @@ public abstract class Character : MonoBehaviour
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
-    public bool FinalDash { get; private set; } = false;
+
+
     public Vector3 dashDirection = Vector3.zero;
     private static AudioClip SOUND_OF_DASH;
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
     protected bool CrashEnvironmentONS = true;
 
-    private static float FINALDASH_POWER_SCALAR = 1.5f;
     private static float DASH_CHARGE_TIME = 0.25f;
     private static float CRASH_DAMAGE = 25f;
 
@@ -683,9 +683,9 @@ public abstract class Character : MonoBehaviour
         {
             Vector3 disposition = foe.transform.position - transform.position;
             float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
-            float maxMag = FinalDash ? Max_Velocity_Of_Dash * FINALDASH_POWER_SCALAR : Max_Velocity_Of_Dash;
+            //float maxMag = FinalDash ? Max_Velocity_Of_Dash * FINALDASH_POWER_SCALAR : Max_Velocity_Of_Dash;
             bool crash = instant || collision.relativeVelocity.magnitude >= minMag;
-            float actualMag = instant ? Mathf.Lerp(minMag, maxMag, DashPower) : Mathf.Min(collision.relativeVelocity.magnitude, maxMag);
+            float actualMag = instant ? Mathf.Lerp(minMag, Max_Velocity_Of_Dash, DashPower) : Mathf.Min(collision.relativeVelocity.magnitude, Max_Velocity_Of_Dash);
             if (crash && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
                 float impactRatio = Strength_Ratio(this, foe) * actualMag / Max_Velocity_Of_Dash;
@@ -693,7 +693,7 @@ public abstract class Character : MonoBehaviour
                 ShoveVector *= 1.0f;
                 foe.Shove(ShoveVector);
                 foe.EventCrashed.Invoke();
-                float damage = CRASH_DAMAGE * actualMag / maxMag;
+                float damage = CRASH_DAMAGE * actualMag / Max_Velocity_Of_Dash;
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
@@ -771,14 +771,10 @@ public abstract class Character : MonoBehaviour
     {
         string key = "dash";
         bool directionIsUndetermined;
-        bool heldChargeUntilCutoff;
-        float finalDashCutoffCharge = 0.9f;
         while (true)
         {
-            FinalDash = false;
             yield return new WaitUntil(() => DashCharging);
             directionIsUndetermined = dashDirection == Vector3.zero;
-            heldChargeUntilCutoff = true;
             while (DashPower < 1.0)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
@@ -786,14 +782,6 @@ public abstract class Character : MonoBehaviour
                 if (directionIsUndetermined)
                 {
                     dashDirection = WalkDirection == Vector3.zero ? dashDirection : WalkDirection;
-                }
-                if (DashPower < finalDashCutoffCharge)
-                {
-                    heldChargeUntilCutoff = heldChargeUntilCutoff && DashCharging;
-                }
-                else if (heldChargeUntilCutoff)
-                {
-                    FinalDash = !DashCharging && dashDirection == Vector3.zero;
                 }
 
                 yield return null;
@@ -806,18 +794,15 @@ public abstract class Character : MonoBehaviour
             }
             else
             {
-                if (FinalDash)
+                if (dashDirection != Vector3.zero)
                 {
-                    scaledVelocity *= FINALDASH_POWER_SCALAR;
-                    dashDirection = LookDirection;
-                }
-                if (FinalDash || dashDirection != Vector3.zero)
                     Dashing = true;
-                Shove(dashDirection * scaledVelocity, true);
-                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
-                sound.layer = Game.layerItem;
-                sound.transform.SetParent(transform);
-                yield return new WaitWhile(() => Shoved);
+                    Shove(dashDirection * scaledVelocity, true);
+                    GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
+                    sound.layer = Game.layerItem;
+                    sound.transform.SetParent(transform);
+                    yield return new WaitWhile(() => Shoved);
+                }
             }
             modSpeed[key] = 0.0f;
             Dashing = false;

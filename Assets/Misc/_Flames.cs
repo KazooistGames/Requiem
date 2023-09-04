@@ -72,10 +72,6 @@ public class _Flames : MonoBehaviour
                     SetFlamePresentation(FlameStyles.Inferno);
                 }
             }
-            else if (boundEntity)
-            {
-                emissionModule.enabled = boundEntity.FinalDash;
-            }
             else
             {
                 emissionModule.enabled = true;
