@@ -58,7 +58,7 @@ public class _Flames : MonoBehaviour
         if (boundObject)
         {
             //setFlamePreset(FlameStyle);
-            Character boundEntity = boundObject.gameObject.GetComponent<Character>();
+            Warrior boundEntity = boundObject.gameObject.GetComponent<Warrior>();
             Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
             if (boundWeapon)
             {
@@ -71,6 +71,10 @@ public class _Flames : MonoBehaviour
                 {
                     SetFlamePresentation(FlameStyles.Inferno);
                 }
+            }
+            else if (boundEntity)
+            {
+                emissionModule.enabled = false;
             }
             else
             {
@@ -115,7 +119,7 @@ public class _Flames : MonoBehaviour
         buildGradients();
         SetFlamePresentation(FlamePresentationStyle);
         transform.SetParent(boundObject.transform, false);
-        Character boundEntity = boundObject.gameObject.GetComponent<Character>();
+        Warrior boundEntity = boundObject.gameObject.GetComponent<Warrior>();
         Wieldable boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
         if (boundEntity)
         {

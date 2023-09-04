@@ -8,9 +8,9 @@ using Newtonsoft.Json.Linq;
 using static Weapon;
 using UnityEngine.TextCore.Text;
 
-public abstract class Character : MonoBehaviour
+public abstract class Warrior : MonoBehaviour
 {
-    public static UnityEvent<Character> EntityVanquished = new UnityEvent<Character> { };
+    public static UnityEvent<Warrior> EntityVanquished = new UnityEvent<Warrior> { };
 
     public Player requiemPlayer;
 
@@ -25,7 +25,6 @@ public abstract class Character : MonoBehaviour
     public float Vitality;
     public float Agility;
     public float Poise;
-    public float Passion;
 
     public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
@@ -49,10 +48,10 @@ public abstract class Character : MonoBehaviour
     public UnityEvent EventVanquished = new UnityEvent();
     public UnityEvent<float> EventWounded = new UnityEvent<float>();
     public UnityEvent EventCrashed = new UnityEvent();
-    public UnityEvent<Character, float> EventLandedDashHit = new UnityEvent<Character, float>();
+    public UnityEvent<Warrior, float> EventLandedDashHit = new UnityEvent<Warrior, float>();
     public UnityEvent<Wieldable> EventPickedUpWieldable = new UnityEvent<Wieldable>();
 
-    public Character Foe;
+    public Warrior Foe;
 
     protected float BaseAcceleration = 8;
     public float SpeedActual { get; private set; } = 0f;
@@ -71,8 +70,8 @@ public abstract class Character : MonoBehaviour
     public Wieldable leftStorage;
     public Wieldable rightStorage;
     public Wieldable backStorage;
-    public UnityEvent<Character> EventAttemptPickup = new UnityEvent<Character> { };
-    public UnityEvent<Character> EventAttemptInteraction = new UnityEvent<Character> { };
+    public UnityEvent<Warrior> EventAttemptPickup = new UnityEvent<Warrior> { };
+    public UnityEvent<Warrior> EventAttemptInteraction = new UnityEvent<Warrior> { };
 
     public CapsuleCollider personalBox;
     protected GameObject model;
@@ -221,7 +220,6 @@ public abstract class Character : MonoBehaviour
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         Poise = Strength;
         StartCoroutine(routineDashHandler());
-        EventWounded.AddListener((damage) => Passion += damage / 1000);
         EventPickedUpWieldable.AddListener(handleWeaponPickedUp);
     }
 
@@ -230,11 +228,7 @@ public abstract class Character : MonoBehaviour
         equipmentManagement();
         indicatorManagement();
         body.mass = Strength * scaleActual;
-        if ((poiseDebounceTimer += Time.deltaTime) < (POISE_DEBOUNCE_PERIOD))
-        {
-
-        }  
-        else if (MainHand ? MainHand.GetComponent<Weapon>() ? MainHand.GetComponent<Weapon>().ActionAnimated == Weapon.ActionAnimation.Idle : false : true )
+        if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD))
         {
             float increment = Time.deltaTime * Strength / POISE_REGEN_PERIOD;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
@@ -251,9 +245,7 @@ public abstract class Character : MonoBehaviour
             {
                 Poise += increment;
             }
-        }
-
-        Passion = Mathf.Clamp(Passion, 0, 1);
+        }  
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
         Poise = Mathf.Clamp(Poise, 0, Strength);
         Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
@@ -406,7 +398,7 @@ public abstract class Character : MonoBehaviour
     {
         if (!dashAlreadyHit.Contains(collision.gameObject))
         {
-            Character foe = collision.gameObject.GetComponent<Character>();
+            Warrior foe = collision.gameObject.GetComponent<Warrior>();
             if (Dashing && foe)
             {
                 resolveDashHit(collision);
@@ -422,7 +414,7 @@ public abstract class Character : MonoBehaviour
     {
         if (!dashAlreadyHit.Contains(collision.gameObject))
         {
-            Character foe = collision.gameObject.GetComponent<Character>();
+            Warrior foe = collision.gameObject.GetComponent<Warrior>();
             if (Dashing && foe)
             {
                 resolveDashHit(collision, instant: true);
@@ -438,7 +430,7 @@ public abstract class Character : MonoBehaviour
 
     /********** PUBLIC **********/
 
-    public static float Strength_Ratio(Character A, Character B)
+    public static float Strength_Ratio(Warrior A, Warrior B)
     {
         if (A && B)
         {
@@ -461,7 +453,7 @@ public abstract class Character : MonoBehaviour
                 bone.AddComponent<Bone>();
             }
             //Entity entity = bone.transform.parent.parent.GetComponent<Entity>();
-            Character entity = bone.GetComponentInParent<Character>();
+            Warrior entity = bone.GetComponentInParent<Warrior>();
             Animator anim = entity.GetComponent<Animator>();
             Vector3 newScale = bone.transform.localScale * entity.scaleActual;
             Vector3 newPosition = bone.transform.position;
@@ -484,13 +476,7 @@ public abstract class Character : MonoBehaviour
     {
         if (magnitude > 0)
         {
-            float poiseDamage = Mathf.Min(Poise, magnitude);
-            alterPoise(-poiseDamage);
-            updatePosture();
-            if (Posture == PostureStrength.Weak)
-            {
-                Stagger(2f * (magnitude - poiseDamage) / Strength);
-            }
+
             Vitality -= magnitude;
             EventWounded.Invoke(magnitude);
         }
@@ -678,7 +664,7 @@ public abstract class Character : MonoBehaviour
     private void resolveDashHit(Collision collision, bool instant = false)
     {
         GameObject other = collision.gameObject;
-        Character foe = other.GetComponent<Character>();
+        Warrior foe = other.GetComponent<Warrior>();
         if (foe ? foe.Allegiance != Allegiance : false)
         {
             Vector3 disposition = foe.transform.position - transform.position;
@@ -734,7 +720,7 @@ public abstract class Character : MonoBehaviour
         bool cleanHit = dot > 0.5f;
         if (cleanHit)
         {
-            Character otherEntity = collision.gameObject.GetComponent<Character>();
+            Warrior otherEntity = collision.gameObject.GetComponent<Warrior>();
             float velocityRatio = (collision.relativeVelocity.magnitude - Min_Velocity_Of_Dash) / (Max_Velocity_Of_Dash - Min_Velocity_Of_Dash);
             if ((otherEntity ? !otherEntity.Dashing : false) && !dashAlreadyHit.Contains(collision.gameObject))
             {
@@ -819,7 +805,7 @@ public abstract class Character : MonoBehaviour
             weapon.Swinging.AddListener(handleWeaponSwing);
             weapon.Clashing.AddListener(handleWeaponClash);
             weapon.Blocking.AddListener(handleWeaponBlock);
-            weapon.Parrying.AddListener(handleWeaponParry);
+            weapon.Parrying.AddListener(handleWeaponParrying);
             weapon.GettingParried.AddListener(handleWeaponParried);
             weapon.Hitting.AddListener(handleWeaponHit);
             weapon.EventDropped.AddListener(handleWeaponDropped);
@@ -839,89 +825,94 @@ public abstract class Character : MonoBehaviour
     {
         if (myWeapon.TrueStrike) 
         {
-            Passion += myWeapon.Heft / 1000;
+            theirWeapon.Wielder.Stagger(2 * myWeapon.Heft / theirWeapon.Wielder.Strength);
         }
-        else if (Posture == PostureStrength.Weak)
+        else if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            Stagger(1.5f * (myWeapon.Heft / Strength));
+
         }
+        else if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
+        {
+            if (Posture == PostureStrength.Weak || theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+            {
+                Stagger((theirWeapon.Heft / Strength));
+            }
+        }
+
     }
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (theirWeapon.Wielder)
-        {
-            theirWeapon.Wielder.alterPoise(Resolve);
-        }
-
         if (theirWeapon.TrueStrike)
         {
-            Disarm();
-            alterPoise(-Poise);
-        }
-        else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-        {
-            Stagger(theirWeapon.Heft / Strength);
-            alterPoise(-theirWeapon.MostRecentWielder.Poise);
-        }
-        else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
-        {
-            alterPoise(-theirWeapon.MostRecentWielder.Resolve);
-            theirWeapon.Wielder.alterPoise(-Resolve);
-        }
-        if (Posture == PostureStrength.Weak)
-        {
-            if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+            if (Posture == PostureStrength.Weak)
             {
                 Disarm();
             }
             else
             {
-                Stagger(1.5f * (theirWeapon.Heft / Strength));
+                Stagger(2 * theirWeapon.Heft / Strength);
+            }
+            alterPoise(-theirWeapon.Heft);
+        }
+        else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+        {
+            Stagger(theirWeapon.Heft / Strength);
+            alterPoise(-theirWeapon.Heft);
+        }
+        else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
+        {
+            if (Posture == PostureStrength.Weak)
+            {
+                Stagger(theirWeapon.Heft / Strength);
             }
         }
+
     }
 
-    private void handleWeaponParry(Weapon myWeapon, Weapon theirWeapon)
+    private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-        Passion += theirWeapon.Heft / 1000;
-        if (theirWeapon.TrueStrike)
-        {
 
-        }
-        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.StrongAttack)
-        {
-            theirWeapon.Wielder.Stagger(1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
-        }
-        else if(theirWeapon.ActionAnimated == Weapon.ActionAnimation.QuickAttack)
-        {
-            theirWeapon.Wielder.alterPoise(-Poise);
-            theirWeapon.Wielder.Stagger(1.5f * (theirWeapon.Heft / theirWeapon.Wielder.Strength));
-        }
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
     {
-        //if(posture == Posture.Weak)
-        //{
-        //    Disarm();
-        //}
+        if (myWeapon.TrueStrike)
+        {
+
+        }
+        else 
+        {
+            if (Posture == PostureStrength.Weak)
+            {
+                Disarm();
+            }
+            else
+            {
+                Stagger(1.5f * (myWeapon.Heft / Strength));
+            }
+            alterPoise(-myWeapon.Heft);
+        }
     }
 
-    private void handleWeaponHit(Weapon myWeapon, Character foe)
+
+    private void handleWeaponHit(Weapon myWeapon, Warrior foe)
     {
-        Passion += myWeapon.Power / 1000;
-        float appliedDamage = myWeapon.Power;
-        if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack && Posture != PostureStrength.Weak)
+        float power = myWeapon.ActionAnimated == ActionAnimation.QuickAttack ?  myWeapon.Sharpness : myWeapon.Heft;
+        float poiseDamage = Mathf.Min(foe.Poise, power);
+        float vitalityDamage = myWeapon.TrueStrike ? power : power - poiseDamage;
+        foe.alterPoise(-poiseDamage);
+        if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            appliedDamage -= foe.Resolve;
+            foe.Stagger(poiseDamage / Strength);
         }
-        else if (myWeapon.TrueStrike && Posture != PostureStrength.Weak)
+        if (vitalityDamage > 0) 
         {
-            appliedDamage += Resolve;
+            foe.Damage(vitalityDamage);
+            foe.Stagger(vitalityDamage / Strength);
         }
-        foe.Damage(appliedDamage);
     }
+
 
     private void handleWeaponDropped(Wieldable wieldable)
     {
@@ -931,7 +922,8 @@ public abstract class Character : MonoBehaviour
             weapon.Swinging.RemoveListener(handleWeaponSwing);
             weapon.Clashing.RemoveListener(handleWeaponClash);
             weapon.Blocking.RemoveListener(handleWeaponBlock);
-            weapon.Parrying.RemoveListener(handleWeaponParry);
+            weapon.Parrying.RemoveListener(handleWeaponParrying);
+            weapon.Hitting.RemoveListener(handleWeaponHit);
             weapon.GettingParried.RemoveListener(handleWeaponParried);
         }
     }

@@ -17,8 +17,8 @@ public class Player : MonoBehaviour
     public Mouse CurrentMouse;
 
     public bool Dead = false;
-    public Character.Loyalty Faction = Character.Loyalty.neutral;
-    public Character HostEntity;
+    public Warrior.Loyalty Faction = Warrior.Loyalty.neutral;
+    public Warrior HostEntity;
 
     public Vector3 Direction = Vector3.zero;
 
@@ -108,7 +108,7 @@ public class Player : MonoBehaviour
         Vector2 hostFlat = new Vector2(HostEntity.LookDirection.x, HostEntity.LookDirection.z).normalized;
         float angleDifference = Vector2.SignedAngle(cameraFlat, hostFlat);
         float spinSpeed = Mathf.Abs(angleDifference) >= differenceCap ? 60 : 30;
-        float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Character.DefaultTurnSpeed, 1.0f, 0.25f);
+        float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Warrior.DefaultTurnSpeed, 1.0f, 0.25f);
         float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
         bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
         Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
@@ -166,38 +166,38 @@ public class Player : MonoBehaviour
             bool released = CurrentKeyboard.tabKey.wasReleasedThisFrame;
             switch (HostEntity.wieldMode)
             {
-                case Character.WieldMode.EmptyHanded:
+                case Warrior.WieldMode.EmptyHanded:
                     if (released && weaponSheathTimer < weaponSheathPeriod)
                     {
                         if (HostEntity.leftStorage || HostEntity.rightStorage)
                         {
-                            HostEntity.wieldMode = Character.WieldMode.OneHanders;
+                            HostEntity.wieldMode = Warrior.WieldMode.OneHanders;
                         }
                         else if (HostEntity.backStorage)
                         {
-                            HostEntity.wieldMode = Character.WieldMode.TwoHanders;
+                            HostEntity.wieldMode = Warrior.WieldMode.TwoHanders;
                         }
                     }
 
                     break;
-                case Character.WieldMode.OneHanders:
+                case Warrior.WieldMode.OneHanders:
                     if (HostEntity.backStorage && released)
                     {
-                        HostEntity.wieldMode = Character.WieldMode.TwoHanders;
+                        HostEntity.wieldMode = Warrior.WieldMode.TwoHanders;
                     }
                     else if (weaponSheathTimer >= weaponSheathPeriod)
                     {
-                        HostEntity.wieldMode = Character.WieldMode.EmptyHanded;
+                        HostEntity.wieldMode = Warrior.WieldMode.EmptyHanded;
                     }
                     break;
-                case Character.WieldMode.TwoHanders:
+                case Warrior.WieldMode.TwoHanders:
                     if ((HostEntity.leftStorage || HostEntity.rightStorage) && released)
                     {
-                        HostEntity.wieldMode = Character.WieldMode.OneHanders;
+                        HostEntity.wieldMode = Warrior.WieldMode.OneHanders;
                     }
                     else if (weaponSheathTimer >= weaponSheathPeriod)
                     {
-                        HostEntity.wieldMode = Character.WieldMode.EmptyHanded;
+                        HostEntity.wieldMode = Warrior.WieldMode.EmptyHanded;
                     }
                     break;
             }
@@ -261,7 +261,7 @@ public class Player : MonoBehaviour
         CurrentMouse = Mouse.current;
         CurrentKeyboard = Keyboard.current;
         listener = GetComponent<AudioListener>() ? GetComponent<AudioListener>() : gameObject.AddComponent<AudioListener>();
-        Faction = Character.Loyalty.hostile;
+        Faction = Warrior.Loyalty.hostile;
         HostEntity = new GameObject().AddComponent<Struggler>();
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;

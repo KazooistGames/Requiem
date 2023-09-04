@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Skelly : Character
+public class Skelly : Warrior
 {
     protected MeshFilter[] bodyParts;
     //protected GameObject head;

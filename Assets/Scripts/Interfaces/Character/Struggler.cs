@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Struggler : Character
+public class Struggler : Warrior
 {
     protected MeshFilter[] bodyparts;
     //protected GameObject head;

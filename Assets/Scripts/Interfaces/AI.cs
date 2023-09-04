@@ -28,7 +28,7 @@ public class AI : MonoBehaviour
     public float TotalWeight;
     public float LookAngle = 0;
 
-    protected Character entity;
+    protected Warrior entity;
     protected Vector3 lastDirection = Vector3.zero;
 
     //meander
@@ -77,7 +77,7 @@ public class AI : MonoBehaviour
     protected bool grabEnabled = false;
     protected float grabSlowScalar = 1.0f;
     public float grabDPS = 15f;
-    protected Character grabLastVictim;
+    protected Warrior grabLastVictim;
 
     //tango
     public bool tangoDeadbanded = false;
@@ -136,7 +136,7 @@ public class AI : MonoBehaviour
     protected bool itemManagementSeeking = false;
     protected bool itemManagementNoDoubles = false;
     protected bool itemManagementNoSingles = false;
-    public Character.WieldMode itemManagementPreferredType = Character.WieldMode.none;
+    public Warrior.WieldMode itemManagementPreferredType = Warrior.WieldMode.none;
     protected Weapon itemManagementTarget;
     protected float itemManagementDelayTimer = 0.0f;
     protected float itemManagementDelayPeriod = 1f;
@@ -218,7 +218,7 @@ public class AI : MonoBehaviour
         {
             behaviourParams[key] = (false, 0);
         }
-        entity = GetComponent<Character>();
+        entity = GetComponent<Warrior>();
     }
 
     protected virtual void Start()
@@ -410,8 +410,8 @@ public class AI : MonoBehaviour
             {
                 sensoryAlertedTimer = 0.0f;
             }
-            sensoryBaseRange = (sensoryAlerted ? 7.5f : 5f) * Character.Scale;
-            Character potentialFoe;
+            sensoryBaseRange = (sensoryAlerted ? 7.5f : 5f) * Warrior.Scale;
+            Warrior potentialFoe;
             bool enemiesAfoot = false;
             if (!entity.Foe)
             {
@@ -423,7 +423,7 @@ public class AI : MonoBehaviour
                     foreach (RaycastHit entityHit in firstPass)
                     {
                         float angle = getAngle(entityHit.transform.position - transform.position);
-                        Character nearbyEntity = entityHit.collider.GetComponent<Character>();
+                        Warrior nearbyEntity = entityHit.collider.GetComponent<Warrior>();
                         enemiesAfoot = nearbyEntity ? nearbyEntity.Allegiance != entity.Allegiance : enemiesAfoot;
                         if (nearbyEntity && Mathf.Abs(LookAngle - angle) <= sightFOVactual / 2 ? nearbyEntity.Allegiance != entity.Allegiance : false)
                         {
@@ -433,7 +433,7 @@ public class AI : MonoBehaviour
                             {
                                 if (objectHit.distance < closestObject)
                                 {
-                                    potentialFoe = objectHit.collider.GetComponent<Character>();
+                                    potentialFoe = objectHit.collider.GetComponent<Warrior>();
                                     if (potentialFoe ? potentialFoe.Allegiance != entity.Allegiance : false)
                                     {
                                         entity.Foe = potentialFoe;
@@ -493,7 +493,7 @@ public class AI : MonoBehaviour
                         {
                             if (hit.distance < temp)
                             {
-                                potentialFoe = hit.collider.GetComponent<Character>();
+                                potentialFoe = hit.collider.GetComponent<Warrior>();
                                 if (potentialFoe ? potentialFoe.Allegiance != entity.Allegiance : false)
                                 {
                                     entity.Foe = potentialFoe;
@@ -606,7 +606,7 @@ public class AI : MonoBehaviour
             Vector3 disposition = grabLastVictim.transform.position - transform.position;
             if (disposition.magnitude < entity.personalBox.radius * entity.scaleActual && !entity.Dashing)
             {
-                grabLastVictim.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = -(grabSlowScalar * Character.Strength_Ratio(entity,entity.Foe));
+                grabLastVictim.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = -(grabSlowScalar * Warrior.Strength_Ratio(entity,entity.Foe));
                 if (grabEnabled)
                 {
                     grabLastVictim.Damage(ReflexRate * behaviourParams[key].Item2 * grabDPS);
@@ -951,23 +951,23 @@ public class AI : MonoBehaviour
             {
                 if (!sensoryAlerted)
                 {
-                    entity.wieldMode = Character.WieldMode.EmptyHanded;
+                    entity.wieldMode = Warrior.WieldMode.EmptyHanded;
                 }
-                else if(itemManagementPreferredType == Character.WieldMode.OneHanders && (entity.leftStorage || entity.rightStorage))
+                else if(itemManagementPreferredType == Warrior.WieldMode.OneHanders && (entity.leftStorage || entity.rightStorage))
                 {
-                    entity.wieldMode = Character.WieldMode.OneHanders;
+                    entity.wieldMode = Warrior.WieldMode.OneHanders;
                 }
-                else if (itemManagementPreferredType == Character.WieldMode.TwoHanders && (entity.backStorage))
+                else if (itemManagementPreferredType == Warrior.WieldMode.TwoHanders && (entity.backStorage))
                 {
-                    entity.wieldMode = Character.WieldMode.TwoHanders;
+                    entity.wieldMode = Warrior.WieldMode.TwoHanders;
                 }
                 else if (!entity.MainHand && (entity.leftStorage || entity.rightStorage))
                 {
-                    entity.wieldMode = Character.WieldMode.OneHanders;
+                    entity.wieldMode = Warrior.WieldMode.OneHanders;
                 }
                 else if (!entity.MainHand && entity.backStorage)
                 {
-                    entity.wieldMode = Character.WieldMode.TwoHanders;
+                    entity.wieldMode = Warrior.WieldMode.TwoHanders;
                 }               
             }              
         }

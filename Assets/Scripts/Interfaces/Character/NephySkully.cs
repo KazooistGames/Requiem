@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class NephySkully : Character
+public class NephySkully : Warrior
 {
     protected override void Awake()
     {
@@ -64,8 +64,8 @@ public class NephySkully : Character
     {
         for(int i = 0; i < 2; i++)
         {
-            Character entity;
-            entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Character>();
+            Warrior entity;
+            entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Warrior>();
             entity.Poise = entity.Strength;
             entity.Shove(AI.RandomDirection() * Min_Velocity_Of_Dash);
         }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Nephalim : Character
+public class Nephalim : Warrior
 {
     protected MeshFilter[] bones;
     protected GameObject ribs;

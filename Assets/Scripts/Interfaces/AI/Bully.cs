@@ -20,7 +20,7 @@ public class Bully : AI
         dashingChargePeriod = 0.5f;
         dashingPower = 1.0f;
         itemManagementSeekItems = true;
-        itemManagementPreferredType = Character.WieldMode.TwoHanders;
+        itemManagementPreferredType = Warrior.WieldMode.TwoHanders;
     }
 
     protected override void Update()

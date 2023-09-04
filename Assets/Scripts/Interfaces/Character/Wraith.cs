@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wraith : Character
+public class Wraith : Warrior
 {
     //StandardAI = typeof(AI_Revanent);
 

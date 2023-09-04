@@ -18,7 +18,7 @@ public class Janitor : AI
         Destroy(entity.indicator);
         CleanZone = GetComponent<SphereCollider>() ? GetComponent<SphereCollider>() : gameObject.AddComponent<SphereCollider>();
         CleanZone.isTrigger = true;
-        CleanZone.radius = Hextile.Radius / Character.Scale;
+        CleanZone.radius = Hextile.Radius / Warrior.Scale;
     }
 
 

@@ -26,7 +26,7 @@ public class Revanent : AI
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
-        itemManagementPreferredType = Character.WieldMode.TwoHanders;
+        itemManagementPreferredType = Warrior.WieldMode.TwoHanders;
         sensorySightRangeScalar = 1.25f;
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
         //new GameObject().AddComponent<Weapon_HandAxe>().PickupItem(entity);

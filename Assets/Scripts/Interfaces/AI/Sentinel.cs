@@ -21,7 +21,7 @@ public class Sentinel : AI
         dashingCooldownPeriod = 1.0f;
         itemManagementSeekItems = true;
         dashingPower = 0.0f;
-        itemManagementPreferredType = Character.WieldMode.OneHanders;
+        itemManagementPreferredType = Warrior.WieldMode.OneHanders;
         new GameObject().AddComponent<Halberd>().PickupItem(entity);
         //entity.modPosture["Sentinel" + GetHashCode().ToString()] = Entity.Posture.Strong;
     }

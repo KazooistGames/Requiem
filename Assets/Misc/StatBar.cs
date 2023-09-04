@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class StatBar : MonoBehaviour
 {
-    public Character Host;
+    public Warrior Host;
     private Canvas canvas;
     private RectTransform[] transforms;
 
@@ -39,11 +39,11 @@ public class StatBar : MonoBehaviour
             border.GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             GetComponent<RectTransform>().sizeDelta = new Vector2(1.0f, 0.1f) * Mathf.Pow(Player.INSTANCE.Cam.Eyes.orthographicSize + 0.25f, 1.5f);
             transform.eulerAngles = new Vector3(-45f, 90f - Player.INSTANCE.Cam.HorizonatalOffsetAngle, 0f);
-            transform.localPosition = Vector3.up * Character.Height * Host.heightScalar;       
+            transform.localPosition = Vector3.up * Warrior.Height * Host.heightScalar;       
         }
         else
         {
-            Host = transform.parent.GetComponent<Character>();
+            Host = transform.parent.GetComponent<Warrior>();
         }
 
     }

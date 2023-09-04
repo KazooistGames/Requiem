@@ -9,7 +9,7 @@ public class Biter : AI
     protected override void Awake()
     {
         base.Awake();
-        entity = GetComponent<Character>() ? GetComponent<Character>() : gameObject.AddComponent<Character>();
+        entity = GetComponent<Warrior>() ? GetComponent<Warrior>() : gameObject.AddComponent<Warrior>();
 
     }
     protected override void Start()

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Devil : Character
+public class Devil : Warrior
 {
 
     protected MeshFilter[] bodyparts;

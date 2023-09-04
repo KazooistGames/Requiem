@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ghosty : Character
+public class Ghosty : Warrior
 {
 
     protected MeshFilter[] bodyparts;

@@ -23,8 +23,8 @@ public class Wieldable : MonoBehaviour
     //protected float rebukeTimer = 0f;
     //protected float rebukePeriod = 0.0f;
 
-    public Character Wielder;
-    public Character.Loyalty Allegiance = Character.Loyalty.neutral;
+    public Warrior Wielder;
+    public Warrior.Loyalty Allegiance = Warrior.Loyalty.neutral;
     public bool Wielded = false;
     public GameObject MountTarget;
 
@@ -40,7 +40,7 @@ public class Wieldable : MonoBehaviour
     public MeshFilter Filter;
     public MeshRenderer Renderer;
 
-    public Character MostRecentWielder;
+    public Warrior MostRecentWielder;
     protected GameObject telecommuteTarget;
     public bool Telecommuting = false;
     public bool Thrown = false;
@@ -123,7 +123,7 @@ public class Wieldable : MonoBehaviour
             {
                 if (Wielded)
                 {
-                    Wielder.wieldMode = Character.WieldMode.Burdened;
+                    Wielder.wieldMode = Warrior.WieldMode.Burdened;
                 }
                 else
                 {
@@ -151,7 +151,7 @@ public class Wieldable : MonoBehaviour
     {
         if (other)
         {
-            Character entity = other.gameObject.GetComponent<Character>();
+            Warrior entity = other.gameObject.GetComponent<Warrior>();
             if (entity && !Wielder && !Thrown && !MountTarget)
             {
                 if(equipType == EquipType.Burdensome)
@@ -168,7 +168,7 @@ public class Wieldable : MonoBehaviour
 
     protected virtual void OnTriggerExit(Collider other)
     {
-        Character entity = other.gameObject.GetComponent<Character>();
+        Warrior entity = other.gameObject.GetComponent<Warrior>();
         if (entity && !Wielder && !Thrown)
         {
             if (equipType == EquipType.Burdensome)
@@ -195,7 +195,7 @@ public class Wieldable : MonoBehaviour
         StartCoroutine(mountHandler(obj, localPosition));
     }
 
-    public void PickupItem(Character newOwner)
+    public void PickupItem(Warrior newOwner)
     {
         StartCoroutine(pickupHandler(newOwner));
     }
@@ -229,7 +229,7 @@ public class Wieldable : MonoBehaviour
             if(equipType == EquipType.Burdensome)
             {
                 Wielder.modSpeed.Remove("burdensome" + GetHashCode().ToString());
-                Wielder.wieldMode = (Wielder.leftStorage || Wielder.rightStorage || Wielder.backStorage) ? Character.WieldMode.OneHanders : Character.WieldMode.EmptyHanded;
+                Wielder.wieldMode = (Wielder.leftStorage || Wielder.rightStorage || Wielder.backStorage) ? Warrior.WieldMode.OneHanders : Warrior.WieldMode.EmptyHanded;
             }
             Wielded = false;
             Wielder = null;
@@ -258,7 +258,7 @@ public class Wieldable : MonoBehaviour
     }
 
     /***** PROTECTED *****/
-    protected virtual IEnumerator pickupHandler(Character newOwner)
+    protected virtual IEnumerator pickupHandler(Warrior newOwner)
     {
         Thrown = false;
         yield return null;
@@ -272,7 +272,7 @@ public class Wieldable : MonoBehaviour
         EventPickedUp.Invoke(this);
         if (equipType == EquipType.Burdensome)
         {
-            if (newOwner.wieldMode == Character.WieldMode.Burdened)
+            if (newOwner.wieldMode == Warrior.WieldMode.Burdened)
             {
                 yield break;
             }
@@ -288,7 +288,7 @@ public class Wieldable : MonoBehaviour
         }
         if (!Wielder.leftStorage && !Wielder.rightStorage && !Wielder.backStorage)
         {
-            Wielder.wieldMode = Character.WieldMode.OneHanders;
+            Wielder.wieldMode = Warrior.WieldMode.OneHanders;
         }
         if (equipType == EquipType.OneHanded)
         {
@@ -312,7 +312,7 @@ public class Wieldable : MonoBehaviour
         }
         else if (equipType == EquipType.Burdensome)
         {
-            Wielder.wieldMode = Character.WieldMode.Burdened;
+            Wielder.wieldMode = Warrior.WieldMode.Burdened;
             Wielder.MainHand = this;
             togglePhysicsBox(false);
         }

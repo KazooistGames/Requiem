@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class Skully : Character
+public class Skully : Warrior
 {
     protected override void Awake()
     {

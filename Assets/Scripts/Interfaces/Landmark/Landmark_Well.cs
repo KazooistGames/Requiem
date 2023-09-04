@@ -31,7 +31,7 @@ public class Landmark_Well : Landmark
 
     protected void OnTriggerEnter(Collider other)
     {
-        Character entity = other.gameObject.GetComponent<Character>();
+        Warrior entity = other.gameObject.GetComponent<Warrior>();
         if(entity && !Used && !Energized)
         {
             entity.EventAttemptInteraction.AddListener(DRINK);
@@ -40,7 +40,7 @@ public class Landmark_Well : Landmark
 
     protected void OnTriggerExit(Collider other)
     {
-        Character entity = other.gameObject.GetComponent<Character>();
+        Warrior entity = other.gameObject.GetComponent<Warrior>();
         if (entity && !Used && !Energized)
         {
             entity.EventAttemptInteraction.RemoveListener(DRINK);
@@ -74,12 +74,12 @@ public class Landmark_Well : Landmark
         Used = false;
     }
 
-    public void DRINK(Character drinker)
+    public void DRINK(Warrior drinker)
     {
         StartCoroutine(drinkRoutine(drinker));
     }
 
-    private IEnumerator drinkRoutine(Character drinker)
+    private IEnumerator drinkRoutine(Warrior drinker)
     {
         playSlurp();
         while (Volume > 0)
