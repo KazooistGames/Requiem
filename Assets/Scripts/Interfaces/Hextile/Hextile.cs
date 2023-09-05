@@ -317,8 +317,8 @@ public class Hextile : MonoBehaviour
         HexagonMesh.uv = getHexMeshUV();
         HexagonMesh.RecalculateNormals();
         HexagonMesh.RecalculateBounds();
-        AssetDatabase.CreateAsset(HexagonMesh, "Assets/Resources/Prefabs/Hextile/HextileMesh.asset");
-        AssetDatabase.SaveAssets();
+        //AssetDatabase.CreateAsset(HexagonMesh, "Assets/Resources/Prefabs/Hextile/HextileMesh.asset");
+        //AssetDatabase.SaveAssets();
     }
 
     private static Vector3[] getHexMeshVerts()

@@ -98,8 +98,8 @@ public class Hexwall : MonoBehaviour
         WallMesh.uv = wallUV;
         WallMesh.RecalculateNormals();
         WallMesh.RecalculateBounds();
-        AssetDatabase.CreateAsset(WallMesh, "Assets/Resources/Prefabs/Hextile/HexWallMesh.asset");
-        AssetDatabase.SaveAssets();
+        //AssetDatabase.CreateAsset(WallMesh, "Assets/Resources/Prefabs/Hextile/HexWallMesh.asset");
+        //AssetDatabase.SaveAssets();
     }
 
     private float DegToRad(float degrees)
