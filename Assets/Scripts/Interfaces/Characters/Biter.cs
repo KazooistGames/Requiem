@@ -18,7 +18,7 @@ public class Biter : Character
         Intelligence = 0.5f;
         ReflexRate = 0.20f;
         tangoStrafeEnabled = false;
-        dashingCooldownPeriod = 1.0f;
+        dashingCooldownPeriod = 2.0f;
         dashingChargePeriod = 1.0f;
         dashingPower = 0.5f;
         grabDPS = 10f;
@@ -60,6 +60,7 @@ public class Biter : Character
                     {
                         Vector3 disposition = entity.Foe.transform.position - transform.position;
                         dashingInitiate = (disposition.magnitude < sensoryBaseRange * sensorySightRangeScalar * 0.25f || entity.DashCharging) && !entity.Shoved;
+                        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     }
                 }
                 break;

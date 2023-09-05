@@ -417,7 +417,10 @@ public abstract class Weapon : Wieldable
         Attacker.Clashing.Invoke(Attacker, Blocker);
         APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: 0.5f);
         Blocker.playTink();
-        Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
+        if (Blocker.Wielder)
+        {
+            Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
+        }
     }
 
     private static void RESOLVE_CLASH(Weapon Attacker, Weapon Defender)

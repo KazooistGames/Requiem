@@ -123,6 +123,167 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &11386814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 11386817}
+  - component: {fileID: 11386816}
+  - component: {fileID: 11386815}
+  m_Layer: 0
+  m_Name: Biter (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &11386815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11386814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4380c844485c70e4ebe7200a4d1daf1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  stateRunTimer: 0
+  ReflexRate: 0.2
+  Intelligence: 0
+  Enthralled: 0
+  actualMovementDirection: {x: 0, y: 0, z: 0}
+  actualMovementAngle: 0
+  DesiredDirection: {x: 0, y: 0, z: 0}
+  TotalWeight: 0
+  LookAngle: 0
+  meanderDirection: {x: 0, y: 0, z: 0}
+  meanderPaused: 0
+  meanderPauseFrequency: 0.5
+  sensoryAlerted: 0
+  pursueStoppingDistance: 0
+  trackingEyesOnTarget: 0
+  trackingTrailCold: 1
+  grabDPS: 15
+  tangoDeadbanded: 0
+  tangoStrafeEnabled: 1
+  martialCurrentState: 0
+  martialPreferredState: 0
+  martialReactiveAttack: 0
+  martialReactiveThrow: 0
+  martialReactiveDefend: 0
+  martialReactiveDefendThrow: 0
+  dashingDodgeAttacks: 0
+  dashingDodgeAim: 0
+  dashingDodgeFoe: 0
+  dashingDodgeFoeDashOnly: 0
+  dashingLunge: 0
+  dashingInitiate: 0
+  itemManagementSeekItems: 0
+  itemManagementGreedy: 0
+  itemManagementPreferredType: 0
+  followVIP: {fileID: 0}
+  followRecall: 0
+  followNutHug: 0
+  followDistance: 0
+  waypointCoordinates: {x: 0, y: 0, z: 0}
+  waypointCommanded: 0
+  waypointDeadbanded: 0
+  waypointDeadbandingScalar: 2
+  waypointInnerlimit: 1
+  waypointOuterLimit: 2
+  wallCrawlDrawRays: 0
+  wallCrawlCrowding: 0
+  wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
+  excitement: 0
+--- !u!114 &11386816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11386814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5b96bfb979cce046b8cb6b84c63969a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  EventVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  EventWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  EventCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  EventLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttemptInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  personalBox: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  DashCharging: 0
+  Dashing: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  Location: {fileID: 0}
+  head: {fileID: 0}
+  Posture: 1
+  wieldMode: 1
+  Allegiance: 0
+--- !u!4 &11386817
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11386814}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.3868496, y: 0.43650657, z: 0.12091631}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &74375184
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,6 +588,167 @@ MonoBehaviour:
   Sharpness: 0
   BasePower: 0
   TrueStrike: 0
+--- !u!1 &747980606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 747980609}
+  - component: {fileID: 747980608}
+  - component: {fileID: 747980607}
+  m_Layer: 0
+  m_Name: Biter (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &747980607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747980606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4380c844485c70e4ebe7200a4d1daf1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  stateRunTimer: 0
+  ReflexRate: 0.2
+  Intelligence: 0
+  Enthralled: 0
+  actualMovementDirection: {x: 0, y: 0, z: 0}
+  actualMovementAngle: 0
+  DesiredDirection: {x: 0, y: 0, z: 0}
+  TotalWeight: 0
+  LookAngle: 0
+  meanderDirection: {x: 0, y: 0, z: 0}
+  meanderPaused: 0
+  meanderPauseFrequency: 0.5
+  sensoryAlerted: 0
+  pursueStoppingDistance: 0
+  trackingEyesOnTarget: 0
+  trackingTrailCold: 1
+  grabDPS: 15
+  tangoDeadbanded: 0
+  tangoStrafeEnabled: 1
+  martialCurrentState: 0
+  martialPreferredState: 0
+  martialReactiveAttack: 0
+  martialReactiveThrow: 0
+  martialReactiveDefend: 0
+  martialReactiveDefendThrow: 0
+  dashingDodgeAttacks: 0
+  dashingDodgeAim: 0
+  dashingDodgeFoe: 0
+  dashingDodgeFoeDashOnly: 0
+  dashingLunge: 0
+  dashingInitiate: 0
+  itemManagementSeekItems: 0
+  itemManagementGreedy: 0
+  itemManagementPreferredType: 0
+  followVIP: {fileID: 0}
+  followRecall: 0
+  followNutHug: 0
+  followDistance: 0
+  waypointCoordinates: {x: 0, y: 0, z: 0}
+  waypointCommanded: 0
+  waypointDeadbanded: 0
+  waypointDeadbandingScalar: 2
+  waypointInnerlimit: 1
+  waypointOuterLimit: 2
+  wallCrawlDrawRays: 0
+  wallCrawlCrowding: 0
+  wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
+  excitement: 0
+--- !u!114 &747980608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747980606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5b96bfb979cce046b8cb6b84c63969a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  EventVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  EventWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  EventCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  EventLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttemptInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  personalBox: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  DashCharging: 0
+  Dashing: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  Location: {fileID: 0}
+  head: {fileID: 0}
+  Posture: 1
+  wieldMode: 1
+  Allegiance: 0
+--- !u!4 &747980609
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747980606}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.3868496, y: 0.43650657, z: 0.12091631}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1285575789
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,6 +930,167 @@ MonoBehaviour:
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+--- !u!1 &1776297670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1776297673}
+  - component: {fileID: 1776297672}
+  - component: {fileID: 1776297671}
+  m_Layer: 0
+  m_Name: Biter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1776297671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776297670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4380c844485c70e4ebe7200a4d1daf1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  stateRunTimer: 0
+  ReflexRate: 0.2
+  Intelligence: 0
+  Enthralled: 0
+  actualMovementDirection: {x: 0, y: 0, z: 0}
+  actualMovementAngle: 0
+  DesiredDirection: {x: 0, y: 0, z: 0}
+  TotalWeight: 0
+  LookAngle: 0
+  meanderDirection: {x: 0, y: 0, z: 0}
+  meanderPaused: 0
+  meanderPauseFrequency: 0.5
+  sensoryAlerted: 0
+  pursueStoppingDistance: 0
+  trackingEyesOnTarget: 0
+  trackingTrailCold: 1
+  grabDPS: 15
+  tangoDeadbanded: 0
+  tangoStrafeEnabled: 1
+  martialCurrentState: 0
+  martialPreferredState: 0
+  martialReactiveAttack: 0
+  martialReactiveThrow: 0
+  martialReactiveDefend: 0
+  martialReactiveDefendThrow: 0
+  dashingDodgeAttacks: 0
+  dashingDodgeAim: 0
+  dashingDodgeFoe: 0
+  dashingDodgeFoeDashOnly: 0
+  dashingLunge: 0
+  dashingInitiate: 0
+  itemManagementSeekItems: 0
+  itemManagementGreedy: 0
+  itemManagementPreferredType: 0
+  followVIP: {fileID: 0}
+  followRecall: 0
+  followNutHug: 0
+  followDistance: 0
+  waypointCoordinates: {x: 0, y: 0, z: 0}
+  waypointCommanded: 0
+  waypointDeadbanded: 0
+  waypointDeadbandingScalar: 2
+  waypointInnerlimit: 1
+  waypointOuterLimit: 2
+  wallCrawlDrawRays: 0
+  wallCrawlCrowding: 0
+  wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
+  excitement: 0
+--- !u!114 &1776297672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776297670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5b96bfb979cce046b8cb6b84c63969a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  EventVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  EventWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  EventCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  EventLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttemptInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  personalBox: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  DashCharging: 0
+  Dashing: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  Location: {fileID: 0}
+  head: {fileID: 0}
+  Posture: 1
+  wieldMode: 1
+  Allegiance: 0
+--- !u!4 &1776297673
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776297670}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.3868496, y: 0.43650657, z: 0.12091631}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1807562878
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,7 +1108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1807562879
 MonoBehaviour:
   m_ObjectHideFlags: 0

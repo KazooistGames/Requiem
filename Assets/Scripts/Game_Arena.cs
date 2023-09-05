@@ -81,7 +81,9 @@ public class Game_Arena : Game
                     break;
                 case 1:
                     well = new GameObject().AddComponent<Landmark_Well>();
-                    well.AssignToTile(ring[UnityEngine.Random.Range(0, ring.Count)]);
+                    Hextile wellTile = ring[UnityEngine.Random.Range(0, ring.Count)];
+                    well.AssignToTile(wellTile);
+                    new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(ring.Where(x=>x != wellTile).ToList()[UnityEngine.Random.Range(0, 5)]);
                     foreach (Hextile tile in ring)
                     {
                         if (tile ? (tile.Landmarks.Count == 0) : false)
@@ -99,36 +101,45 @@ public class Game_Arena : Game
 
 
     protected IEnumerator gameLoop()
-    {
-        
+    { 
+        List<Torch> allTorches = new List<Torch>();
+        allTorches = FindObjectsOfType<Torch>().ToList();
         State = GameState.Liminal;
         Difficulty = 1;
         yield return new WaitUntil(() => Commissioned);
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTiles[0]);
-        bool allMobsSpawned = false;
-        MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => allMobsSpawned = true);
-        bool allElitesSpawned = false;
-        EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => allElitesSpawned = true);
+        List<GameObject> spawnedMobs = new List<GameObject>();
+        List<GameObject> spawnedElites = new List<GameObject>();
+        MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs );
+        EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites );
         while (Difficulty < 6)
         {
             State = GameState.Liminal;
-            allMobsSpawned = false;
+            foreach(Torch torch in allTorches)
+            {
+                torch.Lit = false;
+            }
+            spawnedMobs = new List<GameObject>();
+            spawnedElites = new List<GameObject>();
             yield return new WaitUntil(() => alter.Used);
             State = GameState.Wave;
+            foreach (Torch torch in allTorches)
+            {
+                torch.Lit = true;
+            }
             int MobsThisWave = 6 * Difficulty;
-            PatrolSpawner.PeriodicallySpawn(10, Difficulty, 2 * Difficulty, 3 * Difficulty);
-            MobSpawner.PeriodicallySpawn(20, Difficulty, 2 * Difficulty, 3 * Difficulty);
-            EliteSpawner.PeriodicallySpawn(30, 1, Difficulty, Difficulty);
-            yield return new WaitUntil(() => allMobsSpawned && allElitesSpawned);
+            PatrolSpawner.PeriodicallySpawn(5 * Difficulty, Difficulty, 2 * Difficulty, 3 * Difficulty);
+            MobSpawner.PeriodicallySpawn(15 + 5 * Difficulty, Difficulty, 2 * Difficulty, 3 * Difficulty);
+            EliteSpawner.PeriodicallySpawn(30 + 5 * Difficulty, 1, Difficulty, Difficulty);
+            yield return new WaitUntil(() => spawnedMobs.Count > 0 && spawnedMobs.Count(x=>x!=null) == 0 && spawnedElites.Count > 0 && spawnedElites.Count(x => x != null) == 0);
             State = GameState.Boss;
-            allElitesSpawned = false;
             List<GameObject> wraiths = BossSpawner.InstantSpawn(Mathf.CeilToInt(Difficulty/2));
             yield return new WaitUntil(() => wraiths.Count(x=>x!= null) == 0);
             Difficulty++;
             well.Refill(50);             
         }
         State = GameState.Finale;
-        SPAWN(typeof(Devil), typeof(Champion), centerTile.transform.position);
+        SPAWN(typeof(Devil), typeof(Revanent), centerTile.transform.position);
     }
   
 

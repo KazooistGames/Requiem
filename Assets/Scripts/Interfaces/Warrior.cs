@@ -676,10 +676,10 @@ public abstract class Warrior : MonoBehaviour
             {
                 float impactRatio = Strength_Ratio(this, foe) * actualMag / Max_Velocity_Of_Dash;
                 Vector3 ShoveVector = disposition.normalized * impactRatio * Max_Velocity_Of_Dash;
-                ShoveVector *= 1.0f;
+                ShoveVector *= 0.75f;
                 foe.Shove(ShoveVector);
                 foe.EventCrashed.Invoke();
-                float damage = CRASH_DAMAGE * actualMag / Max_Velocity_Of_Dash;
+                float damage = CRASH_DAMAGE * impactRatio;
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
@@ -825,7 +825,10 @@ public abstract class Warrior : MonoBehaviour
     {
         if (myWeapon.TrueStrike) 
         {
-            theirWeapon.Wielder.Stagger(2 * myWeapon.Heft / theirWeapon.Wielder.Strength);
+            if (theirWeapon.Wielder)
+            {
+                theirWeapon.Wielder.Stagger(2 * myWeapon.Heft / theirWeapon.Wielder.Strength);
+            }
         }
         else if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
@@ -857,7 +860,7 @@ public abstract class Warrior : MonoBehaviour
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            Stagger(theirWeapon.Heft / Strength);
+            Stagger(1.5f * theirWeapon.Heft / Strength);
             alterPoise(-theirWeapon.Heft);
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)

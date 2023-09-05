@@ -65,7 +65,7 @@ public class Game : MonoBehaviour
         {
             Time.timeScale = TimeScale;
             Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 

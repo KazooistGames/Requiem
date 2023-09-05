@@ -24,7 +24,7 @@ public class Halberd : Weapon
         wHitBox.height = 0.6f;
         equipType = EquipType.TwoHanded;
         Range = 0.45F;
-        BasePower = 40f;
+        BasePower = 60f;
         Heft = 80;
         base.Start();
     }
