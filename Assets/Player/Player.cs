@@ -116,14 +116,14 @@ public class Player : MonoBehaviour
         if (differenceCap == 0)
         {
 
-            HostEntity.LookDirection = AI.angleToDirection(AI.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
+            HostEntity.LookDirection = Character.angleToDirection(Character.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
             Cam.HorizonatalOffsetAngle += angleDifference / 5;
         }
         else
         {
             if (Mathf.Abs(angleDifference) < differenceCap || aligning)
             {
-                HostEntity.LookDirection = AI.angleToDirection(AI.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
+                HostEntity.LookDirection = Character.angleToDirection(Character.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
             }
             if (Mathf.Abs(angleDifference) >= differenceCap && !aligning)
             {
@@ -141,7 +141,7 @@ public class Player : MonoBehaviour
         rawInput = new Vector3();
         rawInput.z = (CurrentKeyboard.wKey.isPressed ? 1 : 0) + (CurrentKeyboard.sKey.isPressed ? -1 : 0);
         rawInput.x = (CurrentKeyboard.aKey.isPressed ? -1 : 0) + (CurrentKeyboard.dKey.isPressed ? 1 : 0);
-        Direction = rawInput == Vector3.zero ? Vector3.zero : AI.angleToDirection(AI.getAngle(rawInput) + 90 + Cam.HorizonatalOffsetAngle);
+        Direction = rawInput == Vector3.zero ? Vector3.zero : Character.angleToDirection(Character.getAngle(rawInput) + 90 + Cam.HorizonatalOffsetAngle);
         Direction = Direction.normalized;
         if (Direction != lastDirection)
         {

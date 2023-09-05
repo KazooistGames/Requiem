@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sentinel : AI
+public class Sentinel : Character
 {
     protected override void Awake()
     {

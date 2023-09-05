@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Champion : AI
+public class Champion : Character
 {
     private _Flames mainHandFlame;
     private _Flames offHandFlame;

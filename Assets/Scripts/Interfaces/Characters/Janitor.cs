@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Janitor : AI
+public class Janitor : Character
 {
     public static Janitor INSTANCE;
     public List<Hextile> TaskList = new List<Hextile>();

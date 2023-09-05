@@ -280,11 +280,11 @@ public abstract class Warrior : MonoBehaviour
                 requiemPlayer.HostEntity = this;
             }
             Allegiance = requiemPlayer.Faction;
-            if (GetComponent<AI>())
+            if (GetComponent<Character>())
             {
-                GetComponent<AI>().Enthralled = true;
-                GetComponent<AI>().enabled = !requiemPlayer;
-                GetComponent<AI>().followVIP = requiemPlayer.HostEntity.gameObject;
+                GetComponent<Character>().Enthralled = true;
+                GetComponent<Character>().enabled = !requiemPlayer;
+                GetComponent<Character>().followVIP = requiemPlayer.HostEntity.gameObject;
             }
         }
         if (!anim.runtimeAnimatorController)
@@ -297,7 +297,7 @@ public abstract class Warrior : MonoBehaviour
             anim.SetFloat("dashCharge", Dashing ? 0 : DashPower);
             anim.SetBool("moving", body.velocity.magnitude > Haste * SpeedScalarGlobal / 20f ? true : false);
             anim.SetFloat("velocity", Mathf.Max(body.velocity.magnitude, Haste * SpeedScalarGlobal / 4f));
-            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AI.angleToDirection(AI.getAngle(LookDirection) - AI.getAngle(body.velocity) + 90);
+            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : Character.angleToDirection(Character.getAngle(LookDirection) - Character.getAngle(body.velocity) + 90);
             anim.SetFloat("x", Shoved ? -relativeDirection.x : relativeDirection.x);
             anim.SetFloat("z", Shoved ? -relativeDirection.z : relativeDirection.z);
         }
@@ -385,7 +385,7 @@ public abstract class Warrior : MonoBehaviour
             TurnSpeed = modTurnSpeed.Values.Aggregate(DefaultTurnSpeed, (result, multiplier) => result *= (1 + multiplier));
             LookDirection.y = 0;
             float scaledY = transform.localEulerAngles.y;
-            float scaledTarget = 90 - AI.getAngle(LookDirection);
+            float scaledTarget = 90 - Character.getAngle(LookDirection);
             scaledTarget = scaledTarget > 180 ? scaledTarget - 360 : scaledTarget;
             float difference = (scaledTarget - scaledY);
             float degMax = TurnSpeed * Time.fixedDeltaTime;

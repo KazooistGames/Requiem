@@ -329,7 +329,6 @@ public abstract class Weapon : Wieldable
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
                     {
-                        Debug.Log(other.gameObject);
                         if (ActionAnimated == ActionAnimation.StrongAttack || ActionAnimated == ActionAnimation.QuickAttack)
                         {
                             RESOLVE_CLASH(this, foeWeapon);
@@ -348,7 +347,6 @@ public abstract class Weapon : Wieldable
                     }
                     else if (foe && !other.isTrigger)
                     {
-                        Debug.Log(other.gameObject);
                         if (ActionAnimated == ActionAnimation.StrongAttack || ActionAnimated == ActionAnimation.QuickAttack)
                         {
                             RESOLVE_HIT(this, foe);

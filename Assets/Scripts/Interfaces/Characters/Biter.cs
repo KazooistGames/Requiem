@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Biter : AI
+public class Biter : Character
 {
     public float excitement = 0f;
 

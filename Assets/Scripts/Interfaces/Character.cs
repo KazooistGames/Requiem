@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections.Specialized;
 
-public class AI : MonoBehaviour
+public class Character : MonoBehaviour
 {
     public enum AIState
     {
@@ -126,7 +126,7 @@ public class AI : MonoBehaviour
     protected float dashingCooldownPeriod = 1.0f;
     protected float dashingCooldownTimer = 0.0f;
     protected float dashingChargePeriod = 0.0f;
-    protected float dashingChargeTimer = 0.0f;
+    //protected float dashingChargeTimer = 0.0f;
     protected float dashingPower = 0.0f;
     protected Vector3 dashingDesiredDirection;
 
@@ -319,7 +319,7 @@ public class AI : MonoBehaviour
     //BEHAVIOURS!!!
     protected void meander(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered)
+        if (behaviourParams[key].Item1)
         {
             meanderTimer += ReflexRate;
             if (meanderTimer >= meanderPeriod || Physics.Raycast(transform.position, DesiredDirection, entity.personalBox.radius, layerMask: meanderAvoidMask, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
@@ -353,7 +353,7 @@ public class AI : MonoBehaviour
 
     protected void patrol(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered)
+        if (behaviourParams[key].Item1)
         {
             float startAngle = Mathf.Lerp(LookAngle, actualMovementAngle, 0.5f);
             float bestAngle = startAngle;
@@ -392,7 +392,7 @@ public class AI : MonoBehaviour
 
     protected void sensory(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered)
+        if (behaviourParams[key].Item1)
         {
             if (entity.Foe)
             {
@@ -532,7 +532,7 @@ public class AI : MonoBehaviour
     protected void pursue(BehaviourType key)
     {
 
-        if (behaviourParams[key].Item1 && !entity.Staggered && entity.Foe)
+        if (behaviourParams[key].Item1 && entity.Foe)
         {
             Vector3 outputDirection;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -557,7 +557,7 @@ public class AI : MonoBehaviour
 
     protected void tracking(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered)
+        if (behaviourParams[key].Item1)
         {
             Vector3 actualDispo = entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero;
             Vector3 trailDispo =  (entity.Foe && trackingEyesOnTarget? entity.Foe.transform.position : trackingLastKnownLocation) - transform.position;
@@ -600,7 +600,7 @@ public class AI : MonoBehaviour
 
     protected void grab(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && entity.Foe && !entity.Shoved && !entity.Staggered)
+        if (behaviourParams[key].Item1 && entity.Foe && !entity.Staggered)
         {
             grabLastVictim = entity.Foe;
             Vector3 disposition = grabLastVictim.transform.position - transform.position;
@@ -630,7 +630,7 @@ public class AI : MonoBehaviour
 
     protected void tango(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && entity.Foe && !entity.Staggered)
+        if (behaviourParams[key].Item1 && entity.Foe)
         {
             Vector3 outputDirection;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -843,7 +843,7 @@ public class AI : MonoBehaviour
 
     protected void dashing(BehaviourType key) 
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered)
+        if (behaviourParams[key].Item1)
         {
             if (entity.Foe)
             {
@@ -854,29 +854,24 @@ public class AI : MonoBehaviour
                         StartCoroutine(dashingCycle());
                     }
                     else
-                    {
-                        dashingCooldownTimer += ReflexRate;
+                    {             
                         dashingDesiredDirection = Vector3.zero;
                     }
                 }
             }
-            else
-            {
-                dashingCooldownTimer = dashingCooldownPeriod;
-                dashingChargeTimer = 0;
-            }
+            dashingCooldownTimer += ReflexRate;
         }
         else
         {
-            dashingCooldownTimer += ReflexRate;
-            dashingChargeTimer = 0;
+            dashingCooldownTimer = dashingCooldownPeriod;
+            //dashingChargeTimer = 0;
             DeEnergize(key);
         }
     }
 
     protected void itemManagement(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered && !entity.Shoved)
+        if (behaviourParams[key].Item1 && !entity.Shoved)
         {
             if (itemManagementTarget ? !itemManagementTarget.Wielder : false)
             {
@@ -980,7 +975,7 @@ public class AI : MonoBehaviour
 
     protected void follow(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered && followVIP)
+        if (behaviourParams[key].Item1 && followVIP)
         {
             followLayerMask = (1 << followVIP.layer) + (1 << Game.layerWall) + (1 << Game.layerObstacle);
             followInnerDeadband = entity.personalBox.radius * entity.scaleActual * 1.5f;
@@ -1008,7 +1003,7 @@ public class AI : MonoBehaviour
 
     protected void waypoint(BehaviourType key)
     {
-        if (behaviourParams[key].Item1 && !entity.Staggered)
+        if (behaviourParams[key].Item1)
         {
             float minimumDisposition = waypointDeadbanded ? waypointOuterLimit : entity.personalBox.radius * entity.scaleActual * waypointDeadbandingScalar;
             Vector3 dispo = (waypointCoordinates - transform.position);
@@ -1028,7 +1023,7 @@ public class AI : MonoBehaviour
     protected void wallCrawl(BehaviourType key)
     {
         wallCrawlObstaclesMask = (1 << Game.layerWall) + (1 << Game.layerObstacle) + (wallCrawlCrowding ? 0 : (1 << Game.layerEntity));
-        if (behaviourParams[key].Item1 && wallCrawlObstacles.Count > 0 && !entity.Staggered)
+        if (behaviourParams[key].Item1 && wallCrawlObstacles.Count > 0)
         {
             float trueRadius = (entity.personalBox.radius - entity.berthActual) * entity.scaleActual;
             bool obstaclesPresent = false;
@@ -1389,105 +1384,86 @@ public class AI : MonoBehaviour
     {            
         dashingONS = false;
         dashingDesiredDirection = Vector3.zero;
-        float cachedPeriod = dashingChargePeriod;
-        while (entity.Foe && !entity.Staggered && (dashingDodgeAim || dashingDodgeAttacks || dashingDodgeFoe || dashingLunge || dashingInitiate))
+        bool dodgingInSomeWay = dashingDodgeAim || dashingDodgeAttacks || dashingDodgeFoe || dashingLunge || dashingInitiate;
+        while (entity.Foe && dodgingInSomeWay)
         {
-            if(dashingDesiredDirection == Vector3.zero)
-            {
-                cachedPeriod = dashingChargePeriod;
-            }
-            Vector3 disposition = entity.Foe.transform.position - transform.position;
-            Vector3 temp = Vector3.zero;
-            if (dashingDodgeAttacks && temp == Vector3.zero)
-            {
-                Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-                Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-                bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongAttack || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongAttack || matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false);
-                bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
-                bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
-                if (foeAttacking && foeInRange && foeFacing)
-                {
-                    temp = -disposition.normalized;
-
-                }
-            }
-            if (dashingDodgeAim && temp == Vector3.zero)
-            {
-                Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-                Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-                bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
-                bool foeThrowing = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupOff.Thrown : false);
-                if (foeThrowing && !foeInRange)
-                {
-                    temp = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-                }
-            }
-            if (dashingDodgeFoe && temp == Vector3.zero)
-            {
-                Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-                Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-                float personalRange = (2.5f * entity.personalBox.radius * entity.scaleActual);
-                bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain && !dashingDodgeFoeDashOnly ? matchupMain.Range : personalRange, matchupOff && !dashingDodgeFoeDashOnly ? matchupOff.Range : personalRange) * 1.20f;
-                if (foeInRange && !entity.Foe.Staggered && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
-                {
-                    temp = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-                }
-            }
-            if (dashingLunge && temp == Vector3.zero)
-            {
-                Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-                Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-                if ((mainHand ? mainHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || mainHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (offHand ? offHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || offHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false))
-                {
-                    temp = disposition.normalized;
-                    //entity.DashPower = 1.0f;
-                }
-            }
-            if (dashingInitiate && temp == Vector3.zero)
-            {
-                if (entity.Foe)
-                {
-                    RaycastHit hit;
-                    int mask = (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall);
-                    bool test = Physics.SphereCast(transform.position, entity.berthActual * entity.scaleActual, disposition.normalized, out hit, sensoryBaseRange, mask, QueryTriggerInteraction.Ignore);
-                    if (test ? hit.collider.gameObject == entity.Foe.gameObject : false)
-                    {
-                        temp = disposition.normalized;
-                    }
-                }
-            }
-            dashingDesiredDirection = temp == Vector3.zero ? dashingDesiredDirection : temp;
             if (dashingDesiredDirection != Vector3.zero)
-            {            
-                if (dashingChargeTimer >= cachedPeriod && !entity.Shoved)
-                {
-                    entity.DashCharging = true;
-                    yield return null;
-                    entity.DashCharging = false;
-                    dashingCooldownTimer = 0.0f;
-                    dashingChargeTimer = 0.0f;
-                    entity.dashDirection = dashingDesiredDirection;
-                    dashingDesiredDirection = Vector3.zero;
-                    dashingONS = true;
-                    yield break;
-                }
-                else
-                {
-                    float ratio = Mathf.Clamp(dashingChargeTimer / cachedPeriod, 0, 1);
-                    dashingChargeTimer += Time.deltaTime;
-                    entity.DashCharging = true;
-                }
+            {
+                entity.DashCharging = true;
+                entity.dashDirection = dashingDesiredDirection;
+                yield return null;
+                entity.dashDirection = dashingDesiredDirection;
+                entity.DashCharging = false;
+                dashingCooldownTimer = 0.0f;
+                dashingDesiredDirection = Vector3.zero;
+                dashingONS = true;
+                yield break;
             }
             else
             {
-                entity.DashCharging = false;
-                dashingChargeTimer = 0.0f;
+                Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
+                Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
+                Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
+                Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
+                Vector3 disposition = entity.Foe.transform.position - transform.position;
+                if (dashingDodgeAttacks)
+                {
+                    bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
+                    bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
+                    bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f);
+                    if (foeAttacking && foeInRange && foeFacing)
+                    {
+                        dashingDesiredDirection = -disposition.normalized;
+
+                    }
+                }
+                if (dashingDodgeAim)
+                {
+
+                    bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
+                    bool foeThrowing = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupOff.Thrown : false);
+                    if (foeThrowing && !foeInRange)
+                    {
+                        dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
+                    }
+                }
+                if (dashingDodgeFoe)
+                {
+                    float personalRange = (2.5f * entity.personalBox.radius * entity.scaleActual);
+                    bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain && !dashingDodgeFoeDashOnly ? matchupMain.Range : personalRange, matchupOff && !dashingDodgeFoeDashOnly ? matchupOff.Range : personalRange) * 1.20f;
+                    if (foeInRange && !entity.Foe.Staggered && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
+                    {
+                        dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
+                    }
+                }
+                if (dashingLunge)
+                {
+
+                    if ((mainHand ? mainHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || mainHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (offHand ? offHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || offHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false))
+                    {
+                        dashingDesiredDirection = disposition.normalized;
+                        //entity.DashPower = 1.0f;
+                    }
+                }
+                if (dashingInitiate)
+                {
+                    if (entity.Foe)
+                    {
+                        RaycastHit hit;
+                        int mask = (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall);
+                        bool test = Physics.SphereCast(transform.position, entity.berthActual * entity.scaleActual, disposition.normalized, out hit, sensoryBaseRange, mask, QueryTriggerInteraction.Ignore);
+                        if (test ? hit.collider.gameObject == entity.Foe.gameObject : false)
+                        {
+                            dashingDesiredDirection = disposition.normalized;
+                        }
+                    }
+                }
+                yield return null;
             }
-            yield return null;
         }
         dashingDesiredDirection = Vector3.zero;
         entity.DashCharging = false;
-        dashingChargeTimer = 0.0f;
+        //dashingChargeTimer = 0.0f;
         dashingONS = true;
         yield break;
     }

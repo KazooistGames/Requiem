@@ -24,6 +24,7 @@ public class Game_Arena : Game
     }
     public GameState State = GameState.Liminal;
 
+    private Spawner PatrolSpawner;
     private Spawner MobSpawner;
     private Spawner EliteSpawner;
     private Spawner BossSpawner;
@@ -34,7 +35,7 @@ public class Game_Arena : Game
     protected override void Start()
     {
         base.Start();
-        StartCoroutine(BuildMap());
+        StartCoroutine(PlayGame());
     }
 
     protected override void Update()
@@ -43,7 +44,7 @@ public class Game_Arena : Game
         gameObject.name = "ARENA";
     }
 
-    protected IEnumerator BuildMap()
+    protected IEnumerator PlayGame()
     {
         yield return null;
         centerTile = Hextile.GenerateRootTile();
@@ -62,8 +63,9 @@ public class Game_Arena : Game
         SPAWN(typeof(Shade), typeof(Janitor), RAND_POS_IN_TILE(randomTile));
         configureSpawners();
         Commissioned = true;
-        StartCoroutine(gameLoop());
+        yield return gameLoop();
     }
+
     private IEnumerator gameInitLandmarks()
     {
         foreach (List<Hextile> ring in TileRings)
@@ -114,38 +116,39 @@ public class Game_Arena : Game
             yield return new WaitUntil(() => alter.Used);
             State = GameState.Wave;
             int MobsThisWave = 6 * Difficulty;
-            MobSpawner.PeriodicallySpawn(10, Difficulty, 2 * Difficulty, 3 * Difficulty);
+            PatrolSpawner.PeriodicallySpawn(10, Difficulty, 2 * Difficulty, 3 * Difficulty);
+            MobSpawner.PeriodicallySpawn(20, Difficulty, 2 * Difficulty, 3 * Difficulty);
             EliteSpawner.PeriodicallySpawn(30, 1, Difficulty, Difficulty);
             yield return new WaitUntil(() => allMobsSpawned && allElitesSpawned);
             State = GameState.Boss;
             allElitesSpawned = false;
-            List<GameObject> wraiths = BossSpawner.InstantSpawn(Difficulty);
+            List<GameObject> wraiths = BossSpawner.InstantSpawn(Mathf.CeilToInt(Difficulty/2));
             yield return new WaitUntil(() => wraiths.Count(x=>x!= null) == 0);
             Difficulty++;
             well.Refill(50);             
         }
         State = GameState.Finale;
-        Game.SPAWN(typeof(Devil), typeof(Champion), centerTile.transform.position);
+        SPAWN(typeof(Devil), typeof(Champion), centerTile.transform.position);
     }
   
 
     private void configureSpawners()
     {
+        PatrolSpawner = gameObject.AddComponent<Spawner>();
+        PatrolSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skully));
+        PatrolSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Biter));
+        PatrolSpawner.transform.position = centerTile.transform.position + Vector3.up;
+
         MobSpawner = gameObject.AddComponent<Spawner>();
         MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skelly));
         MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Goon));
         MobSpawner.transform.position = centerTile.transform.position + Vector3.up;
-        MobSpawner.Spawned.AddListener(listOfNewInstances =>
-            {
-                Hextile randomTile = AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)];
-                MobSpawner.transform.position = randomTile.transform.position + Vector3.up;
-            }
-        );
-        Hextile randomTile = AllTiles[UnityEngine.Random.Range(1, AllTiles.Count)];
+
         EliteSpawner = gameObject.AddComponent<Spawner>();
         EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Nephalim));
         EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Bully));
         EliteSpawner.transform.position = centerTile.transform.position + Vector3.up;
+
         BossSpawner = gameObject.AddComponent<Spawner>();
         BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Wraith));
         BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Revanent));

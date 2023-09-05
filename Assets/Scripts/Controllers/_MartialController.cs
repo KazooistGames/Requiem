@@ -42,7 +42,7 @@ public class _MartialController : MonoBehaviour
             float debounce = kvp.Value.Debounce;
             if (!weapon)
             {
-                Cancel_Actions(weapon);
+                KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
             }
             else if (Debounce_Timers[weapon] > 0)
             {
@@ -63,10 +63,15 @@ public class _MartialController : MonoBehaviour
         }
         foreach (Weapon weapon in KEYS_TO_DEQUEUE_THIS_FRAME)
         {
-            if (Action_Queues[weapon].Count > 0)
+            if (!weapon)
+            {
+                Cancel_Actions(weapon);
+            }
+            else if (Action_Queues[weapon].Count > 0)
             {
                 Weapon_Actions[weapon] = Action_Queues[weapon].Dequeue();
             }
+
         }
 
     }
@@ -130,6 +135,7 @@ public class _MartialController : MonoBehaviour
     private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.ActionAnimation desiredAction)
     {
         (bool, bool, bool) triggerControlValues;
+        weapon.ThrowTrigger = false;
         switch (desiredAction)
         {
             case Weapon.ActionAnimation.Idle:
@@ -163,6 +169,14 @@ public class _MartialController : MonoBehaviour
                 {
                     triggerControlValues = (false, true, false);
                 }
+                break;
+            case Weapon.ActionAnimation.Aiming:
+                triggerControlValues = (false, false, false);
+                weapon.ThrowTrigger = true;
+                break;
+            case Weapon.ActionAnimation.Throwing:
+                triggerControlValues = (false, false, false);
+                weapon.ThrowTrigger = weapon.ActionAnimated != Weapon.ActionAnimation.Aiming;
                 break;
             default:
                 triggerControlValues = (false, false, false);

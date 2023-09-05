@@ -127,7 +127,7 @@ public class Game : MonoBehaviour
     {
         float outerLimit = Hextile.Radius * 0.8f;
         float innerLimit = Hextile.Radius * 0.2f;
-        Vector3 location = tile.transform.position + (AI.RandomDirection() * Mathf.Clamp(UnityEngine.Random.value, innerLimit, outerLimit)) + Vector3.up * Hextile.Thickness / 2;
+        Vector3 location = tile.transform.position + (Character.RandomDirection() * Mathf.Clamp(UnityEngine.Random.value, innerLimit, outerLimit)) + Vector3.up * Hextile.Thickness / 2;
         return location;
     }
 

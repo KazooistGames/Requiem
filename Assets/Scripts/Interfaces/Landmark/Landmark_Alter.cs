@@ -99,11 +99,11 @@ public class Landmark_Alter : Landmark
         Lines.widthMultiplier = 0.015f;
         List<Vector3> points = new List<Vector3>()
         {
-            AI.angleToDirection(54) * 0.4f * pentagramRadius,
-            AI.angleToDirection(270) * 0.4f * pentagramRadius,
-            AI.angleToDirection(126) * 0.4f * pentagramRadius,
-            AI.angleToDirection(342) * 0.4f * pentagramRadius,
-            AI.angleToDirection(198) * 0.4f * pentagramRadius,
+            Character.angleToDirection(54) * 0.4f * pentagramRadius,
+            Character.angleToDirection(270) * 0.4f * pentagramRadius,
+            Character.angleToDirection(126) * 0.4f * pentagramRadius,
+            Character.angleToDirection(342) * 0.4f * pentagramRadius,
+            Character.angleToDirection(198) * 0.4f * pentagramRadius,
         };
         _Flames.FlameStyles flamePreset = _Flames.FlameStyles.Magic;
         while (true)

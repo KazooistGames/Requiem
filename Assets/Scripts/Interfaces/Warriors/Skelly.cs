@@ -73,9 +73,9 @@ public class Skelly : Warrior
         Debone(head);
         Haste *= 1.25f;
         Strength *= 0.75f;
-        if (GetComponent<AI>())
+        if (GetComponent<Character>())
         {
-            Destroy(GetComponent<AI>());
+            Destroy(GetComponent<Character>());
             gameObject.AddComponent<Assassin>();
         }
     }

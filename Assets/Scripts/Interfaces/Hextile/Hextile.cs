@@ -178,7 +178,7 @@ public class Hextile : MonoBehaviour
         {
             if (!AdjacentTiles.ContainsKey(otherTile))
             {
-                int angle = (Mathf.RoundToInt(AI.getAngle(otherTile.transform.position - transform.position)) + 360) % 360;
+                int angle = (Mathf.RoundToInt(Character.getAngle(otherTile.transform.position - transform.position)) + 360) % 360;
                 HexPosition position = (HexPosition)Mathf.RoundToInt((angle + 30) / 60);
                 AdjacentTiles.Add(otherTile, position);
                 otherTile.alterTiles(this);

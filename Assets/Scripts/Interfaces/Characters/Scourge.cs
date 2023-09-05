@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static AI;
+using static Character;
 
-public class Scourge : AI
+public class Scourge : Character
 {
 
 

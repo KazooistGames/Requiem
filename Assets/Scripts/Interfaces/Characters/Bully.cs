@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bully : AI
+public class Bully : Character
 {
     public float excitement = 0f;
 
@@ -38,7 +38,6 @@ public class Bully : AI
             case AIState.passive:
                 if (entity.Foe)
                 {
-                    dashingCooldownTimer = 0.0f;
                     StateTransition(AIState.aggro);
                 }
                 else
@@ -66,13 +65,13 @@ public class Bully : AI
                             float disposition = (entity.Foe.transform.position - transform.position).magnitude;
                             if (mainWep.Range >= disposition)
                             {
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
                                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
                                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
+                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
                             }
                             else
                             {
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil);
+                                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
                             }
                         }
                     }
