@@ -56,6 +56,7 @@ public class Bully : Character
                     Weapon mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                     if (mainWep)
                     {
+                        martialCurrentState = mainWep.ActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : martialState.attacking;
                         if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);

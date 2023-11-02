@@ -97,7 +97,7 @@ public abstract class Warrior : MonoBehaviour
 
     /********** DASHING **********/
     public static float Max_Velocity_Of_Dash { get; private set; } = 3.0f;
-    public static float Min_Velocity_Of_Dash { get; private set; } = 1.0f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 1.5f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
@@ -124,6 +124,11 @@ public abstract class Warrior : MonoBehaviour
     public GameObject Location;
     public GameObject head;
 
+    public bool FinalDash = false;
+    public float Tempo { get; private set; }
+    public float TempoTargetCenter { get; private set; } = 0.90f;
+    public float TempoTargetWidth { get; private set; } = 0.2f;
+    private bool tempoChargeONS = true;
 
     public enum PostureStrength
     {
@@ -683,11 +688,10 @@ public abstract class Warrior : MonoBehaviour
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
-                    //alterPoise(Strength);
                 }
                 else 
                 {
-                    if (foe.Posture == PostureStrength.Weak)
+                    if (FinalDash)
                     {
                         foe.Damage(damage);
                     }
@@ -760,8 +764,9 @@ public abstract class Warrior : MonoBehaviour
         while (true)
         {
             yield return new WaitUntil(() => DashCharging);
+
             directionIsUndetermined = dashDirection == Vector3.zero;
-            while (DashPower < 1.0)
+            while (DashCharging)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
@@ -769,7 +774,18 @@ public abstract class Warrior : MonoBehaviour
                 {
                     dashDirection = WalkDirection == Vector3.zero ? dashDirection : WalkDirection;
                 }
-
+                if(DashPower >= 1 && Tempo >= 0)
+                {
+                    float finalDashChargeRatioToDashCharge = 0.5f;
+                    if((Tempo + increment * finalDashChargeRatioToDashCharge) > 1)
+                    {
+                        Tempo = -0.01f;
+                    }
+                    else
+                    {
+                        Tempo = Mathf.Clamp(Tempo + increment * finalDashChargeRatioToDashCharge, 0, 1);
+                    }                
+                }
                 yield return null;
             }
             dashAlreadyHit = new List<GameObject>();
@@ -778,18 +794,22 @@ public abstract class Warrior : MonoBehaviour
             {
 
             }
-            else
+            else if (dashDirection != Vector3.zero)
             {
-                if (dashDirection != Vector3.zero)
+                FinalDash = Mathf.Abs(Tempo - TempoTargetCenter) < 0.5f * TempoTargetWidth;
+                if (FinalDash)
                 {
-                    Dashing = true;
-                    Shove(dashDirection * scaledVelocity, true);
-                    GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
-                    sound.layer = Game.layerItem;
-                    sound.transform.SetParent(transform);
-                    yield return new WaitWhile(() => Shoved);
+                    scaledVelocity *= 2;
                 }
+                Dashing = true;
+                Shove(dashDirection * scaledVelocity, true);
+                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
+                sound.layer = Game.layerItem;
+                sound.transform.SetParent(transform);
+                yield return new WaitWhile(() => Shoved);
             }
+            FinalDash = false;
+            Tempo = 0;
             modSpeed[key] = 0.0f;
             Dashing = false;
             DashPower = 0.0f;

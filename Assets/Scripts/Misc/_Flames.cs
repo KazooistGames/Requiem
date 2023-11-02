@@ -74,7 +74,7 @@ public class _Flames : MonoBehaviour
             }
             else if (boundEntity)
             {
-                emissionModule.enabled = false;
+                emissionModule.enabled = boundEntity.FinalDash;
             }
             else
             {

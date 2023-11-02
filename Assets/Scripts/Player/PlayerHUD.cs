@@ -51,33 +51,21 @@ public class PlayerHUD : MonoBehaviour
             statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
             statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Warrior.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
-
-            if (!Player.INSTANCE.HostEntity.MainHand)
+            TempoBar.SetActive(true);
+            if (Player.INSTANCE.HostEntity.DashPower == 1 && Player.INSTANCE.HostEntity.Tempo >= 0)
             {
-                TempoBar.SetActive(false);
-            }
-            else if (!Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>())
-            {
-                TempoBar.SetActive(false);
+                fadeTransforms(tempoBarTransforms, 0.75f, 0.1f);
             }
             else
             {
-                Weapon weapon = Player.INSTANCE.HostEntity.MainHand.GetComponent<Weapon>();
-                TempoBar.SetActive(true);
-                if(weapon.ActionAnimated == Weapon.ActionAnimation.StrongWindup)
-                {
-                    fadeTransforms(tempoBarTransforms, 0.75f, 10f);
-                }
-                else
-                {
-                    fadeTransforms(tempoBarTransforms, 0, 2);
-                }
-                tempoBarTransforms[3].anchorMin = new Vector2(weapon.Tempo, 1f);
-                tempoBarTransforms[3].anchorMax = new Vector2(weapon.Tempo, 1f);
-                tempoBarTransforms[2].anchorMin = new Vector2(weapon.TempoTargetCenter, 1f);
-                tempoBarTransforms[2].anchorMax = new Vector2(weapon.TempoTargetCenter, 1f);
-                tempoBarTransforms[2].sizeDelta = new Vector2(weapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
+                fadeTransforms(tempoBarTransforms, 0, 0.5f);
             }
+            tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.HostEntity.Tempo, 1f);
+            tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Tempo, 1f);
+            tempoBarTransforms[2].anchorMin = new Vector2(Player.INSTANCE.HostEntity.TempoTargetCenter, 1f);
+            tempoBarTransforms[2].anchorMax = new Vector2(Player.INSTANCE.HostEntity.TempoTargetCenter, 1f);
+            tempoBarTransforms[2].sizeDelta = new Vector2(Player.INSTANCE.HostEntity.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
+        
         }
         else
         {
@@ -137,7 +125,7 @@ public class PlayerHUD : MonoBehaviour
    
     /***** PRIVATE *****/
 
-    private void fadeTransforms(Transform[] transforms, float alphaValue, float rate)
+    private void fadeTransforms(Transform[] transforms, float alphaValue, float periodSeconds)
     {
         foreach (Transform transform in transforms)
         {
@@ -145,7 +133,7 @@ public class PlayerHUD : MonoBehaviour
             if (image)
             {
                 Color color = image.color;
-                image.color = new Color(color.r, color.g, color.b, Mathf.MoveTowards(color.a, alphaValue, Time.deltaTime * rate));
+                image.color = new Color(color.r, color.g, color.b, Mathf.MoveTowards(color.a, alphaValue, Time.deltaTime / periodSeconds));
             }
         }
     }
