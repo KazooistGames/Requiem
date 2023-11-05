@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Halberd : Weapon
 {
+
     protected override void Awake()
     {
         base.Awake();
@@ -13,35 +14,19 @@ public class Halberd : Weapon
     {
         CapsuleCollider wHitBox = HitBox.GetComponent<CapsuleCollider>();
         gameObject.name = "Halberd";
-        transform.localScale = new Vector3(2.0f, 2.5f, 2.0f);
+        transform.localScale = new Vector3(1f, 1.0f, 1f);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Axe"];
-        Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Axe"));
-        Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Axe"));
-        wHitBox.center = new Vector3(0.0f, 0.15f, 0.05f);
-        hitRadius = 0.1f;
-        defendRadius = 0.15f;
-        wHitBox.height = 0.6f;
+        Filter.mesh = Game.weaponMeshes["Halberd"];
+        Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Halberd"));
+        Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Halberd"));
+        wHitBox.center = new Vector3(0, 0.2f, 0);
+        wHitBox.height = 1.5f;
+        hitRadius = 0.05f;
+        defendRadius = 0.4f;
+        Range = 0.52f;
+        BasePower = 50f;
+        Heft = 60;
         equipType = EquipType.TwoHanded;
-        Range = 0.45F;
-        BasePower = 60f;
-        Heft = 80;
         base.Start();
     }
-
-    protected override void Update()
-    {
-        base.Update();
-    }
-
-    protected override void OnTriggerEnter(Collider other)
-    {
-        base.OnTriggerEnter(other);
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-
 }

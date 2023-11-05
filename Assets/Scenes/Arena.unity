@@ -163,6 +163,7 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -201,7 +202,6 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &11386816
 MonoBehaviour:
@@ -266,6 +266,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
@@ -295,7 +296,7 @@ GameObject:
   - component: {fileID: 74375186}
   - component: {fileID: 74375185}
   m_Layer: 0
-  m_Name: halberd
+  m_Name: Greataxe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -628,6 +629,7 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -666,7 +668,6 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &747980608
 MonoBehaviour:
@@ -731,6 +732,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
@@ -970,6 +972,7 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -1008,7 +1011,6 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &1776297672
 MonoBehaviour:
@@ -1073,6 +1075,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
@@ -1131,6 +1134,7 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -1169,7 +1173,6 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  wallCrawlObstacles: []
 --- !u!114 &1807562880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1233,6 +1236,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
@@ -1250,6 +1254,111 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2008132592
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2008132594}
+  - component: {fileID: 2008132593}
+  m_Layer: 0
+  m_Name: Halberd
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2008132593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008132592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2143910d4dcfd6742bad9de2c97f777a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EventDropped:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+  EventThrown:
+    m_PersistentCalls:
+      m_Calls: []
+  ImpalingSomething: 0
+  Heft: 25
+  Idling: 1
+  Recoiling: 0
+  Wielder: {fileID: 0}
+  Allegiance: 0
+  Wielded: 0
+  MountTarget: {fileID: 0}
+  PrimaryTrigger: 0
+  SecondaryTrigger: 0
+  TertiaryTrigger: 0
+  ThrowTrigger: 0
+  Anim: {fileID: 0}
+  Body: {fileID: 0}
+  HitBox: {fileID: 0}
+  PhysicsBoxes: []
+  Filter: {fileID: 0}
+  Renderer: {fileID: 0}
+  MostRecentWielder: {fileID: 0}
+  Telecommuting: 0
+  Thrown: 0
+  equipType: 0
+  Hitting:
+    m_PersistentCalls:
+      m_Calls: []
+  Clashing:
+    m_PersistentCalls:
+      m_Calls: []
+  Blocking:
+    m_PersistentCalls:
+      m_Calls: []
+  Parrying:
+    m_PersistentCalls:
+      m_Calls: []
+  GettingParried:
+    m_PersistentCalls:
+      m_Calls: []
+  Swinging:
+    m_PersistentCalls:
+      m_Calls: []
+  Rebuked:
+    m_PersistentCalls:
+      m_Calls: []
+  ChangingActionAnimations:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionAnimated: 0
+  Throwing: 0
+  Range: 0
+  Sharpness: 0
+  BasePower: 0
+  TrueStrike: 0
+--- !u!4 &2008132594
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008132592}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2059821363
 GameObject:
@@ -1306,6 +1415,7 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
+  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -1344,7 +1454,6 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &2059821367
 MonoBehaviour:
@@ -1409,6 +1518,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0

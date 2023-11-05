@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HandAxe : Weapon
+public class Handaxe : Weapon
 {
     protected override void Awake()
     {

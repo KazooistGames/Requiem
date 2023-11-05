@@ -32,8 +32,8 @@ public class Scourge : Character
         dashingPower = 1.0f;
         dashingDodgeAttacks = false;
         sensorySightRangeScalar = 1.5f;
-        new GameObject().AddComponent<HandAxe>().PickupItem(entity);
-        new GameObject().AddComponent<HandAxe>().PickupItem(entity);
+        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
+        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
     }
 
     protected override void Update()

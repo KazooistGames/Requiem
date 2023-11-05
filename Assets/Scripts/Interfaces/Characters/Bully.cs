@@ -13,7 +13,7 @@ public class Bully : Character
     protected override void Start()
     {
         base.Start();
-        new GameObject().AddComponent<Halberd>().PickupItem(entity);
+        new GameObject().AddComponent<Greataxe>().PickupItem(entity);
         Intelligence = 0.5f;
 
         tangoStrafeEnabled = false;

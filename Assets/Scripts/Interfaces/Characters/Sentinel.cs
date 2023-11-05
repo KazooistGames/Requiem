@@ -22,7 +22,7 @@ public class Sentinel : Character
         itemManagementSeekItems = true;
         dashingPower = 0.0f;
         itemManagementPreferredType = Warrior.WieldMode.OneHanders;
-        new GameObject().AddComponent<Halberd>().PickupItem(entity);
+        new GameObject().AddComponent<Greataxe>().PickupItem(entity);
         //entity.modPosture["Sentinel" + GetHashCode().ToString()] = Entity.Posture.Strong;
     }
 

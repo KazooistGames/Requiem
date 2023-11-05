@@ -13,7 +13,7 @@ public class Goon : Character
     protected override void Start()
     {
         base.Start();
-        new GameObject().AddComponent<HandAxe>().PickupItem(entity);
+        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
         Intelligence = 0.75f;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
