@@ -635,6 +635,7 @@ public abstract class Weapon : Wieldable
 
     private static GameObject testObstructionBetweenEntities(Warrior target, Warrior origin)
     {
+        if(target == null) { return null; }
         Vector3 disposition = target.transform.position - origin.transform.position;
         disposition.y = 0;
         Vector3 rayStart = origin.transform.position;

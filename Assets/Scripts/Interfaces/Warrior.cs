@@ -765,15 +765,10 @@ public abstract class Warrior : MonoBehaviour
         {
             yield return new WaitUntil(() => DashCharging);
 
-            directionIsUndetermined = dashDirection == Vector3.zero;
             while (DashCharging)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
-                if (directionIsUndetermined)
-                {
-                    dashDirection = WalkDirection == Vector3.zero ? dashDirection : WalkDirection;
-                }
                 if(DashPower >= 1 && Tempo >= 0)
                 {
                     float finalDashChargeRatioToDashCharge = 0.5f;

@@ -31,142 +31,7 @@ public class Character : MonoBehaviour
     protected Warrior entity;
     protected Vector3 lastDirection = Vector3.zero;
 
-    //meander
-    public Vector3 meanderDirection = Vector3.zero;
-    public bool meanderPaused = false;
-    public float meanderPauseFrequency = 0.5f;
-    protected float meanderTimer = 0f;
-    protected float meanderPeriod = 0f;
-    protected int meanderAvoidMask;
 
-    //patrol
-    protected float patrolScanAngle = 90f;
-    protected int patrolMask;
-    protected float patrolCurrentAngle = 0f;
-
-    //survey
-    public bool sensoryAlerted = false;
-    protected float sensoryAlertedTimer = 0.0f;
-    protected float sensoryAlertedPeriod = 5.0f;
-    protected bool sensorySightDetection = true;
-    protected int sensorySightMask;
-    protected float sensoryBaseRange = 1.0f;
-    protected float sensorySightRangeScalar = 1.0f;
-    protected float sensorySightFOV = 120f;
-    protected bool sensoryAudioDetection = true;
-    protected bool sensoryAudioApproach = false;
-    protected float sensoryAudioRangeScalar = 1.5f;
-    protected float sensoryAudioTimer = 0f;
-    protected float sensoryAudioPeriod = 3.0f;
-    protected Vector3 sensoryAudioDirection = Vector3.zero;
-
-    //pursue
-    public float pursueStoppingDistance = 0.0f;
-
-    //tracking
-    public bool trackingEyesOnTarget = false;
-    public bool trackingTrailCold = true;
-    protected bool trackingTrailingEnabled = true;
-    protected float trackingTrailingTimer = 0.0f;
-    protected float trackingTrailingPeriod = 5.0f;
-    protected Vector3 trackingLastKnownLocation = Vector3.zero;
-    protected Vector3 trackingLastKnownDirection = Vector3.zero;
-    protected int trackingObstructionMask;
-
-    //grab
-    protected bool grabEnabled = false;
-    protected float grabSlowScalar = 1.0f;
-    public float grabDPS = 15f;
-    protected Warrior grabLastVictim;
-
-    //tango
-    public bool tangoDeadbanded = false;
-    protected bool tangoDeadbandingEnabled = true;
-    protected float tangoTargetDisposition;
-    protected float tangoInnerRange = 0f;
-    protected float tangoOuterRange = 1f;
-    protected float tangoTimer = 0;
-    protected float tangoPeriod = 1;
-    protected float tangoPeriodScalar = 1.0f;
-    public bool tangoStrafeEnabled = true;
-    protected float tangoStrafePauseFreq = 0.5f;
-    private bool tangoStrafePaused = false;
-    private int tangoStrafeFlipFlop = 1;
-    private bool tangoNearStart = false;
-    private bool tangoFarStart = false;
-
-    //martial
-    public enum martialState
-    {
-        none = 0,
-        defending = 1,
-        attacking = 2,
-        throwing = 3,
-    }
-    public martialState martialCurrentState = 0;
-    public martialState martialPreferredState = martialState.none;
-    public bool martialReactiveAttack = false;
-    public bool martialReactiveThrow = false;
-    public bool martialReactiveDefend = false;
-    public bool martialReactiveDefendThrow = false;
-    protected float martialStateTimer = 0;
-    protected float martialStatePeriod = 0;
-    protected bool martialStateBouncing = true;
-    protected bool martialAttackingONS = true;
-    protected bool martialDefendingONS = true;
-
-    //dashing
-    public bool dashingDodgeAttacks = false;
-    public bool dashingDodgeAim = false;
-    public bool dashingDodgeFoe = false;
-    public bool dashingDodgeFoeDashOnly = false;
-    public bool dashingLunge = false;
-    public bool dashingInitiate = false;
-    protected bool dashingONS = true;
-    protected float dashingCooldownPeriod = 1.0f;
-    protected float dashingCooldownTimer = 0.0f;
-    protected float dashingChargePeriod = 0.0f;
-    //protected float dashingChargeTimer = 0.0f;
-    protected float dashingPower = 0.0f;
-    protected Vector3 dashingDesiredDirection;
-
-    //itemManagement
-    public bool itemManagementSeekItems = false;
-    public bool itemManagementGreedy = false;
-    protected bool itemManagementSeeking = false;
-    protected bool itemManagementNoDoubles = false;
-    protected bool itemManagementNoSingles = false;
-    public Warrior.WieldMode itemManagementPreferredType = Warrior.WieldMode.none;
-    protected Weapon itemManagementTarget;
-    protected float itemManagementDelayTimer = 0.0f;
-    protected float itemManagementDelayPeriod = 1f;
-
-    //follow
-    public GameObject followVIP;
-    public bool followRecall = false;
-    public bool followNutHug = false;
-    public float followDistance;
-    protected Vector3 followVIPlastCoordinates;
-    protected float followInnerDeadband;
-    protected float followOuterDeadband;
-    protected int followLayerMask;
-
-    //waypoint
-    public Vector3 waypointCoordinates;
-    public bool waypointCommanded = false;
-    public bool waypointDeadbanded = false;
-    public float waypointDeadbandingScalar = 2.0f;
-    public float waypointInnerlimit = Hextile.Radius;
-    public float waypointOuterLimit = Hextile.Radius * 2;
-
-    //wallCrawl
-    public bool wallCrawlDrawRays = false;
-    public bool wallCrawlCrowding = false;
-    public bool wallCrawlAvoidFoe = true;
-    protected int wallCrawlObstaclesMask;
-    protected int wallCrawlAvoidAngle;
-    protected float wallCrawlTimer = 0;
-    protected float wallCrawlPeriod = 3;
     public List<GameObject> wallCrawlObstacles = new List<GameObject>();
 
     public delegate void behaviour(BehaviourType key);
@@ -317,6 +182,14 @@ public class Character : MonoBehaviour
     }
 
     //BEHAVIOURS!!!
+
+    //meander
+    public Vector3 meanderDirection = Vector3.zero;
+    public bool meanderPaused = false;
+    public float meanderPauseFrequency = 0.5f;
+    protected float meanderTimer = 0f;
+    protected float meanderPeriod = 0f;
+    protected int meanderAvoidMask;
     protected void meander(BehaviourType key)
     {
         if (behaviourParams[key].Item1)
@@ -351,6 +224,11 @@ public class Character : MonoBehaviour
         }
     }
 
+
+    //patrol
+    protected float patrolScanAngle = 90f;
+    protected int patrolMask;
+    protected float patrolCurrentAngle = 0f;
     protected void patrol(BehaviourType key)
     {
         if (behaviourParams[key].Item1)
@@ -390,6 +268,21 @@ public class Character : MonoBehaviour
         }
     }
 
+    //survey
+    public bool sensoryAlerted = false;
+    protected float sensoryAlertedTimer = 0.0f;
+    protected float sensoryAlertedPeriod = 5.0f;
+    protected bool sensorySightDetection = true;
+    protected int sensorySightMask;
+    protected float sensoryBaseRange = 1.0f;
+    protected float sensorySightRangeScalar = 1.0f;
+    protected float sensorySightFOV = 120f;
+    protected bool sensoryAudioDetection = true;
+    protected bool sensoryAudioApproach = false;
+    protected float sensoryAudioRangeScalar = 1.5f;
+    protected float sensoryAudioTimer = 0f;
+    protected float sensoryAudioPeriod = 3.0f;
+    protected Vector3 sensoryAudioDirection = Vector3.zero;
     protected void sensory(BehaviourType key)
     {
         if (behaviourParams[key].Item1)
@@ -529,6 +422,8 @@ public class Character : MonoBehaviour
         }
     }
 
+    //pursue
+    public float pursueStoppingDistance = 0.0f;
     protected void pursue(BehaviourType key)
     {
 
@@ -555,6 +450,19 @@ public class Character : MonoBehaviour
         }
     }
 
+
+
+
+
+    //tracking
+    public bool trackingEyesOnTarget = false;
+    public bool trackingTrailCold = true;
+    protected bool trackingTrailingEnabled = true;
+    protected float trackingTrailingTimer = 0.0f;
+    protected float trackingTrailingPeriod = 5.0f;
+    protected Vector3 trackingLastKnownLocation = Vector3.zero;
+    protected Vector3 trackingLastKnownDirection = Vector3.zero;
+    protected int trackingObstructionMask;
     protected void tracking(BehaviourType key)
     {
         if (behaviourParams[key].Item1)
@@ -598,6 +506,11 @@ public class Character : MonoBehaviour
         }
     }
 
+    //grab
+    protected bool grabEnabled = false;
+    protected float grabSlowScalar = 1.0f;
+    public float grabDPS = 15f;
+    protected Warrior grabLastVictim;
     protected void grab(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && entity.Foe && !entity.Staggered)
@@ -627,6 +540,22 @@ public class Character : MonoBehaviour
             DeEnergize(key);
         }
     }
+
+    //tango
+    public bool tangoDeadbanded = false;
+    protected bool tangoDeadbandingEnabled = true;
+    protected float tangoTargetDisposition;
+    protected float tangoInnerRange = 0f;
+    protected float tangoOuterRange = 1f;
+    protected float tangoTimer = 0;
+    protected float tangoPeriod = 1;
+    protected float tangoPeriodScalar = 1.0f;
+    public bool tangoStrafeEnabled = true;
+    protected float tangoStrafePauseFreq = 0.5f;
+    private bool tangoStrafePaused = false;
+    private int tangoStrafeFlipFlop = 1;
+    private bool tangoNearStart = false;
+    private bool tangoFarStart = false;
 
     protected void tango(BehaviourType key)
     {
@@ -675,172 +604,64 @@ public class Character : MonoBehaviour
         }
     }
 
+    //martial
+    public enum martialState
+    {
+        none = 0,
+        defending = 1,
+        attacking = 2,
+        throwing = 3,
+    }
+    public martialState martialCurrentState = 0;
+    public martialState martialPreferredState = martialState.none;
+    public bool martialReactiveAttack = false;
+    public bool martialReactiveThrow = false;
+    public bool martialReactiveDefend = false;
+    public bool martialReactiveDefendThrow = false;
+    protected float martialStateTimer = 0;
+    protected float martialStatePeriod = 0;
+    protected bool martialStateBouncing = true;
+    protected bool martialAttackingONS = true;
+    protected bool martialDefendingONS = true;
     protected void martial(BehaviourType key)
     {
-        //Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-        //Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-        //if (behaviourParams[key].Item1 && entity.Foe && (mainHand || offHand) && !entity.Stunned)
-        //{
-        //    Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-        //    Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-        //    Vector3 disposition = entity.Foe.transform.position - transform.position;
-        //    bool inRange = disposition.magnitude <= Mathf.Max(mainHand ? mainHand.Range : 0.0f, offHand ? offHand.Range : 0.0f);
-        //    bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range : false);
-        //    bool foeAttacking = (matchupMain ? matchupMain.WindingUp || matchupMain.Attacking : false) || (matchupOff ? matchupOff.WindingUp || matchupOff.Attacking : false);
-        //    bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.25f;
-        //    bool foeAiming = (matchupMain ? matchupMain.Aiming : false) || (matchupOff ? matchupOff.Aiming : false);
-        //    bool foeRebuked = matchupMain ? matchupMain.Rebuked : true && matchupOff ? matchupOff.Rebuked : true;
-        //    bool foeCharging = (matchupMain ? matchupMain.WindingUp : false) || (matchupOff ? matchupOff.WindingUp : false);
-        //    bool timerDone = martialStateTimer > martialStatePeriod;
-        //    martialState martialPreviousState = martialCurrentState;
-        //    if (!martialStateBouncing)
-        //    {
-        //        bool opportunityToAttack = foeRebuked || !foeFacing || (foeCharging && inRange) || (!matchupMain && !matchupOff);
-        //        bool opportunityToThrow = (foeCharging && !inRange) && foeFacing;
-        //        bool opportunityToDefend = foeAttacking && foeInRange && foeFacing;
-        //        bool opportunityToDefendThrow = foeAiming && !inRange && foeFacing;
-        //        if (martialReactiveAttack && opportunityToAttack)
-        //        {
-        //            martialCurrentState = martialState.attacking;
-        //        }
-        //        else if(martialReactiveThrow && opportunityToThrow)
-        //        {
-        //            martialCurrentState = martialState.throwing;
-        //        }
-        //        else if ((martialReactiveDefend && opportunityToDefend) || (martialReactiveDefendThrow && opportunityToDefendThrow))
-        //        {
-        //            martialCurrentState = martialState.defending;
-        //        }
-        //        else if (timerDone)
-        //        {
-        //            martialCurrentState = martialPreferredState;
-        //        }
-        //    }
-        //    if (martialCurrentState == martialState.none)
-        //    {
-        //        martialCurrentState = Random.value >= 0.5f ? martialState.attacking : martialState.defending;
-        //    }
-        //    if (martialCurrentState != martialPreviousState || timerDone)
-        //    {
-        //        martialStateTimer = 0;
-        //        martialStatePeriod = (Random.value * 1.5f) + 1.0f;
-        //    }
-        //    if ((mainHand ? mainHand.ActionCurrentlyTaken != Weapon.Action.Coiling : true) && (offHand ? offHand.ActionCurrentlyTaken != Weapon.Action.Coiling : true))
-        //    {
-        //        martialStateTimer += ReflexRate;
-
-        //    }        
-        //    switch (martialCurrentState)
-        //    {
-        //        case martialState.defending:
-        //            StopCoroutine("martialAttackCycle");
-        //            StopCoroutine("martialThrowCycle");
-        //            martialAttackingONS = true;
-        //            if (mainHand)
-        //            {
-        //                martialStateBouncing = !(mainHand.ActionCurrentlyTaken == Weapon.Action.Guarding || (offHand ? offHand.ActionCurrentlyTaken == Weapon.Action.Guarding : false));
-        //                mainHand.Primary = false;
-        //                if (martialDefendingONS && mainHand.Idling)
-        //                {
-        //                    martialDefendingONS = false;
-        //                    StartCoroutine(martialDefendCycle(mainHand, offHand));
-        //                }
-        //            }
-        //            break;
-        //        case martialState.attacking:
-        //            StopCoroutine("martialDefendCycle");
-        //            StopCoroutine("martialThrowCycle");
-        //            martialDefendingONS = true;
-        //            if (mainHand)
-        //            {                     
-        //                mainHand.Secondary = false;
-        //                if (offHand)
-        //                {
-        //                    offHand.Secondary = false;
-        //                }
-        //                if (inRange && martialAttackingONS && mainHand.Idling)
-        //                {
-        //                    martialAttackingONS = false;
-        //                    StartCoroutine(martialAttackCycle(mainHand, offHand));
-        //                }
-        //            }
-        //            else
-        //            {
-        //                martialStateBouncing = false;
-        //            }
-        //            break;
-        //        case martialState.throwing:
-        //            StopCoroutine("martialAttackCycle");
-        //            StopCoroutine("martialDefendCycle");
-        //            martialDefendingONS = true;
-        //            martialAttackingONS = true;
-        //            if (mainHand)
-        //            {
-        //                //mainHand.Primary = false;
-        //                mainHand.Secondary = false;
-        //                if (offHand)
-        //                {
-        //                    //offHand.Primary = false;
-        //                    offHand.Secondary = false;
-        //                }
-        //                if(martialAttackingONS)
-        //                {
-        //                    StartCoroutine(martialThrowCycle(mainHand, offHand));
-        //                }           
-        //            }
-        //            else
-        //            {
-        //                martialStateBouncing = false;
-        //            }
-        //            break;
-        //    }              
-        //    if (foeAttacking && martialCurrentState == martialState.defending)
-        //    {
-        //        Weapon attackingWeapon = (matchupMain ? matchupMain.ActionCurrentlyTaken == Weapon.Action.Attacking || matchupMain.ActionCurrentlyTaken == Weapon.Action.Windup : false) ? matchupMain : matchupOff;
-
-        //        if (attackingWeapon)
-        //        {
-        //            Vector3 dispo = attackingWeapon.GetComponent<MeshRenderer>().bounds.center - transform.position;
-        //            LookDirectives[key] = getAngle(dispo);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        LookDirectives.Remove(key);
-        //    }
-        //    behaviourParams[key] = (false, 0);
-        //}
-        //else if(!martialStateBouncing)
-        //{
-        //    StopCoroutine("martialAttackCycle");
-        //    StopCoroutine("martialDefendCycle");
-        //    StopCoroutine("martialThrowCycle");
-        //    martialAttackingONS = true;
-        //    martialDefendingONS = true;
-        //    martialCurrentState = martialState.none;
-        //    martialStateBouncing = false;
-        //    if (entity.MainHand)
-        //    {
-        //        entity.MainHand.Primary = false;
-        //        entity.MainHand.Secondary = false;
-        //        entity.MainHand.Tertiary = false;
-        //        entity.MainHand.ThrowTrigger = false;
-        //    }
-        //    if (entity.OffHand)
-        //    {
-        //        entity.OffHand.Primary = false;
-        //        entity.OffHand.Secondary = false;
-        //        entity.OffHand.Tertiary = false;
-        //        entity.OffHand.ThrowTrigger = false;
-        //    }
-        //    DeEnergize(key);
-        //}
-        //else
-        //{
-        //    martialStateBouncing = mainHand ? !mainHand.Idling : false;
-        //}
+        Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
+        Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
+        if (behaviourParams[key].Item1 && entity.Foe && (mainHand || offHand))
+        {
+            Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
+            Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            bool inRange = disposition.magnitude <= Mathf.Max(mainHand ? mainHand.Range : 0.0f, offHand ? offHand.Range : 0.0f);
+            bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range : false);
+            bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickAttack : false);
+            bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.25f;
+            bool foeAiming = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming : false);
+            bool foeRebuked = matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Recoiling : true;
+            bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
+            bool opportunityToAttack = foeRebuked || !foeFacing || (foeCharging && inRange) || (!matchupMain && !matchupOff);
+            bool opportunityToThrow = (foeCharging && !inRange) && foeFacing;
+            bool opportunityToDefend = foeAttacking && foeInRange && foeFacing;
+            bool opportunityToDefendThrow = foeAiming && !inRange && foeFacing;
+         
+        }
     }
 
+
+    public bool dashingDodgeAttacks = false;
+    public bool dashingDodgeAim = false;
+    public bool dashingDodgeFoe = false;
+    public bool dashingDodgeFoeDashOnly = false;
+    public bool dashingLunge = false;
+    public bool dashingInitiate = false;
+    protected bool dashingONS = true;
+    protected float dashingCooldownPeriod = 1.0f;
+    protected float dashingCooldownTimer = 0.0f;
+    protected float dashingChargePeriod = 0.0f;
+    protected float dashingChargeTimer = 0.0f;
+    //protected float dashingChargeTimer = 0.0f;
+    protected float dashingPower = 0.0f;
+    protected Vector3 dashingDesiredDirection;
     protected void dashing(BehaviourType key) 
     {
         if (behaviourParams[key].Item1)
@@ -869,6 +690,18 @@ public class Character : MonoBehaviour
         }
     }
 
+
+
+    //itemManagement
+    public bool itemManagementSeekItems = false;
+    public bool itemManagementGreedy = false;
+    protected bool itemManagementSeeking = false;
+    protected bool itemManagementNoDoubles = false;
+    protected bool itemManagementNoSingles = false;
+    public Warrior.WieldMode itemManagementPreferredType = Warrior.WieldMode.none;
+    protected Weapon itemManagementTarget;
+    protected float itemManagementDelayTimer = 0.0f;
+    protected float itemManagementDelayPeriod = 1f;
     protected void itemManagement(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && !entity.Shoved)
@@ -973,6 +806,17 @@ public class Character : MonoBehaviour
         }
     }
 
+
+    //follow
+    public GameObject followVIP;
+    public bool followRecall = false;
+    public bool followNutHug = false;
+    public float followDistance;
+    protected Vector3 followVIPlastCoordinates;
+    protected float followInnerDeadband;
+    protected float followOuterDeadband;
+    protected int followLayerMask;
+
     protected void follow(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && followVIP)
@@ -1001,6 +845,14 @@ public class Character : MonoBehaviour
         }
     }
 
+
+    //waypoint
+    public Vector3 waypointCoordinates;
+    public bool waypointCommanded = false;
+    public bool waypointDeadbanded = false;
+    public float waypointDeadbandingScalar = 2.0f;
+    public float waypointInnerlimit = Hextile.Radius;
+    public float waypointOuterLimit = Hextile.Radius * 2;
     protected void waypoint(BehaviourType key)
     {
         if (behaviourParams[key].Item1)
@@ -1020,6 +872,15 @@ public class Character : MonoBehaviour
         }
     }
 
+
+    //wallCrawl
+    public bool wallCrawlDrawRays = false;
+    public bool wallCrawlCrowding = false;
+    public bool wallCrawlAvoidFoe = true;
+    protected int wallCrawlObstaclesMask;
+    protected int wallCrawlAvoidAngle;
+    protected float wallCrawlTimer = 0;
+    protected float wallCrawlPeriod = 3;
     protected void wallCrawl(BehaviourType key)
     {
         wallCrawlObstaclesMask = (1 << Game.layerWall) + (1 << Game.layerObstacle) + (wallCrawlCrowding ? 0 : (1 << Game.layerEntity));
@@ -1255,131 +1116,6 @@ public class Character : MonoBehaviour
 
     /***** helper coroutines *****/
 
-    private IEnumerator martialAttackCycle(Weapon mainHand, Weapon offHand)
-    {
-        IEnumerator exit()
-        {
-            martialStateBouncing = false;
-            martialAttackingONS = true;
-            yield break;
-        }       
-        float timer;
-        bool inRange;
-        bool timesUp;
-        Vector3 disposition;
-        if (mainHand)
-        {
-            timer = 0;
-            mainHand.PrimaryTrigger = true;
-            martialStateBouncing = true;
-            yield return new WaitUntil(() => mainHand.currentAnimation.IsTag("Hold") || mainHand.currentAnimation.IsTag("Rebuked"));
-            inRange = false;
-            timesUp = false;
-            while (!timesUp || (!inRange && martialReactiveAttack))
-            {
-                martialStateBouncing = !timesUp;
-                timesUp = (timer += Time.deltaTime) > 1 - Intelligence;
-                if (mainHand.currentAnimation.IsTag("Rebuked"))
-                {                
-                    mainHand.PrimaryTrigger = false;
-                    yield return exit();
-                }
-                else if (entity ? entity.Foe : false)
-                {
-                    disposition = entity.Foe.transform.position - transform.position;
-                    inRange = disposition.magnitude <= mainHand.Range;
-                    yield return null;
-                }
-                else
-                {
-                    inRange = true;
-                    yield return null;
-                }
-            }
-            mainHand.PrimaryTrigger = false;
-            if (!entity.Foe)
-            {
-                yield return exit();
-            }
-        }
-        if (offHand)
-        {
-            timer = 0;
-            offHand.PrimaryTrigger = true;
-            martialStateBouncing = true;
-            yield return new WaitUntil(() => offHand.currentAnimation.IsTag("Hold") || offHand.currentAnimation.IsTag("Rebuked"));
-            inRange = false;
-            timesUp = false;
-            while (!timesUp || (!inRange && martialReactiveAttack))
-            {
-                martialStateBouncing = !timesUp;
-                timesUp = (timer += Time.deltaTime) > 1 - Intelligence;
-                if (offHand.currentAnimation.IsTag("Rebuked"))
-                {                
-                    offHand.PrimaryTrigger = false;
-                    yield return exit();
-                }
-                else if (entity ? entity.Foe : false)
-                {
-                    disposition = entity.Foe.transform.position - transform.position;
-                    inRange = disposition.magnitude <= offHand.Range;
-                    timer += Time.deltaTime;
-                    yield return null;
-                }
-                else
-                {
-                    inRange = true;
-                    yield return null;
-                }
-
-            }
-            offHand.PrimaryTrigger = false;
-        }
-        yield return exit();
-    }    
-
-    private IEnumerator martialDefendCycle(Weapon mainHand, Weapon offHand)
-    {
-        mainHand.SecondaryTrigger = false;
-        if (offHand)
-        {
-            offHand.SecondaryTrigger = false;
-        }
-        yield return new WaitForSeconds(1 - Intelligence);
-        mainHand.SecondaryTrigger = true;
-        if (offHand)
-        {
-            offHand.SecondaryTrigger = true;
-        }
-        yield break;
-    }
-
-    private IEnumerator martialThrowCycle(Weapon mainHand, Weapon offHand)
-    {
-        martialAttackingONS = false;
-        martialStateBouncing = true;
-        if (mainHand)
-        {
-            mainHand.ThrowTrigger = true;
-
-            yield return new WaitUntil(() => mainHand.currentAnimation.IsTag("Aim"));
-            yield return new WaitForSeconds(1 - Intelligence);
-            mainHand.ThrowTrigger = false;
-            yield return new WaitUntil(() => mainHand.Thrown);
-        }
-        if (offHand)
-        {
-            offHand.ThrowTrigger = true;
-            yield return new WaitUntil(() => offHand.currentAnimation.IsTag("Aim"));
-            yield return new WaitForSeconds(1 - Intelligence);
-            offHand.ThrowTrigger = false;
-            yield return new WaitUntil(() => offHand.Thrown);
-        }
-        martialStateBouncing = false;
-        martialAttackingONS = true;
-        yield break;
-    }
-
     private IEnumerator dashingCycle()
     {            
         dashingONS = false;
@@ -1387,11 +1123,71 @@ public class Character : MonoBehaviour
         bool dodgingInSomeWay = dashingDodgeAim || dashingDodgeAttacks || dashingDodgeFoe || dashingLunge || dashingInitiate;
         while (entity.Foe && dodgingInSomeWay)
         {
-            if (dashingDesiredDirection != Vector3.zero)
+            Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
+            Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
+            Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
+            Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            if (dashingDodgeAttacks)
+            {
+                bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
+                bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
+                bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f);
+                if (foeAttacking && foeInRange && foeFacing)
+                {
+                    dashingDesiredDirection = -disposition.normalized;
+
+                }
+            }
+            if (dashingDodgeAim)
+            {
+
+                bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
+                bool foeThrowing = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupOff.Thrown : false);
+                if (foeThrowing && !foeInRange)
+                {
+                    dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
+                }
+            }
+            if (dashingDodgeFoe)
+            {
+                float personalRange = (2.5f * entity.personalBox.radius * entity.scaleActual);
+                bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain && !dashingDodgeFoeDashOnly ? matchupMain.Range : personalRange, matchupOff && !dashingDodgeFoeDashOnly ? matchupOff.Range : personalRange) * 1.20f;
+                if (foeInRange && !entity.Foe.Staggered && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
+                {
+                    dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
+                }
+            }
+            if (dashingLunge)
+            {
+
+                if ((mainHand ? mainHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || mainHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (offHand ? offHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || offHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false))
+                {
+                    dashingDesiredDirection = disposition.normalized;
+                    //entity.DashPower = 1.0f;
+                }
+            }
+            if (dashingInitiate)
+            {
+                if (entity.Foe)
+                {
+                    RaycastHit hit;
+                    int mask = (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall);
+                    bool test = Physics.SphereCast(transform.position, entity.berthActual * entity.scaleActual, disposition.normalized, out hit, sensoryBaseRange, mask, QueryTriggerInteraction.Ignore);
+                    if (test ? hit.collider.gameObject == entity.Foe.gameObject : false)
+                    {
+                        dashingDesiredDirection = disposition.normalized;
+                    }
+                }
+            }
+            if (dashingDesiredDirection != Vector3.zero || entity.DashCharging)
             {
                 entity.DashCharging = true;
-                entity.dashDirection = dashingDesiredDirection;
-                yield return null;
+                dashingChargeTimer += Time.deltaTime;  
+            }
+            if (dashingChargeTimer >= dashingChargePeriod)
+            {
+                dashingChargeTimer = 0;
                 entity.dashDirection = dashingDesiredDirection;
                 entity.DashCharging = false;
                 dashingCooldownTimer = 0.0f;
@@ -1399,67 +1195,8 @@ public class Character : MonoBehaviour
                 dashingONS = true;
                 yield break;
             }
-            else
-            {
-                Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-                Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-                Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-                Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-                Vector3 disposition = entity.Foe.transform.position - transform.position;
-                if (dashingDodgeAttacks)
-                {
-                    bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
-                    bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
-                    bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f);
-                    if (foeAttacking && foeInRange && foeFacing)
-                    {
-                        dashingDesiredDirection = -disposition.normalized;
-
-                    }
-                }
-                if (dashingDodgeAim)
-                {
-
-                    bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
-                    bool foeThrowing = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupOff.Thrown : false);
-                    if (foeThrowing && !foeInRange)
-                    {
-                        dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-                    }
-                }
-                if (dashingDodgeFoe)
-                {
-                    float personalRange = (2.5f * entity.personalBox.radius * entity.scaleActual);
-                    bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain && !dashingDodgeFoeDashOnly ? matchupMain.Range : personalRange, matchupOff && !dashingDodgeFoeDashOnly ? matchupOff.Range : personalRange) * 1.20f;
-                    if (foeInRange && !entity.Foe.Staggered && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
-                    {
-                        dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-                    }
-                }
-                if (dashingLunge)
-                {
-
-                    if ((mainHand ? mainHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || mainHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (offHand ? offHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || offHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false))
-                    {
-                        dashingDesiredDirection = disposition.normalized;
-                        //entity.DashPower = 1.0f;
-                    }
-                }
-                if (dashingInitiate)
-                {
-                    if (entity.Foe)
-                    {
-                        RaycastHit hit;
-                        int mask = (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall);
-                        bool test = Physics.SphereCast(transform.position, entity.berthActual * entity.scaleActual, disposition.normalized, out hit, sensoryBaseRange, mask, QueryTriggerInteraction.Ignore);
-                        if (test ? hit.collider.gameObject == entity.Foe.gameObject : false)
-                        {
-                            dashingDesiredDirection = disposition.normalized;
-                        }
-                    }
-                }
-                yield return null;
-            }
+            yield return null;
+           
         }
         dashingDesiredDirection = Vector3.zero;
         entity.DashCharging = false;

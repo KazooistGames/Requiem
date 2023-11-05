@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,18 +6,16 @@ using UnityEngine;
 
 public class Struggler : Warrior
 {
+
     protected MeshFilter[] bodyparts;
-    //protected GameObject head;
     protected GameObject torso;
     protected GameObject leg1;
     protected GameObject leg2;
-
-    private static GameObject bloodSplatter;
-
-
     protected override void Awake()
     {
         base.Awake();
+        Strength = 100f;
+        Haste = 1.0f;
     }
 
     protected override void Start()
@@ -25,13 +24,11 @@ public class Struggler : Warrior
         createProfile();
         gameObject.name = "Struggler";
         EventWounded.AddListener(fleshWound);
-        if (!bloodSplatter)
-        {
-            bloodSplatter = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");
-        }
-        flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
+
     }
 
+
+    /***** PUBLIC *****/
 
     /***** PROTECTED *****/
     protected override void Die()
@@ -52,20 +49,21 @@ public class Struggler : Warrior
             model.GetComponent<Rigidbody>().velocity = body.velocity;
             if (Shoved)
             {
-                Vector3 direction = Foe ? Foe.transform.position - transform.position : new Vector3(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f);
+                Vector3 direction = Foe ? Foe.transform.position - transform.position : new Vector3(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f);
                 model.GetComponent<Rigidbody>().AddForce(-direction.normalized * 1, ForceMode.VelocityChange);
             }
         }
-        _SoundService.PlayAmbientSound(Game.deathSounds[Random.Range(0, Game.deathSounds.Length)], transform.position, 1, 0.5f).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Game.deathSounds[UnityEngine.Random.Range(0, Game.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         base.Die();
     }
+
 
     /***** PRIVATE *****/
     private void fleshWound(float damage)
     {
         if (Vitality > 0)
         {
-            _SoundService.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 1.0f, 0.5f).layer = gameObject.layer;
+            _SoundService.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         }
         if (!BLOOD_SPLATTER_PREFAB)
         {
@@ -76,9 +74,10 @@ public class Struggler : Warrior
         splatter.transform.eulerAngles = new Vector3(45, UnityEngine.Random.value * 360f, 45);
         splatter.GetComponent<Projector>().orthographicSize = Mathf.Lerp(0.05f, 0.70f, (damage / 100));
     }
+
     private void createProfile()
     {
-        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/fleshBody"));
+        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/devilBody"));
         model.gameObject.name = "Model";
         model.transform.SetParent(transform, false);
         model.transform.localPosition = Vector3.zero;
@@ -96,4 +95,5 @@ public class Struggler : Warrior
             }
         }
     }
+
 }

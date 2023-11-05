@@ -95,14 +95,19 @@ public class _Flames : MonoBehaviour
         switch (preset)
         {
             case FlameStyles.Inferno:
+                particleLight.intensity = 7.5f;
+                flameGradient.mode = ParticleSystemGradientMode.Gradient;
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
             case FlameStyles.Soulless:
+                particleLight.intensity = 5f;
+                flameGradient.mode = ParticleSystemGradientMode.Gradient;
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
             case FlameStyles.Magic:
+                particleLight.intensity = 7.5f;
                 flameGradient.mode = ParticleSystemGradientMode.TwoGradients;
                 flameGradient.gradientMin = gradients[0];
                 flameGradient.gradientMax = gradients[1];

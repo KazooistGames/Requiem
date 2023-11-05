@@ -149,6 +149,7 @@ public class Player : MonoBehaviour
             lastDirection = Direction;
         }
         HostEntity.DashCharging = CurrentKeyboard.spaceKey.isPressed && !HostEntity.Dashing;
+        HostEntity.dashDirection = HostEntity.WalkDirection;
     }
 
     private void inputItemManagement()

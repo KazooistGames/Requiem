@@ -11,7 +11,7 @@ public class Skully : Warrior
         base.Awake();
         Strength = 25f;
         berthScalar = 0.80f;
-        Haste = 1.75f;
+        Haste = 1.5f;
         BaseAcceleration = 4f;
     }
 

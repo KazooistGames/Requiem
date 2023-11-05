@@ -63,7 +63,7 @@ public class Devil : Warrior
     {
         if (Vitality > 0)
         {
-            _SoundService.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 1.0f, 0.5f).layer = gameObject.layer;
+            _SoundService.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         }
         if (!BLOOD_SPLATTER_PREFAB)
         {

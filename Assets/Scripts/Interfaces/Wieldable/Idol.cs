@@ -64,7 +64,7 @@ public class Idol : Bone
         equipType = EquipType.Burdensome;
         pitchScalar = 0.6f;
         spiritFlame = GetComponentInChildren<_Flames>();
-        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Inferno);
+        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Soulless);
         spiritFlame.boundObject = gameObject;
         StartCoroutine(banter());
         Body.mass = 3f;
@@ -105,9 +105,10 @@ public class Idol : Bone
     private IEnumerator banter()
     {
         yield return new WaitUntil(() => Player.INSTANCE);
-        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Magic);
+        spiritFlame.emissionModule.enabled = false;
         float timeOfLastBlurb = 0;
         yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
+        spiritFlame.emissionModule.enabled = true;
         timeOfLastBlurb = sayShit(greetings);
         yield return new WaitUntil(() => (Time.time - timeOfLastBlurb) > 30 || Wielder == Player.INSTANCE.HostEntity);
         while (true)
