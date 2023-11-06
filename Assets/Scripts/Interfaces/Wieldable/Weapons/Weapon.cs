@@ -74,6 +74,7 @@ public abstract class Weapon : Wieldable
     protected float heftSlowModifier;
     protected string heftSlowKey;
     protected static float HEFT_SLOW_RAMP_SPEED = 3;
+    protected static float HEFT_TURN_RAMP_SPEED = 6;
 
     protected float hitRadius = 0.1f;
     protected float defendRadius = 0.1f;
@@ -225,7 +226,7 @@ public abstract class Weapon : Wieldable
                         Swinging.Invoke(this);
                         playSwing();
                     }
-                    modifyWielderSpeed(heftSlowModifier);
+                    modifyWielderSpeed(heftSlowModifier, true);
                     setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.Recovering)
@@ -674,7 +675,7 @@ public abstract class Weapon : Wieldable
         }
     }
 
-    private void modifyWielderSpeed(float value)
+    private void modifyWielderSpeed(float value, bool lockRotation = false)
     {
         if (MostRecentWielder)
         {
@@ -686,8 +687,9 @@ public abstract class Weapon : Wieldable
             {
                 MostRecentWielder.modSpeed[heftSlowKey] = 0;
             }
-            MostRecentWielder.modTurnSpeed[heftSlowKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSlowKey], value, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
-            MostRecentWielder.modSpeed[heftSlowKey] = Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSlowKey], value, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
+            MostRecentWielder.modTurnSpeed[heftSlowKey] =  Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSlowKey], lockRotation ? -0.95f : value, Time.deltaTime * HEFT_TURN_RAMP_SPEED);
+            MostRecentWielder.modSpeed[heftSlowKey] = Mathf.MoveTowards(MostRecentWielder.modSpeed[heftSlowKey], value, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
+
         }
     }
 
@@ -767,7 +769,7 @@ public abstract class Weapon : Wieldable
             {
                 return ActionAnimation.Recovering;
             }
-            else if (nextAnimation.IsTag("Idle"))
+            else if (nextAnimation.IsTag("Idle") || nextAnimation.IsTag("QuickCoil"))
             {
                 return ActionAnimation.Recovering;
             }

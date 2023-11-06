@@ -96,8 +96,8 @@ public abstract class Warrior : MonoBehaviour
     protected float staggerTimer = 0;
 
     /********** DASHING **********/
-    public static float Max_Velocity_Of_Dash { get; private set; } = 3.0f;
-    public static float Min_Velocity_Of_Dash { get; private set; } = 1.5f;
+    public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
@@ -111,7 +111,7 @@ public abstract class Warrior : MonoBehaviour
     private static float DASH_CHARGE_TIME = 0.25f;
     private static float CRASH_DAMAGE = 25f;
 
-    private static float POISE_REGEN_PERIOD = 2f;
+    private static float POISE_REGEN_PERIOD = 4f;
     private static float POISE_DEBOUNCE_PERIOD = 4f;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebounceTimer = 0.0f;
@@ -165,7 +165,7 @@ public abstract class Warrior : MonoBehaviour
     protected virtual void Awake()
     {
         Strength = 100f;
-        Resolve = 10;
+        Resolve = 20;
         Haste = 1.0f;
         BaseAcceleration = 8;
         hurtBox = gameObject.AddComponent<CapsuleCollider>();
@@ -760,12 +760,11 @@ public abstract class Warrior : MonoBehaviour
     private IEnumerator routineDashHandler()
     {
         string key = "dash";
-        bool directionIsUndetermined;
         while (true)
         {
+            float scaledVelocity = 0;
             yield return new WaitUntil(() => DashCharging);
-
-            while (DashCharging)
+            while (DashCharging || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
@@ -781,15 +780,11 @@ public abstract class Warrior : MonoBehaviour
                         Tempo = Mathf.Clamp(Tempo + increment * finalDashChargeRatioToDashCharge, 0, 1);
                     }                
                 }
+                scaledVelocity = Max_Velocity_Of_Dash * DashPower;
                 yield return null;
             }
             dashAlreadyHit = new List<GameObject>();
-            float scaledVelocity = Max_Velocity_Of_Dash * DashPower;
-            if (scaledVelocity <= Min_Velocity_Of_Dash)
-            {
-
-            }
-            else if (dashDirection != Vector3.zero)
+            if (dashDirection != Vector3.zero)
             {
                 FinalDash = Mathf.Abs(Tempo - TempoTargetCenter) < 0.5f * TempoTargetWidth;
                 if (FinalDash)
@@ -851,7 +846,7 @@ public abstract class Warrior : MonoBehaviour
         }
         else if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
-            if (Posture == PostureStrength.Weak || theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+            if (/*Posture == PostureStrength.Weak ||*/ theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
             {
                 Stagger((theirWeapon.Heft / Strength));
             }
@@ -880,17 +875,20 @@ public abstract class Warrior : MonoBehaviour
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
-            if (Posture == PostureStrength.Weak)
-            {
-                Stagger(theirWeapon.Heft / Strength);
-            }
+            //if (Posture == PostureStrength.Weak)
+            //{
+            //    Stagger(theirWeapon.Heft / Strength);
+            //}
         }
 
     }
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-
+        if (theirWeapon.Wielder)
+        {
+            theirWeapon.Wielder.alterPoise(-Resolve);
+        }
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
@@ -918,16 +916,15 @@ public abstract class Warrior : MonoBehaviour
     {
         float power = myWeapon.ActionAnimated == ActionAnimation.QuickAttack ?  myWeapon.Sharpness : myWeapon.Heft;
         float poiseDamage = Mathf.Min(foe.Poise, power);
-        float vitalityDamage = myWeapon.TrueStrike ? power : power - poiseDamage;
+        float vitalityDamage = Posture == PostureStrength.Weak ? power : power - Resolve;
         foe.alterPoise(-poiseDamage);
-        if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+        if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack || foe.Posture == PostureStrength.Weak)
         {
-            foe.Stagger(poiseDamage / Strength);
+            foe.Stagger(1.5f * poiseDamage / Strength);
         }
         if (vitalityDamage > 0) 
         {
             foe.Damage(vitalityDamage);
-            foe.Stagger(vitalityDamage / Strength);
         }
     }
 

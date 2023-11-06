@@ -204,7 +204,7 @@ public class Wieldable : MonoBehaviour
     {
         if (Renderer ? Renderer.sharedMaterial : false)
         {
-            Color colorActual = Color.Lerp(Color.black, highlight, 0.15f);
+            Color colorActual = Color.Lerp(Color.black, highlight, 0.1f);
             if (colorActual != Renderer.sharedMaterial.GetColor("_EmissionColor"))
             {
                 Renderer.sharedMaterial.SetColor("_EmissionColor", colorActual);
