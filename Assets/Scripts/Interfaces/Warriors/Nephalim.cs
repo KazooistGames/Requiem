@@ -16,7 +16,7 @@ public class Nephalim : Warrior
     {
         base.Awake();
         Strength = 200f;
-        Resolve = 20f;
+        Resolve = 40f;
         Haste = 1.0f;
         hoverScalar = 1.125f;
         scaleScalar = 1.20f;

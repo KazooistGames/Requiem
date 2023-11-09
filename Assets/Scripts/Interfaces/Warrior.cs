@@ -914,9 +914,8 @@ public abstract class Warrior : MonoBehaviour
 
     private void handleWeaponHit(Weapon myWeapon, Warrior foe)
     {
-        float power = myWeapon.ActionAnimated == ActionAnimation.QuickAttack ?  myWeapon.Sharpness : myWeapon.Heft;
-        float poiseDamage = Mathf.Min(foe.Poise, power);
-        float vitalityDamage = Posture == PostureStrength.Weak ? power : power - Resolve;
+        float poiseDamage = Mathf.Min(foe.Poise, myWeapon.Power);
+        float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : myWeapon.Power - foe.Resolve;
         foe.alterPoise(-poiseDamage);
         if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack || foe.Posture == PostureStrength.Weak)
         {

@@ -49,7 +49,7 @@ public abstract class Weapon : Wieldable
     public bool Throwing = false;
 
     public float Range = 0f;
-    public float Sharpness = 0f;
+    public float Power = 0f;
     public float BasePower = 0f;
 
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
@@ -146,7 +146,7 @@ public abstract class Weapon : Wieldable
     protected override void Update()
     {
         base.Update();
-        Sharpness = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+        Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
         if (Wielder)
         {
             ActionAnimated = getActionFromCurrentAnimationState();
@@ -317,7 +317,7 @@ public abstract class Weapon : Wieldable
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        Sharpness = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+        Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
         if (other)
         {
             if (!alreadyHit.Contains(other.gameObject))
@@ -587,7 +587,7 @@ public abstract class Weapon : Wieldable
         if (foe)
         {
             foe.EventCrashed.RemoveListener(impale_doupleDipDamage);
-            foe.Damage(Sharpness);
+            foe.Damage(Power);
             playSlap(transform.position);
         }
         impale_release();
@@ -819,7 +819,7 @@ public abstract class Weapon : Wieldable
 
     private void playSlap(Vector3 position)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Clamp(10f / Sharpness, 0.4f, 1.6f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Clamp(10f / Power, 0.4f, 1.6f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
     }
 
     private void playTink()

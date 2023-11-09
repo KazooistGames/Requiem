@@ -31,7 +31,7 @@ public class WeaponQuest : Quest
         }
         else if (weapon.GetType() == WeaponType)
         {
-            GoalProgress += (int)weapon.Sharpness;
+            GoalProgress += (int)weapon.Power;
         }
     }
 
