@@ -109,7 +109,7 @@ public abstract class Warrior : MonoBehaviour
     protected bool CrashEnvironmentONS = true;
 
     private static float DASH_CHARGE_TIME = 0.25f;
-    private static float CRASH_DAMAGE = 25f;
+    private static float CRASH_DAMAGE = 50f;
 
     private static float POISE_REGEN_PERIOD = 4f;
     private static float POISE_DEBOUNCE_PERIOD = 4f;
@@ -676,7 +676,7 @@ public abstract class Warrior : MonoBehaviour
             float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
             //float maxMag = FinalDash ? Max_Velocity_Of_Dash * FINALDASH_POWER_SCALAR : Max_Velocity_Of_Dash;
             bool crash = instant || collision.relativeVelocity.magnitude >= minMag;
-            float actualMag = instant ? Mathf.Lerp(minMag, Max_Velocity_Of_Dash, DashPower) : Mathf.Min(collision.relativeVelocity.magnitude, Max_Velocity_Of_Dash);
+            float actualMag = instant ? Mathf.Lerp(minMag, Max_Velocity_Of_Dash, DashPower) : collision.relativeVelocity.magnitude;
             if (crash && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
                 float impactRatio = Strength_Ratio(this, foe) * actualMag / Max_Velocity_Of_Dash;
@@ -691,15 +691,11 @@ public abstract class Warrior : MonoBehaviour
                 }
                 else 
                 {
+                    foe.alterPoise(-damage);
                     if (FinalDash)
                     {
                         foe.Damage(damage);
                     }
-                    else
-                    {
-                        foe.alterPoise(-damage);
-                    }
-
                     EventLandedDashHit.Invoke(foe, damage);              
                 }
                 _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
