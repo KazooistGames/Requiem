@@ -323,6 +323,7 @@ public class Wieldable : MonoBehaviour
         togglePhysicsBox(false);
         Allegiance = Wielder.Allegiance;
         transform.SetParent(Wielder.transform);
+        setHighlightColor(Color.gray);
         Anim.enabled = true;
         if (gameObject.activeSelf)
         {
@@ -347,7 +348,7 @@ public class Wieldable : MonoBehaviour
             Vector3 direction = Wielder.LookDirection;
             direction.y = 0;
             DropItem(true, direction, magnitude);
-            setHighlightColor(Color.red);
+            //setHighlightColor(Color.red);
             Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
             yield return new WaitWhile(() =>!Thrown);
             yield return new WaitUntil(() => Wielder);

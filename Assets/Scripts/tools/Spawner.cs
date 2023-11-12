@@ -8,10 +8,10 @@ using System.Drawing;
 
 public class Spawner : MonoBehaviour
 {
-    public UnityEvent<List<GameObject>> Spawned = new UnityEvent<List<GameObject>>();
+    public UnityEvent<List<GameObject>> JustSpawned = new UnityEvent<List<GameObject>>();
     public UnityEvent<List<GameObject>> FinishedPeriodicSpawning = new UnityEvent<List<GameObject>>();
     public List<Type> ListOfComponentsAddedToSpawnedObjects = new List<Type>();
-
+    public List<GameObject> AllSpawnedObjects = new List<GameObject>();
 
     void Start()
     {
@@ -42,18 +42,18 @@ public class Spawner : MonoBehaviour
             }
             listOfNewInstances.Add(spawned);
         }
-        if (Spawned != null)
+        if (JustSpawned != null)
         {
-            Spawned.Invoke(listOfNewInstances);
+            JustSpawned.Invoke(listOfNewInstances);
         }
         return listOfNewInstances;
     }
 
-    public void PeriodicallySpawn(float frequency, int groupSize = 1, int maxConcurrentInstances = -1, int totalInstancesToSpawn = -1)
+    public void PeriodicallySpawn(float periodSeconds, int groupSize = 1, int minConcurrentInstances = -1, int maxConcurrentInstances = -1)
     {
         if(groupSize <= 0) { return; }
         StopAllCoroutines();
-        StartCoroutine(routinePeriodicSpawning(frequency, groupSize, maxConcurrentInstances, totalInstancesToSpawn));
+        StartCoroutine(routinePeriodicSpawning(periodSeconds, groupSize, minConcurrentInstances, maxConcurrentInstances));
     }
 
     public void StopPeriodicSpawning()
@@ -67,28 +67,24 @@ public class Spawner : MonoBehaviour
     /***** PRIVATE *****/
 
 
-    private IEnumerator routinePeriodicSpawning(float frequency, int groupSize = 1, int maxConcurrentInstances = -1, int totalInstancesToSpawn = -1)
+    private IEnumerator routinePeriodicSpawning(float periodSecondsBetweenSpawns, int groupSize = 1, int minConcurrentInstances = int.MinValue, int maxConcurrentInstances = int.MaxValue)
     {
         if(groupSize <= 0) { yield break; }
- 
-        List<GameObject> instancesSpawnedThisCycle = new List<GameObject>();
-        while (instancesSpawnedThisCycle.Count < totalInstancesToSpawn && totalInstancesToSpawn > 0)
+        List<GameObject> currentInstances = new List<GameObject>();
+        float timer;
+        while (true)
         {
-            if(maxConcurrentInstances > 0)
+            timer = 0;
+            currentInstances = AllSpawnedObjects.Where(x => x != null).ToList();
+            if(currentInstances.Count < maxConcurrentInstances)
             {
-                int delta = 0;
-                yield return new WaitUntil(() => { delta = maxConcurrentInstances - instancesSpawnedThisCycle.Count(x => x != null); return delta > 0; });
-                instancesSpawnedThisCycle.AddRange(InstantSpawn(Mathf.Min(delta, groupSize)));
-            }       
-            else
-            {
-                int permissableGroupSize = Mathf.Min(groupSize, totalInstancesToSpawn - instancesSpawnedThisCycle.Count);
-                instancesSpawnedThisCycle.AddRange(InstantSpawn(permissableGroupSize));
+                int delta = maxConcurrentInstances - currentInstances.Count;
+                int permissableGroupSize = Mathf.Min(groupSize, delta);
+                AllSpawnedObjects.AddRange(InstantSpawn(permissableGroupSize));
             }
-            yield return new WaitForSeconds(frequency);
+            yield return new WaitUntil( () => (timer += Time.deltaTime) > periodSecondsBetweenSpawns);
+            timer -= periodSecondsBetweenSpawns;
         }
-        FinishedPeriodicSpawning.Invoke(instancesSpawnedThisCycle);
-        yield break;
     }
 
 

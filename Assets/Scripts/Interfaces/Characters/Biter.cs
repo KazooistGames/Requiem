@@ -42,6 +42,7 @@ public class Biter : Character
             case AIState.seek:
                 if (entity.Foe)
                 {
+                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     StateTransition(AIState.aggro);
                 }
                 else
@@ -59,8 +60,8 @@ public class Biter : Character
                     if (entity.Foe)
                     {
                         Vector3 disposition = entity.Foe.transform.position - transform.position;
-                        dashingInitiate = (disposition.magnitude < sensoryBaseRange * sensorySightRangeScalar * 0.25f || entity.DashCharging) && !entity.Shoved;
-                        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                        dashingInitiate = (disposition.magnitude < pursueStoppingDistance || entity.DashCharging) && !entity.Shoved;
+
                     }
                 }
                 break;

@@ -168,7 +168,7 @@ public abstract class Weapon : Wieldable
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
-                    setHighlightColor(Color.gray);
+                    //setHighlightColor(Color.gray);
                 }
                 else if (ActionAnimated == ActionAnimation.Idle)
                 {
@@ -177,7 +177,7 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = false;
                     TrueStrike = false;
                     modifyWielderSpeed(0);
-                    setHighlightColor(Color.gray);
+                    //setHighlightColor(Color.gray);
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
                 {
@@ -191,19 +191,19 @@ public abstract class Weapon : Wieldable
                     }
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
-                    setHighlightColor(new Color(1, 0.1f, 0.1f));
+                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.QuickWindup)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
-                    setHighlightColor(new Color(1, 0.1f, 0.1f));
+                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.QuickCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(0);
-                    setHighlightColor(new Color(1, 0.1f, 0.1f));
+                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.StrongAttack || ActionAnimated == ActionAnimation.QuickAttack)
                 {
@@ -227,7 +227,7 @@ public abstract class Weapon : Wieldable
                         playSwing();
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
-                    setHighlightColor(new Color(1, 0.1f, 0.1f));
+                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.Recovering)
                 {
@@ -241,12 +241,12 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = !nextAnimation.IsTag("Rebuked");
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                     modifyWielderSpeed(heftSlowModifier / 2);
-                    setHighlightColor(new Color(0.1f, 0.1f, 1));
+                    //setHighlightColor(new Color(0.1f, 0.1f, 1));
                 }
                 else if (ActionAnimated == ActionAnimation.Aiming)
                 {
                     modifyWielderSpeed(heftSlowModifier);
-                    setHighlightColor(new Color(1, 0.1f, 0.1f));
+                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.Throwing)
                 {
@@ -259,9 +259,9 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = true;
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
-
+                bool availableToGuard = !((ActionAnimated == ActionAnimation.QuickAttack) || (ActionAnimated == ActionAnimation.StrongAttack) || (ActionAnimated == ActionAnimation.Recoiling) || (ActionAnimated == ActionAnimation.QuickWindup) || (ActionAnimated == ActionAnimation.StrongWindup));
                 Anim.SetBool("primary", PrimaryTrigger && !Recoiling);
-                Anim.SetBool("secondary", SecondaryTrigger && !Recoiling);
+                Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
                 Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
                 Anim.SetBool("rebuked", Recoiling);
                 Anim.Update(0);
@@ -600,7 +600,7 @@ public abstract class Weapon : Wieldable
         if (!foe) { return; }
         Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
         Vector3 disposition = foe.transform.position - origin;
-        Vector3 velocityChange = disposition.normalized * (weapon.Heft / 25f) * Warrior.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        Vector3 velocityChange = disposition.normalized * (weapon.Heft / 40f) * Warrior.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
         foe.Shove(velocityChange);
     }
 

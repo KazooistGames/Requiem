@@ -43,7 +43,7 @@ public class PlayerHUD : MonoBehaviour
         _SoundService.SOUND_MASTER_VOLUME = SoundSlider.value;
         Text[] metrics = Info.GetComponentsInChildren<Text>();
         metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
-        metrics[1].text = "Kills:  " + Game.KillCount.ToString();
+        metrics[1].text = "Bones:  " + Player.INSTANCE.BonesCollected.ToString();
         metrics[2].text = "Time:   " + Game.INSTANCE.GameClock.ToString("0.00");
         if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
@@ -105,7 +105,7 @@ public class PlayerHUD : MonoBehaviour
         }
     }
     /***** PUBLIC *****/
-    public Text setIndicatorOnHUD(string key)
+    public Text setIndicatorOnHUD(string key, string text)
     {
         Text indicator;
         if (StatusIndicators.ContainsKey(key))
@@ -115,7 +115,7 @@ public class PlayerHUD : MonoBehaviour
         else
         {
             indicator = Instantiate(Resources.Load<GameObject>("Prefabs/UX/statusIndicator")).GetComponent<Text>();
-            indicator.text = key;
+            indicator.text = text;
             StatusIndicators[key] = indicator;
         }
         return indicator;

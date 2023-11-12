@@ -109,17 +109,15 @@ public abstract class Warrior : MonoBehaviour
     protected bool CrashEnvironmentONS = true;
 
     private static float DASH_CHARGE_TIME = 0.25f;
-    private static float CRASH_DAMAGE = 50f;
+    private static float CRASH_DAMAGE = 20f;
+    private static float FINAL_DASH_RATIO = 2f;
 
     private static float POISE_REGEN_PERIOD = 4f;
     private static float POISE_DEBOUNCE_PERIOD = 4f;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebounceTimer = 0.0f;
 
-
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
-
-    //public bool Running = false;
 
     public GameObject Location;
     public GameObject head;
@@ -684,20 +682,20 @@ public abstract class Warrior : MonoBehaviour
                 ShoveVector *= 0.75f;
                 foe.Shove(ShoveVector);
                 foe.EventCrashed.Invoke();
-                float damage = CRASH_DAMAGE * impactRatio;
+                float damage = Mathf.Sqrt(Strength) * impactRatio;
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
                 }
-                else 
+                else if(FinalDash)
                 {
-                    foe.alterPoise(-damage);
-                    if (FinalDash)
+                    if(foe.Posture == PostureStrength.Weak)
                     {
                         foe.Damage(damage);
                     }
-                    EventLandedDashHit.Invoke(foe, damage);              
+                    foe.alterPoise(-damage);   
                 }
+                EventLandedDashHit.Invoke(foe, damage);
                 _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
             }
         }
@@ -744,7 +742,11 @@ public abstract class Warrior : MonoBehaviour
                 }
                 if (!Dashing)
                 {
-                    Damage(velocityRatio * CRASH_DAMAGE);
+                    alterPoise(-velocityRatio * CRASH_DAMAGE);
+                    if(Posture == PostureStrength.Weak)
+                    {
+                        Damage(velocityRatio * CRASH_DAMAGE);
+                    }
                     EventCrashed.Invoke();
                 }
                 CrashEnvironmentONS = false;
@@ -759,22 +761,19 @@ public abstract class Warrior : MonoBehaviour
         while (true)
         {
             float scaledVelocity = 0;
+            float overChargeTimer = 0;
             yield return new WaitUntil(() => DashCharging);
             while (DashCharging || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
-                if(DashPower >= 1 && Tempo >= 0)
+                if(DashPower >= 1 )
                 {
-                    float finalDashChargeRatioToDashCharge = 0.5f;
-                    if((Tempo + increment * finalDashChargeRatioToDashCharge) > 1)
+                    overChargeTimer += increment / FINAL_DASH_RATIO;     
+                    if(overChargeTimer > DASH_CHARGE_TIME * FINAL_DASH_RATIO)
                     {
-                        Tempo = -0.01f;
+                        FinalDash = true;
                     }
-                    else
-                    {
-                        Tempo = Mathf.Clamp(Tempo + increment * finalDashChargeRatioToDashCharge, 0, 1);
-                    }                
                 }
                 scaledVelocity = Max_Velocity_Of_Dash * DashPower;
                 yield return null;
@@ -782,10 +781,9 @@ public abstract class Warrior : MonoBehaviour
             dashAlreadyHit = new List<GameObject>();
             if (dashDirection != Vector3.zero)
             {
-                FinalDash = Mathf.Abs(Tempo - TempoTargetCenter) < 0.5f * TempoTargetWidth;
                 if (FinalDash)
                 {
-                    scaledVelocity *= 2;
+                    scaledVelocity *= FINAL_DASH_RATIO;
                 }
                 Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);

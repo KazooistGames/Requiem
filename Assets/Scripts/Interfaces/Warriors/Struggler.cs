@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Struggler : Warrior
 {
-
+    public Halberd MyHalberd;
     protected MeshFilter[] bodyparts;
     protected GameObject torso;
     protected GameObject leg1;
@@ -24,7 +24,8 @@ public class Struggler : Warrior
         createProfile();
         gameObject.name = "Struggler";
         EventWounded.AddListener(fleshWound);
-
+        MyHalberd = new GameObject().AddComponent<Halberd>();
+        MyHalberd.PickupItem(this);
     }
 
 

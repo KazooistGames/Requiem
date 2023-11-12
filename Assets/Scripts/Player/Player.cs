@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 public class Player : MonoBehaviour
 {
     public static Player INSTANCE { get; private set; }
+    public int BonesCollected = 0;
 
     public PlayerHUD HUD;
     public PlayerCamera Cam;
@@ -49,7 +50,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-
+        //HUD.setIndicatorOnHUD("bones", "Bones: " + BonesCollected.ToString());
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {
             Game.INSTANCE.Paused = !Game.INSTANCE.Paused;

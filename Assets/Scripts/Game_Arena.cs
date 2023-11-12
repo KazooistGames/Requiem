@@ -9,7 +9,7 @@ public class Game_Arena : Game
 {
     private int RadiusOfTiles = 1;
     private List<List<Hextile>> TileRings = new List<List<Hextile>>();
-    List<Hextile> AllTiles = new List<Hextile>();
+    List<Hextile> AllTilesInPlay = new List<Hextile>();
     private Hextile centerTile;
     private Landmark_Well well;
     private Landmark_Alter alter;
@@ -22,7 +22,7 @@ public class Game_Arena : Game
         Boss,
         Finale,
     }
-    public GameState State = GameState.Liminal;
+    public GameState StateOfGame = GameState.Liminal;
 
     private Spawner PatrolSpawner;
     private Spawner MobSpawner;
@@ -42,6 +42,10 @@ public class Game_Arena : Game
     {
         base.Update();
         gameObject.name = "ARENA";
+        if(StateOfGame != GameState.Liminal)
+        {
+            GameClock += Time.deltaTime;
+        }
     }
 
     protected IEnumerator PlayGame()
@@ -51,7 +55,7 @@ public class Game_Arena : Game
         yield return null;
         yield return Hextile.DrawCircle(RadiusOfTiles, Hextile.LastGeneratedTile, Tiles: TileRings);
         yield return new WaitForSecondsRealtime(0.5f);
-        AllTiles = TileRings.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList());
+        AllTilesInPlay = TileRings.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList());
         yield return gameInitLandmarks();
         //yield return gameInitCrypts();
         new GameObject().AddComponent<Player>();
@@ -99,47 +103,36 @@ public class Game_Arena : Game
         }
     }
 
-
     protected IEnumerator gameLoop()
     { 
         List<Torch> allTorches = new List<Torch>();
-        allTorches = FindObjectsOfType<Torch>().ToList();
-        State = GameState.Liminal;
+
+        allTorches = FindObjectsOfType<Torch>().ToList();        
+        foreach (Torch torch in allTorches)
+        {
+            torch.Lit = false;
+        }
+
         Difficulty = 1;
         yield return new WaitUntil(() => Commissioned);
-        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTiles[0]);
+        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTilesInPlay[0]);
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
         MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs );
         EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites );
-        while (Difficulty < 6)
+        StateOfGame = GameState.Liminal;
+        yield return new WaitUntil(() => alter.Used);
+        alter.DesiredOffering = alter.TopStep;
+        StateOfGame = GameState.Wave;
+        while (true)
         {
-            State = GameState.Liminal;
-            foreach(Torch torch in allTorches)
-            {
-                torch.Lit = false;
-            }
-            spawnedMobs = new List<GameObject>();
-            spawnedElites = new List<GameObject>();
-            yield return new WaitUntil(() => alter.Used);
-            State = GameState.Wave;
-            foreach (Torch torch in allTorches)
-            {
-                torch.Lit = true;
-            }
-            int MobsThisWave = 6 * Difficulty;
-            PatrolSpawner.PeriodicallySpawn(5 * Difficulty, Difficulty, 2 * Difficulty, 3 * Difficulty);
-            MobSpawner.PeriodicallySpawn(15 + 5 * Difficulty, Difficulty, 2 * Difficulty, 3 * Difficulty);
-            EliteSpawner.PeriodicallySpawn(30 + 5 * Difficulty, 1, Difficulty, Difficulty);
-            yield return new WaitUntil(() => spawnedMobs.Count > 0 && spawnedMobs.Count(x=>x!=null) == 0 && spawnedElites.Count > 0 && spawnedElites.Count(x => x != null) == 0);
-            State = GameState.Boss;
-            List<GameObject> wraiths = BossSpawner.InstantSpawn(Mathf.CeilToInt(Difficulty/2));
-            yield return new WaitUntil(() => wraiths.Count(x=>x!= null) == 0);
-            Difficulty++;
-            well.Refill(50);             
+            //start periodically spawning enemies and every minute re-evaluate
+            MobSpawner.PeriodicallySpawn(10, 2, Difficulty, Difficulty * 2);
+            EliteSpawner.PeriodicallySpawn(30, 1, 0, Mathf.CeilToInt(Mathf.Sqrt(Difficulty)));
+            PatrolSpawner.PeriodicallySpawn(60, 3, 0, Difficulty * 3);
+            yield return new WaitForSeconds(60);
+            Difficulty = 1 + (int)(GameClock % 60);
         }
-        State = GameState.Finale;
-        SPAWN(typeof(Devil), typeof(Revanent), centerTile.transform.position);
     }
   
 
@@ -148,22 +141,28 @@ public class Game_Arena : Game
         PatrolSpawner = gameObject.AddComponent<Spawner>();
         PatrolSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skully));
         PatrolSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Biter));
-        PatrolSpawner.transform.position = centerTile.transform.position + Vector3.up;
+        PatrolSpawner.transform.position = getRandomPositionInRandomTileInPlay();
+        PatrolSpawner.JustSpawned.AddListener(x => PatrolSpawner.transform.position = getRandomPositionInRandomTileInPlay());
 
         MobSpawner = gameObject.AddComponent<Spawner>();
         MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skelly));
         MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Goon));
-        MobSpawner.transform.position = centerTile.transform.position + Vector3.up;
+        MobSpawner.JustSpawned.AddListener(x => PatrolSpawner.transform.position = getRandomPositionInRandomTileInPlay());
 
         EliteSpawner = gameObject.AddComponent<Spawner>();
         EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Nephalim));
         EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Bully));
-        EliteSpawner.transform.position = centerTile.transform.position + Vector3.up;
+        EliteSpawner.JustSpawned.AddListener(x => PatrolSpawner.transform.position = getRandomPositionInRandomTileInPlay());
 
         BossSpawner = gameObject.AddComponent<Spawner>();
         BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Wraith));
         BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Revanent));
-        BossSpawner.transform.position = centerTile.transform.position + Vector3.up;
+        BossSpawner.transform.position = getRandomPositionInRandomTileInPlay();
     }
 
+    private Vector3 getRandomPositionInRandomTileInPlay()
+    {
+        Hextile randomTile = AllTilesInPlay[UnityEngine.Random.Range(0, AllTilesInPlay.Count)];
+        return RAND_POS_IN_TILE(randomTile);
+    }
 }
