@@ -123,6 +123,7 @@ public class Entity : MonoBehaviour
     public GameObject Location;
     public GameObject head;
 
+    public bool FinalDashEnabled = false;
     public bool FinalDash = false;
     //public float Tempo { get; private set; }
     //public float TempoTargetCenter { get; private set; } = 0.90f;
@@ -439,7 +440,7 @@ public class Entity : MonoBehaviour
     {
         if (A && B)
         {
-            return Mathf.Pow(A.Strength / B.Strength, -3);
+            return Mathf.Pow(A.Strength / B.Strength, 1/3);
         }
         else
         {
@@ -468,7 +469,7 @@ public class Entity : MonoBehaviour
             bone.transform.position = newPosition;
             bone.layer = Game.layerItem;
 
-            bone.GetComponent<Rigidbody>().velocity = entity.body.velocity;
+            bone.GetComponent<Rigidbody>().velocity = entity.body.velocity.normalized * Mathf.Pow(entity.body.velocity.magnitude, 0.75f);
             if (entity.Shoved)
             {
                 Vector3 direction = entity.Foe ? entity.Foe.transform.position - entity.transform.position : new Vector3(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f);
@@ -684,16 +685,17 @@ public class Entity : MonoBehaviour
                 ShoveVector *= 0.75f;
                 foe.Shove(ShoveVector);
                 foe.EventCrashed.Invoke();
-                float damage = Mathf.Sqrt(Strength) * impactRatio;
+                float damage = CRASH_DAMAGE * impactRatio;
                 if (foe.requiemPlayer ? false : !foe.Foe)
                 {
                     foe.Vitality = 0;
                 }
-                else if(FinalDash)
+                else
                 {
                     if(foe.Posture == PostureStrength.Weak)
                     {
                         foe.Damage(damage);
+                        foe.Stagger(Mathf.Sqrt(damage / Strength));
                     }
                     foe.alterPoise(-damage);   
                 }
@@ -769,7 +771,7 @@ public class Entity : MonoBehaviour
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
-                if(DashPower >= 1 )
+                if(DashPower >= 1 && FinalDashEnabled)
                 {
                     overChargeTimer += increment / FINAL_DASH_RATIO;     
                     if(overChargeTimer > DASH_CHARGE_TIME * FINAL_DASH_RATIO)
@@ -829,20 +831,16 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (myWeapon.TrueStrike) 
+        if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
             if (theirWeapon.Wielder)
             {
-                theirWeapon.Wielder.Stagger(2 * myWeapon.Heft / theirWeapon.Wielder.Strength);
+                theirWeapon.Wielder.Stagger(Mathf.Sqrt(myWeapon.Heft / theirWeapon.Wielder.Strength));
             }
-        }
-        else if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-        {
-
         }
         else if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
-            if (/*Posture == PostureStrength.Weak ||*/ theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+            if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
             {
                 Stagger((theirWeapon.Heft / Strength));
             }
@@ -866,7 +864,7 @@ public class Entity : MonoBehaviour
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            Stagger(1.5f * theirWeapon.Heft / Strength);
+            Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
             alterPoise(-theirWeapon.Heft);
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
@@ -901,7 +899,7 @@ public class Entity : MonoBehaviour
             }
             else
             {
-                Stagger(1.5f * (myWeapon.Heft / Strength));
+                Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
             }
             alterPoise(-myWeapon.Heft);
         }
@@ -915,7 +913,7 @@ public class Entity : MonoBehaviour
         foe.alterPoise(-poiseDamage);
         if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack || foe.Posture == PostureStrength.Weak)
         {
-            foe.Stagger(1.5f * poiseDamage / Strength);
+            foe.Stagger(Mathf.Sqrt(poiseDamage / Strength));
         }
         if (vitalityDamage > 0) 
         {

@@ -7,11 +7,9 @@ using UnityEngine.UIElements;
 
 public class Idol : Wieldable
 {
-
-    public bool mobMode = false;
     public static Idol INSTANCE;
 
-    public _Flames spiritFlame;
+    public _Flames flames;
 
     public float pitchScalar = 1.0f;
     public float NoiseImpulse = 0.015f;
@@ -63,7 +61,7 @@ public class Idol : Wieldable
         "Show them no mercy.",
     };
 
-    private Entity mobContainer;
+    private Entity mobEntity;
 
     protected override void Awake()
     {
@@ -81,9 +79,9 @@ public class Idol : Wieldable
         INSTANCE = this;
         equipType = EquipType.Burdensome;
         pitchScalar = 0.6f;
-        spiritFlame = GetComponentInChildren<_Flames>();
-        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Soulless);
-        spiritFlame.boundObject = gameObject;
+        flames = GetComponentInChildren<_Flames>();
+        flames.FlameStyle(_Flames.FlameStyles.Soulless);
+        flames.boundObject = gameObject;
         StartCoroutine(banter());
         Body.mass = 3f;
         PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
@@ -92,17 +90,11 @@ public class Idol : Wieldable
     protected override void Update()
     {
         base.Update();
-        if (mobMode)
+        if (mobEntity)
         {
-            mobMode = false;
-            BecomeMob();
+            flames.FlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless);
         }
-
-        if (MountTarget && (Player.INSTANCE ? Player.INSTANCE.HostEntity : false))
-        {
-            transform.LookAt(Player.INSTANCE.HostEntity.head.transform);
-        }
-        if (Wielder ? Wielder.requiemPlayer : false)
+        else if (Wielder ? Wielder.requiemPlayer : false)
         {
             
         }
@@ -136,35 +128,37 @@ public class Idol : Wieldable
 
     public void BecomeMob()
     {
+        DropItem();
         togglePhysicsBox(false);
         Body.isKinematic = true;
         name = "Head";
 
         GameObject Mob = new GameObject("Nemesis");
         Mob.transform.position = transform.position;
-        mobContainer = Mob.AddComponent<IdolSkully>();
+        mobEntity = Mob.AddComponent<IdolSkully>();
         Mob.AddComponent<Nemesis>();
 
-        GameObject model = mobContainer.model = new GameObject("Model");
-        model.transform.SetParent(mobContainer.transform, true);
+        GameObject model = mobEntity.model = new GameObject("Model");
+        model.transform.SetParent(mobEntity.transform, true);
         model.transform.localPosition = Vector3.zero;
         model.transform.localEulerAngles = Vector3.zero;
-        mobContainer.head = gameObject; 
+        mobEntity.head = gameObject; 
 
         transform.SetParent(model.transform, true);
         transform.localPosition = Vector3.zero;
         transform.localEulerAngles = Vector3.zero;
         transform.localScale /= Entity.Scale;
 
-        mobContainer.EventVanquished.AddListener(BecomeItem);
+        mobEntity.EventVanquished.AddListener(BecomeItem);
+        mobEntity.FinalDashEnabled = true;
     }
 
     public void BecomeItem()
     {
-        mobContainer.EventVanquished.RemoveListener(BecomeItem);
+        mobEntity.EventVanquished.RemoveListener(BecomeItem);
         togglePhysicsBox(true);
         Body.isKinematic = false;
-        StartCoroutine(reviveMob(10));
+        StartCoroutine(reviveMob(15));
     }
 
 
@@ -184,10 +178,10 @@ public class Idol : Wieldable
     private IEnumerator banter()
     {
         yield return new WaitUntil(() => Player.INSTANCE);
-        spiritFlame.emissionModule.enabled = false;
+        flames.emissionModule.enabled = false;
         float timeOfLastBlurb = 0;
         yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
-        spiritFlame.emissionModule.enabled = true;
+        flames.emissionModule.enabled = true;
         timeOfLastBlurb = SayShit(greetings);
         yield return new WaitUntil(() => (Time.time - timeOfLastBlurb) > 30 || Wielder == Player.INSTANCE.HostEntity);
         while (true)

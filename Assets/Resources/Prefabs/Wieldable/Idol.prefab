@@ -4899,7 +4899,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   particleLight: {fileID: 0}
   PowerLevel: 100
-  FlameStyle: 3
+  FlamePresentationStyle: 3
   boundObject: {fileID: 0}
 --- !u!1 &7299579221141989809
 GameObject:
@@ -4933,7 +4933,7 @@ Transform:
   m_GameObject: {fileID: 7299579221141989809}
   m_LocalRotation: {x: -0.00000045430883, y: 0.56641304, z: 0.00000086139323, w: -0.82412153}
   m_LocalPosition: {x: 1.330698, y: 0.36562482, z: 1.9067068}
-  m_LocalScale: {x: 0.18, y: 0.18000022, z: 0.24000011}
+  m_LocalScale: {x: 0.2, y: 0.20000023, z: 0.26666677}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4804424416607799038}
@@ -5065,14 +5065,14 @@ MonoBehaviour:
   ImpalingSomething: 0
   Heft: 25
   Idling: 1
-  Rebuked: 0
+  Recoiling: 0
   Wielder: {fileID: 0}
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
   PrimaryTrigger: 0
-  Secondary: 0
-  Tertiary: 0
+  SecondaryTrigger: 0
+  TertiaryTrigger: 0
   ThrowTrigger: 0
   Anim: {fileID: 0}
   Body: {fileID: 0}
@@ -5084,9 +5084,9 @@ MonoBehaviour:
   Telecommuting: 0
   Thrown: 0
   equipType: -1
+  flames: {fileID: 0}
   pitchScalar: 1
   NoiseImpulse: 0.015
-  spiritFlame: {fileID: 0}
 --- !u!65 &7976157581576396476
 BoxCollider:
   m_ObjectHideFlags: 0

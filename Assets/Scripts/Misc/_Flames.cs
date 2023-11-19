@@ -71,11 +71,11 @@ public class _Flames : MonoBehaviour
                 emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.ActionAnimated == Weapon.ActionAnimation.Parrying;
                 if (boundWeapon.TrueStrike)
                 {
-                    SetFlamePresentation(FlameStyles.Inferno);
+                    FlameStyle(FlameStyles.Inferno);
                 }
                 else if (boundWeapon.ActionAnimated == Weapon.ActionAnimation.Parrying)
                 {
-                    SetFlamePresentation(FlameStyles.Inferno);
+                    FlameStyle(FlameStyles.Inferno);
                 }
             }
             else if (boundEntity)
@@ -94,7 +94,7 @@ public class _Flames : MonoBehaviour
     }
 
     /***** PUBLIC *****/
-    public void SetFlamePresentation(FlameStyles preset)
+    public void FlameStyle(FlameStyles preset)
     {
         if(preset == FlamePresentationStyle) { return; }
         ParticleSystem.MinMaxGradient flameGradient = colorModule.color;
@@ -128,7 +128,7 @@ public class _Flames : MonoBehaviour
         if (!bindingObject) { return; }
         boundObject = bindingObject;
         buildGradients();
-        SetFlamePresentation(FlamePresentationStyle);
+        FlameStyle(FlamePresentationStyle);
         transform.SetParent(boundObject.transform, false);
         Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
         Wieldable boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
@@ -211,6 +211,6 @@ public class _Flames : MonoBehaviour
             );
             gradients.Add(gradientThree);
         }
-        SetFlamePresentation(FlamePresentationStyle);
+        FlameStyle(FlamePresentationStyle);
     }
 }

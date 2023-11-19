@@ -269,23 +269,6 @@ public class Wieldable : MonoBehaviour
         }
         Wielder = newOwner;
         Wielder.EventPickedUpWieldable.Invoke(this);
-        EventPickedUp.Invoke(this);
-        if (equipType == EquipType.Burdensome)
-        {
-            if (newOwner.wieldMode == Entity.WieldMode.Burdened)
-            {
-                yield break;
-            }
-            else
-            {
-                newOwner.EventAttemptInteraction.RemoveListener(PickupItem);
-            }
-        }
-        else
-        {
-            newOwner.EventAttemptPickup.RemoveListener(PickupItem);
-
-        }
         if (!Wielder.leftStorage && !Wielder.rightStorage && !Wielder.backStorage)
         {
             Wielder.wieldMode = Entity.WieldMode.OneHanders;
@@ -323,7 +306,6 @@ public class Wieldable : MonoBehaviour
         togglePhysicsBox(false);
         Allegiance = Wielder.Allegiance;
         transform.SetParent(Wielder.transform);
-        setHighlightColor(Color.gray);
         Anim.enabled = true;
         if (gameObject.activeSelf)
         {
@@ -334,6 +316,18 @@ public class Wieldable : MonoBehaviour
         {
             Wielder.rightStorage = null;
         }
+        if (equipType == EquipType.Burdensome)
+        {
+            if (newOwner.wieldMode != Entity.WieldMode.Burdened)
+            {
+                newOwner.EventAttemptInteraction.RemoveListener(PickupItem);
+            }
+        }
+        else
+        {
+            newOwner.EventAttemptPickup.RemoveListener(PickupItem);
+        }
+        EventPickedUp.Invoke(this);
         yield break;
     }
 
@@ -348,7 +342,6 @@ public class Wieldable : MonoBehaviour
             Vector3 direction = Wielder.LookDirection;
             direction.y = 0;
             DropItem(true, direction, magnitude);
-            //setHighlightColor(Color.red);
             Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
             yield return new WaitWhile(() =>!Thrown);
             yield return new WaitUntil(() => Wielder);

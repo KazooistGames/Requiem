@@ -272,6 +272,7 @@ public class Player : MonoBehaviour
         HostEntity = new GameObject().AddComponent<Struggler>();
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;
+        HostEntity.FinalDashEnabled = true;
         StartCoroutine(FadeCurtains());
     }
 
@@ -282,7 +283,7 @@ public class Player : MonoBehaviour
         HUD.Curtains.enabled = true;
         HUD.Curtains.gameObject.SetActive(true);
         float fadeTimer = 0f;
-        float fadePeriod = 3f;
+        float fadePeriod = 5f;
         yield return new WaitUntil(() => Hextile.LastGeneratedTile);
         while (fadeTimer < fadePeriod)
         {

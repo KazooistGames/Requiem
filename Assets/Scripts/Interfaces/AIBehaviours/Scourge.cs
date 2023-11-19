@@ -114,7 +114,7 @@ public class Scourge : AIBehaviour
         }
         else
         {
-            footFlame.SetFlamePresentation(flameLevel);
+            footFlame.FlameStyle(flameLevel);
         }
 
         if (entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : false)
@@ -137,7 +137,7 @@ public class Scourge : AIBehaviour
         else
         {
             mainHandFlame.transform.SetParent(transform);
-            mainHandFlame.SetFlamePresentation(0);
+            mainHandFlame.FlameStyle(0);
         }
 
         if (entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : false)
@@ -161,7 +161,7 @@ public class Scourge : AIBehaviour
         else
         {
             offHandFlame.transform.SetParent(transform);
-            offHandFlame.SetFlamePresentation(0);
+            offHandFlame.FlameStyle(0);
         }
     }
 

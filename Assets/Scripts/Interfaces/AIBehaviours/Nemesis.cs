@@ -42,12 +42,11 @@ public class Nemesis : AIBehaviour
             case AIState.seek:
                 if (entity.Foe)
                 {
-                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.6f;
                     StateTransition(AIState.aggro);
                 }
                 else
                 {
-                    meanderPauseFrequency = 0.75f;
+
                 }
                 break;
             case AIState.aggro:
@@ -57,11 +56,19 @@ public class Nemesis : AIBehaviour
                 }
                 else
                 {
+                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     if (entity.Foe)
                     {
                         Vector3 disposition = entity.Foe.transform.position - transform.position;
                         dashingInitiate = (disposition.magnitude < pursueStoppingDistance || entity.DashCharging) && !entity.Shoved;
-
+                        if (entity.DashCharging)
+                        {
+                            dashingCooldownPeriod = 1;
+                        }
+                        else if (entity.FinalDash)
+                        {
+                            dashingCooldownPeriod = 5;
+                        }
                     }
                 }
                 break;

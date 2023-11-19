@@ -141,7 +141,9 @@ public abstract class Weapon : Wieldable
         flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
+        flames.gameObject.SetActive(false);
         gameObject.AddComponent<WeaponRangeFinder>();
+        EventPickedUp.AddListener(x => flames.gameObject.SetActive(x.Wielder.requiemPlayer));
     }
 
     protected override void Update()

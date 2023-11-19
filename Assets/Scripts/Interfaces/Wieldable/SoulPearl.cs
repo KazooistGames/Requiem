@@ -26,7 +26,7 @@ public class SoulPearl : Wieldable
         spiritFlame.shapeModule.shapeType = ParticleSystemShapeType.Circle;
         spiritFlame.shapeModule.radius = 0.001f;
         spiritFlame.shapeModule.scale = Vector3.one * 0.001f;
-        spiritFlame.SetFlamePresentation(_Flames.FlameStyles.Soulless);
+        spiritFlame.FlameStyle(_Flames.FlameStyles.Soulless);
         spiritFlame.particleLight.range /= 2;
         spiritFlame.particleLight.intensity /= 2;
     }
