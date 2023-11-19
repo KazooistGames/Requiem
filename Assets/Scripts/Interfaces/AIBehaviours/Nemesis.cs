@@ -2,23 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Biter : Character
+public class Nemesis : AIBehaviour
 {
     public float excitement = 0f;
 
     protected override void Awake()
     {
         base.Awake();
-        entity = GetComponent<Warrior>() ? GetComponent<Warrior>() : gameObject.AddComponent<Warrior>();
+        //entity = GetComponent<Entity>() ? GetComponent<Entity>() : gameObject.AddComponent<Entity>();
 
     }
     protected override void Start()
     {
         base.Start();
-        Intelligence = 0.5f;
-        ReflexRate = 0.20f;
+        Intelligence = 1f;
+        ReflexRate = 0.05f;
         tangoStrafeEnabled = false;
-        dashingCooldownPeriod = 2.0f;
+        dashingCooldownPeriod = 3.0f;
         dashingChargePeriod = 1.0f;
         dashingPower = 0.5f;
         grabDPS = 10f;
@@ -42,7 +42,7 @@ public class Biter : Character
             case AIState.seek:
                 if (entity.Foe)
                 {
-                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.6f;
                     StateTransition(AIState.aggro);
                 }
                 else

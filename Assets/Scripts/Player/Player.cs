@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 public class Player : MonoBehaviour
 {
+    public Weapon MyWeapon;
     public static Player INSTANCE { get; private set; }
     public int BonesCollected = 0;
 
@@ -18,8 +19,8 @@ public class Player : MonoBehaviour
     public Mouse CurrentMouse;
 
     public bool Dead = false;
-    public Warrior.Loyalty Faction = Warrior.Loyalty.neutral;
-    public Warrior HostEntity;
+    public Entity.Loyalty Faction = Entity.Loyalty.neutral;
+    public Entity HostEntity;
 
     public Vector3 Direction = Vector3.zero;
 
@@ -51,6 +52,10 @@ public class Player : MonoBehaviour
     void Update()
     {
         //HUD.setIndicatorOnHUD("bones", "Bones: " + BonesCollected.ToString());
+        if (HostEntity ? HostEntity.MainHand : false)
+        {
+            MyWeapon = HostEntity.MainHand.GetComponent<Weapon>();
+        }
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {
             Game.INSTANCE.Paused = !Game.INSTANCE.Paused;
@@ -109,7 +114,7 @@ public class Player : MonoBehaviour
         Vector2 hostFlat = new Vector2(HostEntity.LookDirection.x, HostEntity.LookDirection.z).normalized;
         float angleDifference = Vector2.SignedAngle(cameraFlat, hostFlat);
         float spinSpeed = Mathf.Abs(angleDifference) >= differenceCap ? 60 : 30;
-        float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Warrior.DefaultTurnSpeed, 1.0f, 0.25f);
+        float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Entity.DefaultTurnSpeed, 1.0f, 0.25f);
         float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
         bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
         Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
@@ -117,14 +122,14 @@ public class Player : MonoBehaviour
         if (differenceCap == 0)
         {
 
-            HostEntity.LookDirection = Character.angleToDirection(Character.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
+            HostEntity.LookDirection = AIBehaviour.angleToDirection(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
             Cam.HorizonatalOffsetAngle += angleDifference / 5;
         }
         else
         {
             if (Mathf.Abs(angleDifference) < differenceCap || aligning)
             {
-                HostEntity.LookDirection = Character.angleToDirection(Character.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
+                HostEntity.LookDirection = AIBehaviour.angleToDirection(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
             }
             if (Mathf.Abs(angleDifference) >= differenceCap && !aligning)
             {
@@ -142,7 +147,7 @@ public class Player : MonoBehaviour
         rawInput = new Vector3();
         rawInput.z = (CurrentKeyboard.wKey.isPressed ? 1 : 0) + (CurrentKeyboard.sKey.isPressed ? -1 : 0);
         rawInput.x = (CurrentKeyboard.aKey.isPressed ? -1 : 0) + (CurrentKeyboard.dKey.isPressed ? 1 : 0);
-        Direction = rawInput == Vector3.zero ? Vector3.zero : Character.angleToDirection(Character.getAngle(rawInput) + 90 + Cam.HorizonatalOffsetAngle);
+        Direction = rawInput == Vector3.zero ? Vector3.zero : AIBehaviour.angleToDirection(AIBehaviour.getAngle(rawInput) + 90 + Cam.HorizonatalOffsetAngle);
         Direction = Direction.normalized;
         if (Direction != lastDirection)
         {
@@ -168,38 +173,38 @@ public class Player : MonoBehaviour
             bool released = CurrentKeyboard.tabKey.wasReleasedThisFrame;
             switch (HostEntity.wieldMode)
             {
-                case Warrior.WieldMode.EmptyHanded:
+                case Entity.WieldMode.EmptyHanded:
                     if (released && weaponSheathTimer < weaponSheathPeriod)
                     {
                         if (HostEntity.leftStorage || HostEntity.rightStorage)
                         {
-                            HostEntity.wieldMode = Warrior.WieldMode.OneHanders;
+                            HostEntity.wieldMode = Entity.WieldMode.OneHanders;
                         }
                         else if (HostEntity.backStorage)
                         {
-                            HostEntity.wieldMode = Warrior.WieldMode.TwoHanders;
+                            HostEntity.wieldMode = Entity.WieldMode.TwoHanders;
                         }
                     }
 
                     break;
-                case Warrior.WieldMode.OneHanders:
+                case Entity.WieldMode.OneHanders:
                     if (HostEntity.backStorage && released)
                     {
-                        HostEntity.wieldMode = Warrior.WieldMode.TwoHanders;
+                        HostEntity.wieldMode = Entity.WieldMode.TwoHanders;
                     }
                     else if (weaponSheathTimer >= weaponSheathPeriod)
                     {
-                        HostEntity.wieldMode = Warrior.WieldMode.EmptyHanded;
+                        HostEntity.wieldMode = Entity.WieldMode.EmptyHanded;
                     }
                     break;
-                case Warrior.WieldMode.TwoHanders:
+                case Entity.WieldMode.TwoHanders:
                     if ((HostEntity.leftStorage || HostEntity.rightStorage) && released)
                     {
-                        HostEntity.wieldMode = Warrior.WieldMode.OneHanders;
+                        HostEntity.wieldMode = Entity.WieldMode.OneHanders;
                     }
                     else if (weaponSheathTimer >= weaponSheathPeriod)
                     {
-                        HostEntity.wieldMode = Warrior.WieldMode.EmptyHanded;
+                        HostEntity.wieldMode = Entity.WieldMode.EmptyHanded;
                     }
                     break;
             }
@@ -248,7 +253,7 @@ public class Player : MonoBehaviour
     {
         INSTANCE = this;   
         interactBox = GetComponent<SphereCollider>() ? GetComponent<SphereCollider>() : gameObject.AddComponent<SphereCollider>();
-        interactBox.radius = 0.25f;
+        interactBox.radius = 0.3f;
         interactBox.isTrigger = true;
         moon = new GameObject("moon").AddComponent<Light>();
         moon.transform.SetParent(transform);
@@ -263,7 +268,7 @@ public class Player : MonoBehaviour
         CurrentMouse = Mouse.current;
         CurrentKeyboard = Keyboard.current;
         listener = GetComponent<AudioListener>() ? GetComponent<AudioListener>() : gameObject.AddComponent<AudioListener>();
-        Faction = Warrior.Loyalty.hostile;
+        Faction = Entity.Loyalty.hostile;
         HostEntity = new GameObject().AddComponent<Struggler>();
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;
@@ -273,6 +278,7 @@ public class Player : MonoBehaviour
     private IEnumerator FadeCurtains()
     {
         yield return null;
+        HostEntity.flames.gameObject.SetActive(true);
         HUD.Curtains.enabled = true;
         HUD.Curtains.gameObject.SetActive(true);
         float fadeTimer = 0f;

@@ -4,25 +4,21 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class Skully : Warrior
+public class IdolSkully : Skully
 {
     protected override void Awake()
     {
         base.Awake();
-        Strength = 25f;
-        berthScalar = 0.80f;
-        Haste = 1.5f;
-        BaseAcceleration = 4f;
+        Strength = 200f;
+        Haste = 1.0f;
+        BaseAcceleration = 6f;
+        scaleScalar = 1.0f;
     }
 
     protected override void Start()
     {
         base.Start();
-        createSkeleton();
-        anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animation/entities/skully/skullyAnimation");
-        gameObject.name = "Skully";
-        hurtBox.height = 0;
-        hurtBox.center = Vector3.up * 0.2f;
+        gameObject.name = "IdolSkully";
     }
 
     protected override void Update()
@@ -47,18 +43,19 @@ public class Skully : Warrior
         _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
     }
 
-    private void createSkeleton()
-    {
-        model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/skullyBody"));
-        model.gameObject.name = "Model";
-        model.transform.SetParent(transform, false);
-        head = head ? head : model.GetComponentInChildren<MeshFilter>().gameObject;
-        head.name = "Head";
-        head.transform.localPosition = Vector3.zero;
-        head.GetComponent<MeshRenderer>().enabled = true;
-        head.layer = gameObject.layer;
-    }
 
+    protected void Mutate()
+    {
+        for(int i = 0; i < 2; i++)
+        {
+            Entity entity;
+            entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
+            entity.Poise = entity.Strength;
+            entity.Shove(AIBehaviour.RandomDirection() * 1);
+        }
+        Destroy(head);
+        Die();
+    }
     protected override void Die()
     {
         Debone(head);

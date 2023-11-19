@@ -18,6 +18,7 @@ public class Bone : MonoBehaviour
 
     private bool allowCollect = false;
 
+    private static float FINAL_SCALE_AFTER_COLLECTION = 0.5f;
 
     protected void Awake()
     {
@@ -94,6 +95,7 @@ public class Bone : MonoBehaviour
         Telecommuting = true;
         float timer = 0.0f;
         Vector3 origin = transform.position;
+        Vector3 originalScale = transform.localScale;
         bool previousPhysicsBoxState = PhysicsBoxes.Count > 0 ? PhysicsBoxes[0].enabled : false;
         bool previousGravity = Body.useGravity;
         Body.useGravity = false;
@@ -130,6 +132,7 @@ public class Bone : MonoBehaviour
                 float scale = (y) / 1.33f;
                 scale = Mathf.Clamp(scale, 0f, 1f);
                 transform.position = Vector3.Lerp(origin, target.transform.position, scale);
+                transform.localScale = Vector3.Lerp(originalScale, originalScale * FINAL_SCALE_AFTER_COLLECTION, scale);
                 if (scale == 1)
                 {
                     callback(this);

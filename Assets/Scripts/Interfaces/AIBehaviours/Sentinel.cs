@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sentinel : Character
+public class Sentinel : AIBehaviour
 {
     protected override void Awake()
     {
@@ -21,7 +21,7 @@ public class Sentinel : Character
         dashingCooldownPeriod = 1.0f;
         itemManagementSeekItems = true;
         dashingPower = 0.0f;
-        itemManagementPreferredType = Warrior.WieldMode.OneHanders;
+        itemManagementPreferredType = Entity.WieldMode.OneHanders;
         new GameObject().AddComponent<Greataxe>().PickupItem(entity);
         //entity.modPosture["Sentinel" + GetHashCode().ToString()] = Entity.Posture.Strong;
     }

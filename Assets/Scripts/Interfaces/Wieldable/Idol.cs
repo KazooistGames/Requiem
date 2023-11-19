@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class Idol : Wieldable
 {
+
+    public bool mobMode = false;
     public static Idol INSTANCE;
 
     public _Flames spiritFlame;
@@ -60,6 +63,8 @@ public class Idol : Wieldable
         "Show them no mercy.",
     };
 
+    private Entity mobContainer;
+
     protected override void Awake()
     {
         base.Awake();
@@ -87,6 +92,11 @@ public class Idol : Wieldable
     protected override void Update()
     {
         base.Update();
+        if (mobMode)
+        {
+            mobMode = false;
+            BecomeMob();
+        }
 
         if (MountTarget && (Player.INSTANCE ? Player.INSTANCE.HostEntity : false))
         {
@@ -102,8 +112,17 @@ public class Idol : Wieldable
         }
     }
 
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        base.OnCollisionEnter(collision);
 
-    public float sayShit(List<string> messages)
+        _SoundService.PlayAmbientSound(Game.boneSounds[Random.Range(0, Game.boneSounds.Length)], transform.position, (0.5f + 0.5f * Random.value) * pitchScalar, 0.1f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+    }
+
+
+    /***** PUBLIC *****/
+
+    public float SayShit(List<string> messages)
     {
         if (currentBlurb)
         {
@@ -115,6 +134,53 @@ public class Idol : Wieldable
         return Time.time;
     }
 
+    public void BecomeMob()
+    {
+        togglePhysicsBox(false);
+        Body.isKinematic = true;
+        name = "Head";
+
+        GameObject Mob = new GameObject("Nemesis");
+        Mob.transform.position = transform.position;
+        mobContainer = Mob.AddComponent<IdolSkully>();
+        Mob.AddComponent<Nemesis>();
+
+        GameObject model = mobContainer.model = new GameObject("Model");
+        model.transform.SetParent(mobContainer.transform, true);
+        model.transform.localPosition = Vector3.zero;
+        model.transform.localEulerAngles = Vector3.zero;
+        mobContainer.head = gameObject; 
+
+        transform.SetParent(model.transform, true);
+        transform.localPosition = Vector3.zero;
+        transform.localEulerAngles = Vector3.zero;
+        transform.localScale /= Entity.Scale;
+
+        mobContainer.EventVanquished.AddListener(BecomeItem);
+    }
+
+    public void BecomeItem()
+    {
+        mobContainer.EventVanquished.RemoveListener(BecomeItem);
+        togglePhysicsBox(true);
+        Body.isKinematic = false;
+        StartCoroutine(reviveMob(10));
+    }
+
+
+    /***** PROTECTED *****/
+
+
+
+
+    /***** PRIVATE *****/
+    private IEnumerator reviveMob(float periodSeconds)
+    {
+        //float timer = 0;
+        yield return new WaitForSeconds(periodSeconds);
+        BecomeMob();
+    }
+
     private IEnumerator banter()
     {
         yield return new WaitUntil(() => Player.INSTANCE);
@@ -122,26 +188,21 @@ public class Idol : Wieldable
         float timeOfLastBlurb = 0;
         yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
         spiritFlame.emissionModule.enabled = true;
-        timeOfLastBlurb = sayShit(greetings);
+        timeOfLastBlurb = SayShit(greetings);
         yield return new WaitUntil(() => (Time.time - timeOfLastBlurb) > 30 || Wielder == Player.INSTANCE.HostEntity);
         while (true)
         {
             yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
             if (Wielder == Player.INSTANCE.HostEntity)
             {
-                timeOfLastBlurb = sayShit(conversation);
+                timeOfLastBlurb = SayShit(conversation);
                 yield return new WaitWhile(() => Wielder == Player.INSTANCE.HostEntity || Time.time - timeOfLastBlurb >= 30);
             }       
             yield return null;
         }
     }
 
-    protected override void OnCollisionEnter(Collision collision)
-    {
-        base.OnCollisionEnter(collision);
 
-        _SoundService.PlayAmbientSound(Game.boneSounds[Random.Range(0, Game.boneSounds.Length)], transform.position, (0.5f + 0.5f * Random.value) * pitchScalar, 0.1f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
-    }
 
 
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Assassin : Character
+public class Assassin : AIBehaviour
 {
 
     protected override void Awake()

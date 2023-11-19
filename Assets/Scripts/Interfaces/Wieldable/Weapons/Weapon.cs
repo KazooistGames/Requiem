@@ -9,7 +9,7 @@ public abstract class Weapon : Wieldable
 {
     public static UnityEvent<Weapon> Weapon_Hit = new UnityEvent<Weapon> { };
 
-    public UnityEvent<Weapon, Warrior> Hitting = new UnityEvent<Weapon, Warrior>();
+    public UnityEvent<Weapon, Entity> Hitting = new UnityEvent<Weapon, Entity>();
     public UnityEvent<Weapon, Weapon> Clashing = new UnityEvent<Weapon, Weapon>();
     public UnityEvent<Weapon, Weapon> Blocking = new UnityEvent<Weapon, Weapon>();
     public UnityEvent<Weapon, Weapon> Parrying = new UnityEvent<Weapon, Weapon>();
@@ -55,7 +55,9 @@ public abstract class Weapon : Wieldable
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
 
     public bool TrueStrike = false;
-    public float Tempo { get; private set; }
+    public float Tempo;
+    private float tempoCharge = 0;
+    public float TempoChargeRate = 1;
     private bool tempoChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.90f;
     public float TempoTargetWidth { get; private set; } = 0.2f;
@@ -104,7 +106,7 @@ public abstract class Weapon : Wieldable
     protected override void Start()
     {
         base.Start();
-        transform.localScale *= Warrior.Scale;
+        transform.localScale *= Entity.Scale;
         Anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animation/items/" + gameObject.name + "/" + gameObject.name +"Controller");
         Body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         HitBox.isTrigger = true;
@@ -140,7 +142,6 @@ public abstract class Weapon : Wieldable
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         gameObject.AddComponent<WeaponRangeFinder>();
-        //StartCoroutine(routineTempo());
     }
 
     protected override void Update()
@@ -168,7 +169,6 @@ public abstract class Weapon : Wieldable
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
-                    //setHighlightColor(Color.gray);
                 }
                 else if (ActionAnimated == ActionAnimation.Idle)
                 {
@@ -177,13 +177,14 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = false;
                     TrueStrike = false;
                     modifyWielderSpeed(0);
-                    //setHighlightColor(Color.gray);
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
                 {
+                    TrueStrike = false;
                     if (TertiaryTrigger && tempoChargeONS)
                     {
-                        Tempo = Mathf.Pow(currentAnimation.normalizedTime, 3);
+                        tempoCharge += Time.deltaTime * TempoChargeRate;
+                        Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, 3), 0, 1);
                     }
                     else
                     {
@@ -191,24 +192,22 @@ public abstract class Weapon : Wieldable
                     }
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
-                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.QuickWindup)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
-                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.QuickCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(0);
-                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.StrongAttack || ActionAnimated == ActionAnimation.QuickAttack)
                 {
                     if (attackONS)
                     {
+                        tempoCharge = 0;
                         tempoChargeONS = true;
                         if (TertiaryTrigger)
                         {
@@ -217,6 +216,10 @@ public abstract class Weapon : Wieldable
                         else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
                         {
                             TrueStrike = true;
+                        }
+                        else
+                        {
+                            Tempo = 0;
                         }
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
@@ -227,7 +230,6 @@ public abstract class Weapon : Wieldable
                         playSwing();
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
-                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.Recovering)
                 {
@@ -241,12 +243,10 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = !nextAnimation.IsTag("Rebuked");
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                     modifyWielderSpeed(heftSlowModifier / 2);
-                    //setHighlightColor(new Color(0.1f, 0.1f, 1));
                 }
                 else if (ActionAnimated == ActionAnimation.Aiming)
                 {
                     modifyWielderSpeed(heftSlowModifier);
-                    //setHighlightColor(new Color(1, 0.1f, 0.1f));
                 }
                 else if (ActionAnimated == ActionAnimation.Throwing)
                 {
@@ -292,7 +292,7 @@ public abstract class Weapon : Wieldable
         if (Thrown)
         {
             Wieldable item = collision.gameObject.GetComponent<Wieldable>();
-            Warrior foe = collision.gameObject.GetComponent<Warrior>();
+            Entity foe = collision.gameObject.GetComponent<Entity>();
             if (foe ? foe.Allegiance != MostRecentWielder.Allegiance : false)
             {
                 if (RESOLVE_HIT(this, foe))
@@ -323,7 +323,7 @@ public abstract class Weapon : Wieldable
             if (!alreadyHit.Contains(other.gameObject))
             {
 
-                Warrior foe = other.gameObject.GetComponent<Warrior>();
+                Entity foe = other.gameObject.GetComponent<Entity>();
                 Weapon foeWeapon = other.gameObject.GetComponent<Weapon>();
                 bool obstacle = (other.gameObject.layer == Game.layerObstacle || other.gameObject.layer == Game.layerWall);
                 if (foe || foeWeapon || obstacle)
@@ -385,7 +385,7 @@ public abstract class Weapon : Wieldable
 
 
     /**********PROTECTED**************/
-    protected override IEnumerator pickupHandler(Warrior newOwner)
+    protected override IEnumerator pickupHandler(Entity newOwner)
     {
         yield return null;
         playShing();
@@ -432,6 +432,10 @@ public abstract class Weapon : Wieldable
             return;
         }
         GameObject obstruction = testObstructionBetweenEntities(Defender.Wielder, Attacker.MostRecentWielder);
+        if (obstruction ? obstruction != Defender.gameObject : false)
+        {
+            return;
+        }
         if (Attacker.ActionAnimated == ActionAnimation.StrongAttack)
         {
             Attacker.playClang(1.0f);
@@ -439,10 +443,6 @@ public abstract class Weapon : Wieldable
         else
         {
             Attacker.playTink();
-        }
-        if (obstruction ? obstruction != Defender.gameObject : false)
-        {
-            return;
         }
         if (Defender.ActionAnimated == ActionAnimation.Parrying)
         {
@@ -458,7 +458,7 @@ public abstract class Weapon : Wieldable
         }
     }
 
-    private static bool RESOLVE_HIT(Weapon weapon, Warrior foe)
+    private static bool RESOLVE_HIT(Weapon weapon, Entity foe)
     {
         if(foe.Allegiance == weapon.Allegiance) {  return false; }
         GameObject obstruction = testObstructionBetweenEntities(foe, weapon.MostRecentWielder);
@@ -500,7 +500,7 @@ public abstract class Weapon : Wieldable
     private IEnumerator ImpaleRoutine(Collision collision)
     {
         setHighlightColor(Color.black);
-        Warrior foe = collision.gameObject.GetComponent<Warrior>();
+        Entity foe = collision.gameObject.GetComponent<Entity>();
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
         bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.25f : 0.75f) : true);
@@ -535,7 +535,7 @@ public abstract class Weapon : Wieldable
                     foe.EventVanquished.AddListener(impale_release);
                     foe.modSpeed[key] = -(Heft/foe.Strength);
                     foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
-                    yield return new WaitWhile(() => foe ? foe.Posture <= Warrior.PostureStrength.Strong : false);
+                    yield return new WaitWhile(() => foe ? foe.Posture <= Entity.PostureStrength.Strong : false);
                     if (foe)
                     {
                         impale_release();
@@ -565,7 +565,7 @@ public abstract class Weapon : Wieldable
 
     private void impale_release()
     {
-        Warrior foe = impaledObject.GetComponent<Warrior>();
+        Entity foe = impaledObject.GetComponent<Entity>();
         if (foe)
         {
             string key = "impaled" + gameObject.GetHashCode().ToString();
@@ -583,7 +583,7 @@ public abstract class Weapon : Wieldable
     
     private void impale_doupleDipDamage()
     {
-        Warrior foe = impaledObject.GetComponent<Warrior>();
+        Entity foe = impaledObject.GetComponent<Entity>();
         if (foe)
         {
             foe.EventCrashed.RemoveListener(impale_doupleDipDamage);
@@ -595,12 +595,12 @@ public abstract class Weapon : Wieldable
     }
 
 
-    private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Warrior foe, float scalar = 1.0f)
+    private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float scalar = 1.0f)
     {
         if (!foe) { return; }
         Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
         Vector3 disposition = foe.transform.position - origin;
-        Vector3 velocityChange = disposition.normalized * (weapon.Heft / 40f) * Warrior.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        Vector3 velocityChange = disposition.normalized * (weapon.Heft / 40f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
         foe.Shove(velocityChange);
     }
 
@@ -613,19 +613,6 @@ public abstract class Weapon : Wieldable
             {
                 alreadyHit.Add(transform.gameObject);
             }
-
-            //if (entity.leftStorage)
-            //{
-            //    alreadyHit.Add(entity.leftStorage.gameObject);
-            //}
-            //if (entity.rightStorage)
-            //{
-            //    alreadyHit.Add(entity.rightStorage.gameObject);
-            //}
-            //if (entity.backStorage)
-            //{
-            //    alreadyHit.Add(entity.backStorage.gameObject);
-            //}
         }
     }
 
@@ -634,9 +621,9 @@ public abstract class Weapon : Wieldable
         alreadyHit.Add(item.gameObject);
     }
 
-    private static GameObject testObstructionBetweenEntities(Warrior target, Warrior origin)
+    private static GameObject testObstructionBetweenEntities(Entity target, Entity origin)
     {
-        if(target == null) { return null; }
+        if(!target || !origin) { return null; }
         Vector3 disposition = target.transform.position - origin.transform.position;
         disposition.y = 0;
         Vector3 rayStart = origin.transform.position;
@@ -644,7 +631,6 @@ public abstract class Weapon : Wieldable
         RaycastHit hit;
         if (Physics.Raycast(rayStart, disposition.normalized, out hit, disposition.magnitude, (1 << Game.layerWall) + (1 << Game.layerObstacle) + (1 << Game.layerItem), QueryTriggerInteraction.Collide))
         {
-            //if(alreadyHit.Contains(hit.collider.gameObject)) { return null; }
             Wieldable item = hit.collider.GetComponent<Wieldable>();
             bool opposingItem = item ? item.Allegiance != origin.Allegiance : false;
             bool obstacle = !hit.collider.isTrigger && hit.collider.gameObject && hit.collider.gameObject.layer != Game.layerItem;
@@ -693,32 +679,6 @@ public abstract class Weapon : Wieldable
         }
     }
 
-    private IEnumerator routineTempo()
-    {
-        while (true)
-        {
-
-            yield return new WaitUntil(() => Wielder && ActionAnimated == ActionAnimation.StrongWindup);
-            while (TertiaryTrigger && ActionAnimated == ActionAnimation.StrongWindup)
-            {
-                Tempo = Mathf.Pow(currentAnimation.normalizedTime, 2);
-                yield return null;
-            }
-            yield return new WaitUntil(() => ActionAnimated == ActionAnimation.StrongAttack);
-            if (TertiaryTrigger)
-            {
-                Tempo = 0;
-                TrueStrike = false;
-            }
-            else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
-            {
-                TrueStrike = true;
-            }
-            yield return new WaitUntil(() => ActionAnimated == ActionAnimation.Idle && !Thrown);
-            TrueStrike = false;
-        }
-    }
-
     private ActionAnimation getActionFromCurrentAnimationState()
     {
         if (currentAnimation.IsTag("Recoil") || nextAnimation.IsTag("Recoil"))
@@ -734,6 +694,10 @@ public abstract class Weapon : Wieldable
             if (nextAnimation.IsTag("Guard"))
             {
                 return ActionAnimation.Parrying;
+            }
+            else if (nextAnimation.IsTag("Windup"))
+            {
+                return ActionAnimation.StrongWindup;
             }
             else if (nextAnimation.IsTag("QuickCoil"))
             {
@@ -783,6 +747,10 @@ public abstract class Weapon : Wieldable
             if (nextAnimation.IsTag("Guard"))
             {
                 return ActionAnimation.Recovering;
+            }
+            else if (nextAnimation.IsTag("Windup"))
+            {
+                return ActionAnimation.StrongWindup;
             }
             else
             {

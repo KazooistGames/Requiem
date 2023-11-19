@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class _Flames : MonoBehaviour
 {
+    public enum ControlMode
+    {
+        Entity,
+        Item,
+        Manual
+    }
     protected ParticleSystem particles;
     public Light particleLight;
 
@@ -58,7 +64,7 @@ public class _Flames : MonoBehaviour
         if (boundObject)
         {
             //setFlamePreset(FlameStyle);
-            Warrior boundEntity = boundObject.gameObject.GetComponent<Warrior>();
+            Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
             Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
             if (boundWeapon)
             {
@@ -124,7 +130,7 @@ public class _Flames : MonoBehaviour
         buildGradients();
         SetFlamePresentation(FlamePresentationStyle);
         transform.SetParent(boundObject.transform, false);
-        Warrior boundEntity = boundObject.gameObject.GetComponent<Warrior>();
+        Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
         Wieldable boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
         if (boundEntity)
         {

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Skelly : Warrior
+public class Skelly : Entity
 {
     protected MeshFilter[] bodyParts;
     //protected GameObject head;
@@ -73,9 +73,9 @@ public class Skelly : Warrior
         Debone(head);
         Haste *= 1.25f;
         Strength *= 0.75f;
-        if (GetComponent<Character>())
+        if (GetComponent<AIBehaviour>())
         {
-            Destroy(GetComponent<Character>());
+            Destroy(GetComponent<AIBehaviour>());
             gameObject.AddComponent<Assassin>();
         }
     }

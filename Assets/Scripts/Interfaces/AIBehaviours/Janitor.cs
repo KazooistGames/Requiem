@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Janitor : Character
+public class Janitor : AIBehaviour
 {
     public static Janitor INSTANCE;
     public List<Hextile> TaskList = new List<Hextile>();
@@ -18,7 +18,7 @@ public class Janitor : Character
         Destroy(entity.indicator);
         CleanZone = GetComponent<SphereCollider>() ? GetComponent<SphereCollider>() : gameObject.AddComponent<SphereCollider>();
         CleanZone.isTrigger = true;
-        CleanZone.radius = Hextile.Radius / Warrior.Scale;
+        CleanZone.radius = Hextile.Radius / Entity.Scale;
     }
 
 

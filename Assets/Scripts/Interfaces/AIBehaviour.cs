@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections.Specialized;
 
-public class Character : MonoBehaviour
+public class AIBehaviour : MonoBehaviour
 {
     public enum AIState
     {
@@ -28,7 +28,7 @@ public class Character : MonoBehaviour
     public float TotalWeight;
     public float LookAngle = 0;
 
-    protected Warrior entity;
+    protected Entity entity;
     protected Vector3 lastDirection = Vector3.zero;
 
 
@@ -83,7 +83,7 @@ public class Character : MonoBehaviour
         {
             behaviourParams[key] = (false, 0);
         }
-        entity = GetComponent<Warrior>();
+        entity = GetComponent<Entity>();
     }
 
     protected virtual void Start()
@@ -303,8 +303,8 @@ public class Character : MonoBehaviour
             {
                 sensoryAlertedTimer = 0.0f;
             }
-            sensoryBaseRange = (sensoryAlerted ? 7.5f : 5f) * Warrior.Scale;
-            Warrior potentialFoe;
+            sensoryBaseRange = (sensoryAlerted ? 7.5f : 5f) * Entity.Scale;
+            Entity potentialFoe;
             bool enemiesAfoot = false;
             if (!entity.Foe)
             {
@@ -316,7 +316,7 @@ public class Character : MonoBehaviour
                     foreach (RaycastHit entityHit in firstPass)
                     {
                         float angle = getAngle(entityHit.transform.position - transform.position);
-                        Warrior nearbyEntity = entityHit.collider.GetComponent<Warrior>();
+                        Entity nearbyEntity = entityHit.collider.GetComponent<Entity>();
                         enemiesAfoot = nearbyEntity ? nearbyEntity.Allegiance != entity.Allegiance : enemiesAfoot;
                         if (nearbyEntity && Mathf.Abs(LookAngle - angle) <= sightFOVactual / 2 ? nearbyEntity.Allegiance != entity.Allegiance : false)
                         {
@@ -326,7 +326,7 @@ public class Character : MonoBehaviour
                             {
                                 if (objectHit.distance < closestObject)
                                 {
-                                    potentialFoe = objectHit.collider.GetComponent<Warrior>();
+                                    potentialFoe = objectHit.collider.GetComponent<Entity>();
                                     if (potentialFoe ? potentialFoe.Allegiance != entity.Allegiance : false)
                                     {
                                         entity.Foe = potentialFoe;
@@ -386,7 +386,7 @@ public class Character : MonoBehaviour
                         {
                             if (hit.distance < temp)
                             {
-                                potentialFoe = hit.collider.GetComponent<Warrior>();
+                                potentialFoe = hit.collider.GetComponent<Entity>();
                                 if (potentialFoe ? potentialFoe.Allegiance != entity.Allegiance : false)
                                 {
                                     entity.Foe = potentialFoe;
@@ -510,7 +510,7 @@ public class Character : MonoBehaviour
     protected bool grabEnabled = false;
     protected float grabSlowScalar = 1.0f;
     public float grabDPS = 15f;
-    protected Warrior grabLastVictim;
+    protected Entity grabLastVictim;
     protected void grab(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && entity.Foe && !entity.Staggered)
@@ -519,7 +519,7 @@ public class Character : MonoBehaviour
             Vector3 disposition = grabLastVictim.transform.position - transform.position;
             if (disposition.magnitude < entity.personalBox.radius * entity.scaleActual && !entity.Dashing)
             {
-                grabLastVictim.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = -(grabSlowScalar * Warrior.Strength_Ratio(entity,entity.Foe));
+                grabLastVictim.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = -(grabSlowScalar * Entity.Strength_Ratio(entity,entity.Foe));
                 if (grabEnabled)
                 {
                     grabLastVictim.Damage(ReflexRate * behaviourParams[key].Item2 * grabDPS);
@@ -698,7 +698,7 @@ public class Character : MonoBehaviour
     protected bool itemManagementSeeking = false;
     protected bool itemManagementNoDoubles = false;
     protected bool itemManagementNoSingles = false;
-    public Warrior.WieldMode itemManagementPreferredType = Warrior.WieldMode.none;
+    public Entity.WieldMode itemManagementPreferredType = Entity.WieldMode.none;
     protected Weapon itemManagementTarget;
     protected float itemManagementDelayTimer = 0.0f;
     protected float itemManagementDelayPeriod = 1f;
@@ -779,23 +779,23 @@ public class Character : MonoBehaviour
             {
                 if (!sensoryAlerted)
                 {
-                    entity.wieldMode = Warrior.WieldMode.EmptyHanded;
+                    entity.wieldMode = Entity.WieldMode.EmptyHanded;
                 }
-                else if(itemManagementPreferredType == Warrior.WieldMode.OneHanders && (entity.leftStorage || entity.rightStorage))
+                else if(itemManagementPreferredType == Entity.WieldMode.OneHanders && (entity.leftStorage || entity.rightStorage))
                 {
-                    entity.wieldMode = Warrior.WieldMode.OneHanders;
+                    entity.wieldMode = Entity.WieldMode.OneHanders;
                 }
-                else if (itemManagementPreferredType == Warrior.WieldMode.TwoHanders && (entity.backStorage))
+                else if (itemManagementPreferredType == Entity.WieldMode.TwoHanders && (entity.backStorage))
                 {
-                    entity.wieldMode = Warrior.WieldMode.TwoHanders;
+                    entity.wieldMode = Entity.WieldMode.TwoHanders;
                 }
                 else if (!entity.MainHand && (entity.leftStorage || entity.rightStorage))
                 {
-                    entity.wieldMode = Warrior.WieldMode.OneHanders;
+                    entity.wieldMode = Entity.WieldMode.OneHanders;
                 }
                 else if (!entity.MainHand && entity.backStorage)
                 {
-                    entity.wieldMode = Warrior.WieldMode.TwoHanders;
+                    entity.wieldMode = Entity.WieldMode.TwoHanders;
                 }               
             }              
         }

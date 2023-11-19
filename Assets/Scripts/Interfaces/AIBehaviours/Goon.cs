@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Goon : Character
+public class Goon : AIBehaviour
 {
     public float excitement = 0f;
 

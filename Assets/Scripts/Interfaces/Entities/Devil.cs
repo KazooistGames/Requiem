@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Struggler : Warrior
+public class Devil : Entity
 {
-    public Halberd MyHalberd;
+
     protected MeshFilter[] bodyparts;
     protected GameObject torso;
     protected GameObject leg1;
@@ -14,18 +14,17 @@ public class Struggler : Warrior
     protected override void Awake()
     {
         base.Awake();
-        Strength = 100f;
-        Haste = 1.0f;
+        Strength = 300f;
+        Haste = 1.4f;
     }
 
     protected override void Start()
     {
         base.Start();
         createProfile();
-        gameObject.name = "Struggler";
+        gameObject.name = "Devil";
         EventWounded.AddListener(fleshWound);
-        MyHalberd = new GameObject().AddComponent<Halberd>();
-        MyHalberd.PickupItem(this);
+
     }
 
 

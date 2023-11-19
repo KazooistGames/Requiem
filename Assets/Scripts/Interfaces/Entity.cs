@@ -8,9 +8,9 @@ using Newtonsoft.Json.Linq;
 using static Weapon;
 using UnityEngine.TextCore.Text;
 
-public abstract class Warrior : MonoBehaviour
+public class Entity : MonoBehaviour
 {
-    public static UnityEvent<Warrior> EntityVanquished = new UnityEvent<Warrior> { };
+    public static UnityEvent<Entity> EntityVanquished = new UnityEvent<Entity> { };
 
     public Player requiemPlayer;
 
@@ -20,7 +20,6 @@ public abstract class Warrior : MonoBehaviour
 
     public float Xp = 0f;
     public int Lvl = 0;
-
 
     public float Vitality;
     public float Agility;
@@ -48,10 +47,10 @@ public abstract class Warrior : MonoBehaviour
     public UnityEvent EventVanquished = new UnityEvent();
     public UnityEvent<float> EventWounded = new UnityEvent<float>();
     public UnityEvent EventCrashed = new UnityEvent();
-    public UnityEvent<Warrior, float> EventLandedDashHit = new UnityEvent<Warrior, float>();
+    public UnityEvent<Entity, float> EventLandedDashHit = new UnityEvent<Entity, float>();
     public UnityEvent<Wieldable> EventPickedUpWieldable = new UnityEvent<Wieldable>();
 
-    public Warrior Foe;
+    public Entity Foe;
 
     protected float BaseAcceleration = 8;
     public float SpeedActual { get; private set; } = 0f;
@@ -62,6 +61,7 @@ public abstract class Warrior : MonoBehaviour
     public static RuntimeAnimatorController DefaultAnimController;
     public Vector3 WalkDirection = Vector3.zero;
     public Vector3 LookDirection = Vector3.zero;
+
     public float TurnSpeed;
     public Dictionary<string, float> modTurnSpeed = new Dictionary<string, float>();
 
@@ -70,11 +70,12 @@ public abstract class Warrior : MonoBehaviour
     public Wieldable leftStorage;
     public Wieldable rightStorage;
     public Wieldable backStorage;
-    public UnityEvent<Warrior> EventAttemptPickup = new UnityEvent<Warrior> { };
-    public UnityEvent<Warrior> EventAttemptInteraction = new UnityEvent<Warrior> { };
+
+    public UnityEvent<Entity> EventAttemptPickup = new UnityEvent<Entity> { };
+    public UnityEvent<Entity> EventAttemptInteraction = new UnityEvent<Entity> { };
 
     public CapsuleCollider personalBox;
-    protected GameObject model;
+    public GameObject model;
     protected CapsuleCollider hurtBox;
     public Rigidbody body;
     public Projector indicator;
@@ -123,10 +124,10 @@ public abstract class Warrior : MonoBehaviour
     public GameObject head;
 
     public bool FinalDash = false;
-    public float Tempo { get; private set; }
-    public float TempoTargetCenter { get; private set; } = 0.90f;
-    public float TempoTargetWidth { get; private set; } = 0.2f;
-    private bool tempoChargeONS = true;
+    //public float Tempo { get; private set; }
+    //public float TempoTargetCenter { get; private set; } = 0.90f;
+    //public float TempoTargetWidth { get; private set; } = 0.2f;
+    //private bool tempoChargeONS = true;
 
     public enum PostureStrength
     {
@@ -157,7 +158,7 @@ public abstract class Warrior : MonoBehaviour
     }
     public Loyalty Allegiance = Loyalty.neutral;
 
-    protected _Flames flames;
+    public _Flames flames;
 
     //******************Functions*************************
     protected virtual void Awake()
@@ -221,6 +222,7 @@ public abstract class Warrior : MonoBehaviour
         flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
+        flames.gameObject.SetActive(false);
         Poise = Strength;
         StartCoroutine(routineDashHandler());
         EventPickedUpWieldable.AddListener(handleWeaponPickedUp);
@@ -230,7 +232,7 @@ public abstract class Warrior : MonoBehaviour
     {
         equipmentManagement();
         indicatorManagement();
-        body.mass = Strength * scaleActual;
+        body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD))
         {
             float increment = Time.deltaTime * Strength / POISE_REGEN_PERIOD;
@@ -283,11 +285,11 @@ public abstract class Warrior : MonoBehaviour
                 requiemPlayer.HostEntity = this;
             }
             Allegiance = requiemPlayer.Faction;
-            if (GetComponent<Character>())
+            if (GetComponent<AIBehaviour>())
             {
-                GetComponent<Character>().Enthralled = true;
-                GetComponent<Character>().enabled = !requiemPlayer;
-                GetComponent<Character>().followVIP = requiemPlayer.HostEntity.gameObject;
+                GetComponent<AIBehaviour>().Enthralled = true;
+                GetComponent<AIBehaviour>().enabled = !requiemPlayer;
+                GetComponent<AIBehaviour>().followVIP = requiemPlayer.HostEntity.gameObject;
             }
         }
         if (!anim.runtimeAnimatorController)
@@ -300,7 +302,7 @@ public abstract class Warrior : MonoBehaviour
             anim.SetFloat("dashCharge", Dashing ? 0 : DashPower);
             anim.SetBool("moving", body.velocity.magnitude > Haste * SpeedScalarGlobal / 20f ? true : false);
             anim.SetFloat("velocity", Mathf.Max(body.velocity.magnitude, Haste * SpeedScalarGlobal / 4f));
-            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : Character.angleToDirection(Character.getAngle(LookDirection) - Character.getAngle(body.velocity) + 90);
+            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AIBehaviour.angleToDirection(AIBehaviour.getAngle(LookDirection) - AIBehaviour.getAngle(body.velocity) + 90);
             anim.SetFloat("x", Shoved ? -relativeDirection.x : relativeDirection.x);
             anim.SetFloat("z", Shoved ? -relativeDirection.z : relativeDirection.z);
         }
@@ -388,7 +390,7 @@ public abstract class Warrior : MonoBehaviour
             TurnSpeed = modTurnSpeed.Values.Aggregate(DefaultTurnSpeed, (result, multiplier) => result *= (1 + multiplier));
             LookDirection.y = 0;
             float scaledY = transform.localEulerAngles.y;
-            float scaledTarget = 90 - Character.getAngle(LookDirection);
+            float scaledTarget = 90 - AIBehaviour.getAngle(LookDirection);
             scaledTarget = scaledTarget > 180 ? scaledTarget - 360 : scaledTarget;
             float difference = (scaledTarget - scaledY);
             float degMax = TurnSpeed * Time.fixedDeltaTime;
@@ -401,7 +403,7 @@ public abstract class Warrior : MonoBehaviour
     {
         if (!dashAlreadyHit.Contains(collision.gameObject))
         {
-            Warrior foe = collision.gameObject.GetComponent<Warrior>();
+            Entity foe = collision.gameObject.GetComponent<Entity>();
             if (Dashing && foe)
             {
                 resolveDashHit(collision);
@@ -417,7 +419,7 @@ public abstract class Warrior : MonoBehaviour
     {
         if (!dashAlreadyHit.Contains(collision.gameObject))
         {
-            Warrior foe = collision.gameObject.GetComponent<Warrior>();
+            Entity foe = collision.gameObject.GetComponent<Entity>();
             if (Dashing && foe)
             {
                 resolveDashHit(collision, instant: true);
@@ -433,11 +435,11 @@ public abstract class Warrior : MonoBehaviour
 
     /********** PUBLIC **********/
 
-    public static float Strength_Ratio(Warrior A, Warrior B)
+    public static float Strength_Ratio(Entity A, Entity B)
     {
         if (A && B)
         {
-            return Mathf.Sqrt(A.Strength / B.Strength);
+            return Mathf.Pow(A.Strength / B.Strength, -3);
         }
         else
         {
@@ -451,12 +453,12 @@ public abstract class Warrior : MonoBehaviour
         {
             Rigidbody body = bone.GetComponent<Rigidbody>() ? bone.GetComponent<Rigidbody>() : bone.AddComponent<Rigidbody>();
             body.useGravity = true;
-            if (!bone.GetComponent<Bone>())
+            if (!bone.GetComponent<Bone>() && !bone.GetComponent<Wieldable>())
             {
                 bone.AddComponent<Bone>();
             }
             //Entity entity = bone.transform.parent.parent.GetComponent<Entity>();
-            Warrior entity = bone.GetComponentInParent<Warrior>();
+            Entity entity = bone.GetComponentInParent<Entity>();
             Animator anim = entity.GetComponent<Animator>();
             Vector3 newScale = bone.transform.localScale * entity.scaleActual;
             Vector3 newPosition = bone.transform.position;
@@ -667,7 +669,7 @@ public abstract class Warrior : MonoBehaviour
     private void resolveDashHit(Collision collision, bool instant = false)
     {
         GameObject other = collision.gameObject;
-        Warrior foe = other.GetComponent<Warrior>();
+        Entity foe = other.GetComponent<Entity>();
         if (foe ? foe.Allegiance != Allegiance : false)
         {
             Vector3 disposition = foe.transform.position - transform.position;
@@ -718,7 +720,7 @@ public abstract class Warrior : MonoBehaviour
         bool cleanHit = dot > 0.5f;
         if (cleanHit)
         {
-            Warrior otherEntity = collision.gameObject.GetComponent<Warrior>();
+            Entity otherEntity = collision.gameObject.GetComponent<Entity>();
             float velocityRatio = (collision.relativeVelocity.magnitude - Min_Velocity_Of_Dash) / (Max_Velocity_Of_Dash - Min_Velocity_Of_Dash);
             if ((otherEntity ? !otherEntity.Dashing : false) && !dashAlreadyHit.Contains(collision.gameObject))
             {
@@ -793,7 +795,7 @@ public abstract class Warrior : MonoBehaviour
                 yield return new WaitWhile(() => Shoved);
             }
             FinalDash = false;
-            Tempo = 0;
+            //Tempo = 0;
             modSpeed[key] = 0.0f;
             Dashing = false;
             DashPower = 0.0f;
@@ -906,7 +908,7 @@ public abstract class Warrior : MonoBehaviour
     }
 
 
-    private void handleWeaponHit(Weapon myWeapon, Warrior foe)
+    private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float poiseDamage = Mathf.Min(foe.Poise, myWeapon.Power);
         float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : myWeapon.Power - foe.Resolve;

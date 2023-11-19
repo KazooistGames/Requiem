@@ -113,7 +113,6 @@ public class Game_Arena : Game
             torch.Lit = false;
         }
 
-        Difficulty = 1;
         yield return new WaitUntil(() => Commissioned);
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTilesInPlay[0]);
         List<GameObject> spawnedMobs = new List<GameObject>();
@@ -122,16 +121,17 @@ public class Game_Arena : Game
         EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites );
         StateOfGame = GameState.Liminal;
         yield return new WaitUntil(() => alter.Used);
+        idol.BecomeMob();
         alter.DesiredOffering = alter.TopStep;
         StateOfGame = GameState.Wave;
         while (true)
         {
             //start periodically spawning enemies and every minute re-evaluate
-            MobSpawner.PeriodicallySpawn(10, 2, Difficulty, Difficulty * 2);
-            EliteSpawner.PeriodicallySpawn(30, 1, 0, Mathf.CeilToInt(Mathf.Sqrt(Difficulty)));
-            PatrolSpawner.PeriodicallySpawn(60, 3, 0, Difficulty * 3);
+            Difficulty = (int)(GameClock % 60);
+            MobSpawner.PeriodicallySpawn(Mathf.Max(0, 10 - Difficulty), 2, 1 + Difficulty, 1 + Difficulty * 2);
+            EliteSpawner.PeriodicallySpawn(Mathf.Max(0, 30 - Difficulty * 2), 1, 0, Mathf.CeilToInt(Mathf.Sqrt(1 + Difficulty)));
+            PatrolSpawner.PeriodicallySpawn(Mathf.Max(0, 60 - Difficulty * 3), 3, 0, 1 + Difficulty * 3);
             yield return new WaitForSeconds(60);
-            Difficulty = 1 + (int)(GameClock % 60);
         }
     }
   

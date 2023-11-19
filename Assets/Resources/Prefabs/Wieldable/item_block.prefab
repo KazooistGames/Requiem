@@ -173,14 +173,14 @@ MonoBehaviour:
   ImpalingSomething: 0
   Heft: 25
   Idling: 1
-  Rebuked: 0
+  Recoiling: 0
   Wielder: {fileID: 0}
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
-  Primary: 0
-  Secondary: 0
-  Tertiary: 0
+  PrimaryTrigger: 0
+  SecondaryTrigger: 0
+  TertiaryTrigger: 0
   ThrowTrigger: 0
   Anim: {fileID: 0}
   Body: {fileID: 0}
@@ -191,7 +191,7 @@ MonoBehaviour:
   MostRecentWielder: {fileID: 0}
   Telecommuting: 0
   Thrown: 0
-  equipType: -1
+  equipType: 3
 --- !u!95 &1373723435178343212
 Animator:
   serializedVersion: 4

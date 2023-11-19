@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bully : Character
+public class Bully : AIBehaviour
 {
     public float excitement = 0f;
 
@@ -20,7 +20,7 @@ public class Bully : Character
         dashingChargePeriod = 0.5f;
         dashingPower = 1.0f;
         itemManagementSeekItems = true;
-        itemManagementPreferredType = Warrior.WieldMode.TwoHanders;
+        itemManagementPreferredType = Entity.WieldMode.TwoHanders;
     }
 
     protected override void Update()

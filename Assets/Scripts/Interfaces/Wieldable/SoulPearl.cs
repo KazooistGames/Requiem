@@ -64,7 +64,7 @@ public class SoulPearl : Wieldable
             }
             else
             {
-                Warrior newForm = new GameObject().AddComponent<Ghosty>();
+                Entity newForm = new GameObject().AddComponent<Ghosty>();
                 newForm.transform.position = transform.position;
                 if (Phylactery.Wielder)
                 {

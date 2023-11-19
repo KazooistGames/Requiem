@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Revanent : Character
+public class Revanent : AIBehaviour
 {
 
     private _Flames mainHandFlame;
@@ -27,7 +27,7 @@ public class Revanent : Character
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
-        itemManagementPreferredType = Warrior.WieldMode.TwoHanders;
+        itemManagementPreferredType = Entity.WieldMode.TwoHanders;
         sensorySightRangeScalar = 1.25f;
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
         //new GameObject().AddComponent<Weapon_HandAxe>().PickupItem(entity);
@@ -69,7 +69,7 @@ public class Revanent : Character
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
                         }
-                        else if(entity.Posture == Warrior.PostureStrength.Weak)
+                        else if(entity.Posture == Entity.PostureStrength.Weak)
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding);
                         }
@@ -89,9 +89,9 @@ public class Revanent : Character
 
                         bool offensive = mainWep ? mainWep.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false;
                         tangoStrafeEnabled = !offensive;
-                        dashingDodgeAttacks = entity.Posture == Warrior.PostureStrength.Weak;
+                        dashingDodgeAttacks = entity.Posture == Entity.PostureStrength.Weak;
                         dashingDodgeFoe = true;
-                        dashingInitiate = offensive && entity.Posture == Warrior.PostureStrength.Strong;
+                        dashingInitiate = offensive && entity.Posture == Entity.PostureStrength.Strong;
                         dashingDodgeAim = offensive;
                         dashingPower = dashingInitiate ? 1.0f : 0.0f;
                         dashingChargePeriod = dashingInitiate ? 0.5f : 0.0f;

@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static AIBehaviour;
 
-public class Champion : Character
+public class Scourge : AIBehaviour
 {
+
+
     private _Flames mainHandFlame;
     private _Flames offHandFlame;
     private _Flames footFlame;
@@ -18,53 +21,62 @@ public class Champion : Character
     protected override void Start()
     {
         base.Start();
-        Intelligence = 1.0f;
-        ReflexRate = 0.05f;
-        tangoStrafeEnabled = false;
-        tangoStrafePauseFreq = 0;
-        martialReactiveAttack = true;
-        martialReactiveDefendThrow = true;
-        martialPreferredState = martialState.none;
-        dashingCooldownPeriod = 0.5f;
-        dashingChargePeriod = 0.5f;
+        Intelligence = 0.5f;
+        tangoPeriodScalar = 1f;
+        tangoStrafePauseFreq = 0f;
+        martialReactiveDefend = true;
+        martialReactiveAttack = false;
+        martialPreferredState = martialState.throwing;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
-        sensorySightRangeScalar = 2.0f;
-        new GameObject().AddComponent<Spear>().PickupItem(entity);
+        dashingPower = 1.0f;
+        dashingDodgeAttacks = false;
+        sensorySightRangeScalar = 1.5f;
+        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
+        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
     }
 
     protected override void Update()
     {
         base.Update();
-        updateFlames(_Flames.FlameStyles.Inferno);
+        updateFlames(_Flames.FlameStyles.Soulless);
         switch (State)
         {
             case AIState.none:
-                StateTransition(AIState.passive);
+                StateTransition(AIState.seek);
                 break;
-            case AIState.passive:
+            case AIState.seek:
                 if (entity.Foe)
                 {
                     StateTransition(AIState.aggro);
                 }
+                else
+                {
+                    ReflexRate = 0.20f;
+                    waypointCoordinates = transform.position;
+                }
                 break;
             case AIState.aggro:
-                if (!entity.Foe)
+
+                if (trackingTrailCold)
                 {
-                    StateTransition(AIState.passive);
+                    StateTransition(AIState.seek);
                 }
                 else
                 {
                     ReflexRate = 0.05f;
                     Weapon wep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-                    bool inRange = entity.Foe && wep ? (wep.Range) >= (entity.Foe.transform.position - transform.position).magnitude : false;
+                    //bool inRange = entity.Foe && wep ? (wep.Range) >= (entity.Foe.transform.position - transform.position).magnitude : false;
                     //bool defensive = (wep ? wep.Defending : true);
-                    //bool offensive = (wep ? wep.WindingUp || wep.WindingUp : false);
-                    //dashingInitiate = defensive && inRange;
-                    dashingDodgeAttacks = entity.Posture != Warrior.PostureStrength.Strong;
-                    martialReactiveDefend = !dashingDodgeAttacks;
-                    dashingLunge = true;
-                    dashingPower = dashingLunge ? 0.25f : 1.0f;
+                    //bool offensive = (wep ? wep.WindingUp : false);
+                    tangoStrafeEnabled = false;
+                    //dashingCooldownPeriod = 0.5f;
+                    //entity.dashMaxVelocity = defensive ? 5.0f : 2.5f;
+                    //dashingDelayPeriod = defensive ? 1.0f : 0.0f;
+                    //dashingCooldownPeriod = defensive ? 2.0f : (offensive ? 0.5f : 1.0f);
+                    //dashingDodgeFoe = !defensive;
+                    //dashingDodgeAim = !defensive;
+                    //dashingInitiate = defensive;
                 }
                 break;
         }
@@ -82,6 +94,14 @@ public class Champion : Character
     protected override void OnTriggerExit(Collider other)
     {
         base.OnTriggerExit(other);
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        Destroy(footFlame.gameObject);
+        Destroy(mainHandFlame.gameObject);
+        Destroy(offHandFlame.gameObject);
     }
 
     private void updateFlames(_Flames.FlameStyles flameLevel)
@@ -111,7 +131,7 @@ public class Champion : Character
             else
             {
                 Weapon mainWep = entity.MainHand.GetComponent<Weapon>();
-                //mainHandFlame.setFlamePreset(mainWep.Attacking || mainWep.WindingUp || mainWep.WindingUp ? flameLevel : 0);
+                //mainHandFlame.setFlamePreset(mainWep.Attacking || mainWep.Throwing ? flameLevel : 0);
             }
         }
         else
@@ -135,7 +155,7 @@ public class Champion : Character
             else
             {
                 Weapon offWep = entity.OffHand.GetComponent<Weapon>();
-                //offHandFlame.setFlamePreset(offWep.Attacking || offWep.WindingUp || offWep.WindingUp ? flameLevel : 0);
+                //offHandFlame.setFlamePreset(offWep.Attacking || offWep.Throwing ? flameLevel : 0);
             }
         }
         else
@@ -146,4 +166,3 @@ public class Champion : Character
     }
 
 }
-

@@ -23,7 +23,7 @@ public class Torch : Wieldable
     protected override void Start()
     {
         base.Start();
-        transform.localScale *= Warrior.Scale;
+        transform.localScale *= Entity.Scale;
         PhysicsBoxes.Add(GetComponent<CapsuleCollider>() ? GetComponent<CapsuleCollider>() : gameObject.AddComponent<CapsuleCollider>());
         PhysicsBoxes.Add(GetComponent<BoxCollider>() ? GetComponent<BoxCollider>() : gameObject.AddComponent<BoxCollider>());
         flame = GetComponentInChildren<Light>();
