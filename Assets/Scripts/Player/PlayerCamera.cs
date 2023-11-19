@@ -7,7 +7,7 @@ public class PlayerCamera : MonoBehaviour
 {
     public Camera Eyes;
 
-
+    public float CamRepoSpeed = 0.1f;
     public Vector3 camOffsetActual = new Vector3(3, 3, 0);
     public float VerticalAngle = 30f;
     public float VerticalAngleMin = 30f;
@@ -70,12 +70,11 @@ public class PlayerCamera : MonoBehaviour
             Vector3 CameraFocus = Player.INSTANCE.HostEntity.transform.position + (Vector3.up * Entity.Scale * CamHeight);
             float leg = CamOffsetMag * Mathf.Cos(DegToRad(VerticalAngle));
             camOffsetActual = new Vector3(Mathf.Cos(DegToRad(HorizonatalOffsetAngle)) * leg, CamOffsetMag * Mathf.Sin(DegToRad(VerticalAngle)), Mathf.Sin(DegToRad(HorizonatalOffsetAngle)) * leg);
-            transform.position = CameraFocus + camOffsetActual;
+            transform.position = Vector3.MoveTowards(transform.position, CameraFocus + camOffsetActual, CamRepoSpeed);
             transform.LookAt(CameraFocus);
             Vector3 temp = transform.localEulerAngles;
             temp.x = temp.x * 0.95f;
             transform.localEulerAngles = temp;
-
         }
         _BlurbService.Instance.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
     }

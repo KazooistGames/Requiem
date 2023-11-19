@@ -82,7 +82,7 @@ public class Spawner : MonoBehaviour
                 int permissableGroupSize = Mathf.Min(groupSize, delta);
                 AllSpawnedObjects.AddRange(InstantSpawn(permissableGroupSize));
             }
-            yield return new WaitUntil( () => (timer += Time.deltaTime) > periodSecondsBetweenSpawns);
+            yield return new WaitUntil( () => (timer += Time.deltaTime) > periodSecondsBetweenSpawns || AllSpawnedObjects.Where(x => x != null).ToArray().Length < minConcurrentInstances);
             timer -= periodSecondsBetweenSpawns;
         }
     }

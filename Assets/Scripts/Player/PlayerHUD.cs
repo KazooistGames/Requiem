@@ -51,7 +51,7 @@ public class PlayerHUD : MonoBehaviour
             statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
             statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Entity.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
-            if (Player.INSTANCE.MyWeapon)
+            if (Player.INSTANCE.hostWeapon)
             {
                 updateTempoBar();
             }
@@ -117,7 +117,7 @@ public class PlayerHUD : MonoBehaviour
     private void updateTempoBar()
     {
         TempoBar.SetActive(true);
-        if (Player.INSTANCE.MyWeapon.Tempo > 0 && Player.INSTANCE.MyWeapon.Tempo < 1)
+        if (Player.INSTANCE.hostWeapon.Tempo > 0 && Player.INSTANCE.hostWeapon.Tempo < 1)
         {
             fadeTransforms(tempoBarTransforms, 0.75f, 0.1f);
         }
@@ -125,11 +125,11 @@ public class PlayerHUD : MonoBehaviour
         {
             fadeTransforms(tempoBarTransforms, 0, 0.5f);
         }
-        tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.MyWeapon.Tempo, 1f);
-        tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.MyWeapon.Tempo, 1f);
-        tempoBarTransforms[2].anchorMin = new Vector2(Player.INSTANCE.MyWeapon.TempoTargetCenter, 1f);
-        tempoBarTransforms[2].anchorMax = new Vector2(Player.INSTANCE.MyWeapon.TempoTargetCenter, 1f);
-        tempoBarTransforms[2].sizeDelta = new Vector2(Player.INSTANCE.MyWeapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
+        tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.hostWeapon.Tempo, 1f);
+        tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.hostWeapon.Tempo, 1f);
+        tempoBarTransforms[2].anchorMin = new Vector2(Player.INSTANCE.hostWeapon.TempoTargetCenter, 1f);
+        tempoBarTransforms[2].anchorMax = new Vector2(Player.INSTANCE.hostWeapon.TempoTargetCenter, 1f);
+        tempoBarTransforms[2].sizeDelta = new Vector2(Player.INSTANCE.hostWeapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
     }
 
     private void fadeTransforms(Transform[] transforms, float alphaValue, float periodSeconds)

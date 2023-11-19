@@ -908,6 +908,10 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
+        if (myWeapon.Thrown)
+        {
+            myWeapon.Hitting.RemoveListener(handleWeaponHit);
+        }
         float poiseDamage = Mathf.Min(foe.Poise, myWeapon.Power);
         float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : myWeapon.Power - foe.Resolve;
         foe.alterPoise(-poiseDamage);
@@ -931,7 +935,10 @@ public class Entity : MonoBehaviour
             weapon.Clashing.RemoveListener(handleWeaponClash);
             weapon.Blocking.RemoveListener(handleWeaponBlock);
             weapon.Parrying.RemoveListener(handleWeaponParrying);
-            weapon.Hitting.RemoveListener(handleWeaponHit);
+            if (!weapon.Thrown)
+            {
+                weapon.Hitting.RemoveListener(handleWeaponHit);
+            }
             weapon.GettingParried.RemoveListener(handleWeaponParried);
         }
     }

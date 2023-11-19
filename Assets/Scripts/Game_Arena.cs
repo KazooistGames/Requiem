@@ -92,7 +92,6 @@ public class Game_Arena : Game
                     {
                         if (tile ? (tile.Landmarks.Count == 0) : false)
                         {
-                            //new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                             new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
                         }
                         yield return new WaitForFixedUpdate();

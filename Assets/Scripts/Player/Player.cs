@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 public class Player : MonoBehaviour
 {
-    public Weapon MyWeapon;
+    public Weapon hostWeapon;
     public static Player INSTANCE { get; private set; }
     public int BonesCollected = 0;
 
@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
         //HUD.setIndicatorOnHUD("bones", "Bones: " + BonesCollected.ToString());
         if (HostEntity ? HostEntity.MainHand : false)
         {
-            MyWeapon = HostEntity.MainHand.GetComponent<Weapon>();
+            hostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
         }
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {
@@ -212,10 +212,20 @@ public class Player : MonoBehaviour
         }
         else if (CurrentKeyboard.eKey.wasPressedThisFrame)
         {
-            HostEntity.EventAttemptPickup.Invoke(HostEntity);
-            HostEntity.EventAttemptPickup.RemoveAllListeners();
+            //HostEntity.EventAttemptPickup.Invoke(HostEntity);
+            //HostEntity.EventAttemptPickup.RemoveAllListeners();
+            if(hostWeapon.Wielder != HostEntity)
+            {
+                hostWeapon.ImpaleRelease();
+                hostWeapon.Telecommute(HostEntity.gameObject, 1f, x => x.PickupItem(HostEntity), useScalarAsSpeed: true);
+            }
         }
         else if (CurrentKeyboard.qKey.wasPressedThisFrame)
+        {
+            HostEntity.transform.position = hostWeapon.transform.position;
+            hostWeapon.PickupItem(HostEntity);
+        }
+        else if (CurrentKeyboard.gKey.wasPressedThisFrame)
         {
             if (HostEntity.MainHand)
             {

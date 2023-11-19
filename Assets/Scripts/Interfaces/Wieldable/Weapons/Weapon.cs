@@ -466,7 +466,6 @@ public abstract class Weapon : Wieldable
         GameObject obstruction = testObstructionBetweenEntities(foe, weapon.MostRecentWielder);
         if (!obstruction)
         {
-
             weapon.Hitting.Invoke(weapon, foe);
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe);
             weapon.playSlap(foe.transform.position);
@@ -508,6 +507,7 @@ public abstract class Weapon : Wieldable
         bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.25f : 0.75f) : true);
         if (cleanhit && !ImpalingSomething)
         {
+            Hitting.Invoke(this, foe);
             impaledObject = collision.gameObject;
             Thrown = false;
             ImpalingSomething = true;
@@ -534,18 +534,18 @@ public abstract class Weapon : Wieldable
                     togglePhysicsBox(false);
                     alreadyHit.Add(foe.gameObject);
                     foe.EventCrashed.AddListener(impale_doupleDipDamage);
-                    foe.EventVanquished.AddListener(impale_release);
+                    foe.EventVanquished.AddListener(ImpaleRelease);
                     foe.modSpeed[key] = -(Heft/foe.Strength);
                     foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
                     yield return new WaitWhile(() => foe ? foe.Posture <= Entity.PostureStrength.Strong : false);
                     if (foe)
                     {
-                        impale_release();
+                        ImpaleRelease();
                     }
                 }
                 else
                 {
-                    impale_release();
+                    ImpaleRelease();
                 }
                 yield break;           
             }
@@ -565,13 +565,14 @@ public abstract class Weapon : Wieldable
         }         
     }
 
-    private void impale_release()
+    public void ImpaleRelease()
     {
-        Entity foe = impaledObject.GetComponent<Entity>();
+        if (!impaledObject) { return; }
+        Entity foe = impaledObject.GetComponent<Entity>();                                                                                                                                                                                   
         if (foe)
         {
             string key = "impaled" + gameObject.GetHashCode().ToString();
-            foe.EventVanquished.RemoveListener(impale_release);
+            foe.EventVanquished.RemoveListener(ImpaleRelease);
             foe.modSpeed.Remove(key);
             foe.BleedingWounds.Remove(key);
         }
@@ -592,7 +593,7 @@ public abstract class Weapon : Wieldable
             foe.Damage(Power);
             playSlap(transform.position);
         }
-        impale_release();
+        ImpaleRelease();
         DropItem(yeet: true, magnitude: 1);
     }
 
