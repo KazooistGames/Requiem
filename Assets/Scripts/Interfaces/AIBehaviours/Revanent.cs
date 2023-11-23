@@ -23,7 +23,7 @@ public class Revanent : AIBehaviour
         Intelligence = 1.0f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;
-        martialReactiveAttack = true;
+        //martialReactiveAttack = true;
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;

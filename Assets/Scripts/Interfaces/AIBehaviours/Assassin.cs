@@ -17,9 +17,9 @@ public class Assassin : AIBehaviour
         tangoStrafePauseFreq = 0;
         tangoPeriodScalar = 2;
         tangoStrafeEnabled = true;
-        martialReactiveAttack = false;
-        martialReactiveDefend = false;
-        martialReactiveDefendThrow = true;
+        //martialReactiveAttack = false;
+        //martialReactiveDefend = false;
+        //martialReactiveDefendThrow = true;
         martialPreferredState = martialState.attacking;
         dashingPower = 0.25f;
         dashingCooldownPeriod = 0.5f;

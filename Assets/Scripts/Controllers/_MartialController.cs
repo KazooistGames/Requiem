@@ -92,13 +92,13 @@ public class _MartialController : MonoBehaviour
         }
     }
 
-    public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action)
+    public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)
     {
         if (Action_Queues.ContainsKey(weapon))
         {
             Action_Queues[weapon].Clear();
         }
-        Queue_Action(weapon, action);
+        Queue_Action(weapon, action, debounce);
     }
 
     public static void Override_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)

@@ -24,7 +24,7 @@ public class Greataxe : Weapon
         wHitBox.height = 0.6f;
         equipType = EquipType.TwoHanded;
         Range = 0.45F;
-        BasePower = 60f;
+        BasePower = 100f;
         Heft = 80;
         base.Start();
     }

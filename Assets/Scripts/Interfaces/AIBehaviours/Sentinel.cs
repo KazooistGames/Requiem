@@ -15,8 +15,8 @@ public class Sentinel : AIBehaviour
         ReflexRate = 0.05f;
         tangoStrafeEnabled = false;
         tangoStrafePauseFreq = 0;
-        martialReactiveAttack = true;
-        martialReactiveDefend = true;
+        //martialReactiveAttack = true;
+        //martialReactiveDefend = true;
         martialPreferredState = martialState.none;
         dashingCooldownPeriod = 1.0f;
         itemManagementSeekItems = true;

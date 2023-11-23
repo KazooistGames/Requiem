@@ -176,10 +176,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialReactiveAttack: 0
-  martialReactiveThrow: 0
-  martialReactiveDefend: 0
-  martialReactiveDefendThrow: 0
+  martialOpportunityToAttack:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToDefend:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToThrow:
+    m_PersistentCalls:
+      m_Calls: []
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
@@ -255,6 +260,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   personalBox: {fileID: 0}
+  model: {fileID: 0}
   body: {fileID: 0}
   indicator: {fileID: 0}
   statBar: {fileID: 0}
@@ -266,10 +272,12 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDashEnabled: 0
   FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
+  flames: {fileID: 0}
 --- !u!4 &11386817
 Transform:
   m_ObjectHideFlags: 0
@@ -372,9 +380,11 @@ MonoBehaviour:
   ActionAnimated: 0
   Throwing: 0
   Range: 0
-  Sharpness: 0
+  Power: 0
   BasePower: 0
   TrueStrike: 0
+  Tempo: 0
+  TempoChargeRate: 1
 --- !u!4 &74375186
 Transform:
   m_ObjectHideFlags: 0
@@ -586,9 +596,11 @@ MonoBehaviour:
   ActionAnimated: 0
   Throwing: 0
   Range: 0
-  Sharpness: 0
+  Power: 0
   BasePower: 0
   TrueStrike: 0
+  Tempo: 0
+  TempoChargeRate: 1
 --- !u!1 &747980606
 GameObject:
   m_ObjectHideFlags: 0
@@ -642,10 +654,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialReactiveAttack: 0
-  martialReactiveThrow: 0
-  martialReactiveDefend: 0
-  martialReactiveDefendThrow: 0
+  martialOpportunityToAttack:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToDefend:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToThrow:
+    m_PersistentCalls:
+      m_Calls: []
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
@@ -721,6 +738,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   personalBox: {fileID: 0}
+  model: {fileID: 0}
   body: {fileID: 0}
   indicator: {fileID: 0}
   statBar: {fileID: 0}
@@ -732,10 +750,12 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDashEnabled: 0
   FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
+  flames: {fileID: 0}
 --- !u!4 &747980609
 Transform:
   m_ObjectHideFlags: 0
@@ -750,6 +770,175 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &844573214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 844573217}
+  - component: {fileID: 844573216}
+  - component: {fileID: 844573215}
+  m_Layer: 0
+  m_Name: skelly
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &844573215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844573214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b392d430f8d865748b45db5b1bbfb331, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  stateRunTimer: 0
+  ReflexRate: 0.2
+  Intelligence: 0
+  Enthralled: 0
+  actualMovementDirection: {x: 0, y: 0, z: 0}
+  actualMovementAngle: 0
+  DesiredDirection: {x: 0, y: 0, z: 0}
+  TotalWeight: 0
+  LookAngle: 0
+  wallCrawlObstacles: []
+  meanderDirection: {x: 0, y: 0, z: 0}
+  meanderPaused: 0
+  meanderPauseFrequency: 0.5
+  sensoryAlerted: 0
+  pursueStoppingDistance: 0
+  trackingEyesOnTarget: 0
+  trackingTrailCold: 1
+  grabDPS: 15
+  tangoDeadbanded: 0
+  tangoStrafeEnabled: 1
+  martialCurrentState: 0
+  martialPreferredState: 0
+  martialOpportunityToAttack:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToDefend:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToThrow:
+    m_PersistentCalls:
+      m_Calls: []
+  dashingDodgeAttacks: 0
+  dashingDodgeAim: 0
+  dashingDodgeFoe: 0
+  dashingDodgeFoeDashOnly: 0
+  dashingLunge: 0
+  dashingInitiate: 0
+  itemManagementSeekItems: 0
+  itemManagementGreedy: 0
+  itemManagementPreferredType: 0
+  followVIP: {fileID: 0}
+  followRecall: 0
+  followNutHug: 0
+  followDistance: 0
+  waypointCoordinates: {x: 0, y: 0, z: 0}
+  waypointCommanded: 0
+  waypointDeadbanded: 0
+  waypointDeadbandingScalar: 2
+  waypointInnerlimit: 1
+  waypointOuterLimit: 2
+  wallCrawlDrawRays: 0
+  wallCrawlCrowding: 0
+  wallCrawlAvoidFoe: 1
+--- !u!114 &844573216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844573214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0484fa1a56cb43e40b92e889dacb2a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  EventVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  EventWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  EventCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  EventLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  EventAttemptInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  personalBox: {fileID: 0}
+  model: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  DashCharging: 0
+  Dashing: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  Location: {fileID: 0}
+  head: {fileID: 0}
+  FinalDashEnabled: 0
+  FinalDash: 0
+  Posture: 1
+  wieldMode: 1
+  Allegiance: 0
+  flames: {fileID: 0}
+--- !u!4 &844573217
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844573214}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.26809937, y: 0.5001569, z: -0.30880547}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1285575789
 GameObject:
@@ -838,9 +1027,11 @@ MonoBehaviour:
   ActionAnimated: 0
   Throwing: 0
   Range: 0
-  Sharpness: 0
+  Power: 0
   BasePower: 0
   TrueStrike: 0
+  Tempo: 0
+  TempoChargeRate: 1
 --- !u!4 &1285575791
 Transform:
   m_ObjectHideFlags: 0
@@ -985,10 +1176,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialReactiveAttack: 0
-  martialReactiveThrow: 0
-  martialReactiveDefend: 0
-  martialReactiveDefendThrow: 0
+  martialOpportunityToAttack:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToDefend:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToThrow:
+    m_PersistentCalls:
+      m_Calls: []
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
@@ -1064,6 +1260,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   personalBox: {fileID: 0}
+  model: {fileID: 0}
   body: {fileID: 0}
   indicator: {fileID: 0}
   statBar: {fileID: 0}
@@ -1075,10 +1272,12 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDashEnabled: 0
   FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
+  flames: {fileID: 0}
 --- !u!4 &1776297673
 Transform:
   m_ObjectHideFlags: 0
@@ -1147,10 +1346,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialReactiveAttack: 0
-  martialReactiveThrow: 0
-  martialReactiveDefend: 0
-  martialReactiveDefendThrow: 0
+  martialOpportunityToAttack:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToDefend:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToThrow:
+    m_PersistentCalls:
+      m_Calls: []
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
@@ -1225,6 +1429,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   personalBox: {fileID: 0}
+  model: {fileID: 0}
   body: {fileID: 0}
   indicator: {fileID: 0}
   statBar: {fileID: 0}
@@ -1236,10 +1441,12 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDashEnabled: 0
   FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
+  flames: {fileID: 0}
 --- !u!4 &1807562881
 Transform:
   m_ObjectHideFlags: 0
@@ -1342,9 +1549,11 @@ MonoBehaviour:
   ActionAnimated: 0
   Throwing: 0
   Range: 0
-  Sharpness: 0
+  Power: 0
   BasePower: 0
   TrueStrike: 0
+  Tempo: 0
+  TempoChargeRate: 1
 --- !u!4 &2008132594
 Transform:
   m_ObjectHideFlags: 0
@@ -1428,10 +1637,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialReactiveAttack: 0
-  martialReactiveThrow: 0
-  martialReactiveDefend: 0
-  martialReactiveDefendThrow: 0
+  martialOpportunityToAttack:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToDefend:
+    m_PersistentCalls:
+      m_Calls: []
+  martialOpportunityToThrow:
+    m_PersistentCalls:
+      m_Calls: []
   dashingDodgeAttacks: 0
   dashingDodgeAim: 0
   dashingDodgeFoe: 0
@@ -1507,6 +1721,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   personalBox: {fileID: 0}
+  model: {fileID: 0}
   body: {fileID: 0}
   indicator: {fileID: 0}
   statBar: {fileID: 0}
@@ -1518,10 +1733,12 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
+  FinalDashEnabled: 0
   FinalDash: 0
   Posture: 1
   wieldMode: 1
   Allegiance: 0
+  flames: {fileID: 0}
 --- !u!1 &2128541354
 GameObject:
   m_ObjectHideFlags: 0
@@ -1586,7 +1803,7 @@ MonoBehaviour:
   GameClock: 0
   Paused: 0
   TimeScale: 0
-  State: 0
+  StateOfGame: 0
   Difficulty: 0
 --- !u!114 &2128541363
 MonoBehaviour:

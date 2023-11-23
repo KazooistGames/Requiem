@@ -22,8 +22,8 @@ public class Champion : AIBehaviour
         ReflexRate = 0.05f;
         tangoStrafeEnabled = false;
         tangoStrafePauseFreq = 0;
-        martialReactiveAttack = true;
-        martialReactiveDefendThrow = true;
+        //martialReactiveAttack = true;
+        //martialReactiveDefendThrow = true;
         martialPreferredState = martialState.none;
         dashingCooldownPeriod = 0.5f;
         dashingChargePeriod = 0.5f;
@@ -62,7 +62,7 @@ public class Champion : AIBehaviour
                     //bool offensive = (wep ? wep.WindingUp || wep.WindingUp : false);
                     //dashingInitiate = defensive && inRange;
                     dashingDodgeAttacks = entity.Posture != Entity.PostureStrength.Strong;
-                    martialReactiveDefend = !dashingDodgeAttacks;
+                    //martialReactiveDefend = !dashingDodgeAttacks;
                     dashingLunge = true;
                     dashingPower = dashingLunge ? 0.25f : 1.0f;
                 }

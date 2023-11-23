@@ -17,6 +17,7 @@ public class Bone : MonoBehaviour
     public Rigidbody Body;
 
     private bool allowCollect = false;
+    private float allowCollectTimer = 0.0f;
 
     private static float FINAL_SCALE_AFTER_COLLECTION = 0.5f;
 
@@ -34,6 +35,11 @@ public class Bone : MonoBehaviour
         Body.mass = 0.25f;
     }
 
+    protected void Update()
+    {
+        allowCollectTimer += Time.deltaTime;
+        allowCollect = allowCollectTimer >= 0.5f;
+    }
 
     protected void OnDestroy()
     {
@@ -46,15 +52,11 @@ public class Bone : MonoBehaviour
         {
             Rattle();
         }
-        if (collision.gameObject.GetComponent<Hextile>())
-        {
-            allowCollect = true;
-        }
     }
 
-    protected void OnTriggerEnter(Collider other)
+    protected void OnTriggerStay(Collider other)
     {
-        if(other.gameObject == Player.INSTANCE.gameObject && allowCollect)
+        if(other.gameObject == Player.INSTANCE.gameObject && allowCollect && !collectTarget)
         {
             Collect(Player.INSTANCE, 0.5f, Consume);
         }

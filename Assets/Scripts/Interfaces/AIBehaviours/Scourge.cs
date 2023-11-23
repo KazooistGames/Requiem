@@ -24,8 +24,8 @@ public class Scourge : AIBehaviour
         Intelligence = 0.5f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;
-        martialReactiveDefend = true;
-        martialReactiveAttack = false;
+        //martialReactiveDefend = true;
+        //martialReactiveAttack = false;
         martialPreferredState = martialState.throwing;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;

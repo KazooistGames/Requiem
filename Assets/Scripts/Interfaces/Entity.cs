@@ -97,8 +97,8 @@ public class Entity : MonoBehaviour
     protected float staggerTimer = 0;
 
     /********** DASHING **********/
-    public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
-    public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
+    public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 2.5f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
@@ -109,13 +109,13 @@ public class Entity : MonoBehaviour
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
     protected bool CrashEnvironmentONS = true;
 
-    private static float DASH_CHARGE_TIME = 0.25f;
-    private static float CRASH_DAMAGE = 20f;
+    private static float DASH_CHARGE_TIME = 0.5f;
+    private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
     private static float POISE_REGEN_PERIOD = 4f;
-    private static float POISE_DEBOUNCE_PERIOD = 4f;
     private static float POISE_RESTING_PERCENTAGE = 1f;
+    private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
 
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
@@ -234,7 +234,7 @@ public class Entity : MonoBehaviour
         equipmentManagement();
         indicatorManagement();
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
-        if ((poiseDebounceTimer += Time.deltaTime) >= (POISE_DEBOUNCE_PERIOD))
+        if ((poiseDebounceTimer += Time.deltaTime) >= (poiseDebouncePeriod))
         {
             float increment = Time.deltaTime * Strength / POISE_REGEN_PERIOD;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
@@ -532,7 +532,7 @@ public class Entity : MonoBehaviour
         {
             Posture = PostureStrength.Strong;
         }
-        else
+        else if (Posture != PostureStrength.Weak)
         {
             Posture = PostureStrength.Normal;
 
@@ -581,7 +581,13 @@ public class Entity : MonoBehaviour
         Poise = Mathf.Clamp(Poise, -1, Strength);
         if (value * existingDelta >= 0)
         {
-            poiseDebounceTimer = 0.0f;
+            float newBounce = Mathf.Abs(value / Strength * 10);
+            float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
+            if (newBounce >= remainingBounce)
+            {
+                poiseDebouncePeriod = newBounce;
+                poiseDebounceTimer = 0.0f;
+            }
         }
         updatePosture();
     }
@@ -791,7 +797,7 @@ public class Entity : MonoBehaviour
                 }
                 Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);
-                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.5f - DashPower / 1.5f, 0.25f + DashPower);
+                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.25f - DashPower / 1.5f, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
                 sound.transform.SetParent(transform);
                 yield return new WaitWhile(() => Shoved);
@@ -913,11 +919,23 @@ public class Entity : MonoBehaviour
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
         float poiseDamage = Mathf.Min(foe.Poise, myWeapon.Power);
-        float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : myWeapon.Power - foe.Resolve;
+        float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : Mathf.Max(0, myWeapon.Power - poiseDamage);
         foe.alterPoise(-poiseDamage);
-        if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack || foe.Posture == PostureStrength.Weak)
+        //if (foe.Posture == PostureStrength.Weak)
+        //{
+        //    foe.Stagger(Mathf.Sqrt(poiseDamage / Strength));
+        //}
+        if(myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            foe.Stagger(Mathf.Sqrt(poiseDamage / Strength));
+            if (myWeapon.TrueStrike)
+            {
+                vitalityDamage += Resolve;
+            }
+        }
+        else if(myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
+        {
+            float duration = 5;
+            foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
         }
         if (vitalityDamage > 0) 
         {

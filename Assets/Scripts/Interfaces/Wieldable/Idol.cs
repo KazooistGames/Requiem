@@ -159,6 +159,7 @@ public class Idol : Wieldable
         togglePhysicsBox(true);
         Body.isKinematic = false;
         StartCoroutine(reviveMob(15));
+        flames.FlamePresentationStyle = _Flames.FlameStyles.Soulless;
     }
 
 

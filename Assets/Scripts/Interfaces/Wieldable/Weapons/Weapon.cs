@@ -119,7 +119,7 @@ public abstract class Weapon : Wieldable
         clangClip = "Audio/Weapons/clang";
         clangPitch = 100 / Heft;
         clangVolume = 0.075f;
-        tinkPitch = 10 / BasePower;
+        tinkPitch = 25 / BasePower;
         if(Heft == 0)
         {
             Heft = BasePower;
@@ -182,7 +182,7 @@ public abstract class Weapon : Wieldable
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
                 {
-                    TrueStrike = false;
+                    TrueStrike = Tempo >= 1;
                     if (TertiaryTrigger && tempoChargeONS)
                     {
                         tempoCharge += Time.deltaTime * TempoChargeRate;
@@ -211,18 +211,19 @@ public abstract class Weapon : Wieldable
                     {
                         tempoCharge = 0;
                         tempoChargeONS = true;
-                        if (TertiaryTrigger)
-                        {
-                            Tempo = 0;
-                        }
-                        else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
-                        {
-                            TrueStrike = true;
-                        }
-                        else
-                        {
-                            Tempo = 0;
-                        }
+
+                        //if (TertiaryTrigger)
+                        //{
+                        //    Tempo = 0;
+                        //}
+                        //else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
+                        //{
+                        //    TrueStrike = true;
+                        //}
+                        //else
+                        //{
+                        //    Tempo = 0;
+                        //}
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
                         HitBox.isTrigger = true;
@@ -316,9 +317,9 @@ public abstract class Weapon : Wieldable
 
     }
 
-    protected override void OnTriggerEnter(Collider other)
+    protected void OnTriggerStay(Collider other)
     {
-        base.OnTriggerEnter(other);
+        //base.OnTriggerEnter(other);
         Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
         if (other)
         {
@@ -507,7 +508,10 @@ public abstract class Weapon : Wieldable
         bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.25f : 0.75f) : true);
         if (cleanhit && !ImpalingSomething)
         {
-            Hitting.Invoke(this, foe);
+            if (foe)
+            {
+                Hitting.Invoke(this, foe);
+            }
             impaledObject = collision.gameObject;
             Thrown = false;
             ImpalingSomething = true;
@@ -790,7 +794,7 @@ public abstract class Weapon : Wieldable
 
     private void playSlap(Vector3 position)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Clamp(10f / Power, 0.4f, 1.6f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Clamp(25f / Power, 0.4f, 1.6f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
     }
 
     private void playTink()

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Goon : AIBehaviour
 {
-    public float excitement = 0f;
+    //public float excitement = 0f;
+
+    private Weapon mainWep;
 
     protected override void Awake()
     {
@@ -17,18 +19,24 @@ public class Goon : AIBehaviour
         Intelligence = 0.75f;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
-        martialReactiveAttack = false;
-        martialReactiveDefend = true;
-        martialReactiveDefendThrow = false;
+        dashingCooldownPeriod = 3;
         martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 1.0f;
         meanderPauseFrequency = 0.5f;
         itemManagementSeekItems = true;
+        martialFoeVulnerable.AddListener(reactiveAttack);
+        martialFoeAttacking.AddListener(reactiveDefend);
+        martialFoeAttacking.AddListener(dodgeDeathBlow);
     }
 
     protected override void Update()
     {
         base.Update();
+        if (!mainWep)
+        {
+            mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
+        }
+
         if (Enthralled)
         {
             StateTransition(AIState.enthralled);
@@ -51,10 +59,9 @@ public class Goon : AIBehaviour
                 }
                 else
                 {
-                    Weapon mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                     if (mainWep)
                     {
-                        martialCurrentState = mainWep.ActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : martialState.attacking;
+                        martialCurrentState = mainWep.ActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : (mainWep.ActionAnimated == Weapon.ActionAnimation.Aiming ? martialState.throwing : (mainWep.ActionAnimated == Weapon.ActionAnimation.Idle ? martialState.none : martialState.attacking));
                         if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
@@ -97,6 +104,51 @@ public class Goon : AIBehaviour
                     StateTransition(AIState.passive);
                 }
                 break;
+        }
+    }
+
+    /***** PUBLIC *****/
+
+
+
+    /***** PROTECTED *****/
+
+
+
+    /***** PRIVATE *****/
+    private void reactiveAttack()
+    {
+        if(martialCurrentState != martialState.attacking)
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }
+    }
+
+    private void reactiveDefend()
+    {
+        if(martialCurrentState != martialState.defending)
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+            if (Random.value >= 0.5f)
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            }
+            else
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+            }
+        }
+    }
+
+    private void dodgeDeathBlow()
+    {
+        if (entity.Posture == Entity.PostureStrength.Weak)
+        {
+            Vector3 diposition = entity.Foe.transform.position - transform.position;
+            dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
+            dashingENGAGE = true;
         }
     }
 

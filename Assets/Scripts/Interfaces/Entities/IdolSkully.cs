@@ -13,6 +13,7 @@ public class IdolSkully : Skully
         Haste = 0.75f;
         BaseAcceleration = 8f;
         scaleScalar = 1.0f;
+        berthScalar = 1.1f;
     }
 
     protected override void Start()
