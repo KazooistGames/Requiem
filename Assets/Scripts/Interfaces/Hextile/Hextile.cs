@@ -178,8 +178,10 @@ public class Hextile : MonoBehaviour
         {
             if (!AdjacentTiles.ContainsKey(otherTile))
             {
-                int angle = (Mathf.RoundToInt(AIBehaviour.getAngle(otherTile.transform.position - transform.position)) + 360) % 360;
-                HexPosition position = (HexPosition)Mathf.RoundToInt((angle + 30) / 60);
+
+                //int angle = (Mathf.RoundToInt(AIBehaviour.getAngle(otherTile.transform.position - transform.position)) + 360) % 360;
+                //HexPosition position = (HexPosition)Mathf.RoundToInt((angle + 30) / 60);
+                HexPosition position = VectorToHexPosition(otherTile.transform.position - transform.position);
                 AdjacentTiles.Add(otherTile, position);
                 otherTile.alterTiles(this);
             }
@@ -227,7 +229,7 @@ public class Hextile : MonoBehaviour
 
     /* STRUCTURE CREATION */
 
-    public static IEnumerator CreateLine(int length, Hextile startingTile, HexPosition direction, List<Hextile> Tiles = null)
+    public static IEnumerator DrawLine(int length, Hextile startingTile, HexPosition direction, List<Hextile> Tiles = null)
     {
         if (direction == HexPosition.error || length <= 0) { yield break; };
         yield return null;
@@ -245,7 +247,7 @@ public class Hextile : MonoBehaviour
             }
             yield return null;
         }
-
+        yield return null;
         yield break;
     }
 
@@ -473,7 +475,15 @@ public class Hextile : MonoBehaviour
         return degrees * (Mathf.PI/180);
     }
 
-    public static HexPosition Rotate(HexPosition startPosition, int turns)
+    public static HexPosition VectorToHexPosition(Vector3 vector)
+    {
+        HexPosition conversion;
+        int angle = (Mathf.RoundToInt(AIBehaviour.getAngle(vector)) + 360) % 360;
+        conversion = (HexPosition)Mathf.RoundToInt((angle + 30) / 60);
+        return conversion;
+    }
+
+    public static HexPosition RotateHexPosition(HexPosition startPosition, int turns)
     {
         int finshPosition = (int)startPosition;
         int sign = (int)Mathf.Sign(turns);

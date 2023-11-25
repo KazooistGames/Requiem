@@ -89,13 +89,6 @@ public class Revanent : AIBehaviour
 
                         bool offensive = mainWep ? mainWep.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false;
                         tangoStrafeEnabled = !offensive;
-                        dashingDodgeAttacks = entity.Posture == Entity.PostureStrength.Weak;
-                        dashingDodgeFoe = true;
-                        dashingInitiate = offensive && entity.Posture == Entity.PostureStrength.Strong;
-                        dashingDodgeAim = offensive;
-                        dashingPower = dashingInitiate ? 1.0f : 0.0f;
-                        dashingChargePeriod = dashingInitiate ? 0.5f : 0.0f;
-                        dashingCooldownPeriod = dashingInitiate ? 2f : 2.0f;
                     }
                 }
                 break;

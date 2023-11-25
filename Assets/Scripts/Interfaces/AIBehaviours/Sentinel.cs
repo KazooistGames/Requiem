@@ -15,15 +15,10 @@ public class Sentinel : AIBehaviour
         ReflexRate = 0.05f;
         tangoStrafeEnabled = false;
         tangoStrafePauseFreq = 0;
-        //martialReactiveAttack = true;
-        //martialReactiveDefend = true;
         martialPreferredState = martialState.none;
-        dashingCooldownPeriod = 1.0f;
         itemManagementSeekItems = true;
-        dashingPower = 0.0f;
         itemManagementPreferredType = Entity.WieldMode.OneHanders;
         new GameObject().AddComponent<Greataxe>().PickupItem(entity);
-        //entity.modPosture["Sentinel" + GetHashCode().ToString()] = Entity.Posture.Strong;
     }
 
     protected override void Update()
@@ -58,12 +53,6 @@ public class Sentinel : AIBehaviour
                     ReflexRate = 0.05f;
                     Weapon wep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                     bool inRange = entity.Foe && wep ? (wep.Range) >= (entity.Foe.transform.position - transform.position).magnitude : false;
-                    //bool defensive = (wep ? wep.Defending : true);
-                    //bool offensive = (wep ? wep.WindingUp: false);
-                    //dashingDodgeFoe = defensive;
-                    //dashingDodgeAim = offensive;
-                    //dashingInitiate = !offensive && !defensive;
-                    dashingLunge = true;
                 }
                 break;
         }

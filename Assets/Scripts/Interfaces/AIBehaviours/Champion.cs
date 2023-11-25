@@ -25,7 +25,7 @@ public class Champion : AIBehaviour
         //martialReactiveAttack = true;
         //martialReactiveDefendThrow = true;
         martialPreferredState = martialState.none;
-        dashingCooldownPeriod = 0.5f;
+        //dashingCooldownPeriod = 0.5f;
         dashingChargePeriod = 0.5f;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
@@ -58,13 +58,6 @@ public class Champion : AIBehaviour
                     ReflexRate = 0.05f;
                     Weapon wep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                     bool inRange = entity.Foe && wep ? (wep.Range) >= (entity.Foe.transform.position - transform.position).magnitude : false;
-                    //bool defensive = (wep ? wep.Defending : true);
-                    //bool offensive = (wep ? wep.WindingUp || wep.WindingUp : false);
-                    //dashingInitiate = defensive && inRange;
-                    dashingDodgeAttacks = entity.Posture != Entity.PostureStrength.Strong;
-                    //martialReactiveDefend = !dashingDodgeAttacks;
-                    dashingLunge = true;
-                    dashingPower = dashingLunge ? 0.25f : 1.0f;
                 }
                 break;
         }

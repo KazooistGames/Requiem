@@ -176,21 +176,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialOpportunityToAttack:
+  martialFoeVulnerable:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToDefend:
+  martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToThrow:
+  martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
-  dashingDodgeAttacks: 0
-  dashingDodgeAim: 0
-  dashingDodgeFoe: 0
-  dashingDodgeFoeDashOnly: 0
-  dashingLunge: 0
-  dashingInitiate: 0
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -267,9 +261,9 @@ MonoBehaviour:
   Shoved: 0
   shoveRecoveryPeriod: 0
   Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
@@ -309,7 +303,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &74375185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -654,21 +648,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialOpportunityToAttack:
+  martialFoeVulnerable:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToDefend:
+  martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToThrow:
+  martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
-  dashingDodgeAttacks: 0
-  dashingDodgeAim: 0
-  dashingDodgeFoe: 0
-  dashingDodgeFoeDashOnly: 0
-  dashingLunge: 0
-  dashingInitiate: 0
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -745,9 +733,9 @@ MonoBehaviour:
   Shoved: 0
   shoveRecoveryPeriod: 0
   Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
@@ -824,21 +812,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialOpportunityToAttack:
+  martialFoeVulnerable:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToDefend:
+  martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToThrow:
+  martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
-  dashingDodgeAttacks: 0
-  dashingDodgeAim: 0
-  dashingDodgeFoe: 0
-  dashingDodgeFoeDashOnly: 0
-  dashingLunge: 0
-  dashingInitiate: 0
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -914,9 +896,9 @@ MonoBehaviour:
   Shoved: 0
   shoveRecoveryPeriod: 0
   Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
@@ -956,7 +938,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1285575790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1176,21 +1158,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialOpportunityToAttack:
+  martialFoeVulnerable:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToDefend:
+  martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToThrow:
+  martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
-  dashingDodgeAttacks: 0
-  dashingDodgeAim: 0
-  dashingDodgeFoe: 0
-  dashingDodgeFoeDashOnly: 0
-  dashingLunge: 0
-  dashingInitiate: 0
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1267,9 +1243,9 @@ MonoBehaviour:
   Shoved: 0
   shoveRecoveryPeriod: 0
   Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
@@ -1346,21 +1322,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialOpportunityToAttack:
+  martialFoeVulnerable:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToDefend:
+  martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToThrow:
+  martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
-  dashingDodgeAttacks: 0
-  dashingDodgeAim: 0
-  dashingDodgeFoe: 0
-  dashingDodgeFoeDashOnly: 0
-  dashingLunge: 0
-  dashingInitiate: 0
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1436,9 +1406,9 @@ MonoBehaviour:
   Shoved: 0
   shoveRecoveryPeriod: 0
   Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
@@ -1478,7 +1448,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2008132593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1637,21 +1607,15 @@ MonoBehaviour:
   tangoStrafeEnabled: 1
   martialCurrentState: 0
   martialPreferredState: 0
-  martialOpportunityToAttack:
+  martialFoeVulnerable:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToDefend:
+  martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialOpportunityToThrow:
+  martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
-  dashingDodgeAttacks: 0
-  dashingDodgeAim: 0
-  dashingDodgeFoe: 0
-  dashingDodgeFoeDashOnly: 0
-  dashingLunge: 0
-  dashingInitiate: 0
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1728,9 +1692,9 @@ MonoBehaviour:
   Shoved: 0
   shoveRecoveryPeriod: 0
   Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  dashDirection: {x: 0, y: 0, z: 0}
   Location: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
@@ -1799,10 +1763,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6848861edd0e808429025c028ae38834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllTilesInPlay: []
   Commissioned: 0
   GameClock: 0
   Paused: 0
   TimeScale: 0
+  RadiusOfCrypts: 1
+  LengthOfCorridors: 4
+  CountOfChambers: 6
   StateOfGame: 0
   Difficulty: 0
 --- !u!114 &2128541363

@@ -125,7 +125,7 @@ public class Stage : MonoBehaviour
 
     protected virtual void createGateOut(Hextile tileToPutGateOutOn = null, Hextile.HexPosition directionToPositionGate = Hextile.HexPosition.error)
     {
-        Hextile.HexPosition newGatePosition = Hextile.Rotate(GateIn.PositionOnTile, Random.Range(-1, 2));
+        Hextile.HexPosition newGatePosition = Hextile.RotateHexPosition(GateIn.PositionOnTile, Random.Range(-1, 2));
         Hextile temp = CenterTile;
         while (temp.AdjacentTiles.ContainsValue(newGatePosition))
         {

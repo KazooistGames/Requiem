@@ -38,7 +38,7 @@ public class Bone : MonoBehaviour
     protected void Update()
     {
         allowCollectTimer += Time.deltaTime;
-        allowCollect = allowCollectTimer >= 0.5f;
+        allowCollect = allowCollectTimer >= 0.75f;
     }
 
     protected void OnDestroy()

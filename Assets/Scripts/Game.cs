@@ -9,6 +9,9 @@ using System.Threading;
 public class Game : MonoBehaviour
 {
     public static Game INSTANCE { get; private set; }
+
+    public List<Hextile> AllTilesInPlay = new List<Hextile>();
+
     public bool Commissioned = false;
     public float GameClock = 0;
     public bool Paused = false;
@@ -129,6 +132,12 @@ public class Game : MonoBehaviour
         float innerLimit = Hextile.Radius * 0.2f;
         Vector3 location = tile.transform.position + (AIBehaviour.RandomDirection() * Mathf.Clamp(UnityEngine.Random.value, innerLimit, outerLimit)) + Vector3.up * Hextile.Thickness / 2;
         return location;
+    }
+
+    public Vector3 RandomPositionInRandomTileInPlay()
+    {
+        Hextile randomTile = AllTilesInPlay[UnityEngine.Random.Range(0, AllTilesInPlay.Count)];
+        return RAND_POS_IN_TILE(randomTile);
     }
 
 

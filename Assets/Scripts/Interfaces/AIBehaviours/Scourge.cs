@@ -24,13 +24,9 @@ public class Scourge : AIBehaviour
         Intelligence = 0.5f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;
-        //martialReactiveDefend = true;
-        //martialReactiveAttack = false;
         martialPreferredState = martialState.throwing;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
-        dashingPower = 1.0f;
-        dashingDodgeAttacks = false;
         sensorySightRangeScalar = 1.5f;
         new GameObject().AddComponent<Handaxe>().PickupItem(entity);
         new GameObject().AddComponent<Handaxe>().PickupItem(entity);

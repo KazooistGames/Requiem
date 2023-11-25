@@ -97,19 +97,18 @@ public class Entity : MonoBehaviour
     protected float staggerTimer = 0;
 
     /********** DASHING **********/
+    public Vector3 dashDirection = Vector3.zero;
+    private static AudioClip SOUND_OF_DASH;
+    private List<GameObject> dashAlreadyHit = new List<GameObject>();
+    protected bool CrashEnvironmentONS = true;
+
     public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
     public static float Min_Velocity_Of_Dash { get; private set; } = 2.5f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-
-    public Vector3 dashDirection = Vector3.zero;
-    private static AudioClip SOUND_OF_DASH;
-    private List<GameObject> dashAlreadyHit = new List<GameObject>();
-    protected bool CrashEnvironmentONS = true;
-
-    private static float DASH_CHARGE_TIME = 0.5f;
+    private static float DASH_CHARGE_TIME = 0.4f;
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
@@ -797,13 +796,12 @@ public class Entity : MonoBehaviour
                 }
                 Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);
-                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2.25f - DashPower / 1.5f, 0.25f + DashPower);
+                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2f - DashPower, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
                 sound.transform.SetParent(transform);
                 yield return new WaitWhile(() => Shoved);
             }
             FinalDash = false;
-            //Tempo = 0;
             modSpeed[key] = 0.0f;
             Dashing = false;
             DashPower = 0.0f;

@@ -19,7 +19,7 @@ public class Goon : AIBehaviour
         Intelligence = 0.75f;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
-        dashingCooldownPeriod = 3;
+        //dashingCooldownPeriod = 3;
         martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 1.0f;
         meanderPauseFrequency = 0.5f;
@@ -144,11 +144,12 @@ public class Goon : AIBehaviour
 
     private void dodgeDeathBlow()
     {
-        if (entity.Posture == Entity.PostureStrength.Weak)
+        if (entity.Posture == Entity.PostureStrength.Weak && dashingCooldownTimer >= 3)
         {
             Vector3 diposition = entity.Foe.transform.position - transform.position;
-            dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-            dashingENGAGE = true;
+            float angularOffset = (Random.value - 0.5f) * 180;
+            dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) + angularOffset);
+            //dashingENGAGE = true;
         }
     }
 

@@ -18,7 +18,6 @@ public class Bully : AIBehaviour
 
         tangoStrafeEnabled = false;
         dashingChargePeriod = 0.5f;
-        dashingPower = 1.0f;
         itemManagementSeekItems = true;
         itemManagementPreferredType = Entity.WieldMode.TwoHanders;
     }

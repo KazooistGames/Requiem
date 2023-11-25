@@ -18,9 +18,7 @@ public class Biter : AIBehaviour
         Intelligence = 0.5f;
         ReflexRate = 0.20f;
         tangoStrafeEnabled = false;
-        dashingCooldownPeriod = 2.0f;
         dashingChargePeriod = 1.0f;
-        dashingPower = 0.5f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
         itemManagementSeekItems = false;
@@ -60,7 +58,7 @@ public class Biter : AIBehaviour
                     if (entity.Foe)
                     {
                         Vector3 disposition = entity.Foe.transform.position - transform.position;
-                        dashingInitiate = (disposition.magnitude < pursueStoppingDistance || entity.DashCharging) && !entity.Shoved;
+                        //dashingInitiate = (disposition.magnitude < pursueStoppingDistance || entity.DashCharging) && !entity.Shoved;
 
                     }
                 }

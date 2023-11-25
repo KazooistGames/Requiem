@@ -684,38 +684,23 @@ public class AIBehaviour : MonoBehaviour
         }
     }
 
-    public bool dashingENGAGE = false;
-    public bool dashingDodgeAttacks = false;
-    public bool dashingDodgeAim = false;
-    public bool dashingDodgeFoe = false;
-    public bool dashingDodgeFoeDashOnly = false;
-    public bool dashingLunge = false;
-    public bool dashingInitiate = false;
-    protected bool dashingONS = true;
-    protected float dashingCooldownPeriod = 1.0f;
+    protected Coroutine dashCycle;
     protected float dashingCooldownTimer = 0.0f;
     protected float dashingChargePeriod = 0.0f;
     protected float dashingChargeTimer = 0.0f;
-    protected float dashingPower = 0.0f;
     protected Vector3 dashingDesiredDirection;
     protected void dashing(BehaviourType key) 
     {
         if (behaviourParams[key].Item1)
         {
-            if (dashingCooldownTimer >= dashingCooldownPeriod)
-            {
-                StartCoroutine(dashingCycle());
-            }
-            else
-            {             
-                dashingDesiredDirection = Vector3.zero;
-            }
             dashingCooldownTimer += ReflexRate;
+            if (dashCycle == null)
+            {
+                dashCycle = StartCoroutine(dashingCycle());
+            }
         }
         else
         {
-            dashingCooldownTimer = dashingCooldownPeriod;
-            //dashingChargeTimer = 0;
             DeEnergize(key);
         }
     }
@@ -1147,110 +1132,23 @@ public class AIBehaviour : MonoBehaviour
     /***** helper coroutines *****/
     private IEnumerator dashingCycle()
     {
-        yield return new WaitUntil(() => dashingENGAGE);
-        dashingENGAGE = false;
-        do
+        while (true)
         {
-            entity.DashCharging = true;
-            entity.Foe.dashDirection = dashingDesiredDirection;
+            yield return new WaitUntil(() => dashingDesiredDirection != Vector3.zero);
+            entity.dashDirection = dashingDesiredDirection;
+            do
+            {
+                entity.DashCharging = true;
+
+                yield return null;
+            } while ((dashingChargeTimer += Time.deltaTime) < dashingChargePeriod);
+            entity.DashCharging = false;
+            yield return new WaitUntil(() => entity.Dashing);
+            dashingCooldownTimer = 0;
+            dashingDesiredDirection = Vector3.zero;
             yield return null;
-        } while ((dashingChargeTimer += Time.deltaTime) < dashingChargePeriod);
-
-        entity.DashCharging = false;
-        yield return new WaitUntil(() => entity.Dashing);
-        dashingDesiredDirection = Vector3.zero;
-        yield break;
+        }
     }
-
-    //private IEnumerator dashingCycle()
-    //{            
-    //    dashingONS = false;
-    //    dashingDesiredDirection = Vector3.zero;
-    //    bool willingToDodge = dashingDodgeAim || dashingDodgeAttacks || dashingDodgeFoe || dashingLunge || dashingInitiate;
-    //    while (entity.Foe && willingToDodge)
-    //    {
-    //        Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-    //        Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
-    //        Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-    //        Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-    //        Vector3 disposition = entity.Foe.transform.position - transform.position;
-    //        if (dashingDodgeAttacks)
-    //        {
-    //            bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
-    //            bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= 0.0f;
-    //            bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f);
-    //            if (foeAttacking && foeInRange && foeFacing)
-    //            {
-    //                dashingDesiredDirection = -disposition.normalized;
-
-    //            }
-    //        }
-    //        if (dashingDodgeAim)
-    //        {
-
-    //            bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain ? matchupMain.Range : 0.0f, matchupOff ? matchupOff.Range : 0.0f);
-    //            bool foeThrowing = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupMain.Thrown : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Aiming || matchupOff.Thrown : false);
-    //            if (foeThrowing && !foeInRange)
-    //            {
-    //                dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-    //            }
-    //        }
-    //        if (dashingDodgeFoe)
-    //        {
-    //            float personalRange = (2.5f * entity.personalBox.radius * entity.scaleActual);
-    //            bool foeInRange = disposition.magnitude <= Mathf.Max(matchupMain && !dashingDodgeFoeDashOnly ? matchupMain.Range : personalRange, matchupOff && !dashingDodgeFoeDashOnly ? matchupOff.Range : personalRange) * 1.20f;
-    //            if (foeInRange && !entity.Foe.Staggered && (!dashingDodgeFoeDashOnly || entity.Foe.Dashing))
-    //            {
-    //                dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + 90 * Mathf.Sign(Random.value - 0.5f));
-    //            }
-    //        }
-    //        if (dashingLunge)
-    //        {
-
-    //            if ((mainHand ? mainHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || mainHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (offHand ? offHand.ActionAnimated == Weapon.ActionAnimation.StrongAttack || offHand.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false))
-    //            {
-    //                dashingDesiredDirection = disposition.normalized;
-    //                //entity.DashPower = 1.0f;
-    //            }
-    //        }
-    //        if (dashingInitiate)
-    //        {
-    //            if (entity.Foe)
-    //            {
-    //                RaycastHit hit;
-    //                int mask = (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall);
-    //                bool test = Physics.SphereCast(transform.position, entity.berthActual * entity.scaleActual, disposition.normalized, out hit, sensoryBaseRange, mask, QueryTriggerInteraction.Ignore);
-    //                if (test ? hit.collider.gameObject == entity.Foe.gameObject : false)
-    //                {
-    //                    dashingDesiredDirection = disposition.normalized;
-    //                }
-    //            }
-    //        }
-    //        if (dashingDesiredDirection != Vector3.zero || entity.DashCharging)
-    //        {
-    //            entity.DashCharging = true;
-    //            dashingChargeTimer += Time.deltaTime; 
-    //        }
-    //        if (dashingChargeTimer >= dashingChargePeriod && dashingDesiredDirection != Vector3.zero )
-    //        {
-    //            yield return null;
-    //            dashingChargeTimer = 0;
-    //            entity.dashDirection = dashingDesiredDirection;
-    //            entity.DashCharging = false;
-    //            dashingCooldownTimer = 0.0f;
-    //            dashingDesiredDirection = Vector3.zero;
-    //            dashingONS = true;
-    //            yield break;
-    //        }
-    //        yield return null;
-           
-    //    }
-    //    dashingDesiredDirection = Vector3.zero;
-    //    entity.DashCharging = false;
-    //    //dashingChargeTimer = 0.0f;
-    //    dashingONS = true;
-    //    yield break;
-    //}
 
     /********** QOL Functions *************/
 
