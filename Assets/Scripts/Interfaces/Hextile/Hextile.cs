@@ -189,9 +189,18 @@ public class Hextile : MonoBehaviour
         refreshWalls();
     }
 
+    public Hextile Edge(HexPosition direction)
+    {
+        Hextile edge = this;
+        while (edge.AdjacentTiles.ContainsValue(direction))
+        {
+            edge = edge.Extend(direction);
+        }
+        return edge;
+    }
+
     public Hextile Extend(HexPosition direction)
     {
-
         Hextile newExtendedTile;
         if (AdjacentTiles.ContainsValue(direction))
         {
@@ -233,9 +242,13 @@ public class Hextile : MonoBehaviour
     {
         if (direction == HexPosition.error || length <= 0) { yield break; };
         yield return null;
-        startingTile.Extend(direction);
+        Hextile operatingTile = startingTile;
+        while (operatingTile.AdjacentTiles.ContainsValue(direction))
+        {
+            operatingTile = operatingTile.Extend(direction);
+        }
         yield return null;
-        for (int i = 0; i < length-1; i++)
+        for (int i = 0; i < length; i++)
         {
             yield return null;
             yield return null;

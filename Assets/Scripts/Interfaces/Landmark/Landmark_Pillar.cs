@@ -58,7 +58,7 @@ public class Landmark_Pillar : Landmark
             torch.Mount(gameObject, new Vector3(0, 0.35f, 0.07f));
         }
         torch.transform.localEulerAngles = new Vector3(45, 0, 0);
-        torch.Lit = false;
+        //torch.Lit = false;
     }
 }
 

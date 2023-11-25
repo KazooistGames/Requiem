@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
 
 public class Torch : Wieldable
 {
@@ -35,8 +36,25 @@ public class Torch : Wieldable
         StartCoroutine(Flicker());
     }
 
+    /***** PUBLIC *****/
+    public static void Toggle(bool newValue)
+    {
+        List<Torch> allTorches = new List<Torch>();
 
-    /**** torch functions ******/
+        allTorches = FindObjectsOfType<Torch>().ToList();
+        foreach (Torch torch in allTorches)
+        {
+            torch.Lit = newValue;
+        }
+    }
+
+
+    /***** PROTECTED *****/
+
+
+
+    /***** PRIVATE *****/
+
 
     private IEnumerator Flicker()
     {
@@ -66,9 +84,7 @@ public class Torch : Wieldable
                 flame.intensity = 0;
                 flame.range = 0;
                 yield return new WaitUntil(() => Lit);
-            }
-
-            
+            }        
         }
     }
 }

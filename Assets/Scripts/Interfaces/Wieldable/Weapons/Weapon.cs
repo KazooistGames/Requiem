@@ -56,9 +56,9 @@ public abstract class Weapon : Wieldable
 
     public bool TrueStrike = false;
     public float Tempo;
-    private float tempoCharge = 0;
-    public float TempoChargeRate = 1;
-    private bool tempoChargeONS = true;
+    private float attackCharge = 0;
+    public float attackChargeRate = 1;
+    //private bool attackChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.90f;
     public float TempoTargetWidth { get; private set; } = 0.2f;
 
@@ -182,16 +182,7 @@ public abstract class Weapon : Wieldable
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
                 {
-                    TrueStrike = Tempo >= 1;
-                    if (TertiaryTrigger && tempoChargeONS)
-                    {
-                        tempoCharge += Time.deltaTime * TempoChargeRate;
-                        Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, 3), 0, 1);
-                    }
-                    else
-                    {
-                        tempoChargeONS = false;
-                    }
+                    chargeTempo();
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
@@ -202,6 +193,7 @@ public abstract class Weapon : Wieldable
                 }
                 else if (ActionAnimated == ActionAnimation.QuickCoil)
                 {
+                    chargeTempo();
                     attackONS = true;
                     modifyWielderSpeed(0);
                 }
@@ -209,21 +201,7 @@ public abstract class Weapon : Wieldable
                 {
                     if (attackONS)
                     {
-                        tempoCharge = 0;
-                        tempoChargeONS = true;
-
-                        //if (TertiaryTrigger)
-                        //{
-                        //    Tempo = 0;
-                        //}
-                        //else if (MathF.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2)
-                        //{
-                        //    TrueStrike = true;
-                        //}
-                        //else
-                        //{
-                        //    Tempo = 0;
-                        //}
+                        attackCharge = 0;
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
                         HitBox.isTrigger = true;
@@ -262,7 +240,7 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = true;
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
-                bool availableToGuard = !((ActionAnimated == ActionAnimation.QuickAttack) || (ActionAnimated == ActionAnimation.StrongAttack) || (ActionAnimated == ActionAnimation.Recoiling) || (ActionAnimated == ActionAnimation.QuickWindup) || (ActionAnimated == ActionAnimation.StrongWindup));
+                bool availableToGuard = !((ActionAnimated == ActionAnimation.Recovering) || (ActionAnimated == ActionAnimation.QuickAttack) || (ActionAnimated == ActionAnimation.StrongAttack));
                 Anim.SetBool("primary", PrimaryTrigger && !Recoiling);
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
                 Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
@@ -780,6 +758,12 @@ public abstract class Weapon : Wieldable
         {
             return ActionAnimation.error;
         }
+    }
+
+    private void chargeTempo()
+    {
+        TrueStrike = attackCharge >= 1;
+        attackCharge += Time.deltaTime * attackChargeRate;
     }
 
     private void playClang(float pitchScalar = 2.0f)

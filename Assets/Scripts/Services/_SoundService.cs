@@ -40,23 +40,24 @@ public class _SoundService : MonoBehaviour
 
             }
             AudioClip clip = SOUND_CLIPS[path];
-            if (!Instance.soundSources.ContainsKey(clip))
-            {
-                Instance.soundSources[clip] = new List<AudioSource>();
-            }
-            AudioSource audioSource = CREATE_NEW_AUDIO_SOURCE(clip, position, pitch, volume, range);
-            audioSource.transform.position = position;
-            audioSource.Play();
-            Instance.soundSources[clip].Add(audioSource);
-            if (Instance.soundSources[clip].Count > SOUND_DUPLICATES_ALLOWED)
-            {
-                Destroy(Instance.soundSources[clip].First(x => x).gameObject);
-            }
-            if (onSoundSpawn != null)
-            {
-                onSoundSpawn(audioSource.gameObject);
-            }
-            return audioSource.gameObject;
+            return PlayAmbientSound(SOUND_CLIPS[path], position, pitch, volume, range, onSoundSpawn);
+            //if (!Instance.soundSources.ContainsKey(clip))
+            //{
+            //    Instance.soundSources[clip] = new List<AudioSource>();
+            //}
+            //AudioSource audioSource = CREATE_NEW_AUDIO_SOURCE(clip, position, pitch, volume, range);
+            //audioSource.transform.position = position;
+            //audioSource.Play();
+            //Instance.soundSources[clip].Add(audioSource);
+            //if (Instance.soundSources[clip].Count > SOUND_DUPLICATES_ALLOWED)
+            //{
+            //    Destroy(Instance.soundSources[clip].First(x => x).gameObject);
+            //}
+            //if (onSoundSpawn != null)
+            //{
+            //    onSoundSpawn(audioSource.gameObject);
+            //}
+            //return audioSource.gameObject;
         }
         else
         {
