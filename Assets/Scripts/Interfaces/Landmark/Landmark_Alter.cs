@@ -79,6 +79,7 @@ public class Landmark_Alter : Landmark
 
     private IEnumerator RitualCycler()
     {
+
         float pentagramRadius = (Hextile.Radius * 2) * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount-1);
         float pentagramHeight = (Hextile.Thickness / 2) + (StepCount + 1) * StepHeight;
         Vector3 flameScale = new Vector3(0.05f, 0.1f, 0.05f);
@@ -106,6 +107,7 @@ public class Landmark_Alter : Landmark
             AIBehaviour.angleToDirection(198) * 0.4f * pentagramRadius,
         };
         _Flames.FlameStyles flamePreset = _Flames.FlameStyles.Magic;
+        yield return null;
         while (true)
         {
             float drawTimer = 0.0f;

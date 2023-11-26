@@ -94,6 +94,9 @@ public class Game_Arena : Game
             newGate.SetPositionOnTile(Hextile.RotateHexPosition(direction, 3));
             chambers.Add(newChamber);
             chamberCandidates.RemoveAt(randomIndex);
+            //set up new quest class
+
+            //assign interaction and completion triggers
         }
 
         //corridor coves
