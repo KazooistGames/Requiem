@@ -9,6 +9,8 @@ public class Landmark_Gate : Landmark
     public Hextile.HexPosition PositionOnTile = Hextile.HexPosition.error;
     private GameObject door;
 
+    public bool ToggleDoor = false;
+
     public BoxCollider BoundingBox;
     public bool PlayerAtDoor;
 
@@ -25,6 +27,17 @@ public class Landmark_Gate : Landmark
         if (Player.INSTANCE)
         {
             PlayerAtDoor = Player.INSTANCE.interactBox.bounds.Intersects(BoundingBox.bounds);
+        }
+        if (ToggleDoor)
+        {
+            if (Used)
+            {
+                CloseDoor();
+            }
+            else
+            {
+                OpenDoor();
+            }
         }
     }
 
@@ -55,7 +68,6 @@ public class Landmark_Gate : Landmark
         float scaledRadius = Hextile.Radius * Mathf.Sin(Mathf.PI/3);
         model.transform.localPosition = new Vector3(Mathf.Cos(rads) * scaledRadius, Hextile.Thickness/2, Mathf.Sin(rads) * scaledRadius);
         model.transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 30 - 60 * (int)newPosition, transform.localEulerAngles.z);
-        PositionOnTile = newPosition;
 
     }
 
