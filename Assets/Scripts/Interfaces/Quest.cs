@@ -44,7 +44,7 @@ public class Quest : MonoBehaviour
                 CompletionGo.Invoke();
                 yield return new WaitWhile(() => completionTrigger());
             }
-            else if (interactionTrigger())
+            if (interactionTrigger())
             {
                 State = States.Interaction;
                 InteractionGo.Invoke();

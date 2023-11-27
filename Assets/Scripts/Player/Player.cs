@@ -4,7 +4,6 @@ using UnityEngine;
 using System;
 using System.Linq;
 using UnityEngine.InputSystem;
-using Newtonsoft.Json;
 
 public class Player : MonoBehaviour
 {

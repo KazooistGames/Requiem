@@ -166,6 +166,7 @@ public abstract class Weapon : Wieldable
             }
             if (Wielded)
             {
+                chargeTempo();
                 if (ActionAnimated == ActionAnimation.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
@@ -182,7 +183,6 @@ public abstract class Weapon : Wieldable
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
                 {
-                    chargeTempo();
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
@@ -193,7 +193,6 @@ public abstract class Weapon : Wieldable
                 }
                 else if (ActionAnimated == ActionAnimation.QuickCoil)
                 {
-                    chargeTempo();
                     attackONS = true;
                     modifyWielderSpeed(0);
                 }
@@ -201,7 +200,6 @@ public abstract class Weapon : Wieldable
                 {
                     if (attackONS)
                     {
-                        attackCharge = 0;
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
                         HitBox.isTrigger = true;
@@ -217,7 +215,6 @@ public abstract class Weapon : Wieldable
                     modifyWielderSpeed(0);
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
-                    Tempo = 0;
                 }
                 else if (ActionAnimated == ActionAnimation.Guarding)
                 {
@@ -762,8 +759,15 @@ public abstract class Weapon : Wieldable
 
     private void chargeTempo()
     {
-        TrueStrike = attackCharge >= 1;
-        attackCharge += Time.deltaTime * attackChargeRate;
+        if(ActionAnimated == ActionAnimation.QuickCoil || ActionAnimated == ActionAnimation.StrongWindup)
+        {
+            attackCharge += Time.deltaTime * attackChargeRate;
+            TrueStrike = attackCharge >= 1;
+        }
+        else
+        {
+            attackCharge = 0;
+        }
     }
 
     private void playClang(float pitchScalar = 2.0f)
