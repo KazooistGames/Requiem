@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
+using UnityEngine.Events;
 
 public class Landmark_Gate : Landmark
 {
@@ -13,11 +12,13 @@ public class Landmark_Gate : Landmark
 
     public BoxCollider BoundingBox;
     public bool PlayerAtDoor;
+    public UnityEvent PlayerArrivedAtDoor = new UnityEvent();
+    public UnityEvent PlayerLeftDoor = new UnityEvent();
 
     private static float openPosition = -0.65f;
     private static float closedPosition = 0;
-    private static float openSpeed = 0.15f;
-    private static float closeSpeed = 0.6f;
+    private static float openSpeed = 0.10f;
+    private static float closeSpeed = 0.8f;
 
     private float doorPositionDesired = 0;
     private float doorSpeedDesired = 0;
@@ -26,7 +27,16 @@ public class Landmark_Gate : Landmark
     {
         if (Player.INSTANCE)
         {
+            bool playerWasAlreadyAtDoor = PlayerAtDoor;
             PlayerAtDoor = Player.INSTANCE.interactBox.bounds.Intersects(BoundingBox.bounds);
+            if(PlayerAtDoor && !playerWasAlreadyAtDoor) 
+            {
+                PlayerArrivedAtDoor.Invoke();
+            }
+            else if(!PlayerAtDoor && playerWasAlreadyAtDoor)
+            {
+                PlayerLeftDoor.Invoke();
+            }
         }
         if (ToggleDoor)
         {
@@ -38,6 +48,21 @@ public class Landmark_Gate : Landmark
             {
                 OpenDoor();
             }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject == Player.INSTANCE.gameObject)
+        {
+            PlayerArrivedAtDoor.Invoke();
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.gameObject == Player.INSTANCE.gameObject)
+        {
+            PlayerLeftDoor.Invoke();
         }
     }
 

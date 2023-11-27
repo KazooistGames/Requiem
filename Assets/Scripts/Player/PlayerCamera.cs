@@ -28,7 +28,7 @@ public class PlayerCamera : MonoBehaviour
 
     public bool Orthographic = false;
 
-    public int RenderResolutionPixelWidth = 360;
+    public int RenderResolutionPixelWidth = 420;
     private int pixelsHigh = 240;
 
 
@@ -54,6 +54,7 @@ public class PlayerCamera : MonoBehaviour
     void Update()
     {
         float ratio = (float)Eyes.pixelHeight / (float)Eyes.pixelWidth;
+        RenderResolutionPixelWidth = Mathf.Max(RenderResolutionPixelWidth, 1);
         pixelsHigh = Mathf.RoundToInt(RenderResolutionPixelWidth * ratio);
         Eyes.tag = "MainCamera";
         Eyes.fieldOfView = Mathf.Clamp(Eyes.fieldOfView, minFOV, maxFOV);

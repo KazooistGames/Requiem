@@ -34,7 +34,7 @@ public class Landmark_Well : Landmark
         Entity entity = other.gameObject.GetComponent<Entity>();
         if(entity && !Used && !Energized)
         {
-            entity.EventAttemptInteraction.AddListener(DRINK);
+            entity.Interact.AddListener(DRINK);
         }
     }
 
@@ -43,7 +43,7 @@ public class Landmark_Well : Landmark
         Entity entity = other.gameObject.GetComponent<Entity>();
         if (entity && !Used && !Energized)
         {
-            entity.EventAttemptInteraction.RemoveListener(DRINK);
+            entity.Interact.RemoveListener(DRINK);
         }
     }
 

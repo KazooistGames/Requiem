@@ -95,8 +95,7 @@ public class Game_Arena : Game
             chambers.Add(newChamber);
             chamberCandidates.RemoveAt(randomIndex);
             //set up new quest class
-
-            //assign interaction and completion triggers
+            newGate.gameObject.AddComponent<Quest_Gate>();
         }
 
         //corridor coves

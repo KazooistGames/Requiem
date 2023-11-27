@@ -71,7 +71,7 @@ public class Entity : MonoBehaviour
     public Wieldable backStorage;
 
     public UnityEvent<Entity> EventAttemptPickup = new UnityEvent<Entity> { };
-    public UnityEvent<Entity> EventAttemptInteraction = new UnityEvent<Entity> { };
+    public UnityEvent<Entity> Interact = new UnityEvent<Entity> { };
 
     public CapsuleCollider personalBox;
     public GameObject model;

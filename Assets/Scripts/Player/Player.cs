@@ -165,7 +165,7 @@ public class Player : MonoBehaviour
         }
         if (CurrentKeyboard.fKey.wasPressedThisFrame)
         {
-            HostEntity.EventAttemptInteraction.Invoke(HostEntity);
+            HostEntity.Interact.Invoke(HostEntity);
         }
         if (CurrentKeyboard.tabKey.isPressed || CurrentKeyboard.tabKey.wasReleasedThisFrame) //cycle equipped item
         {

@@ -9,7 +9,7 @@ public class WeaponQuest : Quest
 {
     public Type WeaponType;
 
-    void Start()
+    protected override void Start()
     {
         Weapon.Weapon_Hit.AddListener(incrementProgress);
         string progressMessage = WeaponType.ToString() + " Damage " + GoalProgress.ToString() + "/" + Goal.ToString();

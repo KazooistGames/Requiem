@@ -156,7 +156,7 @@ public class Wieldable : MonoBehaviour
             {
                 if(equipType == EquipType.Burdensome)
                 {
-                    entity.EventAttemptInteraction.AddListener(PickupItem);
+                    entity.Interact.AddListener(PickupItem);
                 }
                 else
                 {
@@ -173,7 +173,7 @@ public class Wieldable : MonoBehaviour
         {
             if (equipType == EquipType.Burdensome)
             {
-                entity.EventAttemptInteraction.RemoveListener(PickupItem);
+                entity.Interact.RemoveListener(PickupItem);
             }
             else
             {
@@ -320,7 +320,7 @@ public class Wieldable : MonoBehaviour
         {
             if (newOwner.wieldMode != Entity.WieldMode.Burdened)
             {
-                newOwner.EventAttemptInteraction.RemoveListener(PickupItem);
+                newOwner.Interact.RemoveListener(PickupItem);
             }
         }
         else

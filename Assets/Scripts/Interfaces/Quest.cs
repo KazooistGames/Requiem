@@ -13,8 +13,6 @@ public class Quest : MonoBehaviour
     public UnityEvent InteractionGo;
     public UnityEvent CompletionGo;
 
-    //public bool Completed = false;
-    //public bool Interacting = false;
     public enum States
     {
         Dormant,
@@ -28,7 +26,7 @@ public class Quest : MonoBehaviour
 
     protected GameObject MessageBlurb;
 
-    private void Start()
+    protected virtual void Start()
     {
         StartCoroutine(questRuntime());
     }
