@@ -920,7 +920,10 @@ public class Entity : MonoBehaviour
         }
         float poiseDamage = Mathf.Min(foe.Poise, myWeapon.Power);
         float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : Mathf.Max(0, myWeapon.Power - poiseDamage);
-        foe.alterPoise(-poiseDamage);
+        if(foe.Posture != PostureStrength.Weak)
+        {
+            foe.alterPoise(-poiseDamage);
+        }
         //if (foe.Posture == PostureStrength.Weak)
         //{
         //    foe.Stagger(Mathf.Sqrt(poiseDamage / Strength));

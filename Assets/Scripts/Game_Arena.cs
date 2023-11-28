@@ -13,6 +13,7 @@ public class Game_Arena : Game
     public int CountOfCoves;
 
     public Hextile StartingChamber;
+    public Landmark_Gate StartingGate;
     public List<List<Hextile>> crypt1 = new List<List<Hextile>>();
     private List<List<Hextile>> crypt2 = new List<List<Hextile>>();
     //private List<List<Hextile>> crypt3 = new List<List<Hextile>>();
@@ -76,9 +77,9 @@ public class Game_Arena : Game
         yield return Hextile.DrawLine(LengthOfCorridors, centerTile, startingDirection, corridor1); //corridor1
         yield return Hextile.DrawCircle(1, corridor1[corridor1.Count - 1], startingDirection, crypt2);
         StartingChamber = crypt2[0][0].Edge(startingDirection).Extend(startingDirection);
-        Landmark_Gate startGate = new GameObject().AddComponent<Landmark_Gate>();
-        startGate.AssignToTile(StartingChamber);
-        startGate.SetPositionOnTile(offsetBy3);
+        StartingGate = new GameObject().AddComponent<Landmark_Gate>();
+        StartingGate.AssignToTile(StartingChamber);
+        StartingGate.SetPositionOnTile(offsetBy3);
         well = new GameObject().AddComponent<Landmark_Well>();
         well.AssignToTile(StartingChamber);
         //yield return Hextile.DrawLine(LengthOfCorridors, centerTile, offsetBy3, corridor2); //corridor2
@@ -227,6 +228,7 @@ public class Game_Arena : Game
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(StartingChamber);
         Player.INSTANCE.HostEntity.Vitality = 1;
         yield return new WaitUntil(() => well.Used);
+        StartingGate.OpenDoor();
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
         MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs );
