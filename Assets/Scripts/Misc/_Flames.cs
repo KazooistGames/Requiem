@@ -49,16 +49,6 @@ public class _Flames : MonoBehaviour
         colorModule = particles.colorOverLifetime;
     }
 
-    private void Start()
-    {
-        buildGradients();
-        //emissionModule.rateOverTime = 200;
-        //emissionModule.rateOverDistance = 200;
-        //particleLight.intensity = Mathf.Lerp(lightIntensityMin, lightIntensityMax, PowerLevel);
-        //particleLight.range = Mathf.Lerp(lightRangeMin, lightRangeMax, PowerLevel);
-
-    }
-
     private void Update()
     {
         if (boundObject)
@@ -96,6 +86,10 @@ public class _Flames : MonoBehaviour
     /***** PUBLIC *****/
     public void FlameStyle(FlameStyles preset)
     {
+        if(gradients.Count == 0)
+        {
+            buildGradients();
+        }
         if(preset == FlamePresentationStyle) { return; }
         ParticleSystem.MinMaxGradient flameGradient = colorModule.color;
         switch (preset)

@@ -7,14 +7,14 @@ using System;
 
 public class Game_Arena : Game
 {
-    public int RadiusOfCrypts = 1;
-    public int LengthOfCorridors = 4;
-    public int CountOfChambers = 6;
-    public int CountOfCoves = 5;
+    public int RadiusOfCrypts;
+    public int LengthOfCorridors;
+    public int CountOfChambers;
+    public int CountOfCoves;
 
     public Hextile StartingChamber;
     public List<List<Hextile>> crypt1 = new List<List<Hextile>>();
-    //private List<List<Hextile>> crypt2 = new List<List<Hextile>>();
+    private List<List<Hextile>> crypt2 = new List<List<Hextile>>();
     //private List<List<Hextile>> crypt3 = new List<List<Hextile>>();
     public List<Hextile> corridor1 = new List<Hextile>();
     //private List<Hextile> corridor2 = new List<Hextile>();
@@ -70,14 +70,15 @@ public class Game_Arena : Game
         centerTile = Hextile.GenerateRootTile();
         yield return null;
 
-        Hextile.HexPosition randomDirection = (Hextile.HexPosition)UnityEngine.Random.Range(1, 7);
-        Hextile.HexPosition offsetBy3 = Hextile.RotateHexPosition(randomDirection, 3);
+        Hextile.HexPosition startingDirection = (Hextile.HexPosition)1;
+        Hextile.HexPosition offsetBy3 = Hextile.RotateHexPosition(startingDirection, 3);
         yield return Hextile.DrawCircle(RadiusOfCrypts, Hextile.LastGeneratedTile, Tiles: crypt1); //crypt1
-        yield return Hextile.DrawLine(LengthOfCorridors, centerTile, randomDirection, corridor1); //corridor1
-        StartingChamber = crypt1[0][0].Edge(offsetBy3).Extend(offsetBy3);
+        yield return Hextile.DrawLine(LengthOfCorridors, centerTile, startingDirection, corridor1); //corridor1
+        yield return Hextile.DrawCircle(1, corridor1[corridor1.Count - 1], startingDirection, crypt2);
+        StartingChamber = crypt2[0][0].Edge(startingDirection).Extend(startingDirection);
         Landmark_Gate startGate = new GameObject().AddComponent<Landmark_Gate>();
         startGate.AssignToTile(StartingChamber);
-        startGate.SetPositionOnTile(randomDirection);
+        startGate.SetPositionOnTile(offsetBy3);
         well = new GameObject().AddComponent<Landmark_Well>();
         well.AssignToTile(StartingChamber);
         //yield return Hextile.DrawLine(LengthOfCorridors, centerTile, offsetBy3, corridor2); //corridor2
@@ -88,7 +89,7 @@ public class Game_Arena : Game
 
         //crypt chambers
         List<Hextile> cryptChamberKeys = new List<Hextile>();
-        chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != randomDirection && x.Value != offsetBy3).ToList());
+        chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != startingDirection && x.Value != offsetBy3).ToList());
         //chamberCandidates.AddRange(crypt2[0][0].AdjacentTiles.Where(x => x.Value != Hextile.RotateHexPosition(randomDirection, 3) && x.Value != Hextile.RotateHexPosition(connectCrypt2and3, 3)).ToList());
         //chamberCandidates.AddRange(crypt3[0][0].AdjacentTiles.Where(x => x.Value != connectCrypt2and3 && x.Value != Hextile.RotateHexPosition(offsetBy3, 3)).ToList());
         while (chambers.Count < CountOfChambers && chamberCandidates.Count > 0)
@@ -99,13 +100,13 @@ public class Game_Arena : Game
             Hextile doorTile = startingTile.Edge(direction);
             //yield return Hextile.DrawCircle(1, startingTile, direction);
             Hextile newChamber = startingTile.Edge(direction).Extend(direction);
-            Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
-            newGate.AssignToTile(doorTile);
-            newGate.SetPositionOnTile(direction);
+            //Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
+            //newGate.AssignToTile(doorTile);
+            //newGate.SetPositionOnTile(direction);
             chambers.Add(newChamber);
             chamberCandidates.RemoveAt(randomIndex);
             //set up new quest class
-            newGate.gameObject.AddComponent<Quest_Gate>();
+            //newGate.gameObject.AddComponent<Quest_Gate>();
         }
 
         //corridor coves
@@ -190,9 +191,26 @@ public class Game_Arena : Game
                 case 1:
                     foreach (Hextile tile in ring)
                     {
-                        if (tile ? (tile.Landmarks.Count == 0): false)
+                        Hextile.HexPosition position = rings[0][0].AdjacentTiles.First(x => x.Key == tile).Value;
+                        if ((int)position % 2 == 0)
                         {
                             new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
+                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile.Extend(position));
+                        }
+                        else
+                        {
+                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
+                        }
+                        yield return new WaitForFixedUpdate();
+                        yield return null;
+                    }
+                    break;
+                case 2:
+                    foreach (Hextile tile in ring)
+                    {
+                        if (tile.Landmarks.Count == 0)
+                        {
+                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                         }
                         yield return new WaitForFixedUpdate();
                         yield return null;

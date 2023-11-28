@@ -9,13 +9,14 @@ public class SoulPearl : Wieldable
     private _Flames spiritFlame;
     private SphereCollider physicsSphere;
 
+    private float wanderPeriod = 5;
     private float timeWanderingSeconds = 0;
-    private float awarenessRadius;
+    public static float Awareness_Radius = 1.5f;
 
     protected override void Start()
     {
         gameObject.name = "SoulPearl";
-        awarenessRadius = Hextile.Radius * 1.5f;
+        //awarenessRadius = Hextile.Radius * 1.5f;
         physicsSphere = gameObject.AddComponent<SphereCollider>();
         physicsSphere.center = Vector3.zero;
         physicsSphere.radius = 0.025f;
@@ -29,20 +30,25 @@ public class SoulPearl : Wieldable
         spiritFlame.FlameStyle(_Flames.FlameStyles.Soulless);
         spiritFlame.particleLight.range /= 2;
         spiritFlame.particleLight.intensity /= 2;
+        spiritFlame.boundObject = gameObject;
     }
 
     protected override void Update()
     {
         timeWanderingSeconds += Time.deltaTime;
-        if(timeWanderingSeconds > 1 && !Telecommuting)
+        if(timeWanderingSeconds > wanderPeriod && !Telecommuting)
         {
-            if (Phylactery)
+            if (!Player.INSTANCE)
+            {
+
+            }
+            else if (Phylactery)
             {
                 Telecommute(Phylactery.gameObject, 0.25f, (x) => x.GetComponent<SoulPearl>().Rematerialize(), useScalarAsSpeed: true);
             }
-            else if ((Player.INSTANCE.transform.position - transform.position).magnitude <= awarenessRadius)
+            else if ((Player.INSTANCE.transform.position - transform.position).magnitude <= Awareness_Radius)
             {
-                Weapon randomWeapon = FindObjectsOfType<Weapon>().FirstOrDefault(x => !x.Wielder && (x.transform.position - transform.position).magnitude <= awarenessRadius);
+                Weapon randomWeapon = FindObjectsOfType<Weapon>().FirstOrDefault(x => !x.Wielder && (x.transform.position - transform.position).magnitude <= Awareness_Radius);
                 if (randomWeapon)
                 {
                     Phylactery = randomWeapon;
@@ -54,24 +60,24 @@ public class SoulPearl : Wieldable
     }
     private void Rematerialize()
     {
-
-
-        if (Phylactery)
+        if (!Phylactery)
         {
+
+        }
+        else if (Phylactery.Wielder)
+        {
+            Phylactery = null;
+        }
+        else
+        {
+            Entity newForm = new GameObject().AddComponent<Ghosty>();
+            newForm.gameObject.AddComponent<Goon>();
+            newForm.transform.position = transform.position;
             if (Phylactery.Wielder)
             {
-                //Phylactery.Wielder.alterPoise(Phylactery.Wielder.Strength);
+                Phylactery.DropItem();
             }
-            else
-            {
-                Entity newForm = new GameObject().AddComponent<Ghosty>();
-                newForm.transform.position = transform.position;
-                if (Phylactery.Wielder)
-                {
-                    Phylactery.DropItem();
-                }
-                Phylactery.PickupItem(newForm);
-            }
+            Phylactery.PickupItem(newForm);    
             Destroy(gameObject);
         }
 

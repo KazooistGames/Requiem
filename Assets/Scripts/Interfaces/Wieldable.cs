@@ -261,7 +261,7 @@ public class Wieldable : MonoBehaviour
     protected virtual IEnumerator pickupHandler(Entity newOwner)
     {
         Thrown = false;
-        yield return null;
+        //yield return null;
 
         if (Wielder || !newOwner)
         {

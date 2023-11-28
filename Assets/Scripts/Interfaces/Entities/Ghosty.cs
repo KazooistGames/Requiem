@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Ghosty : Entity
 {
+    public Wieldable Phylactery;
 
     protected MeshFilter[] bodyparts;
     protected GameObject torso;
@@ -13,6 +14,7 @@ public class Ghosty : Entity
 
     private ParticleSystem profileParticles;
     private ParticleSystem.ShapeModule shapeModule;
+
 
     protected override void Awake()
     {
@@ -28,18 +30,19 @@ public class Ghosty : Entity
         createProfile();
         gameObject.name = "Ghosty";
         EventVanquished.AddListener(Dematerialize);
+        Disarmed.AddListener(Die);
     }
 
     protected override void Update()
     {
         base.Update();
-        if(!MainHand && !OffHand)
+        if (!Player.INSTANCE)
         {
-            Vitality = 0;
+
         }
-        if (!Foe)
+        else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius)
         {
-            Vitality = 0;
+            Die();
         }
     }
 
@@ -88,7 +91,7 @@ public class Ghosty : Entity
         pearl.transform.position = transform.position;
         if (MainHand)
         {
-            pearl.Phylactery = MainHand;
+            pearl.Phylactery = Phylactery;
         }
         if (leftStorage)
         {

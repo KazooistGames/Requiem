@@ -761,6 +761,82 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &786075280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 786075282}
+  - component: {fileID: 786075281}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &786075281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786075280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63d17e1dbbf2b4c459b89f4a7a7e343b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EventDropped:
+    m_PersistentCalls:
+      m_Calls: []
+  EventPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+  EventThrown:
+    m_PersistentCalls:
+      m_Calls: []
+  ImpalingSomething: 0
+  Heft: 25
+  Idling: 1
+  Recoiling: 0
+  Wielder: {fileID: 0}
+  Allegiance: 0
+  Wielded: 0
+  MountTarget: {fileID: 0}
+  PrimaryTrigger: 0
+  SecondaryTrigger: 0
+  TertiaryTrigger: 0
+  ThrowTrigger: 0
+  Anim: {fileID: 0}
+  Body: {fileID: 0}
+  HitBox: {fileID: 0}
+  PhysicsBoxes: []
+  Filter: {fileID: 0}
+  Renderer: {fileID: 0}
+  MostRecentWielder: {fileID: 0}
+  Telecommuting: 0
+  Thrown: 0
+  equipType: 0
+  Phylactery: {fileID: 0}
+--- !u!4 &786075282
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786075280}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &844573214
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,7 +1017,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1285575790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1777,9 +1853,10 @@ MonoBehaviour:
   Paused: 0
   TimeScale: 0
   RadiusOfCrypts: 2
-  LengthOfCorridors: 4
+  LengthOfCorridors: 3
   CountOfChambers: 6
   CountOfCoves: 4
+  StartingChamber: {fileID: 0}
   corridor1: []
   chambers: []
   coves: []

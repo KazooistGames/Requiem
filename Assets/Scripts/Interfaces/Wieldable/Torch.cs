@@ -7,12 +7,12 @@ using UnityEngine.UI;
 public class Torch : Wieldable
 {
     public bool Lit = false;
-    public static float maxFadeRange = 15;
+    public static float maxFadeRange = 12;
     public static float minFadeRange = 3;
-    public static float maxIntensity = 6f;
-    public static float minIntensity = 4f;
-    public static float maxLightRange = 1.25f;
-    public static float minLightRange = 1.0f;
+    public static float maxIntensity = 7.5f;
+    public static float minIntensity = 5f;
+    public static float maxLightRange = 2.5f;
+    public static float minLightRange = 1.5f;
     public static float flickerRate = 0.1f;
 
     private float proximityToPlayerScalar;

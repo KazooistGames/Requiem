@@ -43,6 +43,7 @@ public class Entity : MonoBehaviour
     public float heightActual { get; private set; }
     public float hoverActual { get; private set; }
 
+    public UnityEvent Disarmed = new UnityEvent();
     public UnityEvent EventVanquished = new UnityEvent();
     public UnityEvent<float> EventWounded = new UnityEvent<float>();
     public UnityEvent EventCrashed = new UnityEvent();
@@ -510,6 +511,7 @@ public class Entity : MonoBehaviour
         {
             offWep.DropItem(yeet: true, magnitude: yeetMagnitude);
         }
+        Disarmed.Invoke();
     }
 
     public void Shove(Vector3 VelocityChange, bool Dash = false)
