@@ -75,8 +75,8 @@ Shader "Custom/bloodSplatter"
 				output = lerp(output, cookie, rand2);
 				//output *= dot(i.worldNormal, normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz));
 				output *= saturate(1 - ratio);
-				output.a = output.a > 0.25 ? output.a : output.a*2;
-				output.r /= 2;
+				output.a = output.a > 1 ? output.a : output.a*2;
+				output.r /= 5;
 				//output *= i.light;
 				return output;
 			}

@@ -12,20 +12,22 @@ public class Game_Arena : Game
     public int CountOfChambers = 6;
     public int CountOfCoves = 5;
 
-    private List<List<Hextile>> crypt1 = new List<List<Hextile>>();
-    private List<List<Hextile>> crypt2 = new List<List<Hextile>>();
-    private List<List<Hextile>> crypt3 = new List<List<Hextile>>();
-    private List<Hextile> corridor1 = new List<Hextile>();
-    private List<Hextile> corridor2 = new List<Hextile>();
-    private List<Hextile> corridor3 = new List<Hextile>();
-    private List<Hextile> chambers = new List<Hextile>();
-    private List<Hextile> coves = new List<Hextile>();
+    public Hextile StartingChamber;
+    public List<List<Hextile>> crypt1 = new List<List<Hextile>>();
+    //private List<List<Hextile>> crypt2 = new List<List<Hextile>>();
+    //private List<List<Hextile>> crypt3 = new List<List<Hextile>>();
+    public List<Hextile> corridor1 = new List<Hextile>();
+    //private List<Hextile> corridor2 = new List<Hextile>();
+    //private List<Hextile> corridor3 = new List<Hextile>();
+    public List<Hextile> chambers = new List<Hextile>();
+    public List<Hextile> coves = new List<Hextile>();
 
     private List<KeyValuePair<Hextile, Hextile.HexPosition>> chamberCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
     private List<KeyValuePair<Hextile, Hextile.HexPosition>> coveCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
 
     private Hextile centerTile;
     private Landmark_Alter alter;
+    private Landmark_Well well;
     private Idol idol;
 
     public enum GameState
@@ -69,29 +71,37 @@ public class Game_Arena : Game
         yield return null;
 
         Hextile.HexPosition randomDirection = (Hextile.HexPosition)UnityEngine.Random.Range(1, 7);
-        Hextile.HexPosition offsetByOne = Hextile.RotateHexPosition(randomDirection, Math.Sign(UnityEngine.Random.value - 0.5f));
+        Hextile.HexPosition offsetBy3 = Hextile.RotateHexPosition(randomDirection, 3);
         yield return Hextile.DrawCircle(RadiusOfCrypts, Hextile.LastGeneratedTile, Tiles: crypt1); //crypt1
         yield return Hextile.DrawLine(LengthOfCorridors, centerTile, randomDirection, corridor1); //corridor1
-        yield return Hextile.DrawLine(LengthOfCorridors, centerTile, offsetByOne, corridor2); //corridor2
-        yield return Hextile.DrawCircle(RadiusOfCrypts, corridor1.Last(x => x), randomDirection, crypt2); //crypt2
-        yield return Hextile.DrawCircle(RadiusOfCrypts, corridor2.Last(x => x), offsetByOne, crypt3); //crypt3
-        Hextile.HexPosition connectCrypt2and3 = Hextile.VectorToHexPosition(crypt2[0][0].transform.position - crypt3[0][0].transform.position);
-        yield return Hextile.DrawLine(LengthOfCorridors, crypt3[0][0], connectCrypt2and3, corridor3); //corridor3
+        StartingChamber = crypt1[0][0].Edge(offsetBy3).Extend(offsetBy3);
+        Landmark_Gate startGate = new GameObject().AddComponent<Landmark_Gate>();
+        startGate.AssignToTile(StartingChamber);
+        startGate.SetPositionOnTile(randomDirection);
+        well = new GameObject().AddComponent<Landmark_Well>();
+        well.AssignToTile(StartingChamber);
+        //yield return Hextile.DrawLine(LengthOfCorridors, centerTile, offsetBy3, corridor2); //corridor2
+        //yield return Hextile.DrawCircle(RadiusOfCrypts, corridor1.Last(x => x), randomDirection, crypt2); //crypt2
+        //yield return Hextile.DrawCircle(RadiusOfCrypts, corridor2.Last(x => x), offsetBy3, crypt3); //crypt3
+        //Hextile.HexPosition connectCrypt2and3 = Hextile.VectorToHexPosition(crypt2[0][0].transform.position - crypt3[0][0].transform.position);
+        //yield return Hextile.DrawLine(LengthOfCorridors, crypt3[0][0], connectCrypt2and3, corridor3); //corridor3
 
         //crypt chambers
         List<Hextile> cryptChamberKeys = new List<Hextile>();
-        chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != randomDirection && x.Value != offsetByOne).ToList());
-        chamberCandidates.AddRange(crypt2[0][0].AdjacentTiles.Where(x => x.Value != Hextile.RotateHexPosition(randomDirection, 3) && x.Value != Hextile.RotateHexPosition(connectCrypt2and3, 3)).ToList());
-        chamberCandidates.AddRange(crypt3[0][0].AdjacentTiles.Where(x => x.Value != connectCrypt2and3 && x.Value != Hextile.RotateHexPosition(offsetByOne, 3)).ToList());
+        chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != randomDirection && x.Value != offsetBy3).ToList());
+        //chamberCandidates.AddRange(crypt2[0][0].AdjacentTiles.Where(x => x.Value != Hextile.RotateHexPosition(randomDirection, 3) && x.Value != Hextile.RotateHexPosition(connectCrypt2and3, 3)).ToList());
+        //chamberCandidates.AddRange(crypt3[0][0].AdjacentTiles.Where(x => x.Value != connectCrypt2and3 && x.Value != Hextile.RotateHexPosition(offsetBy3, 3)).ToList());
         while (chambers.Count < CountOfChambers && chamberCandidates.Count > 0)
         {
             int randomIndex = UnityEngine.Random.Range(0, chamberCandidates.Count);
             Hextile startingTile = chamberCandidates[randomIndex].Key;
             Hextile.HexPosition direction = chamberCandidates[randomIndex].Value;
+            Hextile doorTile = startingTile.Edge(direction);
+            //yield return Hextile.DrawCircle(1, startingTile, direction);
             Hextile newChamber = startingTile.Edge(direction).Extend(direction);
             Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
-            newGate.AssignToTile(newChamber);
-            newGate.SetPositionOnTile(Hextile.RotateHexPosition(direction, 3));
+            newGate.AssignToTile(doorTile);
+            newGate.SetPositionOnTile(direction);
             chambers.Add(newChamber);
             chamberCandidates.RemoveAt(randomIndex);
             //set up new quest class
@@ -100,9 +110,9 @@ public class Game_Arena : Game
 
         //corridor coves
         List<Hextile> corridorCoveKeys = new List<Hextile>();
-        corridorCoveKeys.Add(corridor1.First(x => x.AdjacentTiles.Count == 2));
-        corridorCoveKeys.Add(corridor2.First(x => x.AdjacentTiles.Count == 2));
-        corridorCoveKeys.Add(corridor3.First(x => x.AdjacentTiles.Count == 2));
+        corridorCoveKeys.AddRange(corridor1.Where(x => x.AdjacentTiles.Count(y=>y.Key.AdjacentTiles.Count > 2) == 0).ToList());
+        //corridorCoveKeys.Add(corridor2.First(x => x.AdjacentTiles.Count == 2));
+        //corridorCoveKeys.Add(corridor3.First(x => x.AdjacentTiles.Count == 2));
         foreach (Hextile tile in corridorCoveKeys)
         {
             for (int i = 1; i <= 6; i++)
@@ -128,20 +138,20 @@ public class Game_Arena : Game
         }
 
         AllTilesInPlay.AddRange(crypt1.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        AllTilesInPlay.AddRange(crypt2.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        AllTilesInPlay.AddRange(crypt3.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
+        //AllTilesInPlay.AddRange(crypt2.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
+        //AllTilesInPlay.AddRange(crypt3.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
         AllTilesInPlay.AddRange(corridor1);
-        AllTilesInPlay.AddRange(corridor2);
-        AllTilesInPlay.AddRange(corridor3);
+        //AllTilesInPlay.AddRange(corridor2);
+        //AllTilesInPlay.AddRange(corridor3);
         AllTilesInPlay.AddRange(chambers);
 
         yield return corridorLandmarks(corridor1);
-        yield return corridorLandmarks(corridor2);
-        yield return corridorLandmarks(corridor3);
+        //yield return corridorLandmarks(corridor2);
+        //yield return corridorLandmarks(corridor3);
 
         yield return cryptLandmarks(crypt1);
-        yield return cryptLandmarks(crypt2);
-        yield return cryptLandmarks(crypt3);
+        //yield return cryptLandmarks(crypt2);
+        //yield return cryptLandmarks(crypt3);
 
         yield return new WaitForSeconds(0.5f);
         new GameObject().AddComponent<Player>();
@@ -196,7 +206,9 @@ public class Game_Arena : Game
     {
         yield return new WaitUntil(() => Commissioned);
         Torch.Toggle(true);
-        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(AllTilesInPlay[0]);
+        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(StartingChamber);
+        Player.INSTANCE.HostEntity.Vitality = 1;
+        yield return new WaitUntil(() => well.Used);
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
         MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs );

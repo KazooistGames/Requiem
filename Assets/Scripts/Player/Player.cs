@@ -167,6 +167,7 @@ public class Player : MonoBehaviour
         {
             HostEntity.Interact.Invoke(HostEntity);
         }
+        HostEntity.Interacting = CurrentKeyboard.fKey.isPressed;
         if (CurrentKeyboard.tabKey.isPressed || CurrentKeyboard.tabKey.wasReleasedThisFrame) //cycle equipped item
         {
             bool released = CurrentKeyboard.tabKey.wasReleasedThisFrame;

@@ -72,6 +72,7 @@ public class Entity : MonoBehaviour
 
     public UnityEvent<Entity> EventAttemptPickup = new UnityEvent<Entity> { };
     public UnityEvent<Entity> Interact = new UnityEvent<Entity> { };
+    public bool Interacting = false;
 
     public CapsuleCollider personalBox;
     public GameObject model;
@@ -931,8 +932,11 @@ public class Entity : MonoBehaviour
         }
         else if(myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
-            float duration = 5;
-            foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
+            if (requiemPlayer)
+            {
+                float duration = 5;
+                foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
+            }
         }
         if (vitalityDamage > 0) 
         {

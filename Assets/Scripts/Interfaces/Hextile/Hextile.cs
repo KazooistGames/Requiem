@@ -178,7 +178,6 @@ public class Hextile : MonoBehaviour
         {
             if (!AdjacentTiles.ContainsKey(otherTile))
             {
-
                 //int angle = (Mathf.RoundToInt(AIBehaviour.getAngle(otherTile.transform.position - transform.position)) + 360) % 360;
                 //HexPosition position = (HexPosition)Mathf.RoundToInt((angle + 30) / 60);
                 HexPosition position = VectorToHexPosition(otherTile.transform.position - transform.position);
@@ -266,10 +265,14 @@ public class Hextile : MonoBehaviour
 
     public static IEnumerator DrawCircle(int circleRadius, Hextile startingTile, HexPosition direction = HexPosition.error, List<List<Hextile>> Tiles = null)
     {
+        if(Tiles == null)
+        {
+            Tiles = new List<List<Hextile>>();
+        }
         yield return null;
         startingTile.Extend(direction);
         yield return null;
-        for (int i = 0; i <= circleRadius; i++)
+        for (int i = 0; i <= circleRadius + 1; i++)
         {
             yield return null;
             yield return null;
@@ -278,7 +281,7 @@ public class Hextile : MonoBehaviour
             {
                 LastExtendedTile.Extend(direction);
             }
-            if (Tiles != null)
+            if(i > 0)
             {
                 Tiles.Add(new List<Hextile>());
             }

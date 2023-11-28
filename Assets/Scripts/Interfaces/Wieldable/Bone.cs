@@ -35,11 +35,11 @@ public class Bone : MonoBehaviour
         Body.mass = 0.25f;
     }
 
-    protected void Update()
-    {
-        allowCollectTimer += Time.deltaTime;
-        allowCollect = allowCollectTimer >= 0.75f;
-    }
+    //protected void Update()
+    //{
+    //    allowCollectTimer += Time.deltaTime;
+    //    allowCollect = allowCollectTimer >= 0.75f;
+    //}
 
     protected void OnDestroy()
     {

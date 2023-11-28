@@ -82,6 +82,7 @@ public class Goon : AIBehaviour
                                 {
                                     _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
                                 }
+                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, 0.5f);
                             }
                             else
                             {
@@ -130,15 +131,6 @@ public class Goon : AIBehaviour
         if(martialCurrentState != martialState.defending)
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
-            if (Random.value >= 0.5f)
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-            }
-            else
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 1f);
-            }
         }
     }
 

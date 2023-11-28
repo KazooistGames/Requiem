@@ -9,7 +9,7 @@ using System.Collections;
 public class Landmark_Well : Landmark
 {
     public float Volume = 100;
-    private float drinkPeriod = 1.0f;
+    private float fullDrinkPeriod = 5.0f;
     protected static GameObject WellModelTemplate;
     protected GameObject Model;
     protected MeshRenderer bloodPoolRenderer;
@@ -19,33 +19,54 @@ public class Landmark_Well : Landmark
     private float bloodWaveXspeed = 0.3f;
     private float bloodWaveYspeed = 0.1f;
 
+    private GameObject gulpSound;
+
+    private List<GameObject> bloodSplatters = new List<GameObject>();
+    protected static GameObject BLOOD_SPLATTER_PREFAB;
+
+    protected void Start()
+    {
+        splatter(Vector3.zero, 0.25f);
+    }
     protected void Update()
     {
         Volume = Mathf.Clamp(Volume, 0, 100);
+        Used = Volume <= 0;
         bloodPoolRenderer.gameObject.transform.localPosition = Vector3.up * Mathf.Lerp(bloodMinHeight, bloodMaxHeight, Volume / 100f);
         bumpMapOffset = new Vector2(Mathf.Sin(Time.time * bloodWaveXspeed), Mathf.Cos(Time.time * bloodWaveYspeed));
         bloodPoolRenderer.material.SetTextureOffset("_MainTex", bumpMapOffset);
         bloodPoolRenderer.gameObject.transform.Rotate(Vector3.up, Time.deltaTime * 5);
-
     }
 
-    protected void OnTriggerEnter(Collider other)
+    protected void OnTriggerStay(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
-        if(entity && !Used && !Energized)
+        if(entity ? Volume > 0 && entity.Interacting : false)
         {
-            entity.Interact.AddListener(DRINK);
+            if (!gulpSound)
+            {
+                playGulp();
+                if(UnityEngine.Random.value > 0.5f)
+                {
+                    Vector3 disposition = entity.transform.position - transform.position;
+                    Vector3 tinyOffset = new Vector3(UnityEngine.Random.value * 0.1f - 0.05f, 0, UnityEngine.Random.value * 0.1f - 0.05f);
+                    float scale = 0.05f + UnityEngine.Random.value * 0.15f;
+                    splatter(disposition + tinyOffset, scale);
+                }
+            }
+            Energized = true;
+            float increment = Time.deltaTime / fullDrinkPeriod;
+            Volume -= 100 * increment;
+            entity.Vitality += entity.Strength * increment;
         }
+        else
+        {
+            Energized = false;
+        }
+
     }
 
-    protected void OnTriggerExit(Collider other)
-    {
-        Entity entity = other.gameObject.GetComponent<Entity>();
-        if (entity && !Used && !Energized)
-        {
-            entity.Interact.RemoveListener(DRINK);
-        }
-    }
+    /***** PUBLIC *****/
 
     public override void AssignToTile(Hextile tile)
     {
@@ -74,26 +95,32 @@ public class Landmark_Well : Landmark
         Used = false;
     }
 
-    public void DRINK(Entity drinker)
+
+    /***** PROTECTED *****/
+
+
+    /***** PRIVATE *****/
+    private GameObject splatter(Vector3 position, float size)
     {
-        StartCoroutine(drinkRoutine(drinker));
+        if (!BLOOD_SPLATTER_PREFAB)
+        {
+            BLOOD_SPLATTER_PREFAB = Resources.Load<GameObject>("Prefabs/Misc/bloodSplatter");
+        }
+        GameObject newSplatter = Instantiate(BLOOD_SPLATTER_PREFAB);
+        bloodSplatters.Add(newSplatter);
+        newSplatter.transform.SetParent(transform);
+        newSplatter.transform.localPosition = position;
+        newSplatter.transform.localEulerAngles = Vector3.up * UnityEngine.Random.value * 180 + Vector3.right * 90;
+        newSplatter.transform.localScale = Vector3.one;
+        newSplatter.GetComponent<Projector>().orthographicSize = size;
+        return newSplatter;
     }
 
-    private IEnumerator drinkRoutine(Entity drinker)
+
+    private void playGulp()
     {
-        playSlurp();
-        while (Volume > 0)
-        {
-            Energized = true;
-            float increment = Time.deltaTime / drinkPeriod;
-            Volume -= 100 * increment;
-            drinker.Vitality += drinker.Strength * increment;
-            yield return new WaitForEndOfFrame();
-        }
-        //playChant();
-        Energized = false;
-        Used = true;
-        yield break;
+        gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
+        gulpSound.GetComponent<AudioSource>().time = 0.8f;
     }
 
     private void playSlurp()

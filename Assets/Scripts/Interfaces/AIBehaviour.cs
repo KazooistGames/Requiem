@@ -1045,19 +1045,22 @@ public class AIBehaviour : MonoBehaviour
                         {
                             Weapon wep = mainWep ? mainWep : offWep;
                             switch (martialCurrentState)
-                            {                                
+                            {
+                                case martialState.none:
+                                    tangoInnerRange = wep.Range * 0.75f;
+                                    tangoOuterRange = wep.Range * 1.5f;
+                                    break;
                                 case martialState.attacking:
                                     tangoInnerRange = wep.Range * 0.75f;
                                     tangoOuterRange = wep.Range * 1.0f;
                                     break;
                                 case martialState.defending:
-                                    tangoInnerRange = wep.Range * 1.5f;
-                                    tangoOuterRange = wep.Range * 2.0f;
+                                    tangoInnerRange = wep.Range * 1.75f;
+                                    tangoOuterRange = wep.Range * 2.25f;
                                     break;
                                 case martialState.throwing:
-                                    bool ranged = wep ? wep.equipType == Wieldable.EquipType.OneHanded : false;
-                                    tangoInnerRange = ranged ? wep.Range * 3.0f : wep.Range * 1.5f;
-                                    tangoOuterRange = ranged ? sensoryBaseRange * sensorySightRangeScalar * 0.75f : wep.Range * 2.0f;
+                                    tangoInnerRange = wep.Range * 2.5f;
+                                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
                                     break;
                             }
                             pursueStoppingDistance = tangoOuterRange;

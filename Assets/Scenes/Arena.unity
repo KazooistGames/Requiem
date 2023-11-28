@@ -250,9 +250,10 @@ MonoBehaviour:
   EventAttemptPickup:
     m_PersistentCalls:
       m_Calls: []
-  EventAttemptInteraction:
+  Interact:
     m_PersistentCalls:
       m_Calls: []
+  Interacting: 0
   personalBox: {fileID: 0}
   model: {fileID: 0}
   body: {fileID: 0}
@@ -722,9 +723,10 @@ MonoBehaviour:
   EventAttemptPickup:
     m_PersistentCalls:
       m_Calls: []
-  EventAttemptInteraction:
+  Interact:
     m_PersistentCalls:
       m_Calls: []
+  Interacting: 0
   personalBox: {fileID: 0}
   model: {fileID: 0}
   body: {fileID: 0}
@@ -885,9 +887,10 @@ MonoBehaviour:
   EventAttemptPickup:
     m_PersistentCalls:
       m_Calls: []
-  EventAttemptInteraction:
+  Interact:
     m_PersistentCalls:
       m_Calls: []
+  Interacting: 0
   personalBox: {fileID: 0}
   model: {fileID: 0}
   body: {fileID: 0}
@@ -1234,9 +1237,10 @@ MonoBehaviour:
   EventAttemptPickup:
     m_PersistentCalls:
       m_Calls: []
-  EventAttemptInteraction:
+  Interact:
     m_PersistentCalls:
       m_Calls: []
+  Interacting: 0
   personalBox: {fileID: 0}
   model: {fileID: 0}
   body: {fileID: 0}
@@ -1397,9 +1401,10 @@ MonoBehaviour:
   EventAttemptPickup:
     m_PersistentCalls:
       m_Calls: []
-  EventAttemptInteraction:
+  Interact:
     m_PersistentCalls:
       m_Calls: []
+  Interacting: 0
   personalBox: {fileID: 0}
   model: {fileID: 0}
   body: {fileID: 0}
@@ -1683,9 +1688,10 @@ MonoBehaviour:
   EventAttemptPickup:
     m_PersistentCalls:
       m_Calls: []
-  EventAttemptInteraction:
+  Interact:
     m_PersistentCalls:
       m_Calls: []
+  Interacting: 0
   personalBox: {fileID: 0}
   model: {fileID: 0}
   body: {fileID: 0}
@@ -1771,9 +1777,12 @@ MonoBehaviour:
   Paused: 0
   TimeScale: 0
   RadiusOfCrypts: 2
-  LengthOfCorridors: 3
+  LengthOfCorridors: 4
   CountOfChambers: 6
-  CountOfCoves: 5
+  CountOfCoves: 4
+  corridor1: []
+  chambers: []
+  coves: []
   StateOfGame: 0
   Difficulty: 0
 --- !u!114 &2128541363
