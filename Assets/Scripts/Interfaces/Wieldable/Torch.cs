@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class Torch : Wieldable
 {
     public bool Lit = false;
-    public static float maxFadeRange = 12;
+    public static float maxFadeRange = 15;
     public static float minFadeRange = 3;
     public static float maxIntensity = 7.5f;
     public static float minIntensity = 5f;

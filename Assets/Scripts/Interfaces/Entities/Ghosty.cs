@@ -44,6 +44,7 @@ public class Ghosty : Entity
         {
             Die();
         }
+        Aggressive = Foe || Poise != Strength;
     }
 
     protected override void FixedUpdate()
@@ -89,7 +90,7 @@ public class Ghosty : Entity
     {
         SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
         pearl.transform.position = transform.position;
-        if (MainHand)
+        if (Phylactery)
         {
             pearl.Phylactery = Phylactery;
         }

@@ -63,13 +63,16 @@ public abstract class Weapon : Wieldable
     public float TempoTargetWidth { get; private set; } = 0.2f;
 
 
-    protected string swingClip;
+    protected string lightSwingClip;
+    protected string heavySwingClip;
     protected float swingPitch;
     protected float clangPitch;
     protected string tinkClip = "Audio/Weapons/tink";
     protected float tinkPitch;
     protected string clangClip;
     protected float clangVolume;
+    private bool playClashSoundONS = true;
+
     protected List<GameObject> alreadyHit = new List<GameObject>();
     protected bool attackONS = true;
 
@@ -114,12 +117,13 @@ public abstract class Weapon : Wieldable
         {
             box.isTrigger = false;
         }
-        swingClip = (equipType == EquipType.TwoHanded) ? "Audio/Weapons/deepSwing" : "Audio/Weapons/midSwing";
-        swingPitch = (equipType == EquipType.TwoHanded ? 50 : 20) / BasePower;
+        lightSwingClip = "Audio/Weapons/midSwing";
+        heavySwingClip = "Audio/Weapons/deepSwing";
+        swingPitch = 40 / Heft;
         clangClip = "Audio/Weapons/clang";
-        clangPitch = 100 / Heft;
+        clangPitch = 120 / Heft;
         clangVolume = 0.075f;
-        tinkPitch = 25 / BasePower;
+        tinkPitch = 50 / Heft;
         if(Heft == 0)
         {
             Heft = BasePower;
@@ -200,13 +204,22 @@ public abstract class Weapon : Wieldable
                 {
                     if (attackONS)
                     {
+                        playClashSoundONS = true;
                         attackONS = false;
                         alreadyHit = new List<GameObject>();
                         HitBox.isTrigger = true;
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
-                        playSwing();
+                        if(ActionAnimated == ActionAnimation.QuickAttack)
+                        {
+                            playLightSwing();
+                        }
+                        else if(ActionAnimated == ActionAnimation.StrongAttack)
+                        {
+                            playHeavySwing();
+                        }
+
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
                 }
@@ -772,7 +785,12 @@ public abstract class Weapon : Wieldable
 
     private void playClang(float pitchScalar = 2.0f)
     {
-        _SoundService.PlayAmbientSound(clangClip, transform.position, clangPitch * pitchScalar, clangVolume, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        if (playClashSoundONS)
+        {
+            playClashSoundONS = false;
+            _SoundService.PlayAmbientSound(clangClip, transform.position, clangPitch * pitchScalar, clangVolume, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        }
+        
     }
 
     private void playShing(float pichScalar = 1.0f)
@@ -787,12 +805,20 @@ public abstract class Weapon : Wieldable
 
     private void playTink()
     {
-        _SoundService.PlayAmbientSound(tinkClip, transform.position, tinkPitch + (tinkPitch * 0.25f) * (UnityEngine.Random.value - 0.5f), 0.25f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        if (playClashSoundONS)
+        {
+            playClashSoundONS = false;
+            _SoundService.PlayAmbientSound(tinkClip, transform.position, tinkPitch + (tinkPitch * 0.25f) * (UnityEngine.Random.value - 0.5f), 0.25f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        }  
     }
 
-    private void playSwing()
+    private void playLightSwing()
     {
-        _SoundService.PlayAmbientSound(swingClip, transform.position, swingPitch, 1.0f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        _SoundService.PlayAmbientSound(lightSwingClip, transform.position, swingPitch, 1.0f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+    }
+    private void playHeavySwing()
+    {
+        _SoundService.PlayAmbientSound(heavySwingClip, transform.position, swingPitch, 1.0f, onSoundSpawn: sound => sound.layer = gameObject.layer);
     }
     
 }

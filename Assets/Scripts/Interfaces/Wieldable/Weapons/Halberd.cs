@@ -19,7 +19,8 @@ public class Halberd : Weapon
         Filter.mesh = Game.weaponMeshes["Halberd"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Halberd"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Halberd"));
-        wHitBox.center = new Vector3(0, 0.2f, 0);
+        wHitBox.center = new Vector3(0, 0.5f, 0.15f);
+        wHitBox.radius = 0.15f;
         wHitBox.height = 1.5f;
         hitRadius = 0.05f;
         defendRadius = 0.4f;

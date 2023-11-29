@@ -270,7 +270,7 @@ public class Hextile : MonoBehaviour
             Tiles = new List<List<Hextile>>();
         }
         yield return null;
-        startingTile.Extend(direction);
+        //startingTile.Extend(direction);
         yield return null;
         for (int i = 0; i <= circleRadius + 1; i++)
         {

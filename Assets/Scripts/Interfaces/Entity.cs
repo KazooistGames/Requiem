@@ -51,6 +51,7 @@ public class Entity : MonoBehaviour
     public UnityEvent<Wieldable> EventPickedUpWieldable = new UnityEvent<Wieldable>();
 
     public Entity Foe;
+    public bool Aggressive = true;
 
     protected float BaseAcceleration = 8;
     public float SpeedActual { get; private set; } = 0f;
@@ -113,7 +114,7 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
-    private static float POISE_REGEN_PERIOD = 4f;
+    private static Vector2 POISE_REGEN_PERIOD = new Vector2(4, 10);
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
@@ -157,7 +158,7 @@ public class Entity : MonoBehaviour
         three = 3,
         four = 4,
     }
-    public Loyalty Allegiance = Loyalty.neutral;
+    public Loyalty Allegiance = Loyalty.hostile;
 
     public _Flames flames;
 
@@ -236,7 +237,8 @@ public class Entity : MonoBehaviour
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         if ((poiseDebounceTimer += Time.deltaTime) >= (poiseDebouncePeriod))
         {
-            float increment = Time.deltaTime * Strength / POISE_REGEN_PERIOD;
+            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_PERIOD.y, POISE_REGEN_PERIOD.x, Vitality / Strength);
+            float increment = Time.deltaTime * Strength / scalingRegenRate;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
             if (Mathf.Abs(delta) <= increment)
@@ -798,7 +800,7 @@ public class Entity : MonoBehaviour
                 }
                 Dashing = true;
                 Shove(dashDirection * scaledVelocity, true);
-                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, 2f - DashPower, 0.25f + DashPower);
+                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, FinalDash ? 0.5f : 2f - DashPower, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
                 sound.transform.SetParent(transform);
                 yield return new WaitWhile(() => Shoved);
@@ -837,20 +839,20 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-        {
-            if (theirWeapon.Wielder)
-            {
-                theirWeapon.Wielder.Stagger(Mathf.Sqrt(myWeapon.Heft / theirWeapon.Wielder.Strength));
-            }
-        }
-        else if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
-        {
-            if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-            {
-                Stagger((theirWeapon.Heft / Strength));
-            }
-        }
+        //if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+        //{
+        //    if (theirWeapon.Wielder)
+        //    {
+        //        theirWeapon.Wielder.Stagger(Mathf.Sqrt(myWeapon.Heft / theirWeapon.Wielder.Strength));
+        //    }
+        //}
+        //else if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
+        //{
+        //    if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+        //    {
+        //        Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
+        //    }
+        //}
 
     }
 
@@ -858,20 +860,20 @@ public class Entity : MonoBehaviour
     {
         if (theirWeapon.TrueStrike)
         {
-            if (Posture == PostureStrength.Weak)
-            {
-                Disarm();
-            }
-            else
-            {
-                Stagger(2 * theirWeapon.Heft / Strength);
-            }
-            alterPoise(-theirWeapon.Heft);
+            //if (Posture == PostureStrength.Weak)
+            //{
+            //    Disarm();
+            //}
+            //else
+            //{
+            //    Stagger(2 * theirWeapon.Heft / Strength);
+            //}
+            //alterPoise(-theirWeapon.Heft);
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
-            alterPoise(-theirWeapon.Heft);
+            //Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
+            //alterPoise(-theirWeapon.Heft);
         }
         else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
@@ -930,18 +932,18 @@ public class Entity : MonoBehaviour
         //}
         if(myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
         {
-            if (myWeapon.TrueStrike)
-            {
-                vitalityDamage += Resolve;
-            }
+            //if (myWeapon.TrueStrike)
+            //{
+            //    vitalityDamage += Resolve;
+            //}
         }
         else if(myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
         {
-            if (requiemPlayer)
-            {
-                float duration = 5;
-                foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
-            }
+            //if (requiemPlayer)
+            //{
+            //    float duration = 5;
+            //    foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
+            //}
         }
         if (vitalityDamage > 0) 
         {

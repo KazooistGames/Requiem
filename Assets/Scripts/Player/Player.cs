@@ -278,7 +278,7 @@ public class Player : MonoBehaviour
         CurrentMouse = Mouse.current;
         CurrentKeyboard = Keyboard.current;
         listener = GetComponent<AudioListener>() ? GetComponent<AudioListener>() : gameObject.AddComponent<AudioListener>();
-        Faction = Entity.Loyalty.hostile;
+        Faction = Entity.Loyalty.neutral;
         HostEntity = new GameObject().AddComponent<Struggler>();
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;

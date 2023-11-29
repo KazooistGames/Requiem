@@ -27,6 +27,10 @@ public class Landmark_Alter : Landmark
         {
             Energized = offeringDetectionCollider.bounds.Contains(DesiredOffering.transform.position);
         }
+        else if(Player.INSTANCE)
+        {
+            Energized = offeringDetectionCollider.bounds.Contains(Player.INSTANCE.HostEntity.transform.position) && Player.INSTANCE.HostEntity.Interacting;
+        }
     }
 
 

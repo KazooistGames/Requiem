@@ -271,6 +271,7 @@ public class AIBehaviour : MonoBehaviour
 
     //survey
     public bool sensoryAlerted = false;
+
     protected float sensoryAlertedTimer = 0.0f;
     protected float sensoryAlertedPeriod = 5.0f;
     protected bool sensorySightDetection = true;
@@ -307,7 +308,7 @@ public class AIBehaviour : MonoBehaviour
             sensoryBaseRange = (sensoryAlerted ? 7.5f : 5f) * Entity.Scale;
             Entity potentialFoe;
             bool enemiesAfoot = false;
-            if (!entity.Foe)
+            if (!entity.Foe && entity.Aggressive)
             {
                 if(sensorySightDetection)
                 {
@@ -343,7 +344,7 @@ public class AIBehaviour : MonoBehaviour
                         }
                     }
                 }
-                if (sensoryAudioDetection && !entity.Foe)
+                if (sensoryAudioDetection && !entity.Foe && entity.Aggressive)
                 {
                     float audioRangeActual = sensoryBaseRange * sensoryAudioRangeScalar;
                     Vector3 newAudioDirection = Vector3.zero;
@@ -368,7 +369,7 @@ public class AIBehaviour : MonoBehaviour
                     sensoryAudioDirection = newAudioDirection != Vector3.zero ? newAudioDirection : sensoryAudioDirection;
                 }
             }
-            else
+            else if(entity.Foe)
             {
                 RaycastHit[] rayHits;
                 Vector3 disposition = (entity.Foe.transform.position - transform.position);
