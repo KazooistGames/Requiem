@@ -9,18 +9,7 @@ public class Landmark_Pillar : Landmark
 
     protected Rigidbody body;
 
-    protected Torch torch;
     /********** pillar functions *************/
-    public override void Impacted()
-    {
-        base.Impacted();
-        if(torch ? torch.MountTarget: false)
-        {
-            torch.MountTarget = null;
-            torch.DropItem(yeet: true);
-            torch = null;
-        }
-    }
 
     public override void AssignToTile(Hextile Tile)
     {
@@ -41,10 +30,10 @@ public class Landmark_Pillar : Landmark
         //body.freezeRotation = true;
         Vector3 temp = transform.localEulerAngles;
         transform.localEulerAngles = new Vector3(0, temp.y, 0);
-        torch = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/torch")).GetComponent<Torch>();
+        //torch = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/torch")).GetComponent<Torch>();
         if (model.tag == "Broken")
         {
-            torch.transform.position = transform.position + new Vector3(0, 0.35f, 0.07f);
+            //torch.transform.position = transform.position + new Vector3(0, 0.35f, 0.07f);
             GameObject otherHalf = Instantiate(model);
             otherHalf.transform.position = model.transform.position + Vector3.up;
             otherHalf.transform.Rotate(new Vector3(Random.value * 180, Random.value * 180, Random.value * 180));
@@ -55,9 +44,9 @@ public class Landmark_Pillar : Landmark
         }
         else
         {
-            torch.Mount(gameObject, new Vector3(0, 0.35f, 0.07f));
+            //torch.Mount(gameObject, new Vector3(0, 0.35f, 0.07f));
         }
-        torch.transform.localEulerAngles = new Vector3(45, 0, 0);
+        //torch.transform.localEulerAngles = new Vector3(45, 0, 0);
         //torch.Lit = false;
     }
 }

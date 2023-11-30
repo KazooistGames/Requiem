@@ -29,7 +29,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1247586716013791906}
-  m_LocalRotation: {x: -0, y: 0.79080033, z: -0, w: -0.6120742}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
@@ -144,14 +144,14 @@ MonoBehaviour:
   ImpalingSomething: 0
   Heft: 25
   Idling: 1
-  Rebuked: 0
+  Recoiling: 0
   Wielder: {fileID: 0}
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
-  Primary: 0
-  Secondary: 0
-  Tertiary: 0
+  PrimaryTrigger: 0
+  SecondaryTrigger: 0
+  TertiaryTrigger: 0
   ThrowTrigger: 0
   Anim: {fileID: 0}
   Body: {fileID: 0}

@@ -14,10 +14,28 @@ public class Landmark : MonoBehaviour
 
     public Hextile.HexPosition PositionOnTile = Hextile.HexPosition.error;
 
+    protected List<Torch> torches = new List<Torch>();
+
+    private void Start()
+    {
+        GetComponentsInChildren(torches);
+        foreach (Torch torch in torches)
+        {
+            Vector3 position = torch.transform.position - transform.position;
+            torch.Mount(gameObject, position);
+        }
+    }
     /***** PUBLIC *****/
     public virtual void Impacted()
     {
-        return;
+        foreach (Torch torch in torches)
+        {
+            if (torch ? torch.MountTarget : false)
+            {
+                torch.MountTarget = null;
+                torch.DropItem(yeet: true);
+            }
+        }
     }
 
     public virtual void AssignToTile(Hextile Tile)
