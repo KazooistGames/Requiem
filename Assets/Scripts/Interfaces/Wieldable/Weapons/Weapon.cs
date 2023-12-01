@@ -87,7 +87,7 @@ public abstract class Weapon : Wieldable
 
     protected _Flames flames;
 
-    private GameObject impaledObject;
+
 
     protected override void Awake()
     {
@@ -154,6 +154,10 @@ public abstract class Weapon : Wieldable
     {
         base.Update();
         Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+        if (ActionAnimated != ActionAnimation.QuickAttack && ActionAnimated != ActionAnimation.StrongAttack)
+        {
+            playClashSoundONS = true;
+        }
         if (Wielder)
         {
             ActionAnimated = getActionFromCurrentAnimationState();
@@ -313,7 +317,6 @@ public abstract class Weapon : Wieldable
         {
             if (!alreadyHit.Contains(other.gameObject))
             {
-
                 Entity foe = other.gameObject.GetComponent<Entity>();
                 Weapon foeWeapon = other.gameObject.GetComponent<Weapon>();
                 bool obstacle = (other.gameObject.layer == Game.layerObstacle || other.gameObject.layer == Game.layerWall);
@@ -494,15 +497,15 @@ public abstract class Weapon : Wieldable
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
         bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.25f : 0.75f) : true);
-        if (cleanhit && !ImpalingSomething)
+        if (cleanhit && !ImpaledObject)
         {
             if (foe)
             {
                 Hitting.Invoke(this, foe);
             }
-            impaledObject = collision.gameObject;
+            ImpaledObject = collision.gameObject;
             Thrown = false;
-            ImpalingSomething = true;
+            //ImpalingSomething = true;
             Body.isKinematic = true;
             transform.SetParent(collision.gameObject.transform, true);
             togglePhysicsBox(false);
@@ -546,7 +549,7 @@ public abstract class Weapon : Wieldable
                 HitBox.enabled = true;
                 GameObject impaledObject = collision.gameObject;
                 yield return new WaitUntil(() => Wielder || !impaledObject);
-                ImpalingSomething = false;
+                //ImpalingSomething = false;
                 togglePhysicsBox(!Wielder);
                 yield break;
             }
@@ -559,11 +562,13 @@ public abstract class Weapon : Wieldable
 
     public void ImpaleRelease()
     {
-        if (!impaledObject) { return; }
-        Entity foe = impaledObject.GetComponent<Entity>();                                                                                                                                                                                   
+        if (!ImpaledObject) { return; }
+
+        Entity foe = ImpaledObject.GetComponent<Entity>();                                                                                                                                                                                   
         if (foe)
         {
             string key = "impaled" + gameObject.GetHashCode().ToString();
+            foe.EventCrashed.RemoveListener(impale_doupleDipDamage);
             foe.EventVanquished.RemoveListener(ImpaleRelease);
             foe.modSpeed.Remove(key);
             foe.BleedingWounds.Remove(key);
@@ -572,13 +577,14 @@ public abstract class Weapon : Wieldable
         togglePhysicsBox(true);
         Body.isKinematic = false;
         enabled = true;
-        ImpalingSomething = false;
+        //ImpalingSomething = false;        
+        ImpaledObject = null;
         DropItem(yeet: false);
     }
     
     private void impale_doupleDipDamage()
     {
-        Entity foe = impaledObject.GetComponent<Entity>();
+        Entity foe = ImpaledObject.GetComponent<Entity>();
         if (foe)
         {
             foe.EventCrashed.RemoveListener(impale_doupleDipDamage);

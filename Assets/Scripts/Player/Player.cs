@@ -212,18 +212,11 @@ public class Player : MonoBehaviour
         }
         else if (CurrentKeyboard.eKey.wasPressedThisFrame)
         {
-            //HostEntity.EventAttemptPickup.Invoke(HostEntity);
-            //HostEntity.EventAttemptPickup.RemoveAllListeners();
-            if(hostWeapon.Wielder != HostEntity)
-            {
-                hostWeapon.ImpaleRelease();
-                hostWeapon.Telecommute(HostEntity.gameObject, 1f, x => x.PickupItem(HostEntity), useScalarAsSpeed: true);
-            }
+            yankWeapon();
         }
         else if (CurrentKeyboard.qKey.wasPressedThisFrame)
         {
-            HostEntity.transform.position = hostWeapon.transform.position;
-            hostWeapon.PickupItem(HostEntity);
+            recallWeapon();
         }
         else if (CurrentKeyboard.gKey.wasPressedThisFrame)
         {
@@ -312,6 +305,55 @@ public class Player : MonoBehaviour
             yield return null;
         }
         Game.INSTANCE.Restart();
+    }
+
+    /***** PRIVATE *****/
+
+    private void recallWeapon()
+    {
+        if (!hostWeapon)
+        {
+
+        }
+        else if (hostWeapon.ImpaledObject)
+        {
+            hostWeapon.ImpaleRelease();
+            Vector3 disposition = hostWeapon.transform.position - transform.position;
+            hostWeapon.DropItem(yeet: true, Vector3.up - disposition.normalized, Entity.Min_Velocity_Of_Dash);
+        }
+        else if (hostWeapon.Wielder != HostEntity)
+        {
+            Vector3 disposition = hostWeapon.transform.position - transform.position;
+            float recallPeriod = Mathf.Min(disposition.magnitude/2, 0.75f);
+            hostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
+        }
+    }
+
+    private void yankWeapon()
+    {
+        if (!hostWeapon)
+        {
+
+        }
+        else if (hostWeapon.ImpaledObject)
+        {
+            Entity impaledFoe = hostWeapon.ImpaledObject.GetComponent<Entity>();
+            if (impaledFoe)
+            {
+                Vector3 disposition = hostWeapon.ImpaledObject.transform.position - transform.position;
+                impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
+            }
+            else
+            {
+                Vector3 disposition = hostWeapon.transform.position - transform.position;
+                HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
+            }
+        }
+        else
+        {
+            Vector3 disposition = hostWeapon.transform.position - transform.position;
+            hostWeapon.DropItem(yeet: true, Vector3.up - disposition.normalized, 2);
+        }
     }
 
 }

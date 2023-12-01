@@ -70,7 +70,7 @@ public class Janitor : AIBehaviour
         if(item ? item.GetComponent<Weapon>() || (item.GetType() == typeof(Bone) && item != Idol.INSTANCE): false)
         {
             Vector3 playerDispo = item.transform.position - Player.INSTANCE.transform.position;
-            bool inUse = item.Wielder || item.MountTarget || item.ImpalingSomething || item.Telecommuting || item.Thrown;
+            bool inUse = item.Wielder || item.MountTarget || item.ImpaledObject || item.Telecommuting || item.Thrown;
             if (playerDispo.magnitude >= Hextile.Radius && !inUse)
             {
                 item.Telecommute(gameObject, 3.0f, (x) => Destroy(x.gameObject));

@@ -223,6 +223,9 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
+  Disarmed:
+    m_PersistentCalls:
+      m_Calls: []
   EventVanquished:
     m_PersistentCalls:
       m_Calls: []
@@ -239,6 +242,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
+  Aggressive: 1
   WalkDirection: {x: 0, y: 0, z: 0}
   LookDirection: {x: 0, y: 0, z: 0}
   TurnSpeed: 0
@@ -271,7 +275,7 @@ MonoBehaviour:
   FinalDash: 0
   Posture: 1
   wieldMode: 1
-  Allegiance: 0
+  Allegiance: -1
   flames: {fileID: 0}
 --- !u!4 &11386817
 Transform:
@@ -326,7 +330,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -334,6 +337,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -542,7 +546,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -550,6 +553,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -696,6 +700,9 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
+  Disarmed:
+    m_PersistentCalls:
+      m_Calls: []
   EventVanquished:
     m_PersistentCalls:
       m_Calls: []
@@ -712,6 +719,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
+  Aggressive: 1
   WalkDirection: {x: 0, y: 0, z: 0}
   LookDirection: {x: 0, y: 0, z: 0}
   TurnSpeed: 0
@@ -744,7 +752,7 @@ MonoBehaviour:
   FinalDash: 0
   Posture: 1
   wieldMode: 1
-  Allegiance: 0
+  Allegiance: -1
   flames: {fileID: 0}
 --- !u!4 &747980609
 Transform:
@@ -799,7 +807,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -807,6 +814,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -936,6 +944,9 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
+  Disarmed:
+    m_PersistentCalls:
+      m_Calls: []
   EventVanquished:
     m_PersistentCalls:
       m_Calls: []
@@ -952,6 +963,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
+  Aggressive: 1
   WalkDirection: {x: 0, y: 0, z: 0}
   LookDirection: {x: 0, y: 0, z: 0}
   TurnSpeed: 0
@@ -1039,7 +1051,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -1047,6 +1058,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -1286,6 +1298,9 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
+  Disarmed:
+    m_PersistentCalls:
+      m_Calls: []
   EventVanquished:
     m_PersistentCalls:
       m_Calls: []
@@ -1302,6 +1317,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
+  Aggressive: 1
   WalkDirection: {x: 0, y: 0, z: 0}
   LookDirection: {x: 0, y: 0, z: 0}
   TurnSpeed: 0
@@ -1334,7 +1350,7 @@ MonoBehaviour:
   FinalDash: 0
   Posture: 1
   wieldMode: 1
-  Allegiance: 0
+  Allegiance: -1
   flames: {fileID: 0}
 --- !u!4 &1776297673
 Transform:
@@ -1450,6 +1466,9 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
+  Disarmed:
+    m_PersistentCalls:
+      m_Calls: []
   EventVanquished:
     m_PersistentCalls:
       m_Calls: []
@@ -1466,6 +1485,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
+  Aggressive: 1
   WalkDirection: {x: 0, y: 0, z: 0}
   LookDirection: {x: 0, y: 0, z: 0}
   TurnSpeed: 0
@@ -1498,7 +1518,7 @@ MonoBehaviour:
   FinalDash: 0
   Posture: 1
   wieldMode: 1
-  Allegiance: 0
+  Allegiance: -1
   flames: {fileID: 0}
 --- !u!4 &1807562881
 Transform:
@@ -1553,7 +1573,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -1561,6 +1580,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -1737,6 +1757,9 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
+  Disarmed:
+    m_PersistentCalls:
+      m_Calls: []
   EventVanquished:
     m_PersistentCalls:
       m_Calls: []
@@ -1753,6 +1776,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
+  Aggressive: 1
   WalkDirection: {x: 0, y: 0, z: 0}
   LookDirection: {x: 0, y: 0, z: 0}
   TurnSpeed: 0
@@ -1785,7 +1809,7 @@ MonoBehaviour:
   FinalDash: 0
   Posture: 1
   wieldMode: 1
-  Allegiance: 0
+  Allegiance: -1
   flames: {fileID: 0}
 --- !u!1 &2128541354
 GameObject:
@@ -1857,6 +1881,7 @@ MonoBehaviour:
   CountOfChambers: 6
   CountOfCoves: 4
   StartingChamber: {fileID: 0}
+  StartingGate: {fileID: 0}
   corridor1: []
   chambers: []
   coves: []

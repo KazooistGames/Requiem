@@ -14,7 +14,7 @@ public class Wieldable : MonoBehaviour
     public UnityEvent<Wieldable> EventPickedUp = new UnityEvent<Wieldable>();
     public UnityEvent<Wieldable> EventThrown = new UnityEvent<Wieldable>();
 
-    public bool ImpalingSomething = false;
+    //public bool ImpalingSomething = false;
 
     public float Heft = 25;
 
@@ -26,7 +26,9 @@ public class Wieldable : MonoBehaviour
     public Entity Wielder;
     public Entity.Loyalty Allegiance = Entity.Loyalty.neutral;
     public bool Wielded = false;
+
     public GameObject MountTarget;
+    public GameObject ImpaledObject;
 
     public bool PrimaryTrigger = false;
     public bool SecondaryTrigger = false;
@@ -338,12 +340,13 @@ public class Wieldable : MonoBehaviour
             yield return new WaitUntil(() => Thrown && Wielder && equipType != EquipType.Burdensome);
             EventThrown.Invoke(this);
             setHighlightColor(Color.gray);
-            float magnitude = 150/Heft;
+            float magnitude = 2f * Wielder.Strength/Heft;
             Vector3 direction = Wielder.LookDirection;
             direction.y = 0;
             DropItem(true, direction, magnitude);
             Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
             yield return new WaitWhile(() =>!Thrown);
+            EventDropped.Invoke(this);
             yield return new WaitUntil(() => Wielder);
         }
     }
