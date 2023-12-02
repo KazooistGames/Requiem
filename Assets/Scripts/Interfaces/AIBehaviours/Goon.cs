@@ -140,7 +140,7 @@ public class Goon : AIBehaviour
         {
             Vector3 diposition = entity.Foe.transform.position - transform.position;
             float angularOffset = (Random.value - 0.5f) * 180;
-            dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) + angularOffset);
+            dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) - angularOffset);
             //dashingENGAGE = true;
         }
     }

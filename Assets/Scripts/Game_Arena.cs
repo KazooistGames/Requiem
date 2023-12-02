@@ -232,6 +232,7 @@ public class Game_Arena : Game
         EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites );
         StateOfGame = GameState.Liminal;
         yield return new WaitUntil(() => well.Used);
+        alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
         while (true)
         {
             StateOfGame = GameState.Wave;
@@ -244,7 +245,7 @@ public class Game_Arena : Game
             //MobSpawner.PeriodicallySpawn(10, 2, 2, 5);
             GameObject mob = SPAWN(typeof(Skelly), typeof(Goon), chambers[0].transform.position);
             yield return new WaitUntil(() => !mob);
-            alter.DesiredOffering = null;
+            alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             yield return null;
             //EliteSpawner.PeriodicallySpawn(Mathf.Max(0, 30 - Difficulty * 2), 1, 0, Mathf.CeilToInt(Mathf.Sqrt(1 + Difficulty)));
             //PatrolSpawner.PeriodicallySpawn(Mathf.Max(0, 60 - Difficulty * 3), 3, 0, 1 + Difficulty * 3);

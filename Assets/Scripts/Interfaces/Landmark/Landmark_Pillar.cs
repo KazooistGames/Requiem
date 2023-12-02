@@ -23,6 +23,7 @@ public class Landmark_Pillar : Landmark
         }
         model = Instantiate(PillarModels[Random.Range(0, PillarModels.Count)]);
         model.transform.SetParent(transform, false);
+        model.transform.localEulerAngles = Vector3.up * Random.value * 360;
         body = GetComponent<Rigidbody>() ? GetComponent<Rigidbody>() : gameObject.AddComponent<Rigidbody>();
         body.mass = model.tag == "Broken" ? 100 : 150;
         body.collisionDetectionMode = CollisionDetectionMode.Discrete;

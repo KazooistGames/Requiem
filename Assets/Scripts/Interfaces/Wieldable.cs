@@ -346,7 +346,6 @@ public class Wieldable : MonoBehaviour
             DropItem(true, direction, magnitude);
             Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
             yield return new WaitWhile(() =>!Thrown);
-            EventDropped.Invoke(this);
             yield return new WaitUntil(() => Wielder);
         }
     }

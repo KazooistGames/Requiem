@@ -996,7 +996,7 @@ MonoBehaviour:
   FinalDash: 0
   Posture: 1
   wieldMode: 1
-  Allegiance: 0
+  Allegiance: -1
   flames: {fileID: 0}
 --- !u!4 &844573217
 Transform:

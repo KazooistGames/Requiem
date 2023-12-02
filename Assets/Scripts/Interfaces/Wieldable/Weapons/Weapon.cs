@@ -383,6 +383,10 @@ public abstract class Weapon : Wieldable
     {
         yield return null;
         playShing();
+        if (ImpaledObject)
+        {
+            ImpaleRelease();
+        }
         yield return base.pickupHandler(newOwner);
     }
 
@@ -532,7 +536,7 @@ public abstract class Weapon : Wieldable
                     foe.EventVanquished.AddListener(ImpaleRelease);
                     foe.modSpeed[key] = -(Heft/foe.Strength);
                     foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
-                    yield return new WaitWhile(() => foe ? foe.Posture <= Entity.PostureStrength.Strong : false);
+                    yield return new WaitWhile(() => foe ? foe.Posture != Entity.PostureStrength.Strong : false);
                     if (foe)
                     {
                         ImpaleRelease();

@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
 
     private Material bloodSplatter;
 
-    public float ChainlinkLength = 0.05f;
+    public float ChainlinkLength = 0.075f;
     public float ChainlinkWidth = 0.025f;
     private LineRenderer chainRenderer;
 
@@ -224,7 +224,10 @@ public class Player : MonoBehaviour
         }
         else if (CurrentKeyboard.qKey.wasPressedThisFrame)
         {
-            recallWeapon();
+            if (hostWeapon.Wielder != HostEntity)
+            {
+                recallWeapon();
+            }
         }
         else if (CurrentKeyboard.gKey.wasPressedThisFrame)
         {
@@ -255,7 +258,7 @@ public class Player : MonoBehaviour
                 offWep.SecondaryTrigger = CurrentKeyboard.leftShiftKey.isPressed;
             }
             Wieldable throwWep = HostEntity.OffHand ? HostEntity.OffHand : HostEntity.MainHand;
-            throwWep.ThrowTrigger = CurrentKeyboard.leftCtrlKey.isPressed;
+            throwWep.ThrowTrigger = CurrentKeyboard.qKey.isPressed;
         }
 
     }
@@ -285,7 +288,7 @@ public class Player : MonoBehaviour
         HostEntity.requiemPlayer = this;
         HostEntity.FinalDashEnabled = true;
         chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();
-        chainRenderer.transform.SetParent(HostEntity.transform);
+        chainRenderer.transform.SetParent(transform);
         chainRenderer.startWidth = ChainlinkWidth;
         chainRenderer.endWidth = ChainlinkWidth;
         StartCoroutine(FadeCurtains());
@@ -345,6 +348,10 @@ public class Player : MonoBehaviour
         {
 
         }
+        else if(hostWeapon.Wielder == HostEntity)
+        {
+
+        }
         else if (hostWeapon.ImpaledObject)
         {
             Entity impaledFoe = hostWeapon.ImpaledObject.GetComponent<Entity>();
@@ -361,19 +368,21 @@ public class Player : MonoBehaviour
         }
         else
         {
-            Vector3 disposition = hostWeapon.transform.position - transform.position;
-            hostWeapon.DropItem(yeet: true, Vector3.up - disposition.normalized, 2);
+            Vector3 disposition = transform.position - hostWeapon.transform.position;
+            hostWeapon.DropItem(yeet: true, disposition.normalized + Vector3.up/2, Entity.Min_Velocity_Of_Dash);
         }
     }
 
     private void updateChainlink()
     {
+
+        chainRenderer.gameObject.SetActive(hostWeapon);
         if(ChainlinkLength == 0) { return; }
-        Vector3 disposition = hostWeapon.transform.position - chainRenderer.transform.position;
+        Vector3 disposition = hostWeapon.transform.position - HostEntity.transform.position;
         Vector3 additiveLinkDisposition = disposition;
         List<Vector3> chainlinkPositions = new List<Vector3>();
         Vector3 newChainlinkPosition = transform.position;
-        while (Mathf.Max(additiveLinkDisposition.magnitude, disposition.magnitude) > ChainlinkLength)
+        while (Mathf.Min(additiveLinkDisposition.magnitude, disposition.magnitude) > ChainlinkLength)
         {
             newChainlinkPosition = newChainlinkPosition + disposition.normalized * ChainlinkLength;
             chainlinkPositions.Add(newChainlinkPosition);

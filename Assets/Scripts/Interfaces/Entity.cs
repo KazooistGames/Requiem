@@ -818,6 +818,10 @@ public class Entity : MonoBehaviour
         Weapon weapon = wieldable.GetComponent<Weapon>();
         if (weapon)
         {
+            if(weapon.MostRecentWielder == this)
+            {
+                handleWeaponDropped(wieldable);
+            }
             weapon.Swinging.AddListener(handleWeaponSwing);
             weapon.Clashing.AddListener(handleWeaponClash);
             weapon.Blocking.AddListener(handleWeaponBlock);
@@ -825,6 +829,24 @@ public class Entity : MonoBehaviour
             weapon.GettingParried.AddListener(handleWeaponParried);
             weapon.Hitting.AddListener(handleWeaponHit);
             weapon.EventDropped.AddListener(handleWeaponDropped);
+        }
+    }
+
+
+    private void handleWeaponDropped(Wieldable wieldable)
+    {
+        Weapon weapon = wieldable.GetComponent<Weapon>();
+        if (weapon)
+        {
+            weapon.Swinging.RemoveListener(handleWeaponSwing);
+            weapon.Clashing.RemoveListener(handleWeaponClash);
+            weapon.Blocking.RemoveListener(handleWeaponBlock);
+            weapon.Parrying.RemoveListener(handleWeaponParrying);
+            if (!weapon.Thrown)
+            {
+                weapon.Hitting.RemoveListener(handleWeaponHit);
+            }
+            weapon.GettingParried.RemoveListener(handleWeaponParried);
         }
     }
 
@@ -952,22 +974,6 @@ public class Entity : MonoBehaviour
     }
 
 
-    private void handleWeaponDropped(Wieldable wieldable)
-    {
-        Weapon weapon = wieldable.GetComponent<Weapon>();
-        if (weapon)
-        {
-            weapon.Swinging.RemoveListener(handleWeaponSwing);
-            weapon.Clashing.RemoveListener(handleWeaponClash);
-            weapon.Blocking.RemoveListener(handleWeaponBlock);
-            weapon.Parrying.RemoveListener(handleWeaponParrying);
-            if (!weapon.Thrown)
-            {
-                weapon.Hitting.RemoveListener(handleWeaponHit);
-            }
-            weapon.GettingParried.RemoveListener(handleWeaponParried);
-        }
-    }
     
 
 }
