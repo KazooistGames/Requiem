@@ -41,6 +41,10 @@ public class Player : MonoBehaviour
 
     private Material bloodSplatter;
 
+    public float ChainlinkLength = 0.05f;
+    public float ChainlinkWidth = 0.025f;
+    private LineRenderer chainRenderer;
+
     void Start()
     {
         gameObject.name = "Player";
@@ -51,6 +55,10 @@ public class Player : MonoBehaviour
     void Update()
     {
         //HUD.setIndicatorOnHUD("bones", "Bones: " + BonesCollected.ToString());
+        if (hostWeapon)
+        {
+            updateChainlink();
+        }
         if (HostEntity ? HostEntity.MainHand : false)
         {
             hostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
@@ -276,6 +284,10 @@ public class Player : MonoBehaviour
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;
         HostEntity.FinalDashEnabled = true;
+        chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();
+        chainRenderer.transform.SetParent(HostEntity.transform);
+        chainRenderer.startWidth = ChainlinkWidth;
+        chainRenderer.endWidth = ChainlinkWidth;
         StartCoroutine(FadeCurtains());
     }
 
@@ -313,18 +325,16 @@ public class Player : MonoBehaviour
     {
         if (!hostWeapon)
         {
-
+            return;
         }
-        else if (hostWeapon.ImpaledObject)
+        if (hostWeapon.ImpaledObject)
         {
             hostWeapon.ImpaleRelease();
-            Vector3 disposition = hostWeapon.transform.position - transform.position;
-            hostWeapon.DropItem(yeet: true, Vector3.up - disposition.normalized, Entity.Min_Velocity_Of_Dash);
         }
-        else if (hostWeapon.Wielder != HostEntity)
+        if (hostWeapon.Wielder != HostEntity)
         {
             Vector3 disposition = hostWeapon.transform.position - transform.position;
-            float recallPeriod = Mathf.Min(disposition.magnitude/2, 0.75f);
+            float recallPeriod = Mathf.Min(disposition.magnitude/2, 0.5f);
             hostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
         }
     }
@@ -354,6 +364,27 @@ public class Player : MonoBehaviour
             Vector3 disposition = hostWeapon.transform.position - transform.position;
             hostWeapon.DropItem(yeet: true, Vector3.up - disposition.normalized, 2);
         }
+    }
+
+    private void updateChainlink()
+    {
+        if(ChainlinkLength == 0) { return; }
+        Vector3 disposition = hostWeapon.transform.position - chainRenderer.transform.position;
+        Vector3 additiveLinkDisposition = disposition;
+        List<Vector3> chainlinkPositions = new List<Vector3>();
+        Vector3 newChainlinkPosition = transform.position;
+        while (Mathf.Max(additiveLinkDisposition.magnitude, disposition.magnitude) > ChainlinkLength)
+        {
+            newChainlinkPosition = newChainlinkPosition + disposition.normalized * ChainlinkLength;
+            chainlinkPositions.Add(newChainlinkPosition);
+            additiveLinkDisposition = hostWeapon.transform.position - newChainlinkPosition;
+            if(additiveLinkDisposition.magnitude > disposition.magnitude)
+            {
+                break;
+            }
+        }
+        chainRenderer.positionCount = chainlinkPositions.Count;
+        chainRenderer.SetPositions(chainlinkPositions.ToArray());
     }
 
 }
