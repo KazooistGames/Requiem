@@ -270,8 +270,8 @@ public class AIBehaviour : MonoBehaviour
     }
 
     //survey
+    public UnityEvent sensoryFoeSpotted = new UnityEvent();
     public bool sensoryAlerted = false;
-
     protected float sensoryAlertedTimer = 0.0f;
     protected float sensoryAlertedPeriod = 5.0f;
     protected bool sensorySightDetection = true;
@@ -332,6 +332,7 @@ public class AIBehaviour : MonoBehaviour
                                     if (potentialFoe ? potentialFoe.Allegiance != entity.Allegiance : false)
                                     {
                                         entity.Foe = potentialFoe;
+                                        sensoryFoeSpotted.Invoke();
                                         closestObject = objectHit.distance;
                                     }
                                     else if (!potentialFoe)
@@ -625,9 +626,13 @@ public class AIBehaviour : MonoBehaviour
     public UnityEvent martialFoeVulnerable = new UnityEvent();
     public UnityEvent martialFoeAttacking = new UnityEvent();
     public UnityEvent martialFoeCharging = new UnityEvent();    
-    private bool martialFoeVulnerableLatch = false;
-    private bool martialFoeAttackingLatch = false;
-    private bool martialFoeChargingLatch = false;
+    public UnityEvent martialFoeEnteredRange = new UnityEvent();    
+    public UnityEvent martialEnteredRange = new UnityEvent();
+    protected bool martialFoeVulnerableLatch = false;
+    protected bool martialFoeAttackingLatch = false;
+    protected bool martialFoeChargingLatch = false;
+    protected bool martialFoeEnteredRangeLatch = false;
+    protected bool martialEnteredRangeLatch = false;
     protected void martial(BehaviourType key)
     {
         Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
@@ -649,6 +654,17 @@ public class AIBehaviour : MonoBehaviour
             bool foeWindingUp = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);          
             bool foeAiming = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming : false);         
             //bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
+
+            if(!martialEnteredRangeLatch && inRange)
+            {
+                martialEnteredRange.Invoke();
+            }
+            martialEnteredRangeLatch = inRange;
+            if(!martialFoeEnteredRangeLatch && foeInRange)
+            {
+                martialFoeEnteredRange.Invoke();
+            }
+            martialFoeEnteredRangeLatch = inRange;
 
             bool instantaneousFoeCharging = foeInRange && !entity.Foe.Staggered && entity.Foe.Dashing;
             if (!martialFoeChargingLatch && instantaneousFoeCharging)

@@ -1,15 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using static _MartialController;
+using UnityEngine.Events;
 
 public class _MartialController : MonoBehaviour
 {
-    private static _MartialController Instance;
+    public static _MartialController INSTANCE;
+
+    public UnityEvent<Weapon> ClearedQueue = new UnityEvent<Weapon>();
+
+    public delegate bool Requisite();
 
     public struct MartialJob
     {
         public Weapon.ActionAnimation Action;
         public float Debounce;
+        public Requisite Prerequisite;
     }
 
     public static Dictionary<Weapon, MartialJob> Weapon_Actions { get; private set; } = new Dictionary<Weapon, MartialJob>();
@@ -21,11 +27,11 @@ public class _MartialController : MonoBehaviour
 
     void Start()
     {
-        if (Instance)
+        if (INSTANCE)
         {
-            Destroy(Instance);
+            Destroy(INSTANCE);
         }
-        Instance = this;
+        INSTANCE = this;
         Weapon_Actions = new Dictionary<Weapon, MartialJob>();
         Action_Queues = new Dictionary<Weapon, Queue<MartialJob>>();
         Debounce_Timers = new Dictionary<Weapon, float>();
@@ -40,13 +46,14 @@ public class _MartialController : MonoBehaviour
             Weapon weapon = kvp.Key;
             Weapon.ActionAnimation desiredAction = kvp.Value.Action;
             float debounce = kvp.Value.Debounce;
-            if (!weapon)
+            if (weapon ? !weapon.Wielder : true)
             {
                 KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
             }
             else if (Debounce_Timers[weapon] > 0)
             {
-                if (Debounce_Timers[weapon] > debounce)
+                bool completedRequisite = kvp.Value.Prerequisite == null ? true : kvp.Value.Prerequisite();
+                if (Debounce_Timers[weapon] > debounce && completedRequisite)
                 {
                     Debounce_Timers[weapon] = 0;
                     KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
@@ -67,9 +74,18 @@ public class _MartialController : MonoBehaviour
             {
                 Cancel_Actions(weapon);
             }
+            else if (!Action_Queues.ContainsKey(weapon))
+            {
+
+            }
             else if (Action_Queues[weapon].Count > 0)
             {
                 Weapon_Actions[weapon] = Action_Queues[weapon].Dequeue();
+                if(Action_Queues[weapon].Count == 0)
+                {
+                    ClearedQueue.Invoke(weapon);
+                    Debug.Log("Cleared queue for: " + weapon.name);
+                }
             }
 
         }
@@ -77,9 +93,9 @@ public class _MartialController : MonoBehaviour
     }
 
     /***** PUBLIC *****/
-    public static void Queue_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)
+    public static void Queue_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
     {
-        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce };
+        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite};
         if (!Weapon_Actions.ContainsKey(weapon))
         {
             Weapon_Actions[weapon] = newJob;
@@ -88,22 +104,26 @@ public class _MartialController : MonoBehaviour
         }
         else
         {
+            if (!Action_Queues.ContainsKey(weapon))
+            {
+                Action_Queues[weapon] = new Queue<MartialJob>();
+            }
             Action_Queues[weapon].Enqueue(newJob);
         }
     }
 
-    public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)
+    public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
     {
         if (Action_Queues.ContainsKey(weapon))
         {
             Action_Queues[weapon].Clear();
         }
-        Queue_Action(weapon, action, debounce);
+        Queue_Action(weapon, action, debounce, requisite);
     }
 
-    public static void Override_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0)
+    public static void Override_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
     {
-        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce };
+        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite };
         Weapon_Actions[weapon] = newJob;
         Debounce_Timers[weapon] = 0;
     }

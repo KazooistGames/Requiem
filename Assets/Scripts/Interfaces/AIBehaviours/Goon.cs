@@ -7,6 +7,8 @@ public class Goon : AIBehaviour
     //public float excitement = 0f;
 
     private Weapon mainWep;
+    public float CombatSpeed = 0.5f;
+    public float Aggression = 0.5f;
 
     protected override void Awake()
     {
@@ -27,6 +29,8 @@ public class Goon : AIBehaviour
         martialFoeVulnerable.AddListener(reactiveAttack);
         martialFoeAttacking.AddListener(reactiveDefend);
         martialFoeAttacking.AddListener(dodgeDeathBlow);
+        sensoryFoeSpotted.AddListener(reactiveAttack);
+        _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
     protected override void Update()
@@ -62,33 +66,6 @@ public class Goon : AIBehaviour
                     if (mainWep)
                     {
                         martialCurrentState = mainWep.ActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : (mainWep.ActionAnimated == Weapon.ActionAnimation.Aiming ? martialState.throwing : (mainWep.ActionAnimated == Weapon.ActionAnimation.Idle ? martialState.none : martialState.attacking));
-                        if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
-                        {
-                            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
-                        }
-                        else if (_MartialController.Action_Queues[mainWep].Count == 0)
-                        {
-                            float disposition = (entity.Foe.transform.position - transform.position).magnitude;
-                            if (mainWep.Range >= disposition)
-                            {
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-                                if (Random.value >= 0.5f)
-                                {
-                                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
-                                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-                                }
-                                else
-                                {
-                                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
-                                }
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, 0.5f);
-                            }
-                            else
-                            {
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle);
-                            }
-                        }
                     }
                     ReflexRate = 0.05f;
                     tangoStrafePauseFreq = 0.5f;
@@ -113,28 +90,55 @@ public class Goon : AIBehaviour
 
 
     /***** PROTECTED *****/
-
-
-
-    /***** PRIVATE *****/
-    private void reactiveAttack()
+    protected void queueNextRoundOfActions(Weapon weapon)
     {
-        if(martialCurrentState != martialState.attacking)
+        if (weapon != mainWep)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickCoil, 0.5f);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            return;
+        }
+        else if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+        }
+        else
+        {
+           
+            if (entity.Posture == Entity.PostureStrength.Weak)
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
+            }
+            else if (Random.value <= Aggression)
+            {
+
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkWeaponInRange);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            }
+            else
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, 0.5f);
+            }
+        }
+
+    }
+
+    protected void reactiveAttack()
+    {
+        if (martialCurrentState != martialState.attacking)
+        {
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkWeaponInRange);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
         }
     }
 
-    private void reactiveDefend()
+    protected void reactiveDefend()
     {
-        if(martialCurrentState != martialState.defending)
+        if (martialCurrentState != martialState.defending)
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
         }
     }
 
-    private void dodgeDeathBlow()
+    protected void dodgeDeathBlow()
     {
         if (entity.Posture == Entity.PostureStrength.Weak && dashingCooldownTimer >= 3)
         {
@@ -142,6 +146,21 @@ public class Goon : AIBehaviour
             float angularOffset = (Random.value - 0.5f) * 180;
             dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) - angularOffset);
             //dashingENGAGE = true;
+        }
+    }
+
+
+    /***** PRIVATE *****/
+    private bool checkWeaponInRange()
+    {
+        if (mainWep)
+        {
+            float disposition = (entity.Foe.transform.position - transform.position).magnitude;
+            return disposition <= mainWep.Range;
+        }
+        else
+        {
+            return false;
         }
     }
 

@@ -185,6 +185,12 @@ MonoBehaviour:
   martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -662,6 +668,12 @@ MonoBehaviour:
   martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -907,6 +919,12 @@ MonoBehaviour:
   martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -923,6 +941,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  CombatSpeed: 0.75
 --- !u!114 &844573216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1006,7 +1025,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 844573214}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.26809937, y: 0.5001569, z: -0.30880547}
+  m_LocalPosition: {x: 6, y: 0.5001569, z: 4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1260,6 +1279,12 @@ MonoBehaviour:
   martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1427,6 +1452,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   martialFoeCharging:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
   itemManagementSeekItems: 0
@@ -1719,6 +1750,12 @@ MonoBehaviour:
   martialFoeCharging:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1899,6 +1936,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 145db41e0e72a3549a6306f13d68db07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ClearedQueue:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2128541365
 MonoBehaviour:
   m_ObjectHideFlags: 0

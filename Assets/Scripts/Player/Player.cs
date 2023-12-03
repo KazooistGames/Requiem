@@ -336,7 +336,9 @@ public class Player : MonoBehaviour
         }
         if (hostWeapon.Wielder != HostEntity)
         {
-            Vector3 disposition = hostWeapon.transform.position - transform.position;
+            Vector3 disposition = hostWeapon.transform.position - transform.position; 
+            hostWeapon.transform.LookAt(HostEntity.transform);
+            hostWeapon.transform.Rotate(Vector3.Cross(disposition.normalized, Vector3.up), -90, Space.World);
             float recallPeriod = Mathf.Min(disposition.magnitude/2, 0.5f);
             hostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
         }
@@ -369,9 +371,12 @@ public class Player : MonoBehaviour
         else
         {
             Vector3 disposition = transform.position - hostWeapon.transform.position;
+            hostWeapon.transform.LookAt(HostEntity.transform);
+            hostWeapon.transform.Rotate(Vector3.Cross(-disposition.normalized, Vector3.up), -90, Space.World);
             hostWeapon.DropItem(yeet: true, disposition.normalized + Vector3.up/2, Entity.Min_Velocity_Of_Dash);
         }
     }
+
 
     private void updateChainlink()
     {
