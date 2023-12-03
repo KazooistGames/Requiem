@@ -263,8 +263,6 @@ public class Wieldable : MonoBehaviour
     protected virtual IEnumerator pickupHandler(Entity newOwner)
     {
         Thrown = false;
-        //yield return null;
-
         if (Wielder || !newOwner)
         {
             yield break;
@@ -314,10 +312,19 @@ public class Wieldable : MonoBehaviour
             Anim.Rebind();
             Anim.Update(0);
         }
+        //if (!Wielder.MainHand)
+        //{
+        //    Wielder.MainHand = this;
+        //    Wielded = true;
+        //    Anim.SetBool("wielded", true);
+        //    Anim.Update(0);
+        //    Wielder.wieldMode = equipType == EquipType.OneHanded ? Entity.WieldMode.OneHanders : Entity.WieldMode.TwoHanders;
+        //}
         if (Wielder.leftStorage ? Wielder.leftStorage == Wielder.rightStorage : false)
         {
             Wielder.rightStorage = null;
         }
+
         if (equipType == EquipType.Burdensome)
         {
             if (newOwner.wieldMode != Entity.WieldMode.Burdened)

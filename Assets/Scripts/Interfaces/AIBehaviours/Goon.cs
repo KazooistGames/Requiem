@@ -26,10 +26,10 @@ public class Goon : AIBehaviour
         sensorySightRangeScalar = 1.0f;
         meanderPauseFrequency = 0.5f;
         itemManagementSeekItems = true;
-        martialFoeVulnerable.AddListener(reactiveAttack);
-        martialFoeAttacking.AddListener(reactiveDefend);
-        martialFoeAttacking.AddListener(dodgeDeathBlow);
-        sensoryFoeSpotted.AddListener(reactiveAttack);
+        martialFoeVulnerable.AddListener(reactToFoeChange);
+        martialFoeAttacking.AddListener(reactToIncomingAttack);
+        sensoryFoeSpotted.AddListener(reactToFoeChange);
+        sensoryFoeLost.AddListener(reactToFoeChange);
         _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
@@ -121,25 +121,25 @@ public class Goon : AIBehaviour
 
     }
 
-    protected void reactiveAttack()
+    protected void reactToFoeChange()
     {
-        if (martialCurrentState != martialState.attacking)
+        if (entity.Foe)
         {
             _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkWeaponInRange);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);         
+        }
+        else
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
         }
     }
 
-    protected void reactiveDefend()
+    protected void reactToIncomingAttack()
     {
         if (martialCurrentState != martialState.defending)
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
         }
-    }
-
-    protected void dodgeDeathBlow()
-    {
         if (entity.Posture == Entity.PostureStrength.Weak && dashingCooldownTimer >= 3)
         {
             Vector3 diposition = entity.Foe.transform.position - transform.position;
@@ -153,7 +153,7 @@ public class Goon : AIBehaviour
     /***** PRIVATE *****/
     private bool checkWeaponInRange()
     {
-        if (mainWep)
+        if (mainWep && entity.Foe)
         {
             float disposition = (entity.Foe.transform.position - transform.position).magnitude;
             return disposition <= mainWep.Range;

@@ -32,6 +32,7 @@ public abstract class Weapon : Wieldable
         QuickAttack,
 
         StrongWindup,
+        StrongCoil,
         StrongAttack,
 
         Recovering,
@@ -190,6 +191,11 @@ public abstract class Weapon : Wieldable
                     modifyWielderSpeed(0);
                 }
                 else if (ActionAnimated == ActionAnimation.StrongWindup)
+                {
+                    attackONS = true;
+                    modifyWielderSpeed(heftSlowModifier);
+                }
+                else if(ActionAnimated == ActionAnimation.StrongCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
@@ -382,7 +388,7 @@ public abstract class Weapon : Wieldable
     protected override IEnumerator pickupHandler(Entity newOwner)
     {
         yield return null;
-        playShing();
+        //playShing();
         if (ImpaledObject)
         {
             ImpaleRelease();
@@ -704,6 +710,10 @@ public abstract class Weapon : Wieldable
             {
                 return ActionAnimation.StrongWindup;
             }
+            else if (nextAnimation.IsTag("StrongCoil"))
+            {
+                return ActionAnimation.StrongWindup;
+            }
             else if (nextAnimation.IsTag("QuickCoil"))
             {
                 return ActionAnimation.QuickWindup;
@@ -728,6 +738,10 @@ public abstract class Weapon : Wieldable
         {
             return ActionAnimation.StrongWindup;
         }
+        else if (currentAnimation.IsTag("StrongCoil"))
+        {
+            return ActionAnimation.StrongCoil;
+        }
         else if (currentAnimation.IsTag("QuickCoil"))
         {
             return ActionAnimation.QuickCoil;
@@ -738,7 +752,7 @@ public abstract class Weapon : Wieldable
             {
                 return ActionAnimation.Recovering;
             }
-            else if (nextAnimation.IsTag("Idle") || nextAnimation.IsTag("QuickCoil"))
+            else if (nextAnimation.IsTag("Idle"))
             {
                 return ActionAnimation.Recovering;
             }
@@ -757,6 +771,10 @@ public abstract class Weapon : Wieldable
             {
                 return ActionAnimation.StrongWindup;
             }
+            else if (nextAnimation.IsTag("StrongCoil"))
+            {
+                return ActionAnimation.StrongWindup;
+            }
             else
             {
                 return ActionAnimation.StrongAttack;
@@ -764,7 +782,18 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("Recovering"))
         {
-            return ActionAnimation.Recovering;
+            if (nextAnimation.IsTag("QuickCoil") || nextAnimation.IsTag("QuickWindup"))
+            {
+                return ActionAnimation.QuickWindup;
+            }
+            else if (nextAnimation.IsTag("StrongCoil") || nextAnimation.IsTag("Windup"))
+            {
+                return ActionAnimation.StrongWindup;
+            }
+            else
+            {
+                return ActionAnimation.Recovering;
+            }
         }
         else if (currentAnimation.IsTag("Aim"))
         {
@@ -782,7 +811,7 @@ public abstract class Weapon : Wieldable
 
     private void chargeTempo()
     {
-        if(ActionAnimated == ActionAnimation.QuickCoil || ActionAnimated == ActionAnimation.StrongWindup)
+        if(ActionAnimated == ActionAnimation.StrongCoil)
         {
             attackCharge += Time.deltaTime * attackChargeRate;
             TrueStrike = attackCharge >= 1;

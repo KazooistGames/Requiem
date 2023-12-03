@@ -577,12 +577,12 @@ public class Entity : MonoBehaviour
 
     /*** PRIVATE ***/
 
-    private void alterPoise(float value)
+    private void alterPoise(float value, bool impactful = true)
     {
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
         Poise += value;
         Poise = Mathf.Clamp(Poise, -1, Strength);
-        if (value * existingDelta >= 0)
+        if (impactful && value * existingDelta >= 0)
         {
             float newBounce = Mathf.Abs(value / Strength * 10);
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;

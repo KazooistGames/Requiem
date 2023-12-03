@@ -339,7 +339,7 @@ public class Player : MonoBehaviour
             Vector3 disposition = hostWeapon.transform.position - transform.position; 
             hostWeapon.transform.LookAt(HostEntity.transform);
             hostWeapon.transform.Rotate(Vector3.Cross(disposition.normalized, Vector3.up), -90, Space.World);
-            float recallPeriod = Mathf.Min(disposition.magnitude/2, 0.5f);
+            float recallPeriod = Mathf.Min(disposition.magnitude/3, 0.5f);
             hostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
         }
     }
@@ -380,7 +380,6 @@ public class Player : MonoBehaviour
 
     private void updateChainlink()
     {
-
         chainRenderer.gameObject.SetActive(hostWeapon);
         if(ChainlinkLength == 0) { return; }
         Vector3 disposition = hostWeapon.transform.position - HostEntity.transform.position;

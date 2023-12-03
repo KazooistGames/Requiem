@@ -271,6 +271,7 @@ public class AIBehaviour : MonoBehaviour
 
     //survey
     public UnityEvent sensoryFoeSpotted = new UnityEvent();
+    public UnityEvent sensoryFoeLost = new UnityEvent();
     public bool sensoryAlerted = false;
     protected float sensoryAlertedTimer = 0.0f;
     protected float sensoryAlertedPeriod = 5.0f;
@@ -378,6 +379,7 @@ public class AIBehaviour : MonoBehaviour
                 if(disposition.magnitude > sensoryBaseRange)
                 {
                     entity.Foe = null;
+                    sensoryFoeLost.Invoke();
                 }
                 else
                 {
@@ -398,6 +400,7 @@ public class AIBehaviour : MonoBehaviour
                                 else if (!potentialFoe)
                                 {
                                     entity.Foe = null;
+                                    sensoryFoeLost.Invoke();
                                     temp = hit.distance;
                                 }
                             }
