@@ -140,13 +140,13 @@ public class Goon : AIBehaviour
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
         }
-        if (entity.Posture == Entity.PostureStrength.Weak && dashingCooldownTimer >= 3)
-        {
-            Vector3 diposition = entity.Foe.transform.position - transform.position;
-            float angularOffset = (Random.value - 0.5f) * 180;
-            dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) - angularOffset);
-            //dashingENGAGE = true;
-        }
+        //if (entity.Posture == Entity.PostureStrength.Weak && dashingCooldownTimer >= 3)
+        //{
+        //    Vector3 diposition = entity.Foe.transform.position - transform.position;
+        //    float angularOffset = (Random.value - 0.5f) * 180;
+        //    dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) - angularOffset);
+        //    //dashingENGAGE = true;
+        //}
     }
 
 

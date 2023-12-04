@@ -235,21 +235,19 @@ public class Game_Arena : Game
         alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
         while (true)
         {
+            Difficulty++;
             StateOfGame = GameState.Wave;
             StartingGate.OpenDoor();
+            well.Volume = 100;
             yield return new WaitUntil(() => alter.Used && alter.Energized);
             alter.DesiredOffering = alter.TopStep;
             StartingGate.CloseDoor();
-            //start periodically spawning enemies and every minute re-evaluate
-            Difficulty = (int)(GameClock % 60);
-            //MobSpawner.PeriodicallySpawn(10, 2, 2, 5);
-            GameObject mob = SPAWN(typeof(Skelly), typeof(Goon), chambers[0].transform.position);
-            yield return new WaitUntil(() => !mob);
+
+
+            yield return new WaitUntil(() =>);
             alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             yield return null;
-            //EliteSpawner.PeriodicallySpawn(Mathf.Max(0, 30 - Difficulty * 2), 1, 0, Mathf.CeilToInt(Mathf.Sqrt(1 + Difficulty)));
-            //PatrolSpawner.PeriodicallySpawn(Mathf.Max(0, 60 - Difficulty * 3), 3, 0, 1 + Difficulty * 3);
-            //yield return new WaitForSeconds(60);
+
         }
     }
   
@@ -276,6 +274,45 @@ public class Game_Arena : Game
         BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Wraith));
         BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Revanent));
         BossSpawner.transform.position = RandomPositionInRandomTileInPlay();
+    }
+
+
+    private Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
+    {
+        { typeof(Skelly), 100 },
+        { typeof(Nephalim), 200 },
+        { typeof(Skully), 25 },
+    };
+    private Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
+    {
+        { typeof(Goon), 1 },
+        { typeof(Goon), 1 },
+        { typeof(Goon), 1 },
+    };
+    private List<(Type, Type)> EntityAIPairings = new List<(Type, Type)>
+    {
+        {(typeof(Skelly), typeof(Goon))},
+        {(typeof(Nephalim), typeof(Bully))},
+        {(typeof(Skully), typeof(Biter))},
+    };
+
+    private List<Type> UnlockedEntities = new List<Type>();
+    private List<Type> UnlockedAIs = new List<Type>();
+
+    private List<Entity> spawnMobs()
+    {
+        List<GameObject> mobs = new List<GameObject>();
+
+        //pick mob types based on what is available
+        List<Type> waveEntities = new List<Type>();
+        List<Type> UnlockedAIs = new List<Type>();
+        //sort by max HP
+        //spawn 1 of highest
+        //spawn other types in order of highest to lowest HP to match highest HP enemy
+        //loop back through until at population
+
+
+        return mobs;
     }
 
 
