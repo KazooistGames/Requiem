@@ -235,6 +235,8 @@ public class Game_Arena : Game
         alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
         while (true)
         {
+            yield return null;
+            alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             Difficulty++;
             StateOfGame = GameState.Wave;
             StartingGate.OpenDoor();
@@ -242,11 +244,8 @@ public class Game_Arena : Game
             yield return new WaitUntil(() => alter.Used && alter.Energized);
             alter.DesiredOffering = alter.TopStep;
             StartingGate.CloseDoor();
-
-
-            yield return new WaitUntil(() =>);
-            alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
-            yield return null;
+            spawnedMobs = spawnMobs();
+            yield return new WaitUntil(() => spawnedMobs.Count(x=> x != null) == 0);
 
         }
     }
@@ -299,7 +298,7 @@ public class Game_Arena : Game
     private List<Type> UnlockedEntities = new List<Type>();
     private List<Type> UnlockedAIs = new List<Type>();
 
-    private List<Entity> spawnMobs()
+    private List<GameObject> spawnMobs()
     {
         List<GameObject> mobs = new List<GameObject>();
 
