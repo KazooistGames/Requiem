@@ -285,14 +285,14 @@ public class Game_Arena : Game
     private Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
-        { typeof(Goon), 1 },
-        { typeof(Goon), 1 },
+        { typeof(Bully), 3 },
+        { typeof(Biter), 3 },
     };
     private List<(Type, Type)> EntityAIPairings = new List<(Type, Type)>
     {
-        {(typeof(Skelly), typeof(Goon))},
-        {(typeof(Nephalim), typeof(Bully))},
-        {(typeof(Skully), typeof(Biter))},
+        {(typeof(Goon), typeof(Skelly))},
+        {(typeof(Bully), typeof(Nephalim))},
+        {(typeof(Biter), typeof(Skully))},
     };
 
     private List<Type> UnlockedEntities = new List<Type>();
@@ -300,14 +300,25 @@ public class Game_Arena : Game
 
     private List<GameObject> spawnMobs()
     {
+        //set up containers for this wave
         List<GameObject> mobs = new List<GameObject>();
+        List<Type> chosenTypes = new List<Type>();
+        List<Type> viableTypes = new List<Type>();
+
+        //establish viable mob types
+        viableTypes = AIDifficulties.Where(x => x.Value <= Difficulty).Select(x => x.Key).ToList();
 
         //pick mob types based on what is available
-        List<Type> waveEntities = new List<Type>();
-        List<Type> UnlockedAIs = new List<Type>();
+
+
+
+
         //sort by max HP
+
         //spawn 1 of highest
+
         //spawn other types in order of highest to lowest HP to match highest HP enemy
+
         //loop back through until at population
 
 
