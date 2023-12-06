@@ -36,7 +36,7 @@ public class Game_Arena : Game
         Liminal,
         Wave,
         Boss,
-        Finale,
+        Lobby,
     }
     public GameState StateOfGame = GameState.Liminal;
 
@@ -230,23 +230,22 @@ public class Game_Arena : Game
         List<GameObject> spawnedElites = new List<GameObject>();
         MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs );
         EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites );
-        StateOfGame = GameState.Liminal;
+        StateOfGame = GameState.Lobby;
         yield return new WaitUntil(() => well.Used);
-        alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
         while (true)
         {
             yield return null;
+            StateOfGame = GameState.Liminal;
             alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             Wave++;
-            StateOfGame = GameState.Wave;
             StartingGate.OpenDoor();
-            well.Volume = 100;
             yield return new WaitUntil(() => alter.Used && alter.Energized);
+            StateOfGame = GameState.Wave;
             alter.DesiredOffering = alter.TopStep;
             StartingGate.CloseDoor();
             spawnedMobs = spawnMobs();
             yield return new WaitUntil(() => spawnedMobs.Count(x=> x != null) == 0);
-
+            well.Volume = 100;
         }
     }
   

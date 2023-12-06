@@ -57,8 +57,8 @@ public abstract class Weapon : Wieldable
 
     public bool TrueStrike = false;
     public float Tempo;
-    private float attackCharge = 0;
-    public float attackChargeRate = 1;
+    private float tempoCharge = 0;
+    public float tempoChargePeriod = 1.5f;
     //private bool attackChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.90f;
     public float TempoTargetWidth { get; private set; } = 0.2f;
@@ -811,14 +811,16 @@ public abstract class Weapon : Wieldable
 
     private void chargeTempo()
     {
-        if(ActionAnimated == ActionAnimation.StrongCoil)
+        Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, 1f / 1.5f), 0, 1);
+        if (ActionAnimated == ActionAnimation.StrongCoil)
         {
-            attackCharge += Time.deltaTime * attackChargeRate;
-            TrueStrike = attackCharge >= 1;
+            tempoCharge += Time.deltaTime / tempoChargePeriod;
+            TrueStrike = Tempo >= 1;
         }
-        else
+        else if(ActionAnimated != ActionAnimation.StrongAttack)
         {
-            attackCharge = 0;
+            TrueStrike = false;
+            tempoCharge = 0;
         }
     }
 

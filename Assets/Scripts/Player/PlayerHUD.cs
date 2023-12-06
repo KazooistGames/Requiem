@@ -117,11 +117,15 @@ public class PlayerHUD : MonoBehaviour
     private void updateTempoBar()
     {
         TempoBar.SetActive(true);
-        if (Player.INSTANCE.hostWeapon.Tempo > 0 && Player.INSTANCE.hostWeapon.Tempo < 1)
+        if (!Player.INSTANCE.hostWeapon)
+        {
+
+        }
+        else if (Player.INSTANCE.hostWeapon.ActionAnimated == Weapon.ActionAnimation.StrongWindup || Player.INSTANCE.hostWeapon.ActionAnimated == Weapon.ActionAnimation.StrongCoil)
         {
             fadeTransforms(tempoBarTransforms, 0.75f, 0.1f);
         }
-        else
+        else if(Player.INSTANCE.hostWeapon.ActionAnimated != Weapon.ActionAnimation.StrongAttack)
         {
             fadeTransforms(tempoBarTransforms, 0, 0.5f);
         }
