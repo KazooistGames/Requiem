@@ -45,7 +45,7 @@ public class Game_Arena : Game
     private Spawner EliteSpawner;
     private Spawner BossSpawner;
 
-    public int Difficulty = 0;
+    public int Wave = 0;
 
 
     protected override void Start()
@@ -237,7 +237,7 @@ public class Game_Arena : Game
         {
             yield return null;
             alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
-            Difficulty++;
+            Wave++;
             StateOfGame = GameState.Wave;
             StartingGate.OpenDoor();
             well.Volume = 100;
@@ -300,15 +300,20 @@ public class Game_Arena : Game
 
     private List<GameObject> spawnMobs()
     {
-        //set up containers for this wave
-        List<GameObject> mobs = new List<GameObject>();
-        List<Type> chosenTypes = new List<Type>();
-        List<Type> viableTypes = new List<Type>();
 
         //establish viable mob types
-        viableTypes = AIDifficulties.Where(x => x.Value <= Difficulty).Select(x => x.Key).ToList();
+        List<Type> viableTypes = new List<Type>();
+        viableTypes = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
 
         //pick mob types based on what is available
+        List<Type> chosenTypes = new List<Type>();
+        int totalTypes = Mathf.Min(viableTypes.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave)));
+        while(chosenTypes.Count > totalTypes)
+        {
+            int randomIndexFromViableTypes = UnityEngine.Random.Range(0, viableTypes.Count);
+            chosenTypes.Add(viableTypes[randomIndexFromViableTypes]);
+
+        }
 
 
 
@@ -321,7 +326,7 @@ public class Game_Arena : Game
 
         //loop back through until at population
 
-
+        List<GameObject> mobs = new List<GameObject>();
         return mobs;
     }
 
