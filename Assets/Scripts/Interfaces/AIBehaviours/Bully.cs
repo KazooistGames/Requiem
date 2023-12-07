@@ -55,12 +55,12 @@ public class Bully : AIBehaviour
                     Weapon mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
                     if (mainWep)
                     {
-                        martialCurrentState = mainWep.ActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : martialState.attacking;
-                        if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
+                        martialCurrentState = mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : martialState.attacking;
+                        if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
                         }
-                        else if (_MartialController.Action_Queues[mainWep].Count == 0)
+                        else if (_MartialController.Weapon_Queues[mainWep].Count == 0)
                         {
                             float disposition = (entity.Foe.transform.position - transform.position).magnitude;
                             if (mainWep.Range >= disposition)

@@ -111,7 +111,7 @@ public class Entity : MonoBehaviour
     public float DashPower { get; private set; } = 0.0f;
 
     private static float DASH_CHARGE_TIME = 0.4f;
-    private static float CRASH_DAMAGE = 25f;
+    private static float CRASH_DAMAGE = 20f;
     private static float FINAL_DASH_RATIO = 2f;
 
     private static Vector2 POISE_REGEN_PERIOD = new Vector2(4, 10);
@@ -235,7 +235,7 @@ public class Entity : MonoBehaviour
         equipmentManagement();
         indicatorManagement();
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
-        if ((poiseDebounceTimer += Time.deltaTime) >= (poiseDebouncePeriod))
+        if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
             float scalingRegenRate = Mathf.Lerp(POISE_REGEN_PERIOD.y, POISE_REGEN_PERIOD.x, Vitality / Strength);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
@@ -584,7 +584,9 @@ public class Entity : MonoBehaviour
         Poise = Mathf.Clamp(Poise, -1, Strength);
         if (impactful && value * existingDelta >= 0)
         {
-            float newBounce = Mathf.Abs(value / Strength * 10);
+            float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
+            float scalar = 5;
+            float newBounce = scaledRatio * scalar;
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
             if (newBounce >= remainingBounce)
             {
@@ -938,14 +940,14 @@ public class Entity : MonoBehaviour
         //{
         //    foe.Stagger(Mathf.Sqrt(poiseDamage / Strength));
         //}
-        if(myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
+        if(myWeapon.CurrentActionAnimated == ActionAnimation.StrongAttack)
         {
             //if (myWeapon.TrueStrike)
             //{
             //    vitalityDamage += Resolve;
             //}
         }
-        else if(myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
+        else if(myWeapon.CurrentActionAnimated == ActionAnimation.QuickAttack)
         {
             //if (requiemPlayer)
             //{

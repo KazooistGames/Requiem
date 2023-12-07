@@ -170,6 +170,9 @@ MonoBehaviour:
   sensoryFoeSpotted:
     m_PersistentCalls:
       m_Calls: []
+  sensoryFoeLost:
+    m_PersistentCalls:
+      m_Calls: []
   sensoryAlerted: 0
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
@@ -385,14 +388,15 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  ActionAnimated: 0
+  CurrentActionAnimated: 0
   Throwing: 0
   Range: 0
   Power: 0
   BasePower: 0
   TrueStrike: 0
   Tempo: 0
-  attackChargeRate: 1
+  tempoChargePeriod: 1
+  tempoChargeExponent: 0.75
 --- !u!4 &74375186
 Transform:
   m_ObjectHideFlags: 0
@@ -601,14 +605,15 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  ActionAnimated: 0
+  CurrentActionAnimated: 0
   Throwing: 0
   Range: 0
   Power: 0
   BasePower: 0
   TrueStrike: 0
   Tempo: 0
-  attackChargeRate: 1
+  tempoChargePeriod: 1
+  tempoChargeExponent: 0.75
 --- !u!1 &747980606
 GameObject:
   m_ObjectHideFlags: 0
@@ -654,6 +659,9 @@ MonoBehaviour:
   meanderPaused: 0
   meanderPauseFrequency: 0.5
   sensoryFoeSpotted:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryFoeLost:
     m_PersistentCalls:
       m_Calls: []
   sensoryAlerted: 0
@@ -910,6 +918,9 @@ MonoBehaviour:
   sensoryFoeSpotted:
     m_PersistentCalls:
       m_Calls: []
+  sensoryFoeLost:
+    m_PersistentCalls:
+      m_Calls: []
   sensoryAlerted: 0
   pursueStoppingDistance: 0
   trackingEyesOnTarget: 0
@@ -950,7 +961,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  CombatSpeed: 0.75
+  CombatSpeed: 0.5
   Aggression: 0.5
 --- !u!114 &844573216
 MonoBehaviour:
@@ -1126,14 +1137,15 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  ActionAnimated: 0
+  CurrentActionAnimated: 0
   Throwing: 0
   Range: 0
   Power: 0
   BasePower: 0
   TrueStrike: 0
   Tempo: 0
-  attackChargeRate: 1
+  tempoChargePeriod: 1
+  tempoChargeExponent: 0.75
 --- !u!4 &1285575791
 Transform:
   m_ObjectHideFlags: 0
@@ -1272,6 +1284,9 @@ MonoBehaviour:
   meanderPaused: 0
   meanderPauseFrequency: 0.5
   sensoryFoeSpotted:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryFoeLost:
     m_PersistentCalls:
       m_Calls: []
   sensoryAlerted: 0
@@ -1450,6 +1465,9 @@ MonoBehaviour:
   meanderPaused: 0
   meanderPauseFrequency: 0.5
   sensoryFoeSpotted:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryFoeLost:
     m_PersistentCalls:
       m_Calls: []
   sensoryAlerted: 0
@@ -1666,14 +1684,15 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  ActionAnimated: 0
+  CurrentActionAnimated: 0
   Throwing: 0
   Range: 0
   Power: 0
   BasePower: 0
   TrueStrike: 0
   Tempo: 0
-  attackChargeRate: 1
+  tempoChargePeriod: 1
+  tempoChargeExponent: 0.75
 --- !u!4 &2008132594
 Transform:
   m_ObjectHideFlags: 0
@@ -1749,6 +1768,9 @@ MonoBehaviour:
   meanderPaused: 0
   meanderPauseFrequency: 0.5
   sensoryFoeSpotted:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryFoeLost:
     m_PersistentCalls:
       m_Calls: []
   sensoryAlerted: 0
@@ -1942,7 +1964,7 @@ MonoBehaviour:
   chambers: []
   coves: []
   StateOfGame: 0
-  Difficulty: 0
+  Wave: 0
 --- !u!114 &2128541363
 MonoBehaviour:
   m_ObjectHideFlags: 0

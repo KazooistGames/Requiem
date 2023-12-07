@@ -47,7 +47,7 @@ public class PlayerCamera : MonoBehaviour
         Eyes.backgroundColor = Color.black;
         Eyes.nearClipPlane = 0.01f;
         Eyes.farClipPlane = 10f;
-        Eyes.fieldOfView = 80f;
+        Eyes.fieldOfView = 0;
         _BlurbService.Instance.blurbCamera = Eyes;
     }
 

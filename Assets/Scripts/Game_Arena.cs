@@ -58,7 +58,7 @@ public class Game_Arena : Game
     {
         base.Update();
         gameObject.name = "ARENA";
-        if(StateOfGame != GameState.Liminal)
+        if (StateOfGame != GameState.Liminal)
         {
             GameClock += Time.deltaTime;
         }
@@ -170,14 +170,14 @@ public class Game_Arena : Game
 
     private IEnumerator corridorLandmarks(List<Hextile> tiles)
     {
-        foreach(Hextile tile in tiles)
+        foreach (Hextile tile in tiles)
         {
             new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
         }
         yield break;
     }
 
-    private IEnumerator cryptLandmarks(List<List<Hextile>>rings)
+    private IEnumerator cryptLandmarks(List<List<Hextile>> rings)
     {
         foreach (List<Hextile> ring in rings)
         {
@@ -228,27 +228,27 @@ public class Game_Arena : Game
         Player.INSTANCE.HostEntity.Vitality = 1;
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
-        MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs );
-        EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites );
+        MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
+        EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
         StateOfGame = GameState.Lobby;
         yield return new WaitUntil(() => well.Used);
         while (true)
         {
-            yield return null;
             StateOfGame = GameState.Liminal;
             alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             Wave++;
             StartingGate.OpenDoor();
+            yield return null;
             yield return new WaitUntil(() => alter.Used && alter.Energized);
             StateOfGame = GameState.Wave;
             alter.DesiredOffering = alter.TopStep;
             StartingGate.CloseDoor();
             spawnedMobs = spawnMobs();
-            yield return new WaitUntil(() => spawnedMobs.Count(x=> x != null) == 0);
+            yield return new WaitUntil(() => spawnedMobs.Count(x => x != null) == 0);
             well.Volume = 100;
         }
     }
-  
+
 
     private void configureSpawners()
     {
@@ -284,14 +284,14 @@ public class Game_Arena : Game
     private Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
-        { typeof(Bully), 3 },
-        { typeof(Biter), 3 },
+        { typeof(Biter), 2 },
+        { typeof(Bully), 4 },
     };
-    private List<(Type, Type)> EntityAIPairings = new List<(Type, Type)>
+    private Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
     {
-        {(typeof(Goon), typeof(Skelly))},
-        {(typeof(Bully), typeof(Nephalim))},
-        {(typeof(Biter), typeof(Skully))},
+        {typeof(Goon),typeof(Skelly) },
+        {typeof(Biter),typeof(Skully) },
+        {typeof(Bully),typeof(Nephalim) }
     };
 
     private List<Type> UnlockedEntities = new List<Type>();
@@ -299,33 +299,57 @@ public class Game_Arena : Game
 
     private List<GameObject> spawnMobs()
     {
-
-        //establish viable mob types
-        List<Type> viableTypes = new List<Type>();
-        viableTypes = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
-
-        //pick mob types based on what is available
-        List<Type> chosenTypes = new List<Type>();
-        int totalTypes = Mathf.Min(viableTypes.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave)));
-        while(chosenTypes.Count > totalTypes)
+        int totalStrengthOfWave;
+        switch(Wave % 3)
         {
-            int randomIndexFromViableTypes = UnityEngine.Random.Range(0, viableTypes.Count);
-            chosenTypes.Add(viableTypes[randomIndexFromViableTypes]);
-
+            case 1:
+                totalStrengthOfWave = 500;
+                break;
+            case 2:
+                totalStrengthOfWave = 800;
+                break;
+            case 0:
+                totalStrengthOfWave = 1200;
+                break;
+            default:
+                totalStrengthOfWave = 0;
+                break;  
         }
 
+        List<Type> viableAIs = new List<Type>();
+        viableAIs = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
 
-
+        int aiVarietyCountOfWave = Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave)));
+        List<Type> chosenAIsForWave = new List<Type>();
+        while(chosenAIsForWave.Count < aiVarietyCountOfWave)
+        {
+            int randomIndexFromViableAIs = UnityEngine.Random.Range(0, viableAIs.Count);
+            chosenAIsForWave.Add(viableAIs[randomIndexFromViableAIs]);
+        }
 
         //sort by max HP
+        chosenAIsForWave.OrderByDescending(x => EntityStrengths[x]);
+
 
         //spawn 1 of highest
-
         //spawn other types in order of highest to lowest HP to match highest HP enemy
-
         //loop back through until at population
-
+        int spawnIndex = 0;
+        int strengthSpawnedSoFar = 0;
         List<GameObject> mobs = new List<GameObject>();
+        while (strengthSpawnedSoFar < totalStrengthOfWave)
+        {
+            Type spawnedAI = chosenAIsForWave[spawnIndex];
+            Type spawnedEntity = AIEntityPairings[spawnedAI];
+            strengthSpawnedSoFar += EntityStrengths[spawnedEntity];
+            mobs.Add(SPAWN(spawnedEntity, spawnedAI, alter.transform.position));
+            spawnIndex++;
+            if(spawnIndex >= chosenAIsForWave.Count)
+            {
+                spawnIndex = 0;
+            }
+        }
+
         return mobs;
     }
 

@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    public Weapon hostWeapon;
+    public Weapon HostWeapon;
     public static Player INSTANCE { get; private set; }
     public int BonesCollected = 0;
 
@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
 
     private Material bloodSplatter;
 
-    public float ChainlinkLength = 0.075f;
+    public float ChainlinkLength = 0.05f;
     public float ChainlinkWidth = 0.025f;
     private LineRenderer chainRenderer;
 
@@ -55,13 +55,13 @@ public class Player : MonoBehaviour
     void Update()
     {
         //HUD.setIndicatorOnHUD("bones", "Bones: " + BonesCollected.ToString());
-        if (hostWeapon)
+        if (HostWeapon)
         {
             updateChainlink();
         }
         if (HostEntity ? HostEntity.MainHand : false)
         {
-            hostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
+            HostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
         }
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {
@@ -165,7 +165,10 @@ public class Player : MonoBehaviour
             lastDirection = Direction;
         }
         HostEntity.DashCharging = CurrentKeyboard.spaceKey.isPressed && !HostEntity.Dashing;
-        HostEntity.dashDirection = HostEntity.WalkDirection;
+        if (!HostEntity.Dashing)
+        {
+            HostEntity.dashDirection = HostEntity.WalkDirection;
+        }
     }
 
     private void inputItemManagement()
@@ -227,7 +230,7 @@ public class Player : MonoBehaviour
         }
         else if (CurrentKeyboard.qKey.wasPressedThisFrame)
         {
-            if (hostWeapon.Wielder != HostEntity)
+            if (HostWeapon.Wielder != HostEntity)
             {
                 recallWeapon();
             }
@@ -292,6 +295,7 @@ public class Player : MonoBehaviour
         HostEntity.FinalDashEnabled = true;
         chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();
         chainRenderer.transform.SetParent(transform);
+        chainRenderer.transform.localEulerAngles = Vector3.right * 90;
         chainRenderer.startWidth = ChainlinkWidth;
         chainRenderer.endWidth = ChainlinkWidth;
         StartCoroutine(FadeCurtains());
@@ -329,85 +333,97 @@ public class Player : MonoBehaviour
 
     private void recallWeapon()
     {
-        if (!hostWeapon)
+        if (!HostWeapon)
         {
             return;
         }
-        if (hostWeapon.ImpaledObject)
+        if (HostWeapon.ImpaledObject)
         {
-            hostWeapon.ImpaleRelease();
+            HostWeapon.ImpaleRelease();
         }
-        if (hostWeapon.Wielder != HostEntity)
+        if (HostWeapon.Wielder != HostEntity)
         {
-            hostWeapon.DropItem();
-            Vector3 disposition = hostWeapon.transform.position - transform.position; 
-            hostWeapon.transform.LookAt(HostEntity.transform);
-            hostWeapon.transform.Rotate(Vector3.Cross(disposition.normalized, Vector3.up), -90, Space.World);
+            HostWeapon.DropItem();
+            Vector3 disposition = HostWeapon.transform.position - transform.position; 
+            HostWeapon.transform.LookAt(HostEntity.transform);
+            HostWeapon.transform.Rotate(Vector3.Cross(disposition.normalized, Vector3.up), -90, Space.World);
             float recallPeriod = Mathf.Min(disposition.magnitude/3, 0.5f);
-            hostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
+            HostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
         }
     }
 
     private void yankWeapon()
     {
-        if (!hostWeapon)
+        if (!HostWeapon)
         {
 
         }
-        else if(hostWeapon.Wielder == HostEntity)
+        else if(HostWeapon.Wielder == HostEntity)
         {
 
         }
-        else if (hostWeapon.ImpaledObject)
+        else if (interactBox.bounds.Contains(HostWeapon.transform.position))
         {
-            Entity impaledFoe = hostWeapon.ImpaledObject.GetComponent<Entity>();
-            Wieldable impaledObject = hostWeapon.ImpaledObject.GetComponent<Wieldable>();
+            HostWeapon.PickupItem(HostEntity);
+        }
+        else if (HostWeapon.ImpaledObject)
+        {
+            Entity impaledFoe = HostWeapon.ImpaledObject.GetComponent<Entity>();
+            Wieldable impaledObject = HostWeapon.ImpaledObject.GetComponent<Wieldable>();
             if (impaledFoe)
             {
-                Vector3 disposition = hostWeapon.ImpaledObject.transform.position - transform.position;
+                Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
             }
             else if (impaledObject)
             {
-                Vector3 disposition = hostWeapon.ImpaledObject.transform.position - transform.position;
+                Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, Entity.Min_Velocity_Of_Dash);
             }
             else
             {
-                Vector3 disposition = hostWeapon.transform.position - transform.position;
+                Vector3 disposition = HostWeapon.transform.position - transform.position;
                 HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
             }
         }
         else
         {
-            Vector3 disposition = transform.position - hostWeapon.transform.position;
-            hostWeapon.transform.LookAt(HostEntity.transform);
-            hostWeapon.transform.Rotate(Vector3.Cross(-disposition.normalized, Vector3.up), -90, Space.World);
-            hostWeapon.DropItem(yeet: true, disposition.normalized + Vector3.up/2, Entity.Min_Velocity_Of_Dash);
+            Vector3 disposition = transform.position - HostWeapon.transform.position;
+            HostWeapon.transform.LookAt(HostEntity.transform);
+            HostWeapon.transform.Rotate(Vector3.Cross(-disposition.normalized, Vector3.up), -90, Space.World);
+            HostWeapon.DropItem(yeet: true, disposition.normalized + Vector3.up/2, Entity.Min_Velocity_Of_Dash);
         }
     }
 
 
     private void updateChainlink()
     {
-        chainRenderer.gameObject.SetActive(hostWeapon);
-        if(ChainlinkLength == 0) { return; }
-        Vector3 disposition = hostWeapon.transform.position - HostEntity.transform.position;
-        Vector3 additiveLinkDisposition = disposition;
-        List<Vector3> chainlinkPositions = new List<Vector3>();
-        Vector3 newChainlinkPosition = transform.position;
-        while (Mathf.Min(additiveLinkDisposition.magnitude, disposition.magnitude) > ChainlinkLength)
+
+        if(ChainlinkLength == 0 || !HostEntity || !HostWeapon) 
         {
-            newChainlinkPosition = newChainlinkPosition + disposition.normalized * ChainlinkLength;
-            chainlinkPositions.Add(newChainlinkPosition);
-            additiveLinkDisposition = hostWeapon.transform.position - newChainlinkPosition;
-            if(additiveLinkDisposition.magnitude > disposition.magnitude)
-            {
-                break;
-            }
+            chainRenderer.gameObject.SetActive(false);
         }
-        chainRenderer.positionCount = chainlinkPositions.Count;
-        chainRenderer.SetPositions(chainlinkPositions.ToArray());
+        else
+        {
+            chainRenderer.gameObject.SetActive(true);
+            Vector3 disposition = HostWeapon.transform.position - HostEntity.transform.position;
+            Vector3 additiveLinkDisposition = disposition;
+            List<Vector3> chainlinkPositions = new List<Vector3>();
+            Vector3 newChainlinkPosition = transform.position;
+            while (Mathf.Min(additiveLinkDisposition.magnitude, disposition.magnitude) > ChainlinkLength)
+            {
+                newChainlinkPosition = newChainlinkPosition + disposition.normalized * ChainlinkLength;
+                chainlinkPositions.Add(newChainlinkPosition);
+                additiveLinkDisposition = HostWeapon.transform.position - newChainlinkPosition;
+                if (additiveLinkDisposition.magnitude > disposition.magnitude)
+                {
+                    break;
+                }
+            }
+            chainRenderer.positionCount = chainlinkPositions.Count;
+            chainRenderer.SetPositions(chainlinkPositions.ToArray());
+        }
+        
     }
 
 }

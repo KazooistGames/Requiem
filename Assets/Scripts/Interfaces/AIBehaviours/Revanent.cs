@@ -65,7 +65,7 @@ public class Revanent : AIBehaviour
                     bool inRange = mainWep ? mainWep.Range >= disposition : false;
                     if (mainWep)
                     {
-                        if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
+                        if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
                         }
@@ -73,7 +73,7 @@ public class Revanent : AIBehaviour
                         {
                             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding);
                         }
-                        else if (_MartialController.Action_Queues[mainWep].Count == 0)
+                        else if (_MartialController.Weapon_Queues[mainWep].Count == 0)
                         {
                             if (inRange)
                             {
@@ -87,7 +87,7 @@ public class Revanent : AIBehaviour
                             }
                         }
 
-                        bool offensive = mainWep ? mainWep.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false;
+                        bool offensive = mainWep ? mainWep.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil : false;
                         tangoStrafeEnabled = !offensive;
                     }
                 }

@@ -21,6 +21,7 @@ public class Skelly : Entity
     {
         base.Start();
         createSkeleton();
+        Haste = 0.75f;
         gameObject.name = "Skelly";
         EventWounded.AddListener(CRUMBLE);
     }
@@ -71,7 +72,7 @@ public class Skelly : Entity
     protected void Mutate()
     {
         Debone(head);
-        Haste *= 1.25f;
+        Haste *= 1.5f;
         Strength *= 0.75f;
         if (GetComponent<AIBehaviour>())
         {

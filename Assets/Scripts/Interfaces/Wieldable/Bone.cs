@@ -17,7 +17,7 @@ public class Bone : MonoBehaviour
     public Rigidbody Body;
 
     private bool allowCollect = false;
-    private float allowCollectTimer = 0.0f;
+    //private float allowCollectTimer = 0.0f;
 
     private static float FINAL_SCALE_AFTER_COLLECTION = 0.5f;
 

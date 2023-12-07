@@ -18,8 +18,9 @@ public class _MartialController : MonoBehaviour
         public Requisite Prerequisite;
     }
 
+    public static Dictionary<Weapon, UnityEvent> Weapon_Completed_Action { get; private set; } = new Dictionary<Weapon, UnityEvent>();
     public static Dictionary<Weapon, MartialJob> Weapon_Actions { get; private set; } = new Dictionary<Weapon, MartialJob>();
-    public static Dictionary<Weapon, Queue<MartialJob>> Action_Queues { get; private set; } = new Dictionary<Weapon, Queue<MartialJob>>();
+    public static Dictionary<Weapon, Queue<MartialJob>> Weapon_Queues { get; private set; } = new Dictionary<Weapon, Queue<MartialJob>>();
     public static Dictionary<Weapon, float> Debounce_Timers { get; private set; } = new Dictionary<Weapon, float>();
 
     private static List<Weapon> KEYS_TO_DEQUEUE_THIS_FRAME = new List<Weapon>();
@@ -33,7 +34,7 @@ public class _MartialController : MonoBehaviour
         }
         INSTANCE = this;
         Weapon_Actions = new Dictionary<Weapon, MartialJob>();
-        Action_Queues = new Dictionary<Weapon, Queue<MartialJob>>();
+        Weapon_Queues = new Dictionary<Weapon, Queue<MartialJob>>();
         Debounce_Timers = new Dictionary<Weapon, float>();
         KEYS_TO_DEQUEUE_THIS_FRAME = new List<Weapon>();
     }
@@ -74,14 +75,14 @@ public class _MartialController : MonoBehaviour
             {
                 Cancel_Actions(weapon);
             }
-            else if (!Action_Queues.ContainsKey(weapon))
+            else if (!Weapon_Queues.ContainsKey(weapon))
             {
 
             }
-            else if (Action_Queues[weapon].Count > 0)
+            else if (Weapon_Queues[weapon].Count > 0)
             {
-                Weapon_Actions[weapon] = Action_Queues[weapon].Dequeue();
-                if(Action_Queues[weapon].Count == 0)
+                Weapon_Actions[weapon] = Weapon_Queues[weapon].Dequeue();
+                if(Weapon_Queues[weapon].Count == 0)
                 {
                     ClearedQueue.Invoke(weapon);
                     Debug.Log("Cleared queue for: " + weapon.name);
@@ -98,25 +99,23 @@ public class _MartialController : MonoBehaviour
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite};
         if (!Weapon_Actions.ContainsKey(weapon))
         {
-            Weapon_Actions[weapon] = newJob;
-            Action_Queues[weapon] = new Queue<MartialJob>();
-            Debounce_Timers[weapon] = 0;
+            createNewWeaponKey(weapon, newJob);
         }
         else
         {
-            if (!Action_Queues.ContainsKey(weapon))
+            if (!Weapon_Queues.ContainsKey(weapon))
             {
-                Action_Queues[weapon] = new Queue<MartialJob>();
+                Weapon_Queues[weapon] = new Queue<MartialJob>();
             }
-            Action_Queues[weapon].Enqueue(newJob);
+            Weapon_Queues[weapon].Enqueue(newJob);
         }
     }
 
     public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
     {
-        if (Action_Queues.ContainsKey(weapon))
+        if (Weapon_Queues.ContainsKey(weapon))
         {
-            Action_Queues[weapon].Clear();
+            Weapon_Queues[weapon].Clear();
         }
         Queue_Action(weapon, action, debounce, requisite);
     }
@@ -134,9 +133,9 @@ public class _MartialController : MonoBehaviour
         {
             Weapon_Actions.Remove(weapon);
         }
-        if (Action_Queues.ContainsKey(weapon))
+        if (Weapon_Queues.ContainsKey(weapon))
         {
-            Action_Queues.Remove(weapon);
+            Weapon_Queues.Remove(weapon);
         }
         if (Debounce_Timers.ContainsKey(weapon))
         {
@@ -149,7 +148,14 @@ public class _MartialController : MonoBehaviour
 
 
     /***** PRIVATE *****/
-
+    private static void createNewWeaponKey(Weapon weapon, MartialJob newJob)
+    {
+        if (Weapon_Actions.ContainsKey(weapon)) { return; }
+        Weapon_Actions[weapon] = newJob;
+        Weapon_Queues[weapon] = new Queue<MartialJob>();
+        Weapon_Completed_Action[weapon] = new UnityEvent();
+        Debounce_Timers[weapon] = 0;
+    }
 
 
     private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.ActionAnimation desiredAction)
@@ -165,7 +171,7 @@ public class _MartialController : MonoBehaviour
                 triggerControlValues = (true, false, false);
                 break;
             case Weapon.ActionAnimation.QuickAttack:
-                if (weapon.ActionAnimated == Weapon.ActionAnimation.QuickCoil)
+                if (weapon.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil)
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -178,10 +184,10 @@ public class _MartialController : MonoBehaviour
                 triggerControlValues = (false, false, true);
                 break;
             case Weapon.ActionAnimation.Guarding:
-                triggerControlValues = (false, true, false);
+                triggerControlValues = (weapon.PrimaryTrigger, true, false);
                 break;
             case Weapon.ActionAnimation.Parrying:
-                if (weapon.ActionAnimated == Weapon.ActionAnimation.Guarding) 
+                if (weapon.CurrentActionAnimated == Weapon.ActionAnimation.Guarding) 
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -196,7 +202,7 @@ public class _MartialController : MonoBehaviour
                 break;
             case Weapon.ActionAnimation.Throwing:
                 triggerControlValues = (false, false, false);
-                weapon.ThrowTrigger = weapon.ActionAnimated != Weapon.ActionAnimation.Aiming;
+                weapon.ThrowTrigger = weapon.CurrentActionAnimated != Weapon.ActionAnimation.Aiming;
                 break;
             default:
                 triggerControlValues = (false, false, false);
@@ -205,7 +211,7 @@ public class _MartialController : MonoBehaviour
         weapon.PrimaryTrigger = triggerControlValues.Item1;
         weapon.SecondaryTrigger = triggerControlValues.Item2;
         weapon.TertiaryTrigger = triggerControlValues.Item3;
-        if(weapon.ActionAnimated == desiredAction)
+        if(weapon.CurrentActionAnimated == desiredAction)
         {
             return true;
         }

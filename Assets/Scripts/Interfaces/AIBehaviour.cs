@@ -647,15 +647,15 @@ public class AIBehaviour : MonoBehaviour
             Vector3 disposition = entity.Foe.transform.position - transform.position;
 
             bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.25f;
-            bool foeRebuked = matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.Recoiling : true;
+            bool foeRebuked = matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.Recoiling : true;
 
             bool inRange = disposition.magnitude <= Mathf.Max(mainHand ? mainHand.Range : 0.0f, offHand ? offHand.Range : 0.0f);
             bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range : false);
 
-            bool foeAttacking = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickAttack : false);
-            bool foeCoiling = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickCoil : false);
-            bool foeWindingUp = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);          
-            bool foeAiming = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.ActionAnimated == Weapon.ActionAnimation.Aiming : false);         
+            bool foeAttacking = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickAttack : false);
+            bool foeCoiling = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil : false);
+            bool foeWindingUp = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.StrongWindup : false);          
+            bool foeAiming = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Aiming : false);         
             //bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
 
             if(!martialEnteredRangeLatch && inRange)
@@ -724,8 +724,6 @@ public class AIBehaviour : MonoBehaviour
             DeEnergize(key);
         }
     }
-
-
 
     //itemManagement
     public bool itemManagementSeekItems = false;

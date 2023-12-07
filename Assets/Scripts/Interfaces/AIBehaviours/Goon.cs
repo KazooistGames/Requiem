@@ -21,12 +21,11 @@ public class Goon : AIBehaviour
         Intelligence = 0.75f;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
-        //dashingCooldownPeriod = 3;
         martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 1.0f;
         meanderPauseFrequency = 0.5f;
         itemManagementSeekItems = true;
-        martialFoeVulnerable.AddListener(reactToFoeChange);
+        martialFoeVulnerable.AddListener(reactToFoeVulnerable);
         martialFoeAttacking.AddListener(reactToIncomingAttack);
         sensoryFoeSpotted.AddListener(reactToFoeChange);
         sensoryFoeLost.AddListener(reactToFoeChange);
@@ -65,7 +64,7 @@ public class Goon : AIBehaviour
                 {
                     if (mainWep)
                     {
-                        martialCurrentState = mainWep.ActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : (mainWep.ActionAnimated == Weapon.ActionAnimation.Aiming ? martialState.throwing : (mainWep.ActionAnimated == Weapon.ActionAnimation.Idle ? martialState.none : martialState.attacking));
+                        martialCurrentState = mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : (mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Aiming ? martialState.throwing : (mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Idle ? martialState.none : martialState.attacking));
                     }
                     ReflexRate = 0.05f;
                     tangoStrafePauseFreq = 0.5f;
@@ -96,7 +95,7 @@ public class Goon : AIBehaviour
         {
             return;
         }
-        else if (!entity.Foe || !_MartialController.Action_Queues.ContainsKey(mainWep))
+        else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
         }
@@ -105,28 +104,55 @@ public class Goon : AIBehaviour
            
             if (entity.Posture == Entity.PostureStrength.Weak)
             {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 1);
             }
-            else if (Random.value <= Aggression)
+            else if (Random.value <= Aggression || _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnimation.Idle)
             {
-
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkWeaponInRange);
+                if (checkMyWeaponInRange())
+                {
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+                }
+                else
+                {
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+                }
                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
             }
             else
             {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, 0.5f);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, getPausePeriod());
             }
         }
 
+    }
+
+    protected void reactToFoeVulnerable()
+    {
+        if (checkMyWeaponInRange())
+        {
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }
+        else if(entity.Posture == Entity.PostureStrength.Strong)
+        {
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }
     }
 
     protected void reactToFoeChange()
     {
         if (entity.Foe)
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkWeaponInRange);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);         
+            if (Random.value > Aggression)
+            {
+                _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+            }
+            else
+            {
+                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle, getPausePeriod());
+            }
         }
         else
         {
@@ -136,22 +162,39 @@ public class Goon : AIBehaviour
 
     protected void reactToIncomingAttack()
     {
-        if (martialCurrentState != martialState.defending)
+        if (mainWep.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil)
+        {
+            if (checkMyWeaponInRange())
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+            }
+            else
+            {
+                if (_MartialController.Weapon_Queues[mainWep].Peek().Action != Weapon.ActionAnimation.Guarding)
+                {
+                    _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+                    _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+                }
+            }
+        }
+        else if (martialCurrentState == martialState.none)
+        {
+            if (_MartialController.Weapon_Queues[mainWep].Peek().Action != Weapon.ActionAnimation.Guarding)
+            {
+                _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+            }
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+        }
+        else if (martialCurrentState == martialState.defending)
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
         }
-        //if (entity.Posture == Entity.PostureStrength.Weak && dashingCooldownTimer >= 3)
-        //{
-        //    Vector3 diposition = entity.Foe.transform.position - transform.position;
-        //    float angularOffset = (Random.value - 0.5f) * 180;
-        //    dashingDesiredDirection = angleToDirection(getAngle(diposition.normalized) - angularOffset);
-        //    //dashingENGAGE = true;
-        //}
     }
 
 
     /***** PRIVATE *****/
-    private bool checkWeaponInRange()
+    private bool checkMyWeaponInRange()
     {
         if (mainWep && entity.Foe)
         {
@@ -162,6 +205,11 @@ public class Goon : AIBehaviour
         {
             return false;
         }
+    }
+
+    private float getPausePeriod()
+    {
+        return 0.5f + Random.value;
     }
 
 }

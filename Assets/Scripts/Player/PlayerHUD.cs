@@ -51,7 +51,7 @@ public class PlayerHUD : MonoBehaviour
             statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
             statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Entity.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
-            if (Player.INSTANCE.hostWeapon)
+            if (Player.INSTANCE.HostWeapon)
             {
                 updateTempoBar();
             }
@@ -117,23 +117,23 @@ public class PlayerHUD : MonoBehaviour
     private void updateTempoBar()
     {
         TempoBar.SetActive(true);
-        if (!Player.INSTANCE.hostWeapon)
+        if (!Player.INSTANCE.HostWeapon)
         {
 
         }
-        else if (Player.INSTANCE.hostWeapon.ActionAnimated == Weapon.ActionAnimation.StrongWindup || Player.INSTANCE.hostWeapon.ActionAnimated == Weapon.ActionAnimation.StrongCoil)
+        else if (Player.INSTANCE.HostWeapon.CurrentActionAnimated == Weapon.ActionAnimation.StrongWindup || Player.INSTANCE.HostWeapon.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil)
         {
             fadeTransforms(tempoBarTransforms, 0.75f, 0.1f);
         }
-        else if(Player.INSTANCE.hostWeapon.ActionAnimated != Weapon.ActionAnimation.StrongAttack)
+        else if(Player.INSTANCE.HostWeapon.CurrentActionAnimated != Weapon.ActionAnimation.StrongAttack)
         {
             fadeTransforms(tempoBarTransforms, 0, 0.5f);
         }
-        tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.hostWeapon.Tempo, 1f);
-        tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.hostWeapon.Tempo, 1f);
-        tempoBarTransforms[2].anchorMin = new Vector2(Player.INSTANCE.hostWeapon.TempoTargetCenter, 1f);
-        tempoBarTransforms[2].anchorMax = new Vector2(Player.INSTANCE.hostWeapon.TempoTargetCenter, 1f);
-        tempoBarTransforms[2].sizeDelta = new Vector2(Player.INSTANCE.hostWeapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
+        tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.HostWeapon.Tempo, 1f);
+        tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostWeapon.Tempo, 1f);
+        tempoBarTransforms[2].anchorMin = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetCenter, 1f);
+        tempoBarTransforms[2].anchorMax = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetCenter, 1f);
+        tempoBarTransforms[2].sizeDelta = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
     }
 
     private void fadeTransforms(Transform[] transforms, float alphaValue, float periodSeconds)

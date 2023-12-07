@@ -58,12 +58,12 @@ public class _Flames : MonoBehaviour
             Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
             if (boundWeapon)
             {
-                emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.ActionAnimated == Weapon.ActionAnimation.Parrying;
+                emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.CurrentActionAnimated == Weapon.ActionAnimation.Parrying;
                 if (boundWeapon.TrueStrike)
                 {
                     FlameStyle(FlameStyles.Inferno);
                 }
-                else if (boundWeapon.ActionAnimated == Weapon.ActionAnimation.Parrying)
+                else if (boundWeapon.CurrentActionAnimated == Weapon.ActionAnimation.Parrying)
                 {
                     FlameStyle(FlameStyles.Inferno);
                 }
