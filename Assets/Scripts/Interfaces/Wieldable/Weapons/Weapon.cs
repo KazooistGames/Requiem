@@ -58,7 +58,8 @@ public abstract class Weapon : Wieldable
     public bool TrueStrike = false;
     public float Tempo;
     private float tempoCharge = 0;
-    public float tempoChargePeriod = 1.5f;
+    public float tempoChargePeriod = 1.0f;
+    public float tempoChargeExponent = 0.75f;
     //private bool attackChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.90f;
     public float TempoTargetWidth { get; private set; } = 0.2f;
@@ -609,9 +610,10 @@ public abstract class Weapon : Wieldable
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float scalar = 1.0f)
     {
         if (!foe) { return; }
+        float impactPower = weapon.Heft * (1 + weapon.Tempo);
         Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
         Vector3 disposition = foe.transform.position - origin;
-        Vector3 velocityChange = disposition.normalized * (weapon.Heft / 40f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        Vector3 velocityChange = disposition.normalized * (impactPower / 40f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
         foe.Shove(velocityChange);
     }
 
@@ -811,7 +813,7 @@ public abstract class Weapon : Wieldable
 
     private void chargeTempo()
     {
-        Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, 1f / 1.5f), 0, 1);
+        Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, tempoChargeExponent), 0, 1);
         if (ActionAnimated == ActionAnimation.StrongCoil)
         {
             tempoCharge += Time.deltaTime / tempoChargePeriod;

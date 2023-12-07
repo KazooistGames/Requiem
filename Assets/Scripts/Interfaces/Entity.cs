@@ -699,14 +699,14 @@ public class Entity : MonoBehaviour
                 {
                     foe.Vitality = 0;
                 }
-                else
+                else if (foe.Posture == PostureStrength.Weak)
                 {
-                    if(foe.Posture == PostureStrength.Weak)
-                    {
-                        foe.Damage(damage);
-                        foe.Stagger(Mathf.Sqrt(damage / Strength));
-                    }
-                    foe.alterPoise(-damage);   
+                    foe.Damage(damage);
+                    foe.Stagger(Mathf.Sqrt(damage / Strength));
+                }
+                else 
+                {
+                    foe.alterPoise(-damage);
                 }
                 EventLandedDashHit.Invoke(foe, damage);
                 _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
@@ -880,31 +880,16 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (theirWeapon.TrueStrike)
-        {
-            //if (Posture == PostureStrength.Weak)
-            //{
-            //    Disarm();
-            //}
-            //else
-            //{
-            //    Stagger(2 * theirWeapon.Heft / Strength);
-            //}
-            //alterPoise(-theirWeapon.Heft);
-        }
-        else if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-        {
-            //Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
-            //alterPoise(-theirWeapon.Heft);
-        }
-        else if (theirWeapon.ActionAnimated == ActionAnimation.QuickAttack)
-        {
-            //if (Posture == PostureStrength.Weak)
-            //{
-            //    Stagger(theirWeapon.Heft / Strength);
-            //}
-        }
+        float impactPower = theirWeapon.Power * theirWeapon.Tempo;      
 
+        if (impactPower > 0)
+        {
+            alterPoise(-impactPower);
+            if(Posture == PostureStrength.Weak)
+            {
+                Stagger(Mathf.Sqrt(impactPower / Strength));
+            }
+        }
     }
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
@@ -938,12 +923,13 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
+        float totalPower = myWeapon.Power * (1 + myWeapon.Tempo);
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
-        float poiseDamage = Mathf.Min(foe.Poise, myWeapon.Power);
-        float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : Mathf.Max(0, myWeapon.Power - poiseDamage);
+        float poiseDamage = Mathf.Min(foe.Poise, totalPower);
+        float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : Mathf.Max(0, totalPower - poiseDamage);
         if(foe.Posture != PostureStrength.Weak)
         {
             foe.alterPoise(-poiseDamage);

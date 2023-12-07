@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerCamera : MonoBehaviour
 {
     public Camera Eyes;
+    public bool LockPosition = true;
 
     public float CamRepoSpeed = 0.1f;
     public Vector3 camOffsetActual = new Vector3(3, 3, 0);
@@ -15,7 +16,7 @@ public class PlayerCamera : MonoBehaviour
     public float HorizonatalOffsetAngle = 0;
 
     public float camOffsetMax = 1.0f;
-    public float camOffsetMin = 0.5f;
+    public float camOffsetMin = 0.75f;
     public float CamOffsetMag = 0.75f;
     public float CamHeight = 0.5f;
     public float CamHeightMin = 1f;

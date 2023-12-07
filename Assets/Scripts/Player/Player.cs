@@ -125,7 +125,10 @@ public class Player : MonoBehaviour
         float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
         bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
         Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
-        Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 360) * Cam.ZoomSensitivity;
+        if (!Cam.LockPosition)
+        {
+            Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 360) * Cam.ZoomSensitivity;
+        }
         if (differenceCap == 0)
         {
 
@@ -336,6 +339,7 @@ public class Player : MonoBehaviour
         }
         if (hostWeapon.Wielder != HostEntity)
         {
+            hostWeapon.DropItem();
             Vector3 disposition = hostWeapon.transform.position - transform.position; 
             hostWeapon.transform.LookAt(HostEntity.transform);
             hostWeapon.transform.Rotate(Vector3.Cross(disposition.normalized, Vector3.up), -90, Space.World);
@@ -357,10 +361,16 @@ public class Player : MonoBehaviour
         else if (hostWeapon.ImpaledObject)
         {
             Entity impaledFoe = hostWeapon.ImpaledObject.GetComponent<Entity>();
+            Wieldable impaledObject = hostWeapon.ImpaledObject.GetComponent<Wieldable>();
             if (impaledFoe)
             {
                 Vector3 disposition = hostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
+            }
+            else if (impaledObject)
+            {
+                Vector3 disposition = hostWeapon.ImpaledObject.transform.position - transform.position;
+                impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, Entity.Min_Velocity_Of_Dash);
             }
             else
             {

@@ -9,7 +9,7 @@ using System.Collections;
 public class Landmark_Well : Landmark
 {
     public float Volume = 100;
-    private float fullDrinkPeriod = 5.0f;
+    private float fullDrinkPeriod = 4.0f;
     protected static GameObject WellModelTemplate;
     protected GameObject Model;
     protected MeshRenderer bloodPoolRenderer;
@@ -75,7 +75,7 @@ public class Landmark_Well : Landmark
         gameObject.name = "Well";
         gameObject.layer = Game.layerObstacle;
         gameObject.AddComponent<Rigidbody>().isKinematic = true;
-        transform.localPosition = Vector3.up * Hextile.Thickness / 2;
+        transform.localPosition = Vector3.up * Hextile.Thickness / 2.25f;
         if (!WellModelTemplate)
         {
             WellModelTemplate = Resources.Load<GameObject>("Prefabs/Structures/Well");
