@@ -163,7 +163,6 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
-  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -213,6 +212,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &11386816
 MonoBehaviour:
@@ -388,7 +388,7 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  CurrentActionAnimated: 0
+  CurrentAction: 0
   Throwing: 0
   Range: 0
   Power: 0
@@ -605,7 +605,7 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  CurrentActionAnimated: 0
+  CurrentAction: 0
   Throwing: 0
   Range: 0
   Power: 0
@@ -654,7 +654,6 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
-  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -704,6 +703,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &747980608
 MonoBehaviour:
@@ -911,7 +911,6 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
-  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -961,8 +960,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
-  CombatSpeed: 0.5
-  Aggression: 0.5
+  wallCrawlObstacles: []
 --- !u!114 &844573216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1137,7 +1135,7 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  CurrentActionAnimated: 0
+  CurrentAction: 0
   Throwing: 0
   Range: 0
   Power: 0
@@ -1279,7 +1277,6 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
-  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -1329,6 +1326,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &1776297672
 MonoBehaviour:
@@ -1460,7 +1458,6 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
-  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -1510,6 +1507,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
 --- !u!114 &1807562880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1684,7 +1682,7 @@ MonoBehaviour:
   ChangingActionAnimations:
     m_PersistentCalls:
       m_Calls: []
-  CurrentActionAnimated: 0
+  CurrentAction: 0
   Throwing: 0
   Range: 0
   Power: 0
@@ -1763,7 +1761,6 @@ MonoBehaviour:
   DesiredDirection: {x: 0, y: 0, z: 0}
   TotalWeight: 0
   LookAngle: 0
-  wallCrawlObstacles: []
   meanderDirection: {x: 0, y: 0, z: 0}
   meanderPaused: 0
   meanderPauseFrequency: 0.5
@@ -1813,6 +1810,7 @@ MonoBehaviour:
   wallCrawlDrawRays: 0
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
   excitement: 0
 --- !u!114 &2059821367
 MonoBehaviour:

@@ -97,6 +97,7 @@ public class Entity : MonoBehaviour
     public bool Staggered = false;
     protected float staggerPeriod = 0;
     protected float staggerTimer = 0;
+    private float STAGGER_BASE_TIME = 1 / 6f;
 
     /********** DASHING **********/
     public Vector3 dashDirection = Vector3.zero;
@@ -126,10 +127,6 @@ public class Entity : MonoBehaviour
 
     public bool FinalDashEnabled = false;
     public bool FinalDash = false;
-    //public float Tempo { get; private set; }
-    //public float TempoTargetCenter { get; private set; } = 0.90f;
-    //public float TempoTargetWidth { get; private set; } = 0.2f;
-    //private bool tempoChargeONS = true;
 
     public enum PostureStrength
     {
@@ -234,6 +231,14 @@ public class Entity : MonoBehaviour
     {
         equipmentManagement();
         indicatorManagement();
+        if (!Staggered)
+        {
+            staggerTimer = 0;
+        }
+        else if ((staggerTimer += Time.deltaTime) >= staggerPeriod)
+        {
+            Staggered = false;
+        }
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
@@ -256,7 +261,7 @@ public class Entity : MonoBehaviour
         }  
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
         Poise = Mathf.Clamp(Poise, 0, Strength);
-        Agility = modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier);
+        Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier));
         updatePosture();
         if (Vitality <= 0)
         {
@@ -317,7 +322,7 @@ public class Entity : MonoBehaviour
         float baseSpeed = Haste * SpeedScalarGlobal;
         //modSpeed["flow"] = posture == Posture.Flow ? Resolve / 100 : 0;
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
-        modSpeed["staggered"] = Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 3);
+        modSpeed["staggered"] = Staggered ? Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 3) : 0;
         modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
         SpeedActual = Agility * SpeedScalarGlobal;
@@ -341,17 +346,7 @@ public class Entity : MonoBehaviour
             shoveRecoveryPeriod = 0;
             shoveRecoveryTimer = 0;
         }
-        if (Staggered)
-        {
-            if (staggerTimer >= staggerPeriod)
-            {
-                Staggered = false;
-            }
-            else
-            {
-                staggerTimer += Time.fixedDeltaTime;
-            }
-        }
+
         RaycastHit hoverHit;
         Vector3 hoverRayInit = transform.position;
         hoverRayInit.y = Hextile.Thickness;
@@ -493,11 +488,16 @@ public class Entity : MonoBehaviour
 
     public void Stagger(float duration)
     {
-        if (duration > staggerPeriod - staggerTimer)
+        if (Staggered)
         {
-            staggerPeriod = duration;
+            Debug.Log("doubleStaggered!");
+        }
+        Staggered = true;
+        float totalDuration = STAGGER_BASE_TIME + duration;
+        if (totalDuration > (staggerPeriod - staggerTimer))
+        {
+            staggerPeriod = STAGGER_BASE_TIME + totalDuration;
             staggerTimer = 0;
-            Staggered = true;
         }
     }
 
@@ -701,17 +701,13 @@ public class Entity : MonoBehaviour
                 {
                     foe.Vitality = 0;
                 }
-                else if (foe.Posture == PostureStrength.Weak)
+                float vitalityDamage = foe.applyDamageToPoiseThenVitality(damage);
+                if (foe.Posture == PostureStrength.Weak)
                 {
-                    foe.Damage(damage);
-                    foe.Stagger(Mathf.Sqrt(damage / Strength));
-                }
-                else 
-                {
-                    foe.alterPoise(-damage);
+                    foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
                 }
                 EventLandedDashHit.Invoke(foe, damage);
-                playPunch(Mathf.Max(1.25f - (impactRatio / 2), 0.5f));
+                playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
             }
         }
         dashAlreadyHit.Add(other);
@@ -746,7 +742,7 @@ public class Entity : MonoBehaviour
                 EventCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
-                playPunch(Mathf.Max(1.5f - velocityRatio, 0.5f));
+                playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
             }
             else if (CrashEnvironmentONS && !otherEntity)
             {
@@ -765,7 +761,7 @@ public class Entity : MonoBehaviour
                     EventCrashed.Invoke();
                 }
                 CrashEnvironmentONS = false;
-                playPunch(Mathf.Max(1.5f - velocityRatio, 0.5f));
+                playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
             }
         }
     }
@@ -804,9 +800,7 @@ public class Entity : MonoBehaviour
                 }
                 Dashing = true;
                 Shove(dashDirection.normalized * scaledVelocity, true);
-                GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, FinalDash ? 0.5f : 2f - DashPower, 0.25f + DashPower);
-                sound.layer = Game.layerItem;
-                sound.transform.SetParent(transform);
+                playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
                 yield return new WaitWhile(() => Shoved);
             }
             FinalDash = false;
@@ -884,14 +878,14 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        float impactPower = theirWeapon.Power * theirWeapon.Tempo;      
-
-        if (impactPower > 0)
+        if (theirWeapon.CurrentAction == ActionAnimation.StrongAttack)
         {
-            alterPoise(-impactPower);
+            float totalPower = theirWeapon.Power * (1 + theirWeapon.Tempo);
+            alterPoise(-totalPower);
             if(Posture == PostureStrength.Weak)
             {
-                Stagger(Mathf.Sqrt(impactPower / Strength));
+                float impact = theirWeapon.Heft * (1 + theirWeapon.Tempo);
+                Stagger(Mathf.Sqrt(impact / Strength));
             }
         }
     }
@@ -928,28 +922,20 @@ public class Entity : MonoBehaviour
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float totalPower = myWeapon.Power * (1 + myWeapon.Tempo);
+        float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
-        float poiseDamage = Mathf.Min(foe.Poise, totalPower);
-        float vitalityDamage = foe.Posture == PostureStrength.Weak ? myWeapon.Power : Mathf.Max(0, totalPower - poiseDamage);
-        if(foe.Posture != PostureStrength.Weak)
+        if (myWeapon.CurrentAction == ActionAnimation.StrongAttack)
         {
-            foe.alterPoise(-poiseDamage);
+            if (Posture == PostureStrength.Weak)
+            {
+                float impact = myWeapon.Heft * vitalityDamage/totalPower;
+                foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
+            }
         }
-        //if (foe.Posture == PostureStrength.Weak)
-        //{
-        //    foe.Stagger(Mathf.Sqrt(poiseDamage / Strength));
-        //}
-        if(myWeapon.CurrentActionAnimated == ActionAnimation.StrongAttack)
-        {
-            //if (myWeapon.TrueStrike)
-            //{
-            //    vitalityDamage += Resolve;
-            //}
-        }
-        else if(myWeapon.CurrentActionAnimated == ActionAnimation.QuickAttack)
+        else if(myWeapon.CurrentAction == ActionAnimation.QuickAttack)
         {
             //if (requiemPlayer)
             //{
@@ -957,10 +943,22 @@ public class Entity : MonoBehaviour
             //    foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
             //}
         }
-        if (vitalityDamage > 0) 
+
+    }
+
+    private float applyDamageToPoiseThenVitality(float totalPower)
+    {
+        float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
+        float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
+        if(poiseDamage != 0)
         {
-            foe.Damage(vitalityDamage);
+            alterPoise(-poiseDamage);
         }
+        if (vitalityDamage != 0)
+        {
+            Damage(vitalityDamage);
+        }
+        return vitalityDamage;
     }
 
     private GameObject playPunch(float pitch)
@@ -971,6 +969,14 @@ public class Entity : MonoBehaviour
         return sound;
     }
 
+    private GameObject playWhoosh(float pitch)
+    {
+        GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, pitch, 0.25f + DashPower);
+        sound.layer = Game.layerItem;
+        sound.transform.SetParent(transform);
+        sound.GetComponent<AudioSource>().time = 0.05f;
+        return sound;
+    }
 
 }
 

@@ -32,9 +32,9 @@ public class WeaponRangeFinder : MonoBehaviour
         while (true)
         {
             yield return new WaitUntil(() => transform.parent);
-            yield return new WaitUntil(() => weapon.CurrentActionAnimated == Weapon.ActionAnimation.StrongAttack);
+            yield return new WaitUntil(() => checkIfWeShouldEstimateRange());
             float maxDistance = 0;
-            while (weapon.CurrentActionAnimated == Weapon.ActionAnimation.StrongAttack)
+            while (checkIfWeShouldEstimateRange())
             {
                 // Get the mesh filter component
                 MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
@@ -71,7 +71,20 @@ public class WeaponRangeFinder : MonoBehaviour
             { 
                 Debug.Log("Max Distance: " + maxDistance); 
             }
-            weapon.Range = maxDistance * 0.75f;
+            weapon.Range = maxDistance;
+        }
+    }
+
+
+    private bool checkIfWeShouldEstimateRange()
+    {
+        if (weapon)
+        {
+            return weapon.CurrentAction == Weapon.ActionAnimation.StrongAttack || weapon.CurrentAction == Weapon.ActionAnimation.QuickAttack;
+        }
+        else
+        {
+            return false;
         }
     }
 }

@@ -44,7 +44,7 @@ public abstract class Weapon : Wieldable
         Aiming,
         Throwing,
     }
-    public ActionAnimation CurrentActionAnimated = ActionAnimation.error;
+    public ActionAnimation CurrentAction = ActionAnimation.error;
     private ActionAnimation actionPreviouslyAnimated = ActionAnimation.error;
 
 
@@ -59,8 +59,8 @@ public abstract class Weapon : Wieldable
     public bool TrueStrike = false;
     public float Tempo;
     private float tempoCharge = 0;
-    public float tempoChargePeriod = 1.0f;
-    public float tempoChargeExponent = 2f;
+    public float tempoChargePeriod = 0.5f;
+    public float tempoChargeExponent = 1.75f;
     //private bool attackChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.94f;
     public float TempoTargetWidth { get; private set; } = 0.1f;
@@ -158,18 +158,18 @@ public abstract class Weapon : Wieldable
     {
         base.Update();
         Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
-        if (CurrentActionAnimated != ActionAnimation.QuickAttack && CurrentActionAnimated != ActionAnimation.StrongAttack)
+        if (CurrentAction != ActionAnimation.QuickAttack && CurrentAction != ActionAnimation.StrongAttack)
         {
             playClashSoundONS = true;
         }
         if (Wielder)
         {
-            CurrentActionAnimated = getActionFromCurrentAnimationState();
-            if (actionPreviouslyAnimated != CurrentActionAnimated)
+            CurrentAction = getActionFromCurrentAnimationState();
+            if (actionPreviouslyAnimated != CurrentAction)
             {
-                ChangingActionAnimations.Invoke(CurrentActionAnimated, actionPreviouslyAnimated);
+                ChangingActionAnimations.Invoke(CurrentAction, actionPreviouslyAnimated);
             }
-            actionPreviouslyAnimated = CurrentActionAnimated;
+            actionPreviouslyAnimated = CurrentAction;
             togglePhysicsBox(false);
             heftSlowModifier = -Heft / Wielder.Strength;
             if (transform.parent != Wielder.transform)
@@ -179,13 +179,13 @@ public abstract class Weapon : Wieldable
             if (Wielded)
             {
                 chargeTempo();
-                if (CurrentActionAnimated == ActionAnimation.Recoiling)
+                if (CurrentAction == ActionAnimation.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
                 }
-                else if (CurrentActionAnimated == ActionAnimation.Idle)
+                else if (CurrentAction == ActionAnimation.Idle)
                 {
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
@@ -193,27 +193,27 @@ public abstract class Weapon : Wieldable
                     TrueStrike = false;
                     modifyWielderSpeed(0);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.StrongWindup)
+                else if (CurrentAction == ActionAnimation.StrongWindup)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier);
                 }
-                else if(CurrentActionAnimated == ActionAnimation.StrongCoil)
+                else if(CurrentAction == ActionAnimation.StrongCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.QuickWindup)
+                else if (CurrentAction == ActionAnimation.QuickWindup)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.QuickCoil)
+                else if (CurrentAction == ActionAnimation.QuickCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(0);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.StrongAttack || CurrentActionAnimated == ActionAnimation.QuickAttack)
+                else if (CurrentAction == ActionAnimation.StrongAttack || CurrentAction == ActionAnimation.QuickAttack)
                 {
                     if (attackONS)
                     {
@@ -224,11 +224,11 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
-                        if(CurrentActionAnimated == ActionAnimation.QuickAttack)
+                        if(CurrentAction == ActionAnimation.QuickAttack)
                         {
                             playLightSwing();
                         }
-                        else if(CurrentActionAnimated == ActionAnimation.StrongAttack)
+                        else if(CurrentAction == ActionAnimation.StrongAttack)
                         {
                             playHeavySwing();
                         }
@@ -236,34 +236,34 @@ public abstract class Weapon : Wieldable
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.Recovering)
+                else if (CurrentAction == ActionAnimation.Recovering)
                 {
                     modifyWielderSpeed(0);
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                 }
-                else if (CurrentActionAnimated == ActionAnimation.Guarding)
+                else if (CurrentAction == ActionAnimation.Guarding)
                 {
                     HitBox.enabled = !nextAnimation.IsTag("Rebuked");
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.Aiming)
+                else if (CurrentAction == ActionAnimation.Aiming)
                 {
                     modifyWielderSpeed(heftSlowModifier);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.Throwing)
+                else if (CurrentAction == ActionAnimation.Throwing)
                 {
                     alreadyHit = new List<GameObject>();
                     modifyWielderSpeed(0);
                 }
-                else if (CurrentActionAnimated == ActionAnimation.Parrying)
+                else if (CurrentAction == ActionAnimation.Parrying)
                 {
                     HitBox.isTrigger = true;
                     HitBox.enabled = true;
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
-                bool availableToGuard = !((CurrentActionAnimated == ActionAnimation.Recovering) || (CurrentActionAnimated == ActionAnimation.QuickAttack) || (CurrentActionAnimated == ActionAnimation.StrongAttack));
+                bool availableToGuard = !((CurrentAction == ActionAnimation.Recovering) || (CurrentAction == ActionAnimation.QuickAttack) || (CurrentAction == ActionAnimation.StrongAttack));
                 Anim.SetBool("primary", PrimaryTrigger && !Recoiling);
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
                 Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
@@ -333,7 +333,7 @@ public abstract class Weapon : Wieldable
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
                     {
-                        if (CurrentActionAnimated == ActionAnimation.StrongAttack || CurrentActionAnimated == ActionAnimation.QuickAttack)
+                        if (CurrentAction == ActionAnimation.StrongAttack || CurrentAction == ActionAnimation.QuickAttack)
                         {
                             RESOLVE_CLASH(this, foeWeapon);
                         }
@@ -351,12 +351,12 @@ public abstract class Weapon : Wieldable
                     }
                     else if (foe && !other.isTrigger)
                     {
-                        if (CurrentActionAnimated == ActionAnimation.StrongAttack || CurrentActionAnimated == ActionAnimation.QuickAttack)
+                        if (CurrentAction == ActionAnimation.StrongAttack || CurrentAction == ActionAnimation.QuickAttack)
                         {
                             RESOLVE_HIT(this, foe);
                         }
                     }
-                    else if (obstacle && (CurrentActionAnimated == ActionAnimation.StrongAttack || CurrentActionAnimated == ActionAnimation.QuickAttack))
+                    else if (obstacle && (CurrentAction == ActionAnimation.StrongAttack || CurrentAction == ActionAnimation.QuickAttack))
                     {
                         resolveObstacleHit(other.gameObject);
                     }
@@ -443,7 +443,7 @@ public abstract class Weapon : Wieldable
         {
             return;
         }
-        if (Attacker.CurrentActionAnimated == ActionAnimation.StrongAttack)
+        if (Attacker.CurrentAction == ActionAnimation.StrongAttack)
         {
             float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
@@ -452,11 +452,11 @@ public abstract class Weapon : Wieldable
         {
             Attacker.playTink();
         }
-        if (Defender.CurrentActionAnimated == ActionAnimation.Parrying)
+        if (Defender.CurrentAction == ActionAnimation.Parrying)
         {
             RESOLVE_PARRY(Attacker, Defender);
         }
-        else if(Defender.CurrentActionAnimated == ActionAnimation.Guarding)
+        else if(Defender.CurrentAction == ActionAnimation.Guarding)
         {
             RESOLVE_BLOCK(Attacker, Defender);
         }
@@ -493,7 +493,7 @@ public abstract class Weapon : Wieldable
 
     private void resolveObstacleHit(GameObject obstacle)
     {
-        if (CurrentActionAnimated == ActionAnimation.StrongAttack)
+        if (CurrentAction == ActionAnimation.StrongAttack)
         {
             float scalar = TrueStrike ? 0.5f : 2 - Tempo;
             playClang(scalar);
@@ -819,12 +819,12 @@ public abstract class Weapon : Wieldable
     private void chargeTempo()
     {
         Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, tempoChargeExponent), 0, 1);
-        if (CurrentActionAnimated == ActionAnimation.StrongCoil)
+        if (CurrentAction == ActionAnimation.StrongCoil)
         {
             tempoCharge += Time.deltaTime / tempoChargePeriod;
             TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth/2;
         }
-        else if(CurrentActionAnimated != ActionAnimation.StrongAttack)
+        else if(CurrentAction != ActionAnimation.StrongAttack)
         {
             TrueStrike = false;
             tempoCharge = 0;

@@ -7,8 +7,8 @@ public class Goon : AIBehaviour
     //public float excitement = 0f;
 
     private Weapon mainWep;
-    public float CombatSpeed = 0.5f;
-    public float Aggression = 0.5f;
+    private float CombatSpeed = 0.75f;
+    private float Aggression = 0.5f;
 
     protected override void Awake()
     {
@@ -64,7 +64,7 @@ public class Goon : AIBehaviour
                 {
                     if (mainWep)
                     {
-                        martialCurrentState = mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Guarding ? martialState.defending : (mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Aiming ? martialState.throwing : (mainWep.CurrentActionAnimated == Weapon.ActionAnimation.Idle ? martialState.none : martialState.attacking));
+                        martialCurrentState = mainWep.CurrentAction == Weapon.ActionAnimation.Guarding ? martialState.defending : (mainWep.CurrentAction == Weapon.ActionAnimation.Aiming ? martialState.throwing : (mainWep.CurrentAction == Weapon.ActionAnimation.Idle ? martialState.none : martialState.attacking));
                     }
                     ReflexRate = 0.05f;
                     tangoStrafePauseFreq = 0.5f;
@@ -99,31 +99,22 @@ public class Goon : AIBehaviour
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
         }
+        else if (entity.Posture == Entity.PostureStrength.Weak)
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
+        }
+        else if (Random.value <= Aggression)
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);       
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }
         else
         {
-           
-            if (entity.Posture == Entity.PostureStrength.Weak)
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 1);
-            }
-            else if (Random.value <= Aggression || _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnimation.Idle)
-            {
-                if (checkMyWeaponInRange())
-                {
-                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
-                }
-                else
-                {
-                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-                }
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-            }
-            else
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, getPausePeriod());
-            }
-        }
-
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }      
     }
 
     protected void reactToFoeVulnerable()
@@ -133,26 +124,13 @@ public class Goon : AIBehaviour
             _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
         }
-        else if(entity.Posture == Entity.PostureStrength.Strong)
-        {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
-        }
     }
 
     protected void reactToFoeChange()
     {
         if (entity.Foe)
         {
-            if (Random.value > Aggression)
-            {
-                _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
-            }
-            else
-            {
-                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle, getPausePeriod());
-            }
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle, getPausePeriod());
         }
         else
         {
@@ -166,26 +144,14 @@ public class Goon : AIBehaviour
         {
             return;
         }
-        else if (mainWep.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil)
+        else if (mainWep.CurrentAction == Weapon.ActionAnimation.QuickCoil && checkMyWeaponInRange())
         {
-            if (checkMyWeaponInRange())
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 1f);
-            }
-            else
-            {
-                _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);            
-                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
-            }
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());            
         }
-        else if (martialCurrentState == martialState.none)
+        else
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);         
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
-        }
-        else if (martialCurrentState == martialState.defending)
-        {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, 1f);
+            _MartialController.Override_Action(mainWep, mainWep.CurrentAction, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
         }
     }
 

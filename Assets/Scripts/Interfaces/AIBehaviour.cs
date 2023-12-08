@@ -33,8 +33,6 @@ public class AIBehaviour : MonoBehaviour
     protected Vector3 lastDirection = Vector3.zero;
 
 
-    public List<GameObject> wallCrawlObstacles = new List<GameObject>();
-
     public delegate void behaviour(BehaviourType key);
     public Dictionary<BehaviourType, behaviour> behaviours;
     public Dictionary<BehaviourType, (bool, float)> behaviourParams;
@@ -432,21 +430,27 @@ public class AIBehaviour : MonoBehaviour
     public float pursueStoppingDistance = 0.0f;
     protected void pursue(BehaviourType key)
     {
-
         if (behaviourParams[key].Item1 && entity.Foe)
         {
             Vector3 outputDirection;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             disposition.y = 0;
-            Rigidbody foeBody = entity.Foe.GetComponent<Rigidbody>();
-            Vector3 targetTrajectory = new Vector3(foeBody.velocity.x, 0, foeBody.velocity.z).normalized;
-            float angleTrajectory = getAngle(targetTrajectory);
-            float angleToTarget = getAngle(disposition);
-            float angularDeficit = Mathf.Abs((angleTrajectory + 360) % 360 - (angleToTarget + 360) % 360);
-            float speedRatio = GetComponent<Rigidbody>().velocity.magnitude / entity.Foe.GetComponent<Rigidbody>().velocity.magnitude;
-            float outputRatio = angularDeficit * speedRatio / 180;
-            Vector3 interceptionRoute = foeBody.velocity.magnitude > 0 && (angularDeficit < 175 || 185 < angularDeficit) ? Vector3.Lerp(targetTrajectory, disposition, outputRatio) : disposition;
-            outputDirection = Vector3.Lerp(disposition.normalized, interceptionRoute.normalized, Intelligence);           
+            if(disposition.magnitude > pursueStoppingDistance)
+            {
+                Rigidbody foeBody = entity.Foe.GetComponent<Rigidbody>();
+                Vector3 targetTrajectory = new Vector3(foeBody.velocity.x, 0, foeBody.velocity.z).normalized;
+                float angleTrajectory = getAngle(targetTrajectory);
+                float angleToTarget = getAngle(disposition);
+                float angularDeficit = Mathf.Abs((angleTrajectory + 360) % 360 - (angleToTarget + 360) % 360);
+                float speedRatio = GetComponent<Rigidbody>().velocity.magnitude / entity.Foe.GetComponent<Rigidbody>().velocity.magnitude;
+                float outputRatio = angularDeficit * speedRatio / 180;
+                Vector3 interceptionRoute = foeBody.velocity.magnitude > 0 && (angularDeficit < 175 || 185 < angularDeficit) ? Vector3.Lerp(targetTrajectory, disposition, outputRatio) : disposition;
+                outputDirection = Vector3.Lerp(disposition.normalized, interceptionRoute.normalized, Intelligence);
+            }
+            else
+            {
+                outputDirection = Vector3.zero;
+            }     
             Directives[key] = (outputDirection, behaviourParams[key].Item2);
             behaviourParams[key] = (false, 0);
         }
@@ -646,17 +650,17 @@ public class AIBehaviour : MonoBehaviour
             Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
 
-            bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.25f;
-            bool foeRebuked = matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.Recoiling : true;
+            bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.75f;
+            bool foeRebuked = matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.Recoiling : true;
 
             bool inRange = disposition.magnitude <= Mathf.Max(mainHand ? mainHand.Range : 0.0f, offHand ? offHand.Range : 0.0f);
             float rangeBoost = 1.2f;
             bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range * rangeBoost : false);
 
-            bool foeAttacking = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickAttack : false);
-            bool foeCoiling = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil : false);
-            bool foeWindingUp = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickWindup || matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.StrongWindup : false);          
-            bool foeAiming = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Aiming : false);         
+            bool foeAttacking = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.QuickAttack : false);
+            bool foeCoiling = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.QuickCoil || matchupMain.CurrentAction == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.QuickCoil || matchupOff.CurrentAction == Weapon.ActionAnimation.StrongCoil : false);
+            bool foeWindingUp = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.QuickWindup || matchupMain.CurrentAction == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.QuickWindup || matchupOff.CurrentAction == Weapon.ActionAnimation.StrongWindup : false);          
+            bool foeAiming = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.CurrentAction == Weapon.ActionAnimation.Aiming : false);         
             //bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
 
             if(!martialEnteredRangeLatch && inRange)
@@ -915,6 +919,7 @@ public class AIBehaviour : MonoBehaviour
     protected int wallCrawlAvoidAngle;
     protected float wallCrawlTimer = 0;
     protected float wallCrawlPeriod = 3;
+    public List<GameObject> wallCrawlObstacles = new List<GameObject>();
     protected void wallCrawl(BehaviourType key)
     {
         wallCrawlObstaclesMask = (1 << Game.layerWall) + (1 << Game.layerObstacle) + (wallCrawlCrowding ? 0 : (1 << Game.layerEntity));
