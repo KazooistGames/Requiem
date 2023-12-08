@@ -87,7 +87,7 @@ public class Revanent : AIBehaviour
                             }
                         }
 
-                        bool offensive = mainWep ? mainWep.CurrentAction == Weapon.ActionAnimation.QuickCoil : false;
+                        bool offensive = mainWep ? mainWep.Action == Weapon.ActionAnimation.QuickCoil : false;
                         tangoStrafeEnabled = !offensive;
                     }
                 }

@@ -82,11 +82,12 @@ public class _MartialController : MonoBehaviour
             else if (Weapon_Queues[weapon].Count > 0)
             {
                 Weapon_Actions[weapon] = Weapon_Queues[weapon].Dequeue();
-                if(Weapon_Queues[weapon].Count == 0)
-                {
-                    ClearedQueue.Invoke(weapon);
-                    Debug.Log("Cleared queue for: " + weapon.name);
-                }
+
+            }
+            if (Weapon_Queues[weapon].Count == 0)
+            {
+                ClearedQueue.Invoke(weapon);
+                Debug.Log("Cleared queue for: " + weapon.name);
             }
 
         }
@@ -113,6 +114,7 @@ public class _MartialController : MonoBehaviour
 
     public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
     {
+        if(weapon == null) { return; }
         if (Weapon_Queues.ContainsKey(weapon))
         {
             Weapon_Queues[weapon].Clear();
@@ -140,6 +142,18 @@ public class _MartialController : MonoBehaviour
         if (Debounce_Timers.ContainsKey(weapon))
         {
             Debounce_Timers.Remove(weapon);
+        }
+    }
+
+    public static Weapon.ActionAnimation Get_Next_Action(Weapon weapon)
+    {
+        if (Weapon_Queues[weapon].Count > 0)
+        {
+            return Weapon_Queues[weapon].Peek().Action; 
+        }
+        else
+        {
+            return Weapon.ActionAnimation.error;
         }
     }
 
@@ -171,7 +185,7 @@ public class _MartialController : MonoBehaviour
                 triggerControlValues = (true, false, false);
                 break;
             case Weapon.ActionAnimation.QuickAttack:
-                if (weapon.CurrentAction == Weapon.ActionAnimation.QuickCoil)
+                if (weapon.Action == Weapon.ActionAnimation.QuickCoil)
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -180,14 +194,24 @@ public class _MartialController : MonoBehaviour
                     triggerControlValues = (true, false, false);
                 }
                 break;
-            case Weapon.ActionAnimation.StrongAttack:
+            case Weapon.ActionAnimation.StrongCoil:
                 triggerControlValues = (false, false, true);
+                break;
+            case Weapon.ActionAnimation.StrongAttack:
+                if(weapon.Action == Weapon.ActionAnimation.StrongCoil)
+                {
+                    triggerControlValues = (false, false, false);
+                }
+                else
+                {
+                    triggerControlValues = (false, false, true);
+                }
                 break;
             case Weapon.ActionAnimation.Guarding:
                 triggerControlValues = (weapon.PrimaryTrigger, true, false);
                 break;
             case Weapon.ActionAnimation.Parrying:
-                if (weapon.CurrentAction == Weapon.ActionAnimation.Guarding) 
+                if (weapon.Action == Weapon.ActionAnimation.Guarding) 
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -202,7 +226,7 @@ public class _MartialController : MonoBehaviour
                 break;
             case Weapon.ActionAnimation.Throwing:
                 triggerControlValues = (false, false, false);
-                weapon.ThrowTrigger = weapon.CurrentAction != Weapon.ActionAnimation.Aiming;
+                weapon.ThrowTrigger = weapon.Action != Weapon.ActionAnimation.Aiming;
                 break;
             default:
                 triggerControlValues = (false, false, false);
@@ -211,7 +235,7 @@ public class _MartialController : MonoBehaviour
         weapon.PrimaryTrigger = triggerControlValues.Item1;
         weapon.SecondaryTrigger = triggerControlValues.Item2;
         weapon.TertiaryTrigger = triggerControlValues.Item3;
-        if(weapon.CurrentAction == desiredAction)
+        if(weapon.Action == desiredAction)
         {
             return true;
         }

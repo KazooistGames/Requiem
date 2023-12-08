@@ -47,8 +47,7 @@ public class Game_Arena : Game
 
     public int Wave = 0;
 
-
-    protected override void Start()
+        protected override void Start()
     {
         base.Start();
         StartCoroutine(SetupGame());

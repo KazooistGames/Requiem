@@ -61,7 +61,7 @@ public class WeaponRangeFinder : MonoBehaviour
                         float distance = Vector3.Distance(Vector3.Scale(corner + transform.localPosition, transform.lossyScale), Vector3.zero);
                         if (distance > maxDistance)
                         {
-                            maxDistance = distance;
+                            maxDistance = distance * 0.9f;
                         }
                     }
                 }
@@ -80,7 +80,7 @@ public class WeaponRangeFinder : MonoBehaviour
     {
         if (weapon)
         {
-            return weapon.CurrentAction == Weapon.ActionAnimation.StrongAttack || weapon.CurrentAction == Weapon.ActionAnimation.QuickAttack;
+            return weapon.Action == Weapon.ActionAnimation.StrongAttack || weapon.Action == Weapon.ActionAnimation.QuickAttack;
         }
         else
         {

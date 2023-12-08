@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Nemesis : AIBehaviour
 {
-    public float excitement = 0f;
 
     protected override void Awake()
     {

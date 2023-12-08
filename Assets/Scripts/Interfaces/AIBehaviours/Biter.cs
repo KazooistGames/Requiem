@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Biter : AIBehaviour
 {
-    public float excitement = 0f;
-
     protected override void Awake()
     {
         base.Awake();
@@ -20,56 +18,26 @@ public class Biter : AIBehaviour
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
+        meanderPauseFrequency = 0.75f;
         itemManagementSeekItems = false;
+        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         grabEnabled = false;
     }
 
     protected override void Update()
     {
         base.Update();
-        if (Enthralled)
+        if (entity.Foe)
         {
-            StateTransition(AIState.enthralled);
-        }
-        switch (State)
-        {
-            case AIState.none:
-                StateTransition(AIState.seek);
-                break;
-            case AIState.seek:
-                if (entity.Foe)
-                {
-                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
-                    StateTransition(AIState.aggro);
-                }
-                else
-                {
-                    ReflexRate = 0.20f;
-                    meanderPauseFrequency = 0.75f;
-                }
-                break;
-            case AIState.aggro:
-                if (trackingTrailCold)
-                {
-                    StateTransition(AIState.seek);
-                }
-                else
-                {
-                    ReflexRate = 0.05f;
-                    if (entity.Foe)
-                    {
-                        Vector3 disposition = entity.Foe.transform.position - transform.position;
-                        bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
-                        bool charged = dashingCooldownTimer >= 3;
-                        dashingChargePeriod = 0.5f;
-                        if (charged && inPosition && !entity.Shoved)
-                        {
-                            dashingDesiredDirection = disposition;
-
-                        }
-                    }
-                }
-                break;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            bool charged = dashingCooldownTimer >= 3;
+            pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * (charged ? 0.3f : 0.5f);
+            bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
+            dashingChargePeriod = 0.5f;
+            if (charged && inPosition && !entity.Shoved)
+            {
+                dashingDesiredDirection = disposition;
+            }
 
         }
     }

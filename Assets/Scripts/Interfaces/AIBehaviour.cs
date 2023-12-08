@@ -32,6 +32,7 @@ public class AIBehaviour : MonoBehaviour
     protected Entity entity;
     protected Vector3 lastDirection = Vector3.zero;
 
+    public float excitement = 0f;
 
     public delegate void behaviour(BehaviourType key);
     public Dictionary<BehaviourType, behaviour> behaviours;
@@ -95,6 +96,11 @@ public class AIBehaviour : MonoBehaviour
         StartCoroutine(Think());
         StartCoroutine(stateHandler());
         entity.EventWounded.AddListener((float damage) => sensoryAlerted = true);
+        martialFoeVulnerable.AddListener(reactToFoeVulnerable);
+        martialFoeAttacking.AddListener(reactToIncomingAttack);
+        sensoryFoeSpotted.AddListener(reactToFoeChange);
+        sensoryFoeLost.AddListener(reactToFoeChange);
+        _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
     protected virtual void Update()
@@ -137,6 +143,66 @@ public class AIBehaviour : MonoBehaviour
         }
         entity.WalkDirection = actualMovementDirection;
         entity.LookDirection = angleToDirection(LookAngle);
+        if (Enthralled)
+        {
+            StateTransition(AIState.enthralled);
+        }
+        switch (State)
+        {
+            case AIState.none:
+                StateTransition(AIState.passive);
+                break;
+            case AIState.passive:
+                if (entity.Foe)
+                {
+                    StateTransition(AIState.aggro);
+                }
+                else
+                {
+                    ReflexRate = 0.2f;
+                }
+                break;
+            case AIState.aggro:
+                if (trackingTrailCold)
+                {
+                    StateTransition(AIState.seek);
+                }
+                else
+                {
+                    ReflexRate = 0.05f;
+                    if (!mainWep)
+                    {
+                        martialCurrentState = martialState.none;
+                    }
+                    else if (mainWep.Action == Weapon.ActionAnimation.Guarding)
+                    {
+                        martialCurrentState = martialState.defending;
+                    }
+                    else if (mainWep.Action == Weapon.ActionAnimation.Aiming)
+                    {
+                        martialCurrentState = martialState.throwing;
+                    }
+                    else if (mainWep.Action == Weapon.ActionAnimation.Idle || mainWep.Action == Weapon.ActionAnimation.Sheathed)
+                    {
+                        martialCurrentState = martialState.none;
+                    }
+                    else
+                    {
+                        martialCurrentState = martialState.attacking;
+                    }
+                }
+                break;
+            case AIState.seek:
+                if (entity.Foe)
+                {
+                    StateTransition(AIState.aggro);
+                }
+                else if (stateRunTimer > 5)
+                {
+                    StateTransition(AIState.passive);
+                }
+                break;
+        }
     }
 
     protected virtual void OnDisable()
@@ -179,6 +245,46 @@ public class AIBehaviour : MonoBehaviour
             }
         }
     }
+
+    /***** PUBLIC *****/
+    /***** PROTECTED *****/
+    protected bool checkMyWeaponInRange()
+    {
+        if (mainWep && entity.Foe)
+        {
+            float disposition = (entity.Foe.transform.position - transform.position).magnitude;
+            return disposition <= mainWep.Range;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    protected float getPausePeriod()
+    {
+        return 0.5f + Random.value;
+    }
+    protected virtual void queueNextRoundOfActions(Weapon weapon)
+    {
+
+    }
+
+    protected virtual void reactToFoeVulnerable()
+    {
+
+    }
+
+    protected virtual void reactToFoeChange()
+    {
+
+    }
+
+    protected virtual void reactToIncomingAttack()
+    {
+
+    }
+
+    /***** PRIVATE *****/
 
     //BEHAVIOURS!!!
 
@@ -235,7 +341,7 @@ public class AIBehaviour : MonoBehaviour
             float startAngle = Mathf.Lerp(LookAngle, actualMovementAngle, 0.5f);
             float bestAngle = startAngle;
             float bestDistance = 0.0f;
-            float lookRange = Intelligence * 2;
+            float lookRange = 1;
             int flipflop = Random.value >= 0.5f ? 1 : -1;
             for (int increment = -(int)(flipflop * (patrolScanAngle / 2)); increment != (int)(flipflop * (patrolScanAngle / 2)); increment += flipflop)
             {
@@ -445,7 +551,7 @@ public class AIBehaviour : MonoBehaviour
                 float speedRatio = GetComponent<Rigidbody>().velocity.magnitude / entity.Foe.GetComponent<Rigidbody>().velocity.magnitude;
                 float outputRatio = angularDeficit * speedRatio / 180;
                 Vector3 interceptionRoute = foeBody.velocity.magnitude > 0 && (angularDeficit < 175 || 185 < angularDeficit) ? Vector3.Lerp(targetTrajectory, disposition, outputRatio) : disposition;
-                outputDirection = Vector3.Lerp(disposition.normalized, interceptionRoute.normalized, Intelligence);
+                outputDirection = interceptionRoute.normalized;
             }
             else
             {
@@ -640,27 +746,31 @@ public class AIBehaviour : MonoBehaviour
     protected bool martialFoeChargingLatch = false;
     protected bool martialFoeEnteredRangeLatch = false;
     protected bool martialEnteredRangeLatch = false;
+    protected Weapon mainWep;
+    protected Weapon offHand;
+    protected Weapon matchupMain;
+    protected Weapon matchupOff;
     protected void martial(BehaviourType key)
     {
-        Weapon mainHand = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-        Weapon offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-        if (behaviourParams[key].Item1 && entity.Foe && (mainHand || offHand))
+        mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
+        offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
+        if (behaviourParams[key].Item1 && entity.Foe && (mainWep || offHand))
         {
-            Weapon matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
-            Weapon matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
+            matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
+            matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
 
             bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.75f;
-            bool foeRebuked = matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.Recoiling : true;
+            bool foeRebuked = matchupMain ? matchupMain.Action == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.Action == Weapon.ActionAnimation.Recoiling : true;
 
-            bool inRange = disposition.magnitude <= Mathf.Max(mainHand ? mainHand.Range : 0.0f, offHand ? offHand.Range : 0.0f);
+            bool inRange = disposition.magnitude <= Mathf.Max(mainWep ? mainWep.Range : 0.0f, offHand ? offHand.Range : 0.0f);
             float rangeBoost = 1.2f;
             bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range * rangeBoost : false);
 
-            bool foeAttacking = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.QuickAttack : false);
-            bool foeCoiling = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.QuickCoil || matchupMain.CurrentAction == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.QuickCoil || matchupOff.CurrentAction == Weapon.ActionAnimation.StrongCoil : false);
-            bool foeWindingUp = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.QuickWindup || matchupMain.CurrentAction == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.CurrentAction == Weapon.ActionAnimation.QuickWindup || matchupOff.CurrentAction == Weapon.ActionAnimation.StrongWindup : false);          
-            bool foeAiming = (matchupMain ? matchupMain.CurrentAction == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.CurrentAction == Weapon.ActionAnimation.Aiming : false);         
+            bool foeAttacking = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnimation.QuickAttack : false);
+            bool foeCoiling = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.QuickCoil || matchupMain.Action == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnimation.QuickCoil || matchupOff.Action == Weapon.ActionAnimation.StrongCoil : false);
+            bool foeWindingUp = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.QuickWindup || matchupMain.Action == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnimation.QuickWindup || matchupOff.Action == Weapon.ActionAnimation.StrongWindup : false);          
+            bool foeAiming = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.Action == Weapon.ActionAnimation.Aiming : false);         
             //bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
 
             if(!martialEnteredRangeLatch && inRange)
@@ -1051,7 +1161,7 @@ public class AIBehaviour : MonoBehaviour
                         break;
                     case AIState.passive:
                         stateRunTimer = sensoryAlerted ? 0 : stateRunTimer;
-                        excitement = Mathf.Lerp(1, 0, stateRunTimer / (Intelligence * 10));
+                        excitement = Mathf.Lerp(1, 0, stateRunTimer / 10);
                         meanderPauseFrequency = Mathf.Lerp(0.75f, 0.25f, excitement);
                         entity.modSpeed["AIState"] = Mathf.Lerp(-0.75f, 0f, excitement);
                         behaviourParams[BehaviourType.patrol] = (!meanderPaused || excitement > 0, Intelligence);

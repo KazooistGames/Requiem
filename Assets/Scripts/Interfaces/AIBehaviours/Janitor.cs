@@ -19,47 +19,38 @@ public class Janitor : AIBehaviour
         CleanZone = GetComponent<SphereCollider>() ? GetComponent<SphereCollider>() : gameObject.AddComponent<SphereCollider>();
         CleanZone.isTrigger = true;
         CleanZone.radius = Hextile.Radius / Entity.Scale;
+        waypointCoordinates = transform.position;
     }
 
 
     protected override void Update()
     {
         base.Update();
-        switch (State)
+        if(TaskList.Count > 0)
         {
-            case AIState.none:
-                waypointCoordinates = transform.position;
-                if(TaskList.Count > 0)
-                {
-                    NextTask = Hextile.Tiles[0];
-                    StateTransition(AIState.passive);
-                }
-                else
-                {
-                    TaskList = Hextile.Tiles;
-                }
-                break;
-            case AIState.passive:
-                behaviourParams[BehaviourType.wallCrawl] = (false, 0);
-                behaviourParams[BehaviourType.sensory] = (false, 0f);
-                waypointCommanded = true;
-                waypointDeadbandingScalar = 3.0f;
-                meanderPauseFrequency = 0.0f;
-                meanderPeriod = 0.5f;
-                behaviourParams[BehaviourType.waypoint] = (true, 1);
-                behaviourParams[BehaviourType.meander] = (true, 0.5f);           
-                if (waypointDeadbanded)
-                {                       
-                    int currentTaskIndex = TaskList.IndexOf(NextTask);
-                    NextTask = currentTaskIndex >= TaskList.Count - 1 ? TaskList[0] : TaskList[currentTaskIndex + 1];
-                    waypointCoordinates = NextTask.transform.position;
-                }
-                entity.modSpeed["mosey"] = -0.5f;
-                break;
-            default:
-                StateTransition(AIState.none);
-                break;
+            NextTask = Hextile.Tiles[0];
+            StateTransition(AIState.passive);
         }
+        else
+        {
+            TaskList = Hextile.Tiles;
+        }
+
+        behaviourParams[BehaviourType.wallCrawl] = (false, 0);
+        behaviourParams[BehaviourType.sensory] = (false, 0f);
+        waypointCommanded = true;
+        waypointDeadbandingScalar = 3.0f;
+        meanderPauseFrequency = 0.0f;
+        meanderPeriod = 0.5f;
+        behaviourParams[BehaviourType.waypoint] = (true, 1);
+        behaviourParams[BehaviourType.meander] = (true, 0.5f);           
+        if (waypointDeadbanded)
+        {                       
+            int currentTaskIndex = TaskList.IndexOf(NextTask);
+            NextTask = currentTaskIndex >= TaskList.Count - 1 ? TaskList[0] : TaskList[currentTaskIndex + 1];
+            waypointCoordinates = NextTask.transform.position;
+        }
+        entity.modSpeed["mosey"] = -0.5f;      
     }
 
 

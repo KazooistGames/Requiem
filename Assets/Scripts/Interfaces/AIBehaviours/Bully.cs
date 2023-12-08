@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Bully : AIBehaviour
 {
-    public float excitement = 0f;
+    private float CombatSpeed = 1f;
+    private float Aggression = 0.5f;
 
     protected override void Awake()
     {
@@ -15,76 +16,83 @@ public class Bully : AIBehaviour
         base.Start();
         new GameObject().AddComponent<Greataxe>().PickupItem(entity);
         Intelligence = 0.5f;
-
         tangoStrafeEnabled = false;
         dashingChargePeriod = 0.5f;
+        meanderPauseFrequency = 0;
         itemManagementSeekItems = true;
         itemManagementPreferredType = Entity.WieldMode.TwoHanders;
+
+        martialFoeVulnerable.AddListener(reactToFoeVulnerable);
+        martialFoeAttacking.AddListener(reactToIncomingAttack);
+        sensoryFoeSpotted.AddListener(reactToFoeChange);
+        sensoryFoeLost.AddListener(reactToFoeChange);
+        _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
-    protected override void Update()
+    /***** PUBLIC *****/
+
+
+
+    /***** PROTECTED  *****/
+    protected override void queueNextRoundOfActions(Weapon weapon)
     {
-        base.Update();
-        if (Enthralled)
+        if (weapon != mainWep)
         {
-            StateTransition(AIState.enthralled);
+            return;
         }
-        switch (State)
+        else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
         {
-            case AIState.none:
-                StateTransition(AIState.passive);
-                break;
-            case AIState.passive:
-                if (entity.Foe)
-                {
-                    StateTransition(AIState.aggro);
-                }
-                else
-                {
-                    ReflexRate = 0.20f;
-                    meanderPauseFrequency = 0.0f;
-                }
-                break;
-            case AIState.aggro:
-                if (trackingTrailCold)
-                {
-                    StateTransition(AIState.passive);
-                }
-                else
-                {
-                    Weapon mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-                    if (mainWep)
-                    {
-                        martialCurrentState = mainWep.CurrentAction == Weapon.ActionAnimation.Guarding ? martialState.defending : martialState.attacking;
-                        if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
-                        {
-                            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
-                        }
-                        else if (_MartialController.Weapon_Queues[mainWep].Count == 0)
-                        {
-                            float disposition = (entity.Foe.transform.position - transform.position).magnitude;
-                            if (mainWep.Range >= disposition)
-                            {
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, 2);
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
-                                _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-                            }
-                            else
-                            {
-                                _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
-                            }
-                        }
-                    }
-                    ReflexRate = 0.05f;
-                    //bool defending = mainWep ? mainWep.Defending : false;
-                    //dashingInitiate = (defending && inRange) || entity.Mutated || entity.DashCharging;
-                    //dashingCooldownPeriod = entity.Mutated ? 1.0f : 2.0f;
-                    //martialPreferredState = entity.Mutated ? martialState.attacking : martialState.none;
-                }
-                break;
-
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+        }
+        else if (entity.Posture == Entity.PostureStrength.Weak)
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
+        }
+        else if(checkMyWeaponInRange())
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }
+        else
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
         }
     }
+
+    protected override void reactToFoeVulnerable()
+    {
+        if (checkMyWeaponInRange())
+        {
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+        }
+    }
+
+    protected override void reactToFoeChange()
+    {
+        if (entity.Foe)
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+        }
+        else
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+        }
+    }
+
+    protected override void reactToIncomingAttack()
+    {
+
+    }
+
+
+    /***** PRIVATE *****/
+
+
 
 }
 
