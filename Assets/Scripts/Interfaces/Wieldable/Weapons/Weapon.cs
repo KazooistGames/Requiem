@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -59,10 +60,10 @@ public abstract class Weapon : Wieldable
     public float Tempo;
     private float tempoCharge = 0;
     public float tempoChargePeriod = 1.0f;
-    public float tempoChargeExponent = 0.75f;
+    public float tempoChargeExponent = 2f;
     //private bool attackChargeONS = true;
-    public float TempoTargetCenter { get; private set; } = 0.90f;
-    public float TempoTargetWidth { get; private set; } = 0.2f;
+    public float TempoTargetCenter { get; private set; } = 0.94f;
+    public float TempoTargetWidth { get; private set; } = 0.1f;
 
 
     protected string lightSwingClip;
@@ -444,7 +445,8 @@ public abstract class Weapon : Wieldable
         }
         if (Attacker.CurrentActionAnimated == ActionAnimation.StrongAttack)
         {
-            Attacker.playClang(1.0f);
+            float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
+            Attacker.playClang(scalar);
         }
         else
         {
@@ -493,7 +495,8 @@ public abstract class Weapon : Wieldable
     {
         if (CurrentActionAnimated == ActionAnimation.StrongAttack)
         {
-            playClang(1.0f);
+            float scalar = TrueStrike ? 0.5f : 2 - Tempo;
+            playClang(scalar);
         }
         else
         {
@@ -592,6 +595,7 @@ public abstract class Weapon : Wieldable
         //ImpalingSomething = false;        
         ImpaledObject = null;
         DropItem(yeet: false);
+        playShing();
     }
     
     private void impale_doupleDipDamage()
@@ -818,7 +822,7 @@ public abstract class Weapon : Wieldable
         if (CurrentActionAnimated == ActionAnimation.StrongCoil)
         {
             tempoCharge += Time.deltaTime / tempoChargePeriod;
-            TrueStrike = Tempo >= 1;
+            TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth/2;
         }
         else if(CurrentActionAnimated != ActionAnimation.StrongAttack)
         {
@@ -837,9 +841,10 @@ public abstract class Weapon : Wieldable
         
     }
 
-    private void playShing(float pichScalar = 1.0f)
+    public void playShing(float pichScalar = 1.0f)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Heft, 0.25f, _SoundService.Instance.DefaultAudioRange / 4, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Heft, 0.25f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        sound.GetComponent<AudioSource>().time = 0.15f;
     }
 
     private void playSlap(Vector3 position)

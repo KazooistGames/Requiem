@@ -333,13 +333,17 @@ public class Player : MonoBehaviour
 
     private void recallWeapon()
     {
-        if (!HostWeapon)
+        if (HostWeapon ? HostWeapon.Telecommuting : true)
         {
             return;
         }
         if (HostWeapon.ImpaledObject)
         {
             HostWeapon.ImpaleRelease();
+        }
+        else
+        {
+            HostWeapon.playShing();
         }
         if (HostWeapon.Wielder != HostEntity)
         {

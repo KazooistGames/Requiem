@@ -711,7 +711,7 @@ public class Entity : MonoBehaviour
                     foe.alterPoise(-damage);
                 }
                 EventLandedDashHit.Invoke(foe, damage);
-                _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.25f - (impactRatio / 2), 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+                playPunch(Mathf.Max(1.25f - (impactRatio / 2), 0.5f));
             }
         }
         dashAlreadyHit.Add(other);
@@ -746,9 +746,9 @@ public class Entity : MonoBehaviour
                 EventCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
-                _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+                playPunch(Mathf.Max(1.5f - velocityRatio, 0.5f));
             }
-            else if (CrashEnvironmentONS)
+            else if (CrashEnvironmentONS && !otherEntity)
             {
                 Landmark landmark = collision.gameObject.GetComponent<Landmark>();
                 if (landmark)
@@ -765,10 +765,12 @@ public class Entity : MonoBehaviour
                     EventCrashed.Invoke();
                 }
                 CrashEnvironmentONS = false;
-                _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, Mathf.Max(1.5f - velocityRatio, 0.5f), 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+                playPunch(Mathf.Max(1.5f - velocityRatio, 0.5f));
             }
         }
     }
+
+
 
     private IEnumerator routineDashHandler()
     {
@@ -801,7 +803,7 @@ public class Entity : MonoBehaviour
                     scaledVelocity *= FINAL_DASH_RATIO;
                 }
                 Dashing = true;
-                Shove(dashDirection * scaledVelocity, true);
+                Shove(dashDirection.normalized * scaledVelocity, true);
                 GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, FinalDash ? 0.5f : 2f - DashPower, 0.25f + DashPower);
                 sound.layer = Game.layerItem;
                 sound.transform.SetParent(transform);
@@ -961,8 +963,14 @@ public class Entity : MonoBehaviour
         }
     }
 
+    private GameObject playPunch(float pitch)
+    {
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        sound.GetComponent<AudioSource>().time = 0.075f;
+        sound.transform.SetParent(transform);
+        return sound;
+    }
 
-    
 
 }
 

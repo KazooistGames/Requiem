@@ -9,9 +9,10 @@ public class SoulPearl : Wieldable
     private _Flames spiritFlame;
     private SphereCollider physicsSphere;
 
-    private float wanderPeriod = 5;
     private float timeWanderingSeconds = 0;
+
     public static float Awareness_Radius = 1.5f;
+    public static float Transition_Debounce = 3;
 
     protected override void Start()
     {
@@ -36,7 +37,7 @@ public class SoulPearl : Wieldable
     protected override void Update()
     {
         timeWanderingSeconds += Time.deltaTime;
-        if(timeWanderingSeconds > wanderPeriod && !Telecommuting)
+        if(timeWanderingSeconds > Transition_Debounce && !Telecommuting)
         {
             if (!Player.INSTANCE)
             {

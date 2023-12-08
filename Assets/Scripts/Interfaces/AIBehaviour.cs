@@ -650,7 +650,8 @@ public class AIBehaviour : MonoBehaviour
             bool foeRebuked = matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.Recoiling : true;
 
             bool inRange = disposition.magnitude <= Mathf.Max(mainHand ? mainHand.Range : 0.0f, offHand ? offHand.Range : 0.0f);
-            bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range : false);
+            float rangeBoost = 1.2f;
+            bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range * rangeBoost : false);
 
             bool foeAttacking = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickAttack : false);
             bool foeCoiling = (matchupMain ? matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupMain.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.QuickCoil || matchupOff.CurrentActionAnimated == Weapon.ActionAnimation.StrongCoil : false);
@@ -1156,16 +1157,17 @@ public class AIBehaviour : MonoBehaviour
         while (true)
         {
             yield return new WaitUntil(() => dashingDesiredDirection != Vector3.zero);
-            entity.dashDirection = dashingDesiredDirection;
             do
             {
+                entity.dashDirection = dashingDesiredDirection.normalized;
                 entity.DashCharging = true;
-
                 yield return null;
             } while ((dashingChargeTimer += Time.deltaTime) < dashingChargePeriod);
+            entity.dashDirection = dashingDesiredDirection.normalized;
             entity.DashCharging = false;
             yield return new WaitUntil(() => entity.Dashing);
             dashingCooldownTimer = 0;
+            dashingChargeTimer = 0;
             dashingDesiredDirection = Vector3.zero;
             yield return null;
         }

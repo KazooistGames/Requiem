@@ -58,8 +58,14 @@ public class Biter : AIBehaviour
                     if (entity.Foe)
                     {
                         Vector3 disposition = entity.Foe.transform.position - transform.position;
-                        //dashingInitiate = (disposition.magnitude < pursueStoppingDistance || entity.DashCharging) && !entity.Shoved;
+                        bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
+                        bool charged = dashingCooldownTimer >= 3;
+                        dashingChargePeriod = 1f;
+                        if (charged && inPosition && !entity.Shoved)
+                        {
+                            dashingDesiredDirection = disposition;
 
+                        }
                     }
                 }
                 break;

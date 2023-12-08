@@ -170,7 +170,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -178,6 +177,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -185,7 +185,8 @@ MonoBehaviour:
   Anim: {fileID: 0}
   Body: {fileID: 0}
   HitBox: {fileID: 0}
-  PhysicsBoxes: []
+  PhysicsBoxes:
+  - {fileID: 1118139354825364352}
   Filter: {fileID: 0}
   Renderer: {fileID: 0}
   MostRecentWielder: {fileID: 0}
@@ -194,7 +195,7 @@ MonoBehaviour:
   equipType: 3
 --- !u!95 &1373723435178343212
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -211,4 +212,5 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

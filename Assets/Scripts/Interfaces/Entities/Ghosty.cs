@@ -15,6 +15,7 @@ public class Ghosty : Entity
     private ParticleSystem profileParticles;
     private ParticleSystem.ShapeModule shapeModule;
 
+    private float lifeTimer = 0;
 
     protected override void Awake()
     {
@@ -36,11 +37,12 @@ public class Ghosty : Entity
     protected override void Update()
     {
         base.Update();
+        lifeTimer += Time.deltaTime;
         if (!Player.INSTANCE)
         {
 
         }
-        else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius)
+        else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius && lifeTimer >= SoulPearl.Transition_Debounce)
         {
             Die();
         }
