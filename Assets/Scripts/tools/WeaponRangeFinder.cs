@@ -3,9 +3,11 @@ using UnityEngine;
 
 public class WeaponRangeFinder : MonoBehaviour
 {
-    public static bool Debugging = false;
+    public bool Debugging = false;
+    public float fudgeFactor = 1f;
     private bool isRunning = false;
     private Weapon weapon;
+    public float maxDistance;
 
     private void Start()
     {
@@ -13,6 +15,7 @@ public class WeaponRangeFinder : MonoBehaviour
         if (weapon == null)
         {
             Debug.LogError("Weapon script not found!");
+            Destroy(this);
             return;
         }
         StartDistanceCheck();
@@ -33,7 +36,6 @@ public class WeaponRangeFinder : MonoBehaviour
         {
             yield return new WaitUntil(() => transform.parent);
             yield return new WaitUntil(() => checkIfWeShouldEstimateRange());
-            float maxDistance = 0;
             while (checkIfWeShouldEstimateRange())
             {
                 // Get the mesh filter component
@@ -42,7 +44,7 @@ public class WeaponRangeFinder : MonoBehaviour
                 if (meshFilter != null && meshFilter.mesh != null)
                 {
                     // Calculate the bounds of the mesh
-                    Bounds bounds = meshFilter.mesh.bounds;
+                    Bounds bounds = weapon.HitBox.bounds;
 
                     // Calculate the distance from the center of the bounds to each corner
                     Vector3[] corners = new Vector3[8];
@@ -56,12 +58,14 @@ public class WeaponRangeFinder : MonoBehaviour
                     corners[7] = bounds.center + new Vector3(-bounds.extents.x, -bounds.extents.y, -bounds.extents.z);
 
                     // Calculate the distance from each corner to the transform position
+                    maxDistance = 0;
                     foreach (Vector3 corner in corners)
                     {
-                        float distance = Vector3.Distance(Vector3.Scale(corner + transform.localPosition, transform.lossyScale), Vector3.zero);
-                        if (distance > maxDistance)
+                        Vector3 dispositionFromWielder = weapon.Wielder.transform.position - corner;
+                        float instantaneousDistanceFromWielder = dispositionFromWielder.magnitude * fudgeFactor;
+                        if (instantaneousDistanceFromWielder > maxDistance)
                         {
-                            maxDistance = distance * 0.9f;
+                            maxDistance = instantaneousDistanceFromWielder;
                         }
                     }
                 }
@@ -69,7 +73,8 @@ public class WeaponRangeFinder : MonoBehaviour
             }
             if (Debugging) 
             { 
-                Debug.Log("Max Distance: " + maxDistance); 
+                Debug.Log("Max Distance: " + maxDistance);
+                Debug.DrawLine(weapon.Wielder.transform.position, weapon.Wielder.transform.position + weapon.Wielder.LookDirection.normalized * maxDistance, Color.red, 2);
             }
             weapon.Range = maxDistance;
         }
@@ -78,7 +83,7 @@ public class WeaponRangeFinder : MonoBehaviour
 
     private bool checkIfWeShouldEstimateRange()
     {
-        if (weapon)
+        if (weapon ? weapon.Wielder : false)
         {
             return weapon.Action == Weapon.ActionAnimation.StrongAttack || weapon.Action == Weapon.ActionAnimation.QuickAttack;
         }

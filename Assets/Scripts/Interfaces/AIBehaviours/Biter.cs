@@ -22,6 +22,7 @@ public class Biter : AIBehaviour
         itemManagementSeekItems = false;
         pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         grabEnabled = false;
+        dashingChargePeriod = 0.75f;
     }
 
     protected override void Update()
@@ -33,7 +34,7 @@ public class Biter : AIBehaviour
             bool charged = dashingCooldownTimer >= 3;
             pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * (charged ? 0.3f : 0.5f);
             bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
-            dashingChargePeriod = 0.5f;
+
             if (charged && inPosition && !entity.Shoved)
             {
                 dashingDesiredDirection = disposition;

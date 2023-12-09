@@ -5,13 +5,14 @@ using UnityEngine;
 public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.75f;
+    private float CombatSpeed = 0.5f;
     private float Aggression = 0.5f;
 
     protected override void Awake()
     {
         base.Awake();
     }
+
     protected override void Start()
     {
         base.Start();

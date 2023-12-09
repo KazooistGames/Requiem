@@ -247,7 +247,39 @@ public class AIBehaviour : MonoBehaviour
     }
 
     /***** PUBLIC *****/
+
     /***** PROTECTED *****/
+    protected virtual void SetTangoParameters()
+    {
+        if (mainWep || offWep)
+        {
+            Weapon wep = mainWep ? mainWep : offWep;
+            switch (martialCurrentState)
+            {
+                case martialState.none:
+                    tangoInnerRange = wep.Range * 0.75f;
+                    tangoOuterRange = wep.Range * 1.5f;
+                    break;
+                case martialState.attacking:
+                    tangoInnerRange = wep.Range * 0.75f;
+                    tangoOuterRange = wep.Range * 1.0f;
+                    break;
+                case martialState.defending:
+                    tangoInnerRange = wep.Range * 1.75f;
+                    tangoOuterRange = wep.Range * 2.25f;
+                    break;
+                case martialState.throwing:
+                    tangoInnerRange = wep.Range * 2.5f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
+                    break;
+            }
+            pursueStoppingDistance = tangoOuterRange;
+        }
+        else
+        {
+            tangoInnerRange = tangoOuterRange = 0;
+        }
+    }
     protected bool checkMyWeaponInRange()
     {
         if (mainWep && entity.Foe)
@@ -747,14 +779,14 @@ public class AIBehaviour : MonoBehaviour
     protected bool martialFoeEnteredRangeLatch = false;
     protected bool martialEnteredRangeLatch = false;
     protected Weapon mainWep;
-    protected Weapon offHand;
+    protected Weapon offWep;
     protected Weapon matchupMain;
     protected Weapon matchupOff;
     protected void martial(BehaviourType key)
     {
         mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-        offHand = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
-        if (behaviourParams[key].Item1 && entity.Foe && (mainWep || offHand))
+        offWep = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
+        if (behaviourParams[key].Item1 && entity.Foe && (mainWep || offWep))
         {
             matchupMain = entity.Foe.MainHand ? entity.Foe.MainHand.GetComponent<Weapon>() : null;
             matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
@@ -763,7 +795,7 @@ public class AIBehaviour : MonoBehaviour
             bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.75f;
             bool foeRebuked = matchupMain ? matchupMain.Action == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.Action == Weapon.ActionAnimation.Recoiling : true;
 
-            bool inRange = disposition.magnitude <= Mathf.Max(mainWep ? mainWep.Range : 0.0f, offHand ? offHand.Range : 0.0f);
+            bool inRange = disposition.magnitude <= Mathf.Max(mainWep ? mainWep.Range : 0.0f, offWep ? offWep.Range : 0.0f);
             float rangeBoost = 1.2f;
             bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range * rangeBoost : false);
 
@@ -964,7 +996,6 @@ public class AIBehaviour : MonoBehaviour
     protected float followInnerDeadband;
     protected float followOuterDeadband;
     protected int followLayerMask;
-
     protected void follow(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && followVIP)
@@ -1151,8 +1182,6 @@ public class AIBehaviour : MonoBehaviour
         {
             if (!Game.INSTANCE.Paused && enabled)
             {
-                Weapon mainWep = entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : null;
-                Weapon offWep = entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : null;
                 disposition = entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero;
                 switch (State)
                 {
@@ -1175,34 +1204,7 @@ public class AIBehaviour : MonoBehaviour
                         behaviourParams[BehaviourType.tango] = (entity.MainHand && trackingEyesOnTarget, 1);
                         behaviourParams[BehaviourType.martial] = (entity.MainHand && trackingEyesOnTarget, Intelligence);
                         behaviourParams[BehaviourType.grab] = (!entity.MainHand && trackingEyesOnTarget, Intelligence);
-                        if (mainWep || offWep)
-                        {
-                            Weapon wep = mainWep ? mainWep : offWep;
-                            switch (martialCurrentState)
-                            {
-                                case martialState.none:
-                                    tangoInnerRange = wep.Range * 0.75f;
-                                    tangoOuterRange = wep.Range * 1.5f;
-                                    break;
-                                case martialState.attacking:
-                                    tangoInnerRange = wep.Range * 0.75f;
-                                    tangoOuterRange = wep.Range * 1.0f;
-                                    break;
-                                case martialState.defending:
-                                    tangoInnerRange = wep.Range * 1.75f;
-                                    tangoOuterRange = wep.Range * 2.25f;
-                                    break;
-                                case martialState.throwing:
-                                    tangoInnerRange = wep.Range * 2.5f;
-                                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
-                                    break;
-                            }
-                            pursueStoppingDistance = tangoOuterRange;
-                        }
-                        else
-                        {
-                            tangoInnerRange = tangoOuterRange = 0;
-                        }
+                        SetTangoParameters();
                         break;
                     case AIState.guard:
                         entity.modSpeed["AIState"] = entity.Foe ? 0 : -0.5f;

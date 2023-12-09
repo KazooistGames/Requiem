@@ -112,10 +112,10 @@ public class Entity : MonoBehaviour
     public float DashPower { get; private set; } = 0.0f;
 
     private static float DASH_CHARGE_TIME = 0.4f;
-    private static float CRASH_DAMAGE = 20f;
+    private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
-    private static Vector2 POISE_REGEN_PERIOD = new Vector2(4, 10);
+    private static float POISE_REGEN_BASE_PERIOD = 1;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
@@ -242,7 +242,7 @@ public class Entity : MonoBehaviour
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
-            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_PERIOD.y, POISE_REGEN_PERIOD.x, Vitality / Strength);
+            float scalingRegenRate = POISE_REGEN_BASE_PERIOD + Mathf.FloorToInt((Strength - Vitality) / 10);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
