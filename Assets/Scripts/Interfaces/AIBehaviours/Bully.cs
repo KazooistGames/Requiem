@@ -32,9 +32,13 @@ public class Bully : AIBehaviour
     {
         base.Update();
         float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 3;
+
         if (dashingCooldownTimer > period)
         {
-            dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+            if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil)
+            {
+                dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+            }
         }
     }
 

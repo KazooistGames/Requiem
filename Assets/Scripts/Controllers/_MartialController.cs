@@ -79,17 +79,16 @@ public class _MartialController : MonoBehaviour
             {
 
             }
+            else if (weapon ? Weapon_Queues[weapon].Count == 0 : false)
+            {
+                ClearedQueue.Invoke(weapon);
+                Debug.Log("Cleared queue for: " + weapon.name);
+            }
             else if (Weapon_Queues[weapon].Count > 0)
             {
                 Weapon_Actions[weapon] = Weapon_Queues[weapon].Dequeue();
 
             }
-            if (weapon ? Weapon_Queues[weapon].Count == 0 : false)
-            {
-                ClearedQueue.Invoke(weapon);
-                Debug.Log("Cleared queue for: " + weapon.name);
-            }
-
         }
 
     }
