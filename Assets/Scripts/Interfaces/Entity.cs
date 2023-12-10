@@ -111,7 +111,7 @@ public class Entity : MonoBehaviour
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-    private static float DASH_CHARGE_TIME = 0.4f;
+    private static float DASH_CHARGE_TIME = 0.3f;
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 

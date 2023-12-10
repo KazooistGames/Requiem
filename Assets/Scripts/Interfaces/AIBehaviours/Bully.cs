@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bully : AIBehaviour
 {
     private float CombatSpeed = 0.5f;
-    private float Aggression = 0.5f;
+    private float Aggression = 0.75f;
 
     protected override void Awake()
     {
@@ -33,9 +33,9 @@ public class Bully : AIBehaviour
         base.Update();
         float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 3;
 
-        if (dashingCooldownTimer > period)
+        if (dashingCooldownTimer > period && entity.Foe)
         {
-            if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil)
+            if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil || dashingDesiredDirection != Vector3.zero)
             {
                 dashingDesiredDirection = entity.Foe.transform.position - transform.position;
             }
@@ -67,11 +67,17 @@ public class Bully : AIBehaviour
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
         }
-        else
+        else if(Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongCoil, CombatSpeed, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+        }
+        else
+        {
+
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
         }
     }
 
@@ -96,22 +102,22 @@ public class Bully : AIBehaviour
         }
     }
 
-    protected override void reactToIncomingAttack()
-    {
-        if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnimation.Guarding || entity.Posture != Entity.PostureStrength.Weak)
-        {
-            return;
-        }
-        else if (mainWep.Action == Weapon.ActionAnimation.QuickCoil && checkMyWeaponInRange())
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
-        }
-        else
-        {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
-        }
-    }
+    //protected override void reactToIncomingAttack()
+    //{
+    //    if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnimation.Guarding || entity.Posture != Entity.PostureStrength.Weak)
+    //    {
+    //        return;
+    //    }
+    //    else if (mainWep.Action == Weapon.ActionAnimation.QuickCoil && checkMyWeaponInRange())
+    //    {
+    //        _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
+    //    }
+    //    else
+    //    {
+    //        _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
+    //        _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
+    //    }
+    //}
 
 
     /***** PRIVATE *****/

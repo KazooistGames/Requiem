@@ -92,22 +92,22 @@ public class Game_Arena : Game
         chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != startingDirection && x.Value != offsetBy3).ToList());
         //chamberCandidates.AddRange(crypt2[0][0].AdjacentTiles.Where(x => x.Value != Hextile.RotateHexPosition(randomDirection, 3) && x.Value != Hextile.RotateHexPosition(connectCrypt2and3, 3)).ToList());
         //chamberCandidates.AddRange(crypt3[0][0].AdjacentTiles.Where(x => x.Value != connectCrypt2and3 && x.Value != Hextile.RotateHexPosition(offsetBy3, 3)).ToList());
-        while (chambers.Count < CountOfChambers && chamberCandidates.Count > 0)
-        {
-            int randomIndex = UnityEngine.Random.Range(0, chamberCandidates.Count);
-            Hextile startingTile = chamberCandidates[randomIndex].Key;
-            Hextile.HexPosition direction = chamberCandidates[randomIndex].Value;
-            Hextile doorTile = startingTile.Edge(direction);
-            //yield return Hextile.DrawCircle(1, startingTile, direction);
-            Hextile newChamber = startingTile.Edge(direction).Extend(direction);
-            //Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
-            //newGate.AssignToTile(doorTile);
-            //newGate.SetPositionOnTile(direction);
-            chambers.Add(newChamber);
-            chamberCandidates.RemoveAt(randomIndex);
-            //set up new quest class
-            //newGate.gameObject.AddComponent<Quest_Gate>();
-        }
+        //while (chambers.Count < CountOfChambers && chamberCandidates.Count > 0)
+        //{
+        //    int randomIndex = UnityEngine.Random.Range(0, chamberCandidates.Count);
+        //    Hextile startingTile = chamberCandidates[randomIndex].Key;
+        //    Hextile.HexPosition direction = chamberCandidates[randomIndex].Value;
+        //    Hextile doorTile = startingTile.Edge(direction);
+        //    yield return Hextile.DrawCircle(1, startingTile, direction);
+        //    Hextile newChamber = startingTile.Edge(direction).Extend(direction);
+        //    Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
+        //    newGate.AssignToTile(doorTile);
+        //    newGate.SetPositionOnTile(direction);
+        //    chambers.Add(newChamber);
+        //    chamberCandidates.RemoveAt(randomIndex);
+        //    set up new quest class
+        //    newGate.gameObject.AddComponent<Quest_Gate>();
+        //}
 
         ////corridor coves
         //List<Hextile> corridorCoveKeys = new List<Hextile>();
