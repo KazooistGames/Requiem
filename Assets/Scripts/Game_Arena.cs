@@ -318,30 +318,36 @@ public class Game_Arena : Game
         List<Type> viableAIs = new List<Type>();
         viableAIs = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
 
-        int aiVarietyCountOfWave = Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave)));
         List<Type> chosenAIsForWave = new List<Type>();
-        while(chosenAIsForWave.Count < aiVarietyCountOfWave)
+        while(chosenAIsForWave.Count < Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave))))
         {
             int randomIndexFromViableAIs = UnityEngine.Random.Range(0, viableAIs.Count);
             chosenAIsForWave.Add(viableAIs[randomIndexFromViableAIs]);
+            viableAIs.RemoveAt(randomIndexFromViableAIs);
         }
 
         //sort by max HP
-        chosenAIsForWave.OrderByDescending(x => EntityStrengths[x]);
+        chosenAIsForWave = chosenAIsForWave.OrderByDescending(x => EntityStrengths[AIEntityPairings[x]]).ToList();
 
 
         //spawn 1 of highest
         //spawn other types in order of highest to lowest HP to match highest HP enemy
         //loop back through until at population
         int spawnIndex = 0;
-        int strengthSpawnedSoFar = 0;
+        //int strengthSpawnedSoFar = 0;
+        
         List<GameObject> mobs = new List<GameObject>();
-        while (strengthSpawnedSoFar < totalStrengthOfWave)
+        while (totalStrengthOfWave > 0)
         {
-            Type spawnedAI = chosenAIsForWave[spawnIndex];
-            Type spawnedEntity = AIEntityPairings[spawnedAI];
-            strengthSpawnedSoFar += EntityStrengths[spawnedEntity];
-            mobs.Add(SPAWN(spawnedEntity, spawnedAI, alter.transform.position));
+            int strengthOfSpawnChunk = Mathf.Min(totalStrengthOfWave, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
+            while (strengthOfSpawnChunk > 0)
+            {
+                Type spawnedAI = chosenAIsForWave[spawnIndex];
+                Type spawnedEntity = AIEntityPairings[spawnedAI];
+                totalStrengthOfWave -= EntityStrengths[spawnedEntity];
+                strengthOfSpawnChunk -= EntityStrengths[spawnedEntity];
+                mobs.Add(SPAWN(spawnedEntity, spawnedAI, alter.transform.position));
+            }      
             spawnIndex++;
             if(spawnIndex >= chosenAIsForWave.Count)
             {

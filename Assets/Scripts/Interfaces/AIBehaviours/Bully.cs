@@ -35,7 +35,11 @@ public class Bully : AIBehaviour
 
         if (dashingCooldownTimer > period && entity.Foe)
         {
-            if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil || dashingDesiredDirection != Vector3.zero)
+            if (!mainWep)
+            {
+
+            }
+            else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil || dashingDesiredDirection != Vector3.zero)
             {
                 dashingDesiredDirection = entity.Foe.transform.position - transform.position;
             }
