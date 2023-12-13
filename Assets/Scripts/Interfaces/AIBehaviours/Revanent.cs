@@ -9,7 +9,7 @@ public class Revanent : AIBehaviour
     private _Flames offHandFlame;
     private _Flames footFlame;
 
-    private float Aggression = 0.75f;
+    private float Aggression = 0.5f;
 
     protected override void Awake()
     {
@@ -25,6 +25,7 @@ public class Revanent : AIBehaviour
         Intelligence = 1.0f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;
+        tangoStrafeEnabled = true;
         //martialReactiveAttack = true;
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
@@ -41,16 +42,20 @@ public class Revanent : AIBehaviour
     {
         base.Update();
         float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 3;
-
         if (dashingCooldownTimer > period && entity.Foe)
         {
             if (!mainWep)
             {
 
             }
-            else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil || dashingDesiredDirection != Vector3.zero)
+            else if (mainWep.Action == Weapon.ActionAnimation.Guarding && dashingCooldownTimer >= 1)
             {
-                //dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+                dashingChargePeriod = mainWep.Action == Weapon.ActionAnimation.Guarding ? 0.5f : 1;
+                dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+            }
+            else if (mainWep.Action == Weapon.ActionAnimation.StrongCoil && dashingCooldownTimer >= 3)
+            {
+
             }
         }
     }
@@ -100,29 +105,19 @@ public class Revanent : AIBehaviour
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, requisite: checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-        }
-        else if (checkMyWeaponInRange())
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding);
         }
         else if (Random.value <= Aggression)
         {
-            if(dashingCooldownTimer > 3)
-            {
-                dashingChargeTimer = 1;
-                dashingDesiredDirection = entity.Foe.transform.position - transform.position;
-            }
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongCoil, requisite: checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
         }
         else
         {
-
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, requisite: checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+
         }
     }
 
@@ -130,7 +125,9 @@ public class Revanent : AIBehaviour
     {
         if (checkMyWeaponInRange())
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil);
+            dashingChargePeriod = 0;
+            dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, requisite: checkMyWeaponInRange);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
         }
     }
@@ -153,15 +150,12 @@ public class Revanent : AIBehaviour
         {
             return;
         }
-        else if (checkMyWeaponInRange())
+        else if (dashingCooldownTimer > 0.5f)
         {
-            if(dashingCooldownTimer > 1)
-            {
-                dashingChargePeriod = 0;
-                Vector3 disposition = entity.Foe.transform.position - transform.position;
-                float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 120;
-                dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
-            }
+            dashingChargePeriod = 0;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+            dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
         else
         {
