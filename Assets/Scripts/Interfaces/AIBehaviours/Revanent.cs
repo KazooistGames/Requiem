@@ -11,6 +11,17 @@ public class Revanent : AIBehaviour
 
     private float Aggression = 0.5f;
 
+    private float OutOfRangeTimer = 0;
+    private float InRangeTimer = 0;
+
+    public enum Pattern
+    {
+        Seething,
+        Overpowering,
+        Dueling
+    }
+    public Pattern CurrentPattern = Pattern.Seething;
+
     protected override void Awake()
     {
         base.Awake();
@@ -41,24 +52,54 @@ public class Revanent : AIBehaviour
     protected override void Update()
     {
         base.Update();
-        float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 3;
-        if (dashingCooldownTimer > period && entity.Foe)
+        if (checkMyWeaponInRange())
         {
-            if (!mainWep)
-            {
+            InRangeTimer += Time.deltaTime;
+            OutOfRangeTimer = 0;
+        }
+        else
+        {
+            OutOfRangeTimer += Time.deltaTime;
+            InRangeTimer = 0;
+        }
+        if (!mainWep)
+        {
 
-            }
-            else if (mainWep.Action == Weapon.ActionAnimation.Guarding && dashingCooldownTimer >= 1)
+        }
+        else if (!entity.Foe)
+        {
+            _MartialController.Cancel_Actions(mainWep);
+        }
+        else
+        {
+            switch (CurrentPattern)
             {
-                dashingChargePeriod = mainWep.Action == Weapon.ActionAnimation.Guarding ? 0.5f : 1;
-                dashingDesiredDirection = entity.Foe.transform.position - transform.position;
-            }
-            else if (mainWep.Action == Weapon.ActionAnimation.StrongCoil && dashingCooldownTimer >= 3)
-            {
-
+                case Pattern.Seething:
+                    if (mainWep.Action == Weapon.ActionAnim.Recovering && dashingCooldownTimer >= 1)
+                    {
+                        dashingChargePeriod = 0.5f;
+                        dashingDesiredDirection = transform.position - entity.Foe.transform.position;
+                    }
+                    break;
+                case Pattern.Overpowering:
+                    if (mainWep.Action == Weapon.ActionAnim.StrongCoil && dashingCooldownTimer >= 3)
+                    {
+                        dashingChargePeriod = 1f;
+                        dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+                    }
+                    else if (mainWep.Action == Weapon.ActionAnim.Guarding && dashingCooldownTimer >= 0.5f)
+                    {
+                        dashingChargePeriod = 0.25f;
+                        dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+                    }
+                    break;
+                case Pattern.Dueling:
+                
+                    break;
             }
         }
     }
+
 
     protected override void OnDisable()
     {
@@ -92,32 +133,35 @@ public class Revanent : AIBehaviour
         }
     }
 
+    /***** PUBLIC *****/
+    /***** PROTECTED *****/
 
     protected override void queueNextRoundOfActions(Weapon weapon)
     {
-        if (weapon != mainWep)
+        if (weapon == mainWep)
         {
-            return;
-        }
-        else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
-        {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
-        }
-        else if (entity.Posture == Entity.PostureStrength.Weak)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding);
-        }
-        else if (Random.value <= Aggression)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongCoil, requisite: checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
-        }
-        else
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, requisite: checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            switch (CurrentPattern)
+            {
+                case Pattern.Seething:
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, requisite: checkMyWeaponInRange);
+                    _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+                    break;
+                case Pattern.Overpowering:
+                    if (Random.value <= Aggression)
+                    {
+                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongCoil, requisite: checkMyWeaponInRange);
+                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongAttack);
+                    }
+                    else
+                    {
+                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 1 + Random.value);               
+                    }
 
+                    break;
+                case Pattern.Dueling:
+
+                    break;
+            }
         }
     }
 
@@ -127,8 +171,8 @@ public class Revanent : AIBehaviour
         {
             dashingChargePeriod = 0;
             dashingDesiredDirection = entity.Foe.transform.position - transform.position;
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, requisite: checkMyWeaponInRange);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, requisite: checkMyWeaponInRange);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
 
@@ -136,32 +180,44 @@ public class Revanent : AIBehaviour
     {
         if (entity.Foe)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
         else
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
     }
 
     protected override void reactToIncomingAttack()
     {
-        if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnimation.Guarding)
+        switch (CurrentPattern)
         {
-            return;
+            case Pattern.Seething:
+                if (_MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding)
+                {
+                    return;
+                }
+                else if (Random.value <= Aggression && dashingCooldownTimer > 0.5f)
+                {
+                    dashingChargePeriod = 0;
+                    Vector3 disposition = entity.Foe.transform.position - transform.position;
+                    float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+                    dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
+                }
+                else
+                {
+                    _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
+                }
+                break;
+            case Pattern.Overpowering:
+                break;
         }
-        else if (dashingCooldownTimer > 0.5f)
-        {
-            dashingChargePeriod = 0;
-            Vector3 disposition = entity.Foe.transform.position - transform.position;
-            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
-            dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
-        }
-        else
-        {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
-        }
+        
     }
+
+    /***** PRIVATE *****/
+
+
 
 }
 

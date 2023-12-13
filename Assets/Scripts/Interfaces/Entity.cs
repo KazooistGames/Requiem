@@ -878,7 +878,7 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (theirWeapon.Action == ActionAnimation.StrongAttack)
+        if (theirWeapon.Action == ActionAnim.StrongAttack)
         {
             float totalPower = theirWeapon.Power * (1 + theirWeapon.Tempo);
             alterPoise(-totalPower);
@@ -927,7 +927,7 @@ public class Entity : MonoBehaviour
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
-        if (myWeapon.Action == ActionAnimation.StrongAttack)
+        if (myWeapon.Action == ActionAnim.StrongAttack)
         {
             if (Posture == PostureStrength.Weak)
             {
@@ -935,7 +935,7 @@ public class Entity : MonoBehaviour
                 foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
             }
         }
-        else if(myWeapon.Action == ActionAnimation.QuickAttack)
+        else if(myWeapon.Action == ActionAnim.QuickAttack)
         {
             //if (requiemPlayer)
             //{

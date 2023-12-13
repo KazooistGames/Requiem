@@ -44,24 +44,24 @@ public class Goon : AIBehaviour
         }
         else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.Idle);
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
         }
         else if (Random.value <= Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);       
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);       
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }      
     }
 
@@ -69,8 +69,8 @@ public class Goon : AIBehaviour
     {
         if (checkMyWeaponInRange())
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
 
@@ -78,28 +78,28 @@ public class Goon : AIBehaviour
     {
         if (entity.Foe)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
         }
         else
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
     }
 
     protected override void reactToIncomingAttack()
     {
-        if(_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnimation.Guarding) 
+        if(_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnim.Guarding) 
         {
             return;
         }
-        else if (mainWep.Action == Weapon.ActionAnimation.QuickCoil && checkMyWeaponInRange())
+        else if (mainWep.Action == Weapon.ActionAnim.QuickCoil && checkMyWeaponInRange())
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());            
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());            
         }
         else
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
         }
     }
 

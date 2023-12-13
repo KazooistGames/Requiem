@@ -18,9 +18,9 @@ public abstract class Weapon : Wieldable
     public UnityEvent<Weapon> Swinging = new UnityEvent<Weapon>();
     public UnityEvent<Weapon> Rebuked = new UnityEvent<Weapon>();
 
-    public UnityEvent<ActionAnimation, ActionAnimation> ChangingActionAnimations = new UnityEvent<ActionAnimation, ActionAnimation>();
+    public UnityEvent<ActionAnim, ActionAnim> ChangingActionAnimations = new UnityEvent<ActionAnim, ActionAnim>();
 
-    public enum ActionAnimation
+    public enum ActionAnim
     {
         error,
 
@@ -44,8 +44,8 @@ public abstract class Weapon : Wieldable
         Aiming,
         Throwing,
     }
-    public ActionAnimation Action = ActionAnimation.error;
-    private ActionAnimation actionPreviouslyAnimated = ActionAnimation.error;
+    public ActionAnim Action = ActionAnim.error;
+    private ActionAnim actionPreviouslyAnimated = ActionAnim.error;
 
 
     public bool Throwing = false;
@@ -107,7 +107,7 @@ public abstract class Weapon : Wieldable
         Renderer.materials[0].EnableKeyword("_EMISSION");
         Renderer.materials[0].SetColor("_EmissionColor", Color.black); 
         Renderer.sharedMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
-        _MartialController.Queue_Action(this, ActionAnimation.Idle);
+        _MartialController.Queue_Action(this, ActionAnim.Idle);
     }
 
     protected override void Start()
@@ -158,7 +158,7 @@ public abstract class Weapon : Wieldable
     {
         base.Update();
         Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
-        if (Action != ActionAnimation.QuickAttack && Action != ActionAnimation.StrongAttack)
+        if (Action != ActionAnim.QuickAttack && Action != ActionAnim.StrongAttack)
         {
             playClashSoundONS = true;
         }
@@ -179,13 +179,13 @@ public abstract class Weapon : Wieldable
             if (Wielded)
             {
                 chargeTempo();
-                if (Action == ActionAnimation.Recoiling)
+                if (Action == ActionAnim.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
                 }
-                else if (Action == ActionAnimation.Idle)
+                else if (Action == ActionAnim.Idle)
                 {
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
@@ -193,27 +193,27 @@ public abstract class Weapon : Wieldable
                     TrueStrike = false;
                     modifyWielderSpeed(0);
                 }
-                else if (Action == ActionAnimation.StrongWindup)
+                else if (Action == ActionAnim.StrongWindup)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier);
                 }
-                else if(Action == ActionAnimation.StrongCoil)
+                else if(Action == ActionAnim.StrongCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
-                else if (Action == ActionAnimation.QuickWindup)
+                else if (Action == ActionAnim.QuickWindup)
                 {
                     attackONS = true;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
-                else if (Action == ActionAnimation.QuickCoil)
+                else if (Action == ActionAnim.QuickCoil)
                 {
                     attackONS = true;
                     modifyWielderSpeed(0);
                 }
-                else if (Action == ActionAnimation.StrongAttack || Action == ActionAnimation.QuickAttack)
+                else if (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack)
                 {
                     if (attackONS)
                     {
@@ -224,11 +224,11 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
-                        if(Action == ActionAnimation.QuickAttack)
+                        if(Action == ActionAnim.QuickAttack)
                         {
                             playLightSwing();
                         }
-                        else if(Action == ActionAnimation.StrongAttack)
+                        else if(Action == ActionAnim.StrongAttack)
                         {
                             playHeavySwing();
                         }
@@ -236,34 +236,34 @@ public abstract class Weapon : Wieldable
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
                 }
-                else if (Action == ActionAnimation.Recovering)
+                else if (Action == ActionAnim.Recovering)
                 {
                     modifyWielderSpeed(0);
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                 }
-                else if (Action == ActionAnimation.Guarding)
+                else if (Action == ActionAnim.Guarding)
                 {
                     HitBox.enabled = !nextAnimation.IsTag("Rebuked");
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                     modifyWielderSpeed(heftSlowModifier / 2);
                 }
-                else if (Action == ActionAnimation.Aiming)
+                else if (Action == ActionAnim.Aiming)
                 {
                     modifyWielderSpeed(heftSlowModifier);
                 }
-                else if (Action == ActionAnimation.Throwing)
+                else if (Action == ActionAnim.Throwing)
                 {
                     alreadyHit = new List<GameObject>();
                     modifyWielderSpeed(0);
                 }
-                else if (Action == ActionAnimation.Parrying)
+                else if (Action == ActionAnim.Parrying)
                 {
                     HitBox.isTrigger = true;
                     HitBox.enabled = true;
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
-                bool availableToGuard = !((Action == ActionAnimation.Recovering) || (Action == ActionAnimation.QuickAttack) || (Action == ActionAnimation.StrongAttack));
+                bool availableToGuard = !((Action == ActionAnim.Recovering) || (Action == ActionAnim.QuickAttack) || (Action == ActionAnim.StrongAttack));
                 Anim.SetBool("primary", PrimaryTrigger && !Recoiling);
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
                 Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
@@ -333,7 +333,7 @@ public abstract class Weapon : Wieldable
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
                     {
-                        if (Action == ActionAnimation.StrongAttack || Action == ActionAnimation.QuickAttack)
+                        if (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack)
                         {
                             RESOLVE_CLASH(this, foeWeapon);
                         }
@@ -351,12 +351,12 @@ public abstract class Weapon : Wieldable
                     }
                     else if (foe && !other.isTrigger)
                     {
-                        if (Action == ActionAnimation.StrongAttack || Action == ActionAnimation.QuickAttack)
+                        if (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack)
                         {
                             RESOLVE_HIT(this, foe);
                         }
                     }
-                    else if (obstacle && (Action == ActionAnimation.StrongAttack || Action == ActionAnimation.QuickAttack))
+                    else if (obstacle && (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack))
                     {
                         resolveObstacleHit(other.gameObject);
                     }
@@ -443,7 +443,7 @@ public abstract class Weapon : Wieldable
         {
             return;
         }
-        if (Attacker.Action == ActionAnimation.StrongAttack)
+        if (Attacker.Action == ActionAnim.StrongAttack)
         {
             float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
@@ -452,11 +452,11 @@ public abstract class Weapon : Wieldable
         {
             Attacker.playTink();
         }
-        if (Defender.Action == ActionAnimation.Parrying)
+        if (Defender.Action == ActionAnim.Parrying)
         {
             RESOLVE_PARRY(Attacker, Defender);
         }
-        else if(Defender.Action == ActionAnimation.Guarding)
+        else if(Defender.Action == ActionAnim.Guarding)
         {
             RESOLVE_BLOCK(Attacker, Defender);
         }
@@ -493,7 +493,7 @@ public abstract class Weapon : Wieldable
 
     private void resolveObstacleHit(GameObject obstacle)
     {
-        if (Action == ActionAnimation.StrongAttack)
+        if (Action == ActionAnim.StrongAttack)
         {
             float scalar = TrueStrike ? 0.5f : 2 - Tempo;
             playClang(scalar);
@@ -697,134 +697,134 @@ public abstract class Weapon : Wieldable
         }
     }
 
-    private ActionAnimation getActionFromCurrentAnimationState()
+    private ActionAnim getActionFromCurrentAnimationState()
     {
         if (currentAnimation.IsTag("Recoil") || nextAnimation.IsTag("Recoil"))
         {
-            return ActionAnimation.Recoiling;
+            return ActionAnim.Recoiling;
         }
         else if (currentAnimation.IsTag("Sheath"))
         {
-            return ActionAnimation.Sheathed;
+            return ActionAnim.Sheathed;
         }
         else if (currentAnimation.IsTag("Idle"))
         {
             if (nextAnimation.IsTag("Guard"))
             {
-                return ActionAnimation.Parrying;
+                return ActionAnim.Parrying;
             }
             else if (nextAnimation.IsTag("Windup"))
             {
-                return ActionAnimation.StrongWindup;
+                return ActionAnim.StrongWindup;
             }
             else if (nextAnimation.IsTag("StrongCoil"))
             {
-                return ActionAnimation.StrongWindup;
+                return ActionAnim.StrongWindup;
             }
             else if (nextAnimation.IsTag("QuickCoil"))
             {
-                return ActionAnimation.QuickWindup;
+                return ActionAnim.QuickWindup;
             }
             else
             {
-                return ActionAnimation.Idle;
+                return ActionAnim.Idle;
             }
         }
         else if (currentAnimation.IsTag("Guard"))
         {
             if (nextAnimation.IsTag("Idle"))
             {
-                return ActionAnimation.Recovering;
+                return ActionAnim.Recovering;
             }
             else
             {
-                return ActionAnimation.Guarding;
+                return ActionAnim.Guarding;
             }
         }
         else if (currentAnimation.IsTag("Windup"))
         {
-            return ActionAnimation.StrongWindup;
+            return ActionAnim.StrongWindup;
         }
         else if (currentAnimation.IsTag("StrongCoil"))
         {
-            return ActionAnimation.StrongCoil;
+            return ActionAnim.StrongCoil;
         }
         else if (currentAnimation.IsTag("QuickCoil"))
         {
-            return ActionAnimation.QuickCoil;
+            return ActionAnim.QuickCoil;
         }
         else if (currentAnimation.IsTag("QuickAttack"))
         {
             if (nextAnimation.IsTag("Guard"))
             {
-                return ActionAnimation.Recovering;
+                return ActionAnim.Recovering;
             }
             else if (nextAnimation.IsTag("Idle"))
             {
-                return ActionAnimation.Recovering;
+                return ActionAnim.Recovering;
             }
             else
             {
-                return ActionAnimation.QuickAttack;
+                return ActionAnim.QuickAttack;
             }
         }
         else if (currentAnimation.IsTag("StrongAttack"))
         {
             if (nextAnimation.IsTag("Guard"))
             {
-                return ActionAnimation.Recovering;
+                return ActionAnim.Recovering;
             }
             else if (nextAnimation.IsTag("Windup"))
             {
-                return ActionAnimation.StrongWindup;
+                return ActionAnim.StrongWindup;
             }
             else if (nextAnimation.IsTag("StrongCoil"))
             {
-                return ActionAnimation.StrongWindup;
+                return ActionAnim.StrongWindup;
             }
             else
             {
-                return ActionAnimation.StrongAttack;
+                return ActionAnim.StrongAttack;
             }
         }
         else if (currentAnimation.IsTag("Recovering"))
         {
             if (nextAnimation.IsTag("QuickCoil") || nextAnimation.IsTag("QuickWindup"))
             {
-                return ActionAnimation.QuickWindup;
+                return ActionAnim.QuickWindup;
             }
             else if (nextAnimation.IsTag("StrongCoil") || nextAnimation.IsTag("Windup"))
             {
-                return ActionAnimation.StrongWindup;
+                return ActionAnim.StrongWindup;
             }
             else
             {
-                return ActionAnimation.Recovering;
+                return ActionAnim.Recovering;
             }
         }
         else if (currentAnimation.IsTag("Aim"))
         {
-            return ActionAnimation.Aiming;
+            return ActionAnim.Aiming;
         }
         else if (currentAnimation.IsTag("Throw"))
         {
-            return ActionAnimation.Throwing;
+            return ActionAnim.Throwing;
         }
         else
         {
-            return ActionAnimation.error;
+            return ActionAnim.error;
         }
     }
 
     private void chargeTempo()
     {
         Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, tempoChargeExponent), 0, 1);
-        if (Action == ActionAnimation.StrongCoil)
+        if (Action == ActionAnim.StrongCoil)
         {
             tempoCharge += Time.deltaTime / tempoChargePeriod;
             TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth/2;
         }
-        else if(Action != ActionAnimation.StrongAttack)
+        else if(Action != ActionAnim.StrongAttack)
         {
             TrueStrike = false;
             tempoCharge = 0;

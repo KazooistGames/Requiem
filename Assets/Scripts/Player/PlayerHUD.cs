@@ -121,11 +121,11 @@ public class PlayerHUD : MonoBehaviour
         {
 
         }
-        else if (Player.INSTANCE.HostWeapon.Action == Weapon.ActionAnimation.StrongWindup || Player.INSTANCE.HostWeapon.Action == Weapon.ActionAnimation.StrongCoil)
+        else if (Player.INSTANCE.HostWeapon.Action == Weapon.ActionAnim.StrongWindup || Player.INSTANCE.HostWeapon.Action == Weapon.ActionAnim.StrongCoil)
         {
             fadeTransforms(tempoBarTransforms, 0.75f, 0.1f);
         }
-        else if(Player.INSTANCE.HostWeapon.Action != Weapon.ActionAnimation.StrongAttack)
+        else if(Player.INSTANCE.HostWeapon.Action != Weapon.ActionAnim.StrongAttack)
         {
             fadeTransforms(tempoBarTransforms, 0, 0.5f);
         }

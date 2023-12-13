@@ -13,7 +13,7 @@ public class _MartialController : MonoBehaviour
 
     public struct MartialJob
     {
-        public Weapon.ActionAnimation Action;
+        public Weapon.ActionAnim Action;
         public float Debounce;
         public Requisite Prerequisite;
     }
@@ -45,7 +45,7 @@ public class _MartialController : MonoBehaviour
         foreach (KeyValuePair<Weapon, MartialJob> kvp in Weapon_Actions)
         {
             Weapon weapon = kvp.Key;
-            Weapon.ActionAnimation desiredAction = kvp.Value.Action;
+            Weapon.ActionAnim desiredAction = kvp.Value.Action;
             float debounce = kvp.Value.Debounce;
             if (weapon ? !weapon.Wielder : true)
             {
@@ -94,7 +94,7 @@ public class _MartialController : MonoBehaviour
     }
 
     /***** PUBLIC *****/
-    public static void Queue_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
+    public static void Queue_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null)
     {
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite};
         if (!Weapon_Actions.ContainsKey(weapon))
@@ -111,7 +111,7 @@ public class _MartialController : MonoBehaviour
         }
     }
 
-    public static void Override_Queue(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
+    public static void Override_Queue(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null)
     {
         if(weapon == null) { return; }
         if (Weapon_Queues.ContainsKey(weapon))
@@ -121,7 +121,7 @@ public class _MartialController : MonoBehaviour
         Queue_Action(weapon, action, debounce, requisite);
     }
 
-    public static void Override_Action(Weapon weapon, Weapon.ActionAnimation action, float debounce = 0, Requisite requisite = null)
+    public static void Override_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null)
     {
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite };
         Weapon_Actions[weapon] = newJob;
@@ -144,7 +144,7 @@ public class _MartialController : MonoBehaviour
         }
     }
 
-    public static Weapon.ActionAnimation Get_Next_Action(Weapon weapon)
+    public static Weapon.ActionAnim Get_Next_Action(Weapon weapon)
     {
         if (Weapon_Queues[weapon].Count > 0)
         {
@@ -152,7 +152,7 @@ public class _MartialController : MonoBehaviour
         }
         else
         {
-            return Weapon.ActionAnimation.error;
+            return Weapon.ActionAnim.error;
         }
     }
 
@@ -171,20 +171,20 @@ public class _MartialController : MonoBehaviour
     }
 
 
-    private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.ActionAnimation desiredAction)
+    private static bool attemptToExecuteDesiredActionWithWeapon(Weapon weapon, Weapon.ActionAnim desiredAction)
     {
         (bool, bool, bool) triggerControlValues;
         weapon.ThrowTrigger = false;
         switch (desiredAction)
         {
-            case Weapon.ActionAnimation.Idle:
+            case Weapon.ActionAnim.Idle:
                 triggerControlValues = (false, false, false);
                 break;
-            case Weapon.ActionAnimation.QuickCoil:
+            case Weapon.ActionAnim.QuickCoil:
                 triggerControlValues = (true, false, false);
                 break;
-            case Weapon.ActionAnimation.QuickAttack:
-                if (weapon.Action == Weapon.ActionAnimation.QuickCoil)
+            case Weapon.ActionAnim.QuickAttack:
+                if (weapon.Action == Weapon.ActionAnim.QuickCoil)
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -193,11 +193,11 @@ public class _MartialController : MonoBehaviour
                     triggerControlValues = (true, false, false);
                 }
                 break;
-            case Weapon.ActionAnimation.StrongCoil:
+            case Weapon.ActionAnim.StrongCoil:
                 triggerControlValues = (false, false, true);
                 break;
-            case Weapon.ActionAnimation.StrongAttack:
-                if(weapon.Action == Weapon.ActionAnimation.StrongCoil)
+            case Weapon.ActionAnim.StrongAttack:
+                if(weapon.Action == Weapon.ActionAnim.StrongCoil)
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -206,11 +206,11 @@ public class _MartialController : MonoBehaviour
                     triggerControlValues = (false, false, true);
                 }
                 break;
-            case Weapon.ActionAnimation.Guarding:
+            case Weapon.ActionAnim.Guarding:
                 triggerControlValues = (weapon.PrimaryTrigger, true, false);
                 break;
-            case Weapon.ActionAnimation.Parrying:
-                if (weapon.Action == Weapon.ActionAnimation.Guarding) 
+            case Weapon.ActionAnim.Parrying:
+                if (weapon.Action == Weapon.ActionAnim.Guarding) 
                 {
                     triggerControlValues = (false, false, false);
                 }
@@ -219,13 +219,13 @@ public class _MartialController : MonoBehaviour
                     triggerControlValues = (false, true, false);
                 }
                 break;
-            case Weapon.ActionAnimation.Aiming:
+            case Weapon.ActionAnim.Aiming:
                 triggerControlValues = (false, false, false);
                 weapon.ThrowTrigger = true;
                 break;
-            case Weapon.ActionAnimation.Throwing:
+            case Weapon.ActionAnim.Throwing:
                 triggerControlValues = (false, false, false);
-                weapon.ThrowTrigger = weapon.Action != Weapon.ActionAnimation.Aiming;
+                weapon.ThrowTrigger = weapon.Action != Weapon.ActionAnim.Aiming;
                 break;
             default:
                 triggerControlValues = (false, false, false);

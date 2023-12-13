@@ -85,7 +85,7 @@ public class WeaponRangeFinder : MonoBehaviour
     {
         if (weapon ? weapon.Wielder : false)
         {
-            return weapon.Action == Weapon.ActionAnimation.StrongAttack || weapon.Action == Weapon.ActionAnimation.QuickAttack;
+            return weapon.Action == Weapon.ActionAnim.StrongAttack || weapon.Action == Weapon.ActionAnim.QuickAttack;
         }
         else
         {

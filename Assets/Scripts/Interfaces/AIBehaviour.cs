@@ -174,15 +174,15 @@ public class AIBehaviour : MonoBehaviour
                     {
                         martialCurrentState = martialState.none;
                     }
-                    else if (mainWep.Action == Weapon.ActionAnimation.Guarding)
+                    else if (mainWep.Action == Weapon.ActionAnim.Guarding)
                     {
                         martialCurrentState = martialState.defending;
                     }
-                    else if (mainWep.Action == Weapon.ActionAnimation.Aiming)
+                    else if (mainWep.Action == Weapon.ActionAnim.Aiming)
                     {
                         martialCurrentState = martialState.throwing;
                     }
-                    else if (mainWep.Action == Weapon.ActionAnimation.Idle || mainWep.Action == Weapon.ActionAnimation.Sheathed)
+                    else if (mainWep.Action == Weapon.ActionAnim.Idle || mainWep.Action == Weapon.ActionAnim.Sheathed)
                     {
                         martialCurrentState = martialState.none;
                     }
@@ -793,16 +793,16 @@ public class AIBehaviour : MonoBehaviour
             Vector3 disposition = entity.Foe.transform.position - transform.position;
 
             bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.75f;
-            bool foeRebuked = matchupMain ? matchupMain.Action == Weapon.ActionAnimation.Recoiling : true && matchupOff ? matchupOff.Action == Weapon.ActionAnimation.Recoiling : true;
+            bool foeRebuked = matchupMain ? matchupMain.Action == Weapon.ActionAnim.Recoiling : true && matchupOff ? matchupOff.Action == Weapon.ActionAnim.Recoiling : true;
 
             bool inRange = disposition.magnitude <= Mathf.Max(mainWep ? mainWep.Range : 0.0f, offWep ? offWep.Range : 0.0f);
             float rangeBoost = 1.2f;
             bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range * rangeBoost : false);
 
-            bool foeAttacking = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.QuickAttack : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnimation.QuickAttack : false);
-            bool foeCoiling = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.QuickCoil || matchupMain.Action == Weapon.ActionAnimation.StrongCoil : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnimation.QuickCoil || matchupOff.Action == Weapon.ActionAnimation.StrongCoil : false);
-            bool foeWindingUp = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.QuickWindup || matchupMain.Action == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnimation.QuickWindup || matchupOff.Action == Weapon.ActionAnimation.StrongWindup : false);          
-            bool foeAiming = (matchupMain ? matchupMain.Action == Weapon.ActionAnimation.Aiming : false) || (matchupOff ? matchupMain.Action == Weapon.ActionAnimation.Aiming : false);         
+            bool foeAttacking = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickAttack : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickAttack : false);
+            bool foeCoiling = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickCoil || matchupMain.Action == Weapon.ActionAnim.StrongCoil : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickCoil || matchupOff.Action == Weapon.ActionAnim.StrongCoil : false);
+            bool foeWindingUp = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickWindup || matchupMain.Action == Weapon.ActionAnim.StrongWindup : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickWindup || matchupOff.Action == Weapon.ActionAnim.StrongWindup : false);          
+            bool foeAiming = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.Aiming : false) || (matchupOff ? matchupMain.Action == Weapon.ActionAnim.Aiming : false);         
             //bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
 
             if(!martialEnteredRangeLatch && inRange)
@@ -838,7 +838,7 @@ public class AIBehaviour : MonoBehaviour
                 martialFoeVulnerableLatch = false;
             }
 
-            bool instantaneousReactiveDefend = (foeAttacking || foeCoiling || foeWindingUp) && foeInRange && foeFacing;
+            bool instantaneousReactiveDefend = (foeAttacking || foeWindingUp) && foeInRange && foeFacing;
             if (!martialFoeAttackingLatch && instantaneousReactiveDefend)
             {
                 martialFoeAttackingLatch = true;

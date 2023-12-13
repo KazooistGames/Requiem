@@ -39,7 +39,7 @@ public class Bully : AIBehaviour
             {
 
             }
-            else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnimation.StrongCoil || dashingDesiredDirection != Vector3.zero)
+            else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || dashingDesiredDirection != Vector3.zero)
             {
                 dashingDesiredDirection = entity.Foe.transform.position - transform.position;
             }
@@ -59,29 +59,29 @@ public class Bully : AIBehaviour
         }
         else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
         else if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if(checkMyWeaponInRange())
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if(Random.value <= Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongCoil, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.StrongAttack);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
         }
         else
         {
 
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
 
@@ -89,8 +89,8 @@ public class Bully : AIBehaviour
     {
         if (checkMyWeaponInRange())
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnimation.QuickCoil, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.QuickAttack);
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
 
@@ -98,11 +98,11 @@ public class Bully : AIBehaviour
     {
         if (entity.Foe)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
         }
         else
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Idle);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
     }
 
