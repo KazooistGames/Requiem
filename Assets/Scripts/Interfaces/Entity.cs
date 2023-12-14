@@ -242,7 +242,7 @@ public class Entity : MonoBehaviour
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
-            float scalingRegenRate = POISE_REGEN_BASE_PERIOD + Mathf.FloorToInt((Strength - Vitality) / 10);
+            float scalingRegenRate = POISE_REGEN_BASE_PERIOD + Mathf.FloorToInt((Strength - Vitality) / 20);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;

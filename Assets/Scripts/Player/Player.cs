@@ -403,7 +403,7 @@ public class Player : MonoBehaviour
     private void updateChainlink()
     {
 
-        if(ChainlinkLength == 0 || !HostEntity || !HostWeapon) 
+        if(ChainlinkLength == 0 || HostEntity == null || HostWeapon == null) 
         {
             chainRenderer.gameObject.SetActive(false);
         }

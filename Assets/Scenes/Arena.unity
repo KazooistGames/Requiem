@@ -1510,6 +1510,7 @@ MonoBehaviour:
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
   wallCrawlObstacles: []
+  CurrentPattern: 0
 --- !u!114 &1807562880
 MonoBehaviour:
   m_ObjectHideFlags: 0
