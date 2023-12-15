@@ -17,7 +17,6 @@ public class Bully : AIBehaviour
         new GameObject().AddComponent<Greataxe>().PickupItem(entity);
         Intelligence = 0.5f;
         tangoStrafeEnabled = false;
-        dashingChargePeriod = 1f;
         meanderPauseFrequency = 0;
         itemManagementSeekItems = true;
         itemManagementPreferredType = Entity.WieldMode.TwoHanders;

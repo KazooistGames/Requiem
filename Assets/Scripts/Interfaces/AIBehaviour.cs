@@ -704,7 +704,6 @@ public class AIBehaviour : MonoBehaviour
     private int tangoStrafeFlipFlop = 1;
     private bool tangoNearStart = false;
     private bool tangoFarStart = false;
-
     protected void tango(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && entity.Foe)
@@ -1190,8 +1189,7 @@ public class AIBehaviour : MonoBehaviour
                         break;
                     case AIState.passive:
                         stateRunTimer = sensoryAlerted ? 0 : stateRunTimer;
-                        excitement = Mathf.Lerp(1, 0, stateRunTimer / 10);
-                        meanderPauseFrequency = Mathf.Lerp(0.75f, 0.25f, excitement);
+                        excitement = Mathf.Lerp(1, 0, stateRunTimer / 20);
                         entity.modSpeed["AIState"] = Mathf.Lerp(-0.75f, 0f, excitement);
                         behaviourParams[BehaviourType.patrol] = (!meanderPaused || excitement > 0, Intelligence);
                         behaviourParams[BehaviourType.meander] = (true, 1);
