@@ -74,7 +74,7 @@ public class Nephalim : Entity
 
     private void CRUMBLE(float damage)
     {
-        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.4f + 0.5f * UnityEngine.Random.value * 0.7f, 0.5f, _SoundService.Instance.DefaultAudioRange / 2);
+        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.4f + 0.5f * UnityEngine.Random.value * 0.7f, 0.5f, _SoundService.Instance.DefaultAudioRange / 2);
     }
 
     private void createSkeleton()

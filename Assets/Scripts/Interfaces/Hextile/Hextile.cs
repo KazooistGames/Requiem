@@ -61,12 +61,12 @@ public class Hextile : MonoBehaviour
     {
         LastGeneratedTile = this;
         Tiles.Add(this);
-        objectsDestroyMask = ~((1 << Game.layerTile) + (1 << Game.layerWall) + (1 << Game.layerScript));
+        objectsDestroyMask = ~((1 << Requiem.layerTile) + (1 << Requiem.layerWall) + (1 << Requiem.layerScript));
         gameObject.name = "HexTile";
         transform.SetParent(HEXBOARD.transform, false);
         transform.localEulerAngles = Vector3.zero;
         transform.localPosition = new Vector3(transform.position.x, 0, transform.position.z);
-        gameObject.layer = Game.layerTile;
+        gameObject.layer = Requiem.layerTile;
         body.useGravity = false;
         body.isKinematic = true;
         positional.isTrigger = true;
@@ -83,7 +83,7 @@ public class Hextile : MonoBehaviour
             alterTiles(tile);
             tile.alterTiles(this);
         }
-        int objectMask = (1 << Game.layerTile) + (1 << Game.layerWall);
+        int objectMask = (1 << Requiem.layerTile) + (1 << Requiem.layerWall);
         if (!ContainedObjects.Contains(other.gameObject) && (other.gameObject.layer & objectMask) == 0)
         {
             ContainedObjects.Add(other.gameObject);
@@ -319,7 +319,7 @@ public class Hextile : MonoBehaviour
         if (!HexagonMesh) GenerateHexMesh();
         HEXBOARD = new GameObject("HexBoard");
         LastGeneratedTile = new GameObject().AddComponent<Hextile>();
-        LastGeneratedTile.gameObject.layer = Game.layerTile;
+        LastGeneratedTile.gameObject.layer = Requiem.layerTile;
         LastGeneratedTile.transform.position = Vector3.zero;
         return LastGeneratedTile;
     }

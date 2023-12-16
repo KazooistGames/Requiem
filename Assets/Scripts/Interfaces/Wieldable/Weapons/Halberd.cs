@@ -16,7 +16,7 @@ public class Halberd : Weapon
         gameObject.name = "Halberd";
         transform.localScale = new Vector3(1f, 1.0f, 1f);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Halberd"];
+        Filter.mesh = Requiem.weaponMeshes["Halberd"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Halberd"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Halberd"));
         wHitBox.center = new Vector3(0, 0.5f, 0.15f);

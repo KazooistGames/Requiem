@@ -29,7 +29,7 @@ public class Bone : MonoBehaviour
 
     protected void Start()
     {
-        gameObject.layer = Game.layerItem;
+        gameObject.layer = Requiem.layerItem;
         Body.useGravity = true;
         Body.isKinematic = false;
         Body.mass = 0.25f;
@@ -67,7 +67,7 @@ public class Bone : MonoBehaviour
     /*** PUBLIC ***/
     public void Rattle()
     {
-        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, (0.5f + 0.5f * UnityEngine.Random.value) * pitchScalar, 0.1f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, (0.5f + 0.5f * UnityEngine.Random.value) * pitchScalar, 0.1f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
     }
 
     public static void Consume(Bone bone)

@@ -11,9 +11,9 @@ public class Champion : AIBehaviour
     protected override void Awake()
     {
         base.Awake();
-        mainHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
-        offHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
-        footFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        mainHandFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        offHandFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        footFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
     }
     protected override void Start()
     {

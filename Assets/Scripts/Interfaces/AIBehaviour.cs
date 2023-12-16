@@ -89,10 +89,10 @@ public class AIBehaviour : MonoBehaviour
     protected virtual void Start()
     {
         //meanderPauseFrequency = Random.value;
-        trackingObstructionMask = (1 << Game.layerWall) + (1 << Game.layerObstacle);
-        meanderAvoidMask = ~((1 << Game.layerTile) + (1 << Game.layerItem));
-        sensorySightMask = (1 << Game.layerObstacle) + (1 << Game.layerEntity) + (1 << Game.layerWall) + (1 << Game.layerItem);
-        patrolMask = 1 << Game.layerWall + (1 << Game.layerObstacle);
+        trackingObstructionMask = (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle);
+        meanderAvoidMask = ~((1 << Requiem.layerTile) + (1 << Requiem.layerItem));
+        sensorySightMask = (1 << Requiem.layerObstacle) + (1 << Requiem.layerEntity) + (1 << Requiem.layerWall) + (1 << Requiem.layerItem);
+        patrolMask = 1 << Requiem.layerWall + (1 << Requiem.layerObstacle);
         StartCoroutine(Think());
         StartCoroutine(stateHandler());
         entity.EventWounded.AddListener((float damage) => sensoryAlerted = true);
@@ -457,7 +457,7 @@ public class AIBehaviour : MonoBehaviour
                 {
                     float sightRangeActual = sensoryBaseRange * sensorySightRangeScalar;
                     float sightFOVactual = sensoryAlerted ? sensorySightFOV * 1.5f : sensorySightFOV;
-                    RaycastHit[] firstPass = Physics.SphereCastAll(transform.position + Vector3.up * sightRangeActual * 2, sightRangeActual, Vector3.down, sightRangeActual * 2, 1 << Game.layerEntity, QueryTriggerInteraction.Ignore);
+                    RaycastHit[] firstPass = Physics.SphereCastAll(transform.position + Vector3.up * sightRangeActual * 2, sightRangeActual, Vector3.down, sightRangeActual * 2, 1 << Requiem.layerEntity, QueryTriggerInteraction.Ignore);
                     foreach (RaycastHit entityHit in firstPass)
                     {
                         float angle = getAngle(entityHit.transform.position - transform.position);
@@ -495,7 +495,7 @@ public class AIBehaviour : MonoBehaviour
                     AudioSource[] sources = FindObjectsOfType<AudioSource>();
                     for (int i = 0; i < sources.Length; i++)
                     {
-                        if (sources[i] ? sources[i].isPlaying && (!sensoryAlerted || sources[i].gameObject.layer == Game.layerEntity) : false)
+                        if (sources[i] ? sources[i].isPlaying && (!sensoryAlerted || sources[i].gameObject.layer == Requiem.layerEntity) : false)
                         {
                             Vector3 dispo = sources[i].transform.position - transform.position;
                             dispo.y = 0;
@@ -503,7 +503,7 @@ public class AIBehaviour : MonoBehaviour
                             {
                                 newAudioDirection += dispo;
                                 sensoryAudioTimer = 0;
-                                if (sources[i].gameObject.layer == Game.layerEntity)
+                                if (sources[i].gameObject.layer == Requiem.layerEntity)
                                 {
                                     sensoryAlerted = true;
                                 }
@@ -915,7 +915,7 @@ public class AIBehaviour : MonoBehaviour
                 {
                     if ((itemManagementDelayTimer += ReflexRate) >= itemManagementDelayPeriod)
                     {
-                        RaycastHit[] firstPass = Physics.SphereCastAll(transform.position + Vector3.up * sensoryBaseRange * 2, sensoryBaseRange, Vector3.down, sensoryBaseRange * 2, 1 << Game.layerItem, QueryTriggerInteraction.Ignore);
+                        RaycastHit[] firstPass = Physics.SphereCastAll(transform.position + Vector3.up * sensoryBaseRange * 2, sensoryBaseRange, Vector3.down, sensoryBaseRange * 2, 1 << Requiem.layerItem, QueryTriggerInteraction.Ignore);
                         Weapon closestWeapon = null;
                         float closestDistance = float.MaxValue;
                         foreach (RaycastHit nearbyHit in firstPass)
@@ -923,7 +923,7 @@ public class AIBehaviour : MonoBehaviour
                             Weapon nearbyWeapon = nearbyHit.collider.GetComponent<Weapon>();
                             if (nearbyWeapon ? !nearbyWeapon.Wielder : false)
                             {
-                                RaycastHit[] secondPass = Physics.RaycastAll(transform.position, nearbyWeapon.transform.position - transform.position, sensoryBaseRange, (1 << Game.layerWall) + (1 << Game.layerObstacle) + (1 << Game.layerItem), QueryTriggerInteraction.Ignore);
+                                RaycastHit[] secondPass = Physics.RaycastAll(transform.position, nearbyWeapon.transform.position - transform.position, sensoryBaseRange, (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerItem), QueryTriggerInteraction.Ignore);
                                 float minDistance = float.MaxValue;
                                 Weapon potentialWeapon = null;
                                 foreach (RaycastHit objectHit in secondPass)
@@ -1005,7 +1005,7 @@ public class AIBehaviour : MonoBehaviour
     {
         if (behaviourParams[key].Item1 && followVIP)
         {
-            followLayerMask = (1 << followVIP.layer) + (1 << Game.layerWall) + (1 << Game.layerObstacle);
+            followLayerMask = (1 << followVIP.layer) + (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle);
             followInnerDeadband = entity.personalBox.radius * entity.scaleActual * 1.5f;
             followOuterDeadband = sensoryBaseRange;
             followDistance = Mathf.Lerp(followInnerDeadband, followOuterDeadband, 0.25f);
@@ -1068,7 +1068,7 @@ public class AIBehaviour : MonoBehaviour
     public List<GameObject> wallCrawlObstacles = new List<GameObject>();
     protected void wallCrawl(BehaviourType key)
     {
-        wallCrawlObstaclesMask = (1 << Game.layerWall) + (1 << Game.layerObstacle) + (wallCrawlCrowding ? 0 : (1 << Game.layerEntity));
+        wallCrawlObstaclesMask = (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle) + (wallCrawlCrowding ? 0 : (1 << Requiem.layerEntity));
         if (behaviourParams[key].Item1 && wallCrawlObstacles.Count > 0)
         {
             float trueRadius = (entity.personalBox.radius - entity.berthActual) * entity.scaleActual;
@@ -1140,7 +1140,7 @@ public class AIBehaviour : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         while (true)
         {
-            if (!Game.INSTANCE.Paused && enabled)
+            if (!Requiem.INSTANCE.Paused && enabled)
             {
                 foreach (KeyValuePair<BehaviourType, behaviour> behaviour in behaviours)
                 {
@@ -1185,7 +1185,7 @@ public class AIBehaviour : MonoBehaviour
         bool leashed;
         while (true)
         {
-            if (!Game.INSTANCE.Paused && enabled)
+            if (!Requiem.INSTANCE.Paused && enabled)
             {
                 disposition = entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero;
                 switch (State)

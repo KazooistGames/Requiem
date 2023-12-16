@@ -73,7 +73,7 @@ public class Landmark_Well : Landmark
         base.AssignToTile(tile);
 
         gameObject.name = "Well";
-        gameObject.layer = Game.layerObstacle;
+        gameObject.layer = Requiem.layerObstacle;
         gameObject.AddComponent<Rigidbody>().isKinematic = true;
         transform.localPosition = Vector3.up * Hextile.Thickness / 2.25f;
         if (!WellModelTemplate)
@@ -83,7 +83,7 @@ public class Landmark_Well : Landmark
         Model = Instantiate(WellModelTemplate);
         Model.transform.SetParent(transform, false);
         Model.transform.localEulerAngles = Vector3.up * UnityEngine.Random.value * 360;
-        Model.layer = Game.layerObstacle;
+        Model.layer = Requiem.layerObstacle;
         bloodPoolRenderer = Model.GetComponentsInChildren<MeshRenderer>()[1];
         bloodPoolRenderer.sharedMaterial = Instantiate(Resources.Load<Material>("Materials/FX/bloodPool"));
     }

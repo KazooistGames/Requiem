@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Game_Arena : Game
+public class Requiem_Arena : Requiem
 {
     public int RadiusOfCrypts;
     public int LengthOfCorridors;
@@ -56,7 +56,6 @@ public class Game_Arena : Game
     protected override void Update()
     {
         base.Update();
-        gameObject.name = "ARENA";
         if (StateOfGame != GameState.Liminal)
         {
             GameClock += Time.deltaTime;

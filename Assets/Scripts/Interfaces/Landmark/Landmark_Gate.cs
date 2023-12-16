@@ -71,14 +71,14 @@ public class Landmark_Gate : Landmark
     {
         base.AssignToTile(tile);
         gameObject.name = "Gate";
-        gameObject.layer = Game.layerWall;
+        gameObject.layer = Requiem.layerWall;
         if (!model)
         {
             model = Instantiate(Resources.Load<GameObject>("Prefabs/structures/Gate"));
             door = model.GetComponentsInChildren<Transform>()[1].gameObject;
             model.transform.SetParent(transform, false);
-            model.layer = Game.layerWall;
-            door.layer = Game.layerWall;
+            model.layer = Requiem.layerWall;
+            door.layer = Requiem.layerWall;
             door.AddComponent<Rigidbody>().isKinematic = true;
             BoundingBox = model.AddComponent<BoxCollider>();
             BoundingBox.isTrigger = true;

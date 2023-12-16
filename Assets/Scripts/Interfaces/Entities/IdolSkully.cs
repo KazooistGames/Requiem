@@ -41,7 +41,7 @@ public class IdolSkully : Skully
     public override void Damage(float damage)
     {
         base.Damage(damage);
-        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
+        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
     }
 
 
@@ -50,7 +50,7 @@ public class IdolSkully : Skully
         for(int i = 0; i < 2; i++)
         {
             Entity entity;
-            entity = Game.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
+            entity = Requiem.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
             entity.Poise = entity.Strength;
             entity.Shove(AIBehaviour.RandomDirection() * 1);
         }

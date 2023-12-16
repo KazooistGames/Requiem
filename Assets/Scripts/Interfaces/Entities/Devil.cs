@@ -41,7 +41,7 @@ public class Devil : Entity
             anim.Rebind();
             model.transform.localScale = newScale;
             model.transform.position = newPosition;
-            model.layer = Game.layerItem;
+            model.layer = Requiem.layerItem;
             model.AddComponent<Rigidbody>();
             model.AddComponent<BoxCollider>();
             model.GetComponent<BoxCollider>().size = new Vector3(0.25f, 1.25f, 0.25f);
@@ -53,7 +53,7 @@ public class Devil : Entity
                 model.GetComponent<Rigidbody>().AddForce(-direction.normalized * 1, ForceMode.VelocityChange);
             }
         }
-        _SoundService.PlayAmbientSound(Game.deathSounds[UnityEngine.Random.Range(0, Game.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Requiem.deathSounds[UnityEngine.Random.Range(0, Requiem.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         base.Die();
     }
 
@@ -63,7 +63,7 @@ public class Devil : Entity
     {
         if (Vitality > 0)
         {
-            _SoundService.PlayAmbientSound(Game.damageSounds[UnityEngine.Random.Range(0, Game.damageSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
+            _SoundService.PlayAmbientSound(Requiem.damageSounds[UnityEngine.Random.Range(0, Requiem.damageSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         }
         if (!BLOOD_SPLATTER_PREFAB)
         {

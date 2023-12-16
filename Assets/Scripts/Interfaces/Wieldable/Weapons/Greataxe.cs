@@ -15,7 +15,7 @@ public class Greataxe : Weapon
         gameObject.name = "Greataxe";
         transform.localScale = new Vector3(2.0f, 2.5f, 2.0f);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Axe"];
+        Filter.mesh = Requiem.weaponMeshes["Axe"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Axe"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Axe"));
         wHitBox.center = new Vector3(0.0f, 0.15f, 0.05f);

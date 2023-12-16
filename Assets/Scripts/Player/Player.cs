@@ -65,9 +65,9 @@ public class Player : MonoBehaviour
         }
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {
-            Game.INSTANCE.Paused = !Game.INSTANCE.Paused;
+            Requiem.INSTANCE.Paused = !Requiem.INSTANCE.Paused;
         }
-        if (!Game.INSTANCE.Paused)
+        if (!Requiem.INSTANCE.Paused)
         {
             if (HostEntity)
             {
@@ -326,7 +326,7 @@ public class Player : MonoBehaviour
             fadeTimer += Time.deltaTime;
             yield return null;
         }
-        Game.INSTANCE.Restart();
+        Requiem.INSTANCE.Restart();
     }
 
     /***** PRIVATE *****/
@@ -379,7 +379,7 @@ public class Player : MonoBehaviour
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
             }
-            else if (impaledObject || HostWeapon.ImpaledObject.layer == Game.layerItem)
+            else if (impaledObject || HostWeapon.ImpaledObject.layer == Requiem.layerItem)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, Entity.Min_Velocity_Of_Dash);

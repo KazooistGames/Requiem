@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Game_Builder: Game
+public class Game_Builder: Requiem
 {
     public int MapRadius = 8;
     List<List<Hextile>> MapRings = new List<List<Hextile>>();

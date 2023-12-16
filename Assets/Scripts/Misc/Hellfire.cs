@@ -306,7 +306,7 @@ public class Hellfire : MonoBehaviour
             Ray castRay = new Ray(Wielder.transform.position, Wielder.HostEntity.LookDirection);
             float castRadius = shape.radius + (main.startSize.constant * size.sizeMultiplier/2);
             Debug.DrawLine(castRay.origin, transform.position + castRay.direction * primaryRange, Color.blue);
-            if (Physics.SphereCast(castRay, castRadius, out castHit, primaryRange, (1 << Game.layerEntity) + (1 << Game.layerObstacle) + (1 << Game.layerWall), QueryTriggerInteraction.Ignore))
+            if (Physics.SphereCast(castRay, castRadius, out castHit, primaryRange, (1 << Requiem.layerEntity) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerWall), QueryTriggerInteraction.Ignore))
             {
                 GameObject other = castHit.collider.gameObject;
                 Entity entity = other.GetComponent<Entity>();

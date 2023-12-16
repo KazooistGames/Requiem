@@ -188,7 +188,7 @@ MonoBehaviour:
   martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialFoeCharging:
+  martialFoeDashing:
     m_PersistentCalls:
       m_Calls: []
   martialFoeEnteredRange:
@@ -679,7 +679,7 @@ MonoBehaviour:
   martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialFoeCharging:
+  martialFoeDashing:
     m_PersistentCalls:
       m_Calls: []
   martialFoeEnteredRange:
@@ -936,7 +936,7 @@ MonoBehaviour:
   martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialFoeCharging:
+  martialFoeDashing:
     m_PersistentCalls:
       m_Calls: []
   martialFoeEnteredRange:
@@ -1303,7 +1303,7 @@ MonoBehaviour:
   martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialFoeCharging:
+  martialFoeDashing:
     m_PersistentCalls:
       m_Calls: []
   martialFoeEnteredRange:
@@ -1484,7 +1484,7 @@ MonoBehaviour:
   martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialFoeCharging:
+  martialFoeDashing:
     m_PersistentCalls:
       m_Calls: []
   martialFoeEnteredRange:
@@ -1789,7 +1789,7 @@ MonoBehaviour:
   martialFoeAttacking:
     m_PersistentCalls:
       m_Calls: []
-  martialFoeCharging:
+  martialFoeDashing:
     m_PersistentCalls:
       m_Calls: []
   martialFoeEnteredRange:
@@ -1904,8 +1904,9 @@ GameObject:
   - component: {fileID: 2128541363}
   - component: {fileID: 2128541366}
   - component: {fileID: 2128541365}
+  - component: {fileID: 2128541367}
   m_Layer: 0
-  m_Name: ARENA
+  m_Name: REQUIEM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2014,3 +2015,16 @@ MonoBehaviour:
   blurbCamera: {fileID: 0}
   blurbScalar: 1
   blurbOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &2128541367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 488971b86d070214db3e43c62458569e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Score: 0

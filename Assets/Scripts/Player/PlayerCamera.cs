@@ -42,7 +42,7 @@ public class PlayerCamera : MonoBehaviour
     {
         gameObject.name = "PlayerCamera";
         Eyes = GetComponent<Camera>() ? GetComponent<Camera>() : gameObject.AddComponent<Camera>();
-        Eyes.cullingMask = ~(1 << Game.layerInvisible); 
+        Eyes.cullingMask = ~(1 << Requiem.layerInvisible); 
         Eyes.clearFlags = CameraClearFlags.Color;
         Eyes.backgroundColor = Color.black;
         Eyes.nearClipPlane = 0.01f;

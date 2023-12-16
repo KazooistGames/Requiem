@@ -22,7 +22,7 @@ public class SoulPearl : Wieldable
         physicsSphere.center = Vector3.zero;
         physicsSphere.radius = 0.025f;
         PhysicsBoxes.Add(physicsSphere);
-        spiritFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        spiritFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
         spiritFlame.transform.SetParent(transform);
         spiritFlame.transform.localPosition = Vector3.zero;
         spiritFlame.shapeModule.shapeType = ParticleSystemShapeType.Circle;

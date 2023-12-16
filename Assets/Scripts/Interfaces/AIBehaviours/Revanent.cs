@@ -30,9 +30,9 @@ public class Revanent : AIBehaviour
     protected override void Start()
     {
         base.Start();
-        mainHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
-        offHandFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
-        footFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        mainHandFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        offHandFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        footFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
         Intelligence = 1.0f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;

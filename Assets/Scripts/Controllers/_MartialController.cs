@@ -26,6 +26,8 @@ public class _MartialController : MonoBehaviour
     private static List<Weapon> KEYS_TO_DEQUEUE_THIS_FRAME = new List<Weapon>();
 
 
+    //TODO: OPTIMIZE!! cannot call events every frame any more
+
     void Start()
     {
         if (INSTANCE)

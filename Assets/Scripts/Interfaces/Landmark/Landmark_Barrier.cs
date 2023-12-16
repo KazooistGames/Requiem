@@ -18,7 +18,7 @@ public class Landmark_Barrier : Landmark
         base.AssignToTile(Tile);
 
         gameObject.name = "Barrier";
-        gameObject.layer = Game.layerObstacle;
+        gameObject.layer = Requiem.layerObstacle;
         if (BarrierModels.Count == 0)
         {
             BarrierModels = Resources.LoadAll<GameObject>("Prefabs/Barriers/").ToList();

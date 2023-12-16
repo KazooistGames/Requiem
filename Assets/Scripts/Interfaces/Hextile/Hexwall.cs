@@ -23,7 +23,7 @@ public class Hexwall : MonoBehaviour
 
     public void Initialize(int i)
     {
-        gameObject.layer = transform.parent.gameObject.layer == Game.layerTile ? Game.layerWall : transform.parent.gameObject.layer;
+        gameObject.layer = transform.parent.gameObject.layer == Requiem.layerTile ? Requiem.layerWall : transform.parent.gameObject.layer;
         filter = GetComponent<MeshFilter>() == null ? gameObject.AddComponent<MeshFilter>() : GetComponent<MeshFilter>();
         render = GetComponent<MeshRenderer>() == null ? gameObject.AddComponent<MeshRenderer>() : GetComponent<MeshRenderer>();
         Position = (Hextile.HexPosition)i;

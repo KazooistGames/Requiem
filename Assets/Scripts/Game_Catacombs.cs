@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Game_Catacombs : Game
+public class Game_Catacombs : Requiem
 {
     // Start is called before the first frame update
     protected override void Start()

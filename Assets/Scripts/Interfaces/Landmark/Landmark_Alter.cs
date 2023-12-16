@@ -39,7 +39,7 @@ public class Landmark_Alter : Landmark
     {
         base.AssignToTile(tile);
         gameObject.name = "Alter";
-        gameObject.layer = Game.layerTile;
+        gameObject.layer = Requiem.layerTile;
         GameObject lastStep = gameObject;
         for (int i = 0; i < StepCount; i++)
         {
@@ -52,7 +52,7 @@ public class Landmark_Alter : Landmark
             step.GetComponent<MeshCollider>().sharedMesh = Hextile.HexagonMesh;
             step.transform.localScale = new Vector3(ingress, 1.0f, ingress);
             step.transform.position = lastStep.transform.position + new Vector3(0.0f, StepHeight, 0.0f);
-            step.layer = Game.layerTile;
+            step.layer = Requiem.layerTile;
             lastStep = step;
             steps.Add(step);
         }
@@ -78,7 +78,7 @@ public class Landmark_Alter : Landmark
         Podium.GetComponent<MeshCollider>().sharedMesh = Hextile.HexagonMesh;
         Podium.transform.localScale = new Vector3(StepIngressRatio / podiumScalar, 1.0f, StepIngressRatio / podiumScalar);
         Podium.transform.position = TopStep.transform.position + new Vector3(0.0f, StepHeight * podiumScalar, 0.0f);
-        Podium.layer = Game.layerObstacle;
+        Podium.layer = Requiem.layerObstacle;
     }
 
     private IEnumerator RitualCycler()
@@ -88,7 +88,7 @@ public class Landmark_Alter : Landmark
         float pentagramHeight = (Hextile.Thickness / 2) + (StepCount + 1) * StepHeight;
         Vector3 flameScale = new Vector3(0.05f, 0.1f, 0.05f);
         _Flames ritualFlame;
-        ritualFlame = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        ritualFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
         ritualFlame.transform.SetParent(Tile.gameObject.transform, false);
         ritualFlame.shapeModule.shapeType = ParticleSystemShapeType.Donut;
         ritualFlame.shapeModule.scale = flameScale;

@@ -16,7 +16,7 @@ public class Spear : Weapon
         gameObject.name = "Spear";
         transform.localScale = new Vector3(1f, 1.25f, 1f);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Spear"];
+        Filter.mesh = Requiem.weaponMeshes["Spear"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Spear"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Spear"));
         wHitBox.center = new Vector3(0, 0.2f, 0);

@@ -29,7 +29,7 @@ public class PlayerHUD : MonoBehaviour
         SidePopup.SetActive(false);
         Message.SetActive(false);
         //MainMenuButton.onClick.AddListener(Requiem.Instance.gotoTitle);        
-        MainMenuButton.onClick.AddListener(Game.INSTANCE.QuitGame);
+        MainMenuButton.onClick.AddListener(Requiem.INSTANCE.QuitGame);
         statBarTransforms = StatBar.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms = TempoBar.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms[3].sizeDelta = new Vector2(10, 25);
@@ -44,18 +44,18 @@ public class PlayerHUD : MonoBehaviour
         Text[] metrics = Info.GetComponentsInChildren<Text>();
         metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
         metrics[1].text = "Bones:  " + Player.INSTANCE.BonesCollected.ToString();
-        metrics[2].text = "Time:   " + Game.INSTANCE.GameClock.ToString("0.00");
+        metrics[2].text = "Time:   " + Requiem.INSTANCE.GameClock.ToString("0.00");
         if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
             statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
             statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
             statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Entity.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
+            transform.GetChild(0).GetComponent<Text>().text = Scoreboard.INSTANCE.Score.ToString();
             if (Player.INSTANCE.HostWeapon)
             {
                 updateTempoBar();
-            }
-        
+            }   
         }
         else
         {
@@ -80,7 +80,7 @@ public class PlayerHUD : MonoBehaviour
                 i++;
             }
         }
-        if (Game.INSTANCE.Paused)
+        if (Requiem.INSTANCE.Paused)
         {
             PauseMenu.SetActive(true);
         }

@@ -64,7 +64,7 @@ public class Wieldable : MonoBehaviour
         Renderer = GetComponent<MeshRenderer>() ? GetComponent<MeshRenderer>() : gameObject.AddComponent<MeshRenderer>();
         Body = GetComponent<Rigidbody>() ? GetComponent<Rigidbody>() : gameObject.AddComponent<Rigidbody>();
         Body.mass = equipType == EquipType.Burdensome ? 5 : 0.5f;
-        gameObject.layer = Game.layerItem;
+        gameObject.layer = Requiem.layerItem;
     }
 
     protected virtual void Start()

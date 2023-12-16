@@ -16,7 +16,7 @@ public class Landmark_Pillar : Landmark
         base.AssignToTile(Tile);
         transform.localPosition = Vector3.zero + Vector3.up * Hextile.Thickness / 2f;
         gameObject.name = "Pillar";
-        gameObject.layer = Game.layerObstacle;
+        gameObject.layer = Requiem.layerObstacle;
         if (PillarModels.Count == 0)
         {
             PillarModels = Resources.LoadAll<GameObject>("Prefabs/Pillars/").ToList();

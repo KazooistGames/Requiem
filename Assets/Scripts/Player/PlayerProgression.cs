@@ -60,7 +60,7 @@ public class PlayerProgression : MonoBehaviour
     {
         if (AwaitingSelection)
         {
-            Game.INSTANCE.Paused = true;
+            Requiem.INSTANCE.Paused = true;
         }
         Player.INSTANCE.HUD.CenterPopup.SetActive(AwaitingSelection);
     }
@@ -120,7 +120,7 @@ public class PlayerProgression : MonoBehaviour
     private void getPowerup()
     {
         AwaitingSelection = false;
-        Game.INSTANCE.Paused = false;
+        Requiem.INSTANCE.Paused = false;
     }
 
 }

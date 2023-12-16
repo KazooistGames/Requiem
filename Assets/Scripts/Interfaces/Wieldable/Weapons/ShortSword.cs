@@ -15,7 +15,7 @@ public class Shortsword : Weapon
         gameObject.name = "ShortSword";
         transform.localScale = new Vector3(1, 1.5f, 1);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Sword"];
+        Filter.mesh = Requiem.weaponMeshes["Sword"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Sword"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Sword"));
         wHitBox.center = new Vector3(0, 0.3f, 0);

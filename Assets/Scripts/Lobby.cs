@@ -50,7 +50,7 @@ public class Lobby : MonoBehaviour
         new GameObject().AddComponent<Player>();
         yield return null;
         yield return null;
-        Player.INSTANCE.HostEntity.transform.position = Game.RAND_POS_IN_TILE(Tile);
+        Player.INSTANCE.HostEntity.transform.position = Requiem.RAND_POS_IN_TILE(Tile);
         //StartingWeapon = (Weapon)new GameObject().AddComponent(Weapon.StandardTypes[UnityEngine.Random.Range(0, Weapon.StandardTypes.Count)]);
         StartingWeapon = new GameObject().AddComponent<Spear>();
         StartingWeapon.transform.position = Tile.transform.position + Vector3.up;

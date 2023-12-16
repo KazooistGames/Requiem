@@ -146,7 +146,7 @@ public abstract class Weapon : Wieldable
                 blade = box;
             }
         }
-        flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        flames = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         flames.gameObject.SetActive(false);
@@ -304,13 +304,13 @@ public abstract class Weapon : Wieldable
                     StartCoroutine(ImpaleRoutine(collision));
                 }
             }
-            else if (collision.gameObject.layer == Game.layerObstacle || collision.gameObject.layer == Game.layerTile || collision.gameObject.layer == Game.layerWall || collision.gameObject.layer == Game.layerItem)
+            else if (collision.gameObject.layer == Requiem.layerObstacle || collision.gameObject.layer == Requiem.layerTile || collision.gameObject.layer == Requiem.layerWall || collision.gameObject.layer == Requiem.layerItem)
             {
                 playTink();
                 StartCoroutine(ImpaleRoutine(collision));
             }
         }
-        else if (collision.collider.gameObject.layer == Game.layerTile && contact.thisCollider == blade)
+        else if (collision.collider.gameObject.layer == Requiem.layerTile && contact.thisCollider == blade)
         {
             playTink();
         }                    
@@ -328,7 +328,7 @@ public abstract class Weapon : Wieldable
             {
                 Entity foe = other.gameObject.GetComponent<Entity>();
                 Weapon foeWeapon = other.gameObject.GetComponent<Weapon>();
-                bool obstacle = (other.gameObject.layer == Game.layerObstacle || other.gameObject.layer == Game.layerWall);
+                bool obstacle = (other.gameObject.layer == Requiem.layerObstacle || other.gameObject.layer == Requiem.layerWall);
                 if (foe || foeWeapon || obstacle)
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
@@ -588,7 +588,7 @@ public abstract class Weapon : Wieldable
             foe.modSpeed.Remove(key);
             foe.BleedingWounds.Remove(key);
         }
-        transform.SetParent(Game.INSTANCE.transform.parent, true);
+        transform.SetParent(Requiem.INSTANCE.transform.parent, true);
         togglePhysicsBox(true);
         Body.isKinematic = false;
         enabled = true;
@@ -647,11 +647,11 @@ public abstract class Weapon : Wieldable
         Vector3 rayStart = origin.transform.position;
         rayStart.y = target.transform.position.y + 0.3f * target.scaleActual;
         RaycastHit hit;
-        if (Physics.Raycast(rayStart, disposition.normalized, out hit, disposition.magnitude, (1 << Game.layerWall) + (1 << Game.layerObstacle) + (1 << Game.layerItem), QueryTriggerInteraction.Collide))
+        if (Physics.Raycast(rayStart, disposition.normalized, out hit, disposition.magnitude, (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerItem), QueryTriggerInteraction.Collide))
         {
             Wieldable item = hit.collider.GetComponent<Wieldable>();
             bool opposingItem = item ? item.Allegiance != origin.Allegiance : false;
-            bool obstacle = !hit.collider.isTrigger && hit.collider.gameObject && hit.collider.gameObject.layer != Game.layerItem;
+            bool obstacle = !hit.collider.isTrigger && hit.collider.gameObject && hit.collider.gameObject.layer != Requiem.layerItem;
             if (opposingItem || obstacle)
             {
                 return hit.collider.gameObject;
@@ -836,7 +836,7 @@ public abstract class Weapon : Wieldable
         if (playClashSoundONS)
         {
             playClashSoundONS = false;
-            _SoundService.PlayAmbientSound(clangClip, transform.position, clangPitch * pitchScalar, clangVolume, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+            _SoundService.PlayAmbientSound(clangClip, transform.position, clangPitch * pitchScalar, clangVolume, onSoundSpawn: sound => sound.layer = Requiem.layerEntity);
         }
         
     }
@@ -849,7 +849,7 @@ public abstract class Weapon : Wieldable
 
     private void playSlap(Vector3 position)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.25f, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.25f, onSoundSpawn: sound => sound.layer = Requiem.layerEntity);
     }
 
     private void playTink()

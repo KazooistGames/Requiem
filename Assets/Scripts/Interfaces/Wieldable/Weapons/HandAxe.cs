@@ -15,7 +15,7 @@ public class Handaxe : Weapon
         gameObject.name = "HandAxe";
         transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Axe"];
+        Filter.mesh = Requiem.weaponMeshes["Axe"];
         wHitBox.center = new Vector3(0.0f, 0.15f, 0.05f);
         hitRadius = 0.1f;
         defendRadius = 0.3f;

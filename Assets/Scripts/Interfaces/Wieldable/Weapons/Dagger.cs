@@ -16,7 +16,7 @@ public class Dagger : Weapon
         gameObject.name = "Dagger";
         transform.localScale = new Vector3(1f, 0.70f, 0.6f);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Sword"];
+        Filter.mesh = Requiem.weaponMeshes["Sword"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Sword"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Sword"));
         wHitBox.center = new Vector3(0, 0.3f, 0);

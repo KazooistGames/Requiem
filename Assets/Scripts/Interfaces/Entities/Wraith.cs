@@ -50,7 +50,7 @@ public class Wraith : Entity
     public override void Damage(float damage)
     {
         base.Damage(damage);
-        _SoundService.PlayAmbientSound(Game.boneSounds[UnityEngine.Random.Range(0, Game.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
     }
 
     private void createSkeleton()

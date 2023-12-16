@@ -6,9 +6,9 @@ using System.Linq;
 using System.Collections;
 using System.Threading;
 
-public class Game : MonoBehaviour
+public class Requiem: MonoBehaviour
 {
-    public static Game INSTANCE { get; private set; }
+    public static Requiem INSTANCE { get; private set; }
 
     public List<Hextile> AllTilesInPlay = new List<Hextile>();
 
@@ -17,6 +17,7 @@ public class Game : MonoBehaviour
     public bool Paused = false;
     public float TimeScale;
     public static int KillCount = 0;
+    public static int Score = 0;
 
     public static GameObject SpiritFlameTemplate;
     public static Dictionary<string, Mesh> weaponMeshes = new Dictionary<string, Mesh>();
@@ -38,7 +39,7 @@ public class Game : MonoBehaviour
     {
         UnityEngine.Random.InitState((int)DateTime.UtcNow.Ticks);
         INSTANCE = this;
-        gameObject.name = "GAME";
+        gameObject.name = "REQUIEM";
         gameObject.layer = layerScript;
         Paused = false;
         KillCount = 0;

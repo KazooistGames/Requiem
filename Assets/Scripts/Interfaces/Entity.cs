@@ -185,7 +185,7 @@ public class Entity : MonoBehaviour
         }
         if (!SOUND_OF_DASH)
         {
-            SOUND_OF_DASH = Game.getSound("Audio/weapons/deepSwing");
+            SOUND_OF_DASH = Requiem.getSound("Audio/weapons/deepSwing");
         }
     }
 
@@ -198,7 +198,7 @@ public class Entity : MonoBehaviour
         personalBox.isTrigger = true;
         personalBox.radius = Mullet.BellCurve(0.7f, 0.1f, 0.5f, 1.0f);
         personalBox.height = heightActual * 1.5f;
-        gameObject.layer = Game.layerEntity;
+        gameObject.layer = Requiem.layerEntity;
         transform.localScale = Vector3.one * scaleActual;
         transform.localEulerAngles = new Vector3(0, 0, 0);
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -218,7 +218,7 @@ public class Entity : MonoBehaviour
         indicator.orthographicSize = berthActual * scaleActual;
         indicator.transform.parent = transform;
         indicator.enabled = false;
-        flames = Instantiate(Game.SpiritFlameTemplate).GetComponent<_Flames>();
+        flames = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         flames.gameObject.SetActive(false);
@@ -350,7 +350,7 @@ public class Entity : MonoBehaviour
         RaycastHit hoverHit;
         Vector3 hoverRayInit = transform.position;
         hoverRayInit.y = Hextile.Thickness;
-        if (Physics.Raycast(hoverRayInit, Vector3.down, out hoverHit, Hextile.Thickness, (1 << Game.layerTile), QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(hoverRayInit, Vector3.down, out hoverHit, Hextile.Thickness, (1 << Requiem.layerTile), QueryTriggerInteraction.Ignore))
         {
             floorHeight = hoverHit.point.y + hoverActual * scaleActual;
             Location = hoverHit.collider.gameObject;
@@ -406,7 +406,7 @@ public class Entity : MonoBehaviour
             {
                 resolveDashHit(collision);
             }
-            else if (collision.collider.gameObject.layer == Game.layerWall || collision.collider.gameObject.layer == Game.layerObstacle || foe)
+            else if (collision.collider.gameObject.layer == Requiem.layerWall || collision.collider.gameObject.layer == Requiem.layerObstacle || foe)
             {
                 resolveCrash(collision);
             }
@@ -464,7 +464,7 @@ public class Entity : MonoBehaviour
             anim.Rebind();
             bone.transform.localScale = newScale;
             bone.transform.position = newPosition;
-            bone.layer = Game.layerItem;
+            bone.layer = Requiem.layerItem;
 
             bone.GetComponent<Rigidbody>().velocity = entity.body.velocity.normalized * Mathf.Pow(entity.body.velocity.magnitude, 0.75f);
             if (entity.Shoved)
@@ -488,10 +488,6 @@ public class Entity : MonoBehaviour
 
     public void Stagger(float duration)
     {
-        if (Staggered)
-        {
-            Debug.Log("doubleStaggered!");
-        }
         Staggered = true;
         float totalDuration = STAGGER_BASE_TIME + duration;
         if (totalDuration > (staggerPeriod - staggerTimer))
@@ -546,7 +542,7 @@ public class Entity : MonoBehaviour
     {
         if (!requiemPlayer)
         {
-            Game.KillCount++;
+            Requiem.KillCount++;
         }
         if (leftStorage)
         {
@@ -701,11 +697,11 @@ public class Entity : MonoBehaviour
                 {
                     foe.Vitality = 0;
                 }
-                float vitalityDamage = foe.applyDamageToPoiseThenVitality(damage);
-                if (foe.Posture == PostureStrength.Weak)
-                {
-                    foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
-                }
+                foe.applyDamageToPoiseThenVitality(damage);
+                //if (foe.Posture == PostureStrength.Weak)
+                //{
+                //    foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
+                //}
                 EventLandedDashHit.Invoke(foe, damage);
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
             }
@@ -963,7 +959,7 @@ public class Entity : MonoBehaviour
 
     private GameObject playPunch(float pitch)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Game.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Requiem.layerEntity);
         sound.GetComponent<AudioSource>().time = 0.075f;
         sound.transform.SetParent(transform);
         return sound;
@@ -972,7 +968,7 @@ public class Entity : MonoBehaviour
     private GameObject playWhoosh(float pitch)
     {
         GameObject sound = _SoundService.PlayAmbientSound(SOUND_OF_DASH, transform.position, pitch, 0.25f + DashPower);
-        sound.layer = Game.layerItem;
+        sound.layer = Requiem.layerItem;
         sound.transform.SetParent(transform);
         sound.GetComponent<AudioSource>().time = 0.05f;
         return sound;

@@ -15,7 +15,7 @@ public class Greatsword : Weapon
         gameObject.name = "GreatSword";
         transform.localScale = new Vector3(1, 2.5f, 2);
         Anim.updateMode = AnimatorUpdateMode.Normal;
-        Filter.mesh = Game.weaponMeshes["Sword"];
+        Filter.mesh = Requiem.weaponMeshes["Sword"];
         Renderer.sharedMaterial.SetTexture("_MainTex", Resources.Load<Texture>("Textures/Sword"));
         Renderer.sharedMaterial.SetTexture("_EmissionMap", Resources.Load<Texture>("Textures/Sword"));
         wHitBox.center = new Vector3(0, 0.3f, 0);
