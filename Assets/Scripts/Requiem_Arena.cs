@@ -31,14 +31,7 @@ public class Requiem_Arena : Requiem
     private Landmark_Well well;
     private Idol idol;
 
-    public enum GameState
-    {
-        Liminal,
-        Wave,
-        Boss,
-        Lobby,
-    }
-    public GameState StateOfGame = GameState.Liminal;
+    
 
     private Spawner PatrolSpawner;
     private Spawner MobSpawner;
@@ -75,83 +68,19 @@ public class Requiem_Arena : Requiem
         StartingGate = new GameObject().AddComponent<Landmark_Gate>();
         StartingGate.AssignToTile(crypt1[0][0].Edge(startingDirection));
         StartingGate.SetPositionOnTile(startingDirection);
-        //yield return Hextile.DrawLine(LengthOfCorridors, centerTile, startingDirection, corridor1); //corridor1
         yield return Hextile.DrawCircle(1, crypt1[0][0].Edge(startingDirection), startingDirection, crypt2);
         StartingChamber = crypt2[0][0];
         well = new GameObject().AddComponent<Landmark_Well>();
         well.AssignToTile(StartingChamber);
-        //yield return Hextile.DrawLine(LengthOfCorridors, centerTile, offsetBy3, corridor2); //corridor2
-        //yield return Hextile.DrawCircle(RadiusOfCrypts, corridor1.Last(x => x), randomDirection, crypt2); //crypt2
-        //yield return Hextile.DrawCircle(RadiusOfCrypts, corridor2.Last(x => x), offsetBy3, crypt3); //crypt3
-        //Hextile.HexPosition connectCrypt2and3 = Hextile.VectorToHexPosition(crypt2[0][0].transform.position - crypt3[0][0].transform.position);
-        //yield return Hextile.DrawLine(LengthOfCorridors, crypt3[0][0], connectCrypt2and3, corridor3); //corridor3
 
-        //crypt chambers
         List<Hextile> cryptChamberKeys = new List<Hextile>();
         chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != startingDirection && x.Value != offsetBy3).ToList());
-        //chamberCandidates.AddRange(crypt2[0][0].AdjacentTiles.Where(x => x.Value != Hextile.RotateHexPosition(randomDirection, 3) && x.Value != Hextile.RotateHexPosition(connectCrypt2and3, 3)).ToList());
-        //chamberCandidates.AddRange(crypt3[0][0].AdjacentTiles.Where(x => x.Value != connectCrypt2and3 && x.Value != Hextile.RotateHexPosition(offsetBy3, 3)).ToList());
-        //while (chambers.Count < CountOfChambers && chamberCandidates.Count > 0)
-        //{
-        //    int randomIndex = UnityEngine.Random.Range(0, chamberCandidates.Count);
-        //    Hextile startingTile = chamberCandidates[randomIndex].Key;
-        //    Hextile.HexPosition direction = chamberCandidates[randomIndex].Value;
-        //    Hextile doorTile = startingTile.Edge(direction);
-        //    yield return Hextile.DrawCircle(1, startingTile, direction);
-        //    Hextile newChamber = startingTile.Edge(direction).Extend(direction);
-        //    Landmark_Gate newGate = new GameObject().AddComponent<Landmark_Gate>();
-        //    newGate.AssignToTile(doorTile);
-        //    newGate.SetPositionOnTile(direction);
-        //    chambers.Add(newChamber);
-        //    chamberCandidates.RemoveAt(randomIndex);
-        //    set up new quest class
-        //    newGate.gameObject.AddComponent<Quest_Gate>();
-        //}
 
-        ////corridor coves
-        //List<Hextile> corridorCoveKeys = new List<Hextile>();
-        //corridorCoveKeys.AddRange(corridor1.Where(x => x.AdjacentTiles.Count(y=>y.Key.AdjacentTiles.Count > 2) == 0).ToList());
-        ////corridorCoveKeys.Add(corridor2.First(x => x.AdjacentTiles.Count == 2));
-        ////corridorCoveKeys.Add(corridor3.First(x => x.AdjacentTiles.Count == 2));
-        //foreach (Hextile tile in corridorCoveKeys)
-        //{
-        //    for (int i = 1; i <= 6; i++)
-        //    {
-        //        Hextile.HexPosition position = (Hextile.HexPosition)i;
-        //        if (!tile.AdjacentTiles.ContainsValue(position))
-        //        {
-        //            coveCandidates.Add( new KeyValuePair<Hextile, Hextile.HexPosition>(tile, position));
-        //        }
-        //    }
-        //}
-        //while (coves.Count < CountOfCoves && coveCandidates.Count > 0)
-        //{
-        //    int randomIndex = UnityEngine.Random.Range(0, coveCandidates.Count);
-        //    Hextile startingTile = coveCandidates[randomIndex].Key;
-        //    Hextile.HexPosition direction = coveCandidates[randomIndex].Value;
-        //    Hextile newCove = startingTile.Edge(direction).Extend(direction);
-        //    if (!coves.Contains(newCove))
-        //    {
-        //        coves.Add(newCove);
-        //    }
-        //    coveCandidates.RemoveAt(randomIndex);
-        //}
 
         AllTilesInPlay.AddRange(crypt1.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        //AllTilesInPlay.AddRange(crypt2.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        //AllTilesInPlay.AddRange(crypt3.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        //AllTilesInPlay.AddRange(corridor1);
-        //AllTilesInPlay.AddRange(corridor2);
-        //AllTilesInPlay.AddRange(corridor3);
         AllTilesInPlay.AddRange(chambers);
 
-        //yield return corridorLandmarks(corridor1);
-        //yield return corridorLandmarks(corridor2);
-        //yield return corridorLandmarks(corridor3);
-
         yield return cryptLandmarks(crypt1);
-        //yield return cryptLandmarks(crypt2);
-        //yield return cryptLandmarks(crypt3);
 
         yield return new WaitForSeconds(0.5f);
         new GameObject().AddComponent<Player>();
@@ -273,51 +202,59 @@ public class Requiem_Arena : Requiem
     }
 
 
-    private Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
+    public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
     {
         { typeof(Skelly), 100 },
         { typeof(Nephalim), 200 },
         { typeof(Skully), 25 },
     };
-    private Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
+    public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
         { typeof(Biter), 2 },
         { typeof(Bully), 4 },
     };
-    private Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
+    public Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
     {
         {typeof(Goon),typeof(Skelly) },
         {typeof(Biter),typeof(Skully) },
         {typeof(Bully),typeof(Nephalim) }
     };
-
-    private List<Type> UnlockedEntities = new List<Type>();
-    private List<Type> UnlockedAIs = new List<Type>();
-
-    private List<GameObject> spawnMobs()
+    public Dictionary<int, int> WaveStrengths = new Dictionary<int, int>()
     {
-        int totalStrengthOfWave;
+        {1, 500 },
+        {2, 800 },
+        {3, 1200 },
+    };
+
+    public List<Type> UnlockedEntities = new List<Type>();
+    public List<Type> UnlockedAIs = new List<Type>();
+
+    public int TotalStrengthOfWave;
+    public List<Type> chosenAIsForWave = new List<Type>();
+    public List<GameObject> WaveMobs = new List<GameObject>();
+    private List<GameObject> spawnMobs()
+    {      
         switch(Wave % 3)
         {
             case 1:
-                totalStrengthOfWave = 500;
+                TotalStrengthOfWave = 500;
                 break;
             case 2:
-                totalStrengthOfWave = 800;
+                TotalStrengthOfWave = 800;
                 break;
             case 0:
-                totalStrengthOfWave = 1200;
+                TotalStrengthOfWave = 1200;
                 break;
             default:
-                totalStrengthOfWave = 0;
+                TotalStrengthOfWave = 0;
                 break;  
         }
 
         List<Type> viableAIs = new List<Type>();
         viableAIs = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
 
-        List<Type> chosenAIsForWave = new List<Type>();
+        chosenAIsForWave = new List<Type>();
         while(chosenAIsForWave.Count < Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave))))
         {
             int randomIndexFromViableAIs = UnityEngine.Random.Range(0, viableAIs.Count);
@@ -328,24 +265,23 @@ public class Requiem_Arena : Requiem
         //sort by max HP
         chosenAIsForWave = chosenAIsForWave.OrderByDescending(x => EntityStrengths[AIEntityPairings[x]]).ToList();
 
-
         //spawn 1 of highest
         //spawn other types in order of highest to lowest HP to match highest HP enemy
         //loop back through until at population
         int spawnIndex = 0;
         //int strengthSpawnedSoFar = 0;
-        
-        List<GameObject> mobs = new List<GameObject>();
-        while (totalStrengthOfWave > 0)
+
+        WaveMobs = new List<GameObject>();
+        while (TotalStrengthOfWave > 0)
         {
-            int strengthOfSpawnChunk = Mathf.Min(totalStrengthOfWave, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
+            int strengthOfSpawnChunk = Mathf.Min(TotalStrengthOfWave, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
             while (strengthOfSpawnChunk > 0)
             {
                 Type spawnedAI = chosenAIsForWave[spawnIndex];
                 Type spawnedEntity = AIEntityPairings[spawnedAI];
-                totalStrengthOfWave -= EntityStrengths[spawnedEntity];
+                TotalStrengthOfWave -= EntityStrengths[spawnedEntity];
                 strengthOfSpawnChunk -= EntityStrengths[spawnedEntity];
-                mobs.Add(SPAWN(spawnedEntity, spawnedAI, alter.transform.position));
+                WaveMobs.Add(SPAWN(spawnedEntity, spawnedAI, alter.transform.position));
             }      
             spawnIndex++;
             if(spawnIndex >= chosenAIsForWave.Count)
@@ -354,7 +290,7 @@ public class Requiem_Arena : Requiem
             }
         }
 
-        return mobs;
+        return WaveMobs;
     }
 
 

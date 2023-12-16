@@ -92,11 +92,11 @@ public class Goon : AIBehaviour
         {
             return;
         }
-        else if (mainWep.Action == Weapon.ActionAnim.QuickCoil && checkMyWeaponInRange())
+        else if (mainWep.Action == Weapon.ActionAnim.QuickCoil && checkMyWeaponInRange() && Random.value >= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());            
         }
-        else
+        else if(Random.value >= Aggression || mainWep.Action == Weapon.ActionAnim.Idle)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());

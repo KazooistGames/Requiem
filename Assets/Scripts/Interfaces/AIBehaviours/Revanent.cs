@@ -45,6 +45,7 @@ public class Revanent : AIBehaviour
         itemManagementPreferredType = Entity.WieldMode.OneHanders;
         sensorySightRangeScalar = 1.25f;
         entity.FinalDashEnabled = true;
+        RestingState = AIState.seek;
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
     }
 

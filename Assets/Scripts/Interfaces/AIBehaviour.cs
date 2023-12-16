@@ -58,6 +58,8 @@ public class AIBehaviour : MonoBehaviour
         wallCrawl,
     }
 
+    public AIState RestingState = AIState.passive;
+
     /********* unity funcs *********/
 
     protected virtual void Awake()
@@ -200,7 +202,7 @@ public class AIBehaviour : MonoBehaviour
                 }
                 else if (stateRunTimer > 5)
                 {
-                    StateTransition(AIState.passive);
+                    StateTransition(RestingState);
                 }
                 break;
         }
@@ -278,7 +280,8 @@ public class AIBehaviour : MonoBehaviour
         }
         else
         {
-            tangoInnerRange = tangoOuterRange = 0;
+            tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
+            tangoOuterRange = sensorySightRangeScalar * sensoryBaseRange;
         }
     }
     protected bool checkMyWeaponInRange()
@@ -1205,7 +1208,7 @@ public class AIBehaviour : MonoBehaviour
                         wallCrawlAvoidFoe = (mainWep || offWep);
                         behaviourParams[BehaviourType.tracking] = (true, 1);
                         behaviourParams[BehaviourType.pursue] = (trackingEyesOnTarget && disposition.magnitude > tangoOuterRange && !tangoDeadbanded, 1);
-                        behaviourParams[BehaviourType.tango] = (entity.MainHand && trackingEyesOnTarget, 1);
+                        behaviourParams[BehaviourType.tango] = (trackingEyesOnTarget, 1);
                         behaviourParams[BehaviourType.martial] = (entity.MainHand && trackingEyesOnTarget, Intelligence);
                         behaviourParams[BehaviourType.grab] = (!entity.MainHand && trackingEyesOnTarget, Intelligence);
                         SetTangoParameters();

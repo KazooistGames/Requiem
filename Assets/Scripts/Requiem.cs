@@ -35,6 +35,15 @@ public class Requiem: MonoBehaviour
     public static int layerWall = 6;
     public static int layerInvisible = 3;
 
+    public enum GameState
+    {
+        Liminal,
+        Wave,
+        Boss,
+        Lobby,
+    }
+    public GameState StateOfGame = GameState.Liminal;
+
     void Awake()
     {
         UnityEngine.Random.InitState((int)DateTime.UtcNow.Ticks);

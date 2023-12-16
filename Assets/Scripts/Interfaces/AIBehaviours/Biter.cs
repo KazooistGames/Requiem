@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Biter : AIBehaviour
 {
+
+    private bool charged = false;
     protected override void Awake()
     {
         base.Awake();
@@ -14,11 +16,15 @@ public class Biter : AIBehaviour
     {
         base.Start();
         Intelligence = 0.5f;
+        RestingState = AIState.seek;
         tangoStrafeEnabled = true;
+        tangoStrafePauseFreq = 0;
+        tangoDeadbandingEnabled = false;
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
-        meanderPauseFrequency = 0.75f;
+        meanderPauseFrequency = 0.5f;
+        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.3f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         grabEnabled = false;
@@ -31,8 +37,10 @@ public class Biter : AIBehaviour
         if (entity.Foe)
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
-            bool charged = dashingCooldownTimer >= 3;
-            pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * (charged ? 0.3f : 0.5f);
+            charged = dashingCooldownTimer >= 3;
+            if (charged)
+            {
+            }
             bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
 
             if (charged && inPosition && !entity.Shoved)
@@ -40,6 +48,21 @@ public class Biter : AIBehaviour
                 dashingDesiredDirection = disposition;
             }
 
+        }
+    }
+
+    protected override void SetTangoParameters()
+    {
+        if (charged)
+        {
+            tangoStrafeEnabled = false;
+            tangoInnerRange = tangoOuterRange = 0;
+        }
+        else
+        {
+            tangoStrafeEnabled = true;
+            tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
+            tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         }
     }
 

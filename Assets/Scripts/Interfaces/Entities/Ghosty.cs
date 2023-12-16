@@ -47,6 +47,7 @@ public class Ghosty : Entity
             Die();
         }
         Aggressive = Foe || Poise != Strength;
+        Allegiance = Player.INSTANCE.HostEntity.Allegiance;
     }
 
     protected override void FixedUpdate()

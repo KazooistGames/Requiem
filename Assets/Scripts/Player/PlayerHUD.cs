@@ -35,7 +35,7 @@ public class PlayerHUD : MonoBehaviour
         tempoBarTransforms[3].sizeDelta = new Vector2(10, 25);
         tempoBarTransforms[3].anchoredPosition = new Vector2(0, -11);        
         tempoBarTransforms[1].sizeDelta = new Vector2(40, 25);
-        tempoBarTransforms[1].anchoredPosition = new Vector2(0, -11);
+        tempoBarTransforms[1].anchoredPosition = new Vector2(4, -11);
     }
     void Update()
     {
