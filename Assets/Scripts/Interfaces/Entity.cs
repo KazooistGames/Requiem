@@ -106,7 +106,7 @@ public class Entity : MonoBehaviour
     protected bool CrashEnvironmentONS = true;
 
     public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
-    public static float Min_Velocity_Of_Dash { get; private set; } = 2.5f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;

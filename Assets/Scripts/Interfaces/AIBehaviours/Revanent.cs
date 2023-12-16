@@ -9,18 +9,18 @@ public class Revanent : AIBehaviour
     private _Flames offHandFlame;
     private _Flames footFlame;
 
-    private float Aggression = 0.5f;
+    private float Aggression = 0.75f;
 
     private float patternTimer = 0.0f;
     private float patternPeriod = 0.0f;
 
     public enum Pattern
     {
-        Seething,
+        Dueling,
         Overpowering,
         //Dueling
     }
-    public Pattern CurrentPattern = Pattern.Seething;
+    public Pattern CurrentPattern = Pattern.Dueling;
 
     protected override void Awake()
     {
@@ -46,15 +46,11 @@ public class Revanent : AIBehaviour
         sensorySightRangeScalar = 1.25f;
         entity.FinalDashEnabled = true;
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
-        //new GameObject().AddComponent<Weapon_HandAxe>().PickupItem(entity);
-        //new GameObject().AddComponent<Weapon_HandAxe>().PickupItem(entity);
     }
 
     protected override void Update()
     {
         base.Update();
-        
-
         if (!mainWep)
         {
 
@@ -63,25 +59,15 @@ public class Revanent : AIBehaviour
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
-        else if ((patternTimer += Time.deltaTime) >= patternPeriod)
-        {
-            patternTimer -= patternPeriod;
-            patternPeriod = Mathf.Lerp(5, 15, Random.value);
-            switch (CurrentPattern)
-            {
-                case Pattern.Overpowering:
-                    CurrentPattern = Pattern.Seething;
-                    break;
-                case Pattern.Seething:
-                    CurrentPattern = Pattern.Overpowering;
-                    break;
-            }
-        }
         else
         {
             switch (CurrentPattern)
             {
-                case Pattern.Seething:
+                case Pattern.Dueling:
+                    if (entity.Posture == Entity.PostureStrength.Strong)
+                    {
+                        CurrentPattern = Pattern.Overpowering;
+                    }
                     if (mainWep.Action == Weapon.ActionAnim.Recovering && dashingCooldownTimer >= 1)
                     {
                         dashingChargePeriod = 0f;
@@ -89,14 +75,14 @@ public class Revanent : AIBehaviour
                     }
                     break;
                 case Pattern.Overpowering:
-                    if (mainWep.Action == Weapon.ActionAnim.StrongCoil && dashingCooldownTimer >= 3)
-                    {
-                        dashingChargePeriod = 1f;
-                        dashingDesiredDirection = entity.Foe.transform.position - transform.position;
-                    }
-                    else if (mainWep.Action == Weapon.ActionAnim.Guarding && dashingCooldownTimer >= 0.5f)
+                    if (mainWep.Action == Weapon.ActionAnim.StrongCoil && dashingCooldownTimer >= 1f)
                     {
                         dashingChargePeriod = 0.25f;
+                        dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+                    }
+                    else if (mainWep.Action == Weapon.ActionAnim.Guarding && dashingCooldownTimer >= 3f)
+                    {
+                        dashingChargePeriod = 1f;
                         dashingDesiredDirection = entity.Foe.transform.position - transform.position;
                     }
                     break;
@@ -146,7 +132,7 @@ public class Revanent : AIBehaviour
         {
             switch (CurrentPattern)
             {
-                case Pattern.Seething:
+                case Pattern.Dueling:
                     _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, requisite: checkMyWeaponInRange);
                     _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
                     _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil);
@@ -160,9 +146,8 @@ public class Revanent : AIBehaviour
                     }
                     else
                     {
-                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 1 + Random.value);               
+                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 1 + Random.value); 
                     }
-
                     break;
             }
         }
@@ -181,13 +166,21 @@ public class Revanent : AIBehaviour
 
     protected override void reactToFoeChange()
     {
-        if (entity.Foe)
+         _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
+    }
+
+    protected override void reactToIncomingDash()
+    {
+        if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
+
         }
-        else
+        if (dashingCooldownTimer > 0.5f)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
+            dashingChargePeriod = 0;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 120;
+            dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
     }
 
@@ -195,12 +188,8 @@ public class Revanent : AIBehaviour
     {
         switch (CurrentPattern)
         {
-            case Pattern.Seething:
-                if (_MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding)
-                {
-                    return;
-                }
-                else if (Random.value <= Aggression && dashingCooldownTimer > 0.5f)
+            case Pattern.Dueling:
+                if (Random.value <= Aggression && dashingCooldownTimer > 0.5f && mainWep.Action != Weapon.ActionAnim.Guarding)
                 {
                     dashingChargePeriod = 0;
                     Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -213,6 +202,7 @@ public class Revanent : AIBehaviour
                 }
                 break;
             case Pattern.Overpowering:
+                CurrentPattern = Pattern.Dueling;
                 break;
         }
         

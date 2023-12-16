@@ -304,7 +304,7 @@ public abstract class Weapon : Wieldable
                     StartCoroutine(ImpaleRoutine(collision));
                 }
             }
-            else if (collision.gameObject.layer == Game.layerObstacle || collision.gameObject.layer == Game.layerTile || collision.collider.gameObject.layer == Game.layerWall || collision.collider.gameObject.layer == Game.layerItem)
+            else if (collision.gameObject.layer == Game.layerObstacle || collision.gameObject.layer == Game.layerTile || collision.gameObject.layer == Game.layerWall || collision.gameObject.layer == Game.layerItem)
             {
                 playTink();
                 StartCoroutine(ImpaleRoutine(collision));

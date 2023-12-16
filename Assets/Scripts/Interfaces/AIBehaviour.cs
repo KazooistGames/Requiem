@@ -98,6 +98,7 @@ public class AIBehaviour : MonoBehaviour
         entity.EventWounded.AddListener((float damage) => sensoryAlerted = true);
         martialFoeVulnerable.AddListener(reactToFoeVulnerable);
         martialFoeAttacking.AddListener(reactToIncomingAttack);
+        martialFoeDashing.AddListener(reactToIncomingDash);
         sensoryFoeSpotted.AddListener(reactToFoeChange);
         sensoryFoeLost.AddListener(reactToFoeChange);
         _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
@@ -312,6 +313,11 @@ public class AIBehaviour : MonoBehaviour
     }
 
     protected virtual void reactToIncomingAttack()
+    {
+
+    }
+
+    protected virtual void reactToIncomingDash()
     {
 
     }
@@ -769,7 +775,7 @@ public class AIBehaviour : MonoBehaviour
     protected bool martialDefendingONS = true;
     public UnityEvent martialFoeVulnerable = new UnityEvent();
     public UnityEvent martialFoeAttacking = new UnityEvent();
-    public UnityEvent martialFoeCharging = new UnityEvent();    
+    public UnityEvent martialFoeDashing = new UnityEvent();    
     public UnityEvent martialFoeEnteredRange = new UnityEvent();    
     public UnityEvent martialEnteredRange = new UnityEvent();
     protected bool martialFoeVulnerableLatch = false;
@@ -791,7 +797,7 @@ public class AIBehaviour : MonoBehaviour
             matchupOff = entity.Foe.OffHand ? entity.Foe.OffHand.GetComponent<Weapon>() : null;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
 
-            bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.75f;
+            bool foeFacing = Vector3.Dot(disposition.normalized, entity.Foe.LookDirection.normalized) <= -0.5f;
             bool foeRebuked = matchupMain ? matchupMain.Action == Weapon.ActionAnim.Recoiling : true && matchupOff ? matchupOff.Action == Weapon.ActionAnim.Recoiling : true;
 
             bool inRange = disposition.magnitude <= Mathf.Max(mainWep ? mainWep.Range : 0.0f, offWep ? offWep.Range : 0.0f);
@@ -819,7 +825,7 @@ public class AIBehaviour : MonoBehaviour
             if (!martialFoeChargingLatch && instantaneousFoeCharging)
             {
                 martialFoeChargingLatch = true;
-                martialFoeCharging.Invoke();
+                martialFoeDashing.Invoke();
             }
             else if (!instantaneousFoeCharging)
             {
