@@ -24,9 +24,8 @@ public class Biter : AIBehaviour
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
         meanderPauseFrequency = 0.5f;
-        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.3f;
         itemManagementSeekItems = false;
-        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
         grabEnabled = false;
         dashingChargePeriod = 0.75f;
     }
@@ -37,7 +36,7 @@ public class Biter : AIBehaviour
         if (entity.Foe)
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
-            charged = dashingCooldownTimer >= 3;
+            charged = dashingCooldownTimer >= Mathf.Lerp(2,4, Random.value);
             if (charged)
             {
             }

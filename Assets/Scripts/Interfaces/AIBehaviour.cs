@@ -153,7 +153,7 @@ public class AIBehaviour : MonoBehaviour
         switch (State)
         {
             case AIState.none:
-                StateTransition(AIState.passive);
+                StateTransition(RestingState);
                 break;
             case AIState.passive:
                 if (entity.Foe)
@@ -260,20 +260,20 @@ public class AIBehaviour : MonoBehaviour
             switch (martialCurrentState)
             {
                 case martialState.none:
-                    tangoInnerRange = wep.Range * 0.75f;
-                    tangoOuterRange = wep.Range * 1.5f;
+                    tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     break;
                 case martialState.attacking:
                     tangoInnerRange = wep.Range * 0.75f;
                     tangoOuterRange = wep.Range * 1.0f;
                     break;
                 case martialState.defending:
-                    tangoInnerRange = wep.Range * 1.75f;
-                    tangoOuterRange = wep.Range * 2.25f;
+                    tangoInnerRange = wep.Range * 1.5f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     break;
                 case martialState.throwing:
-                    tangoInnerRange = wep.Range * 2.5f;
-                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
+                    tangoInnerRange = wep.Range * 2.0f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     break;
             }
             pursueStoppingDistance = tangoOuterRange;

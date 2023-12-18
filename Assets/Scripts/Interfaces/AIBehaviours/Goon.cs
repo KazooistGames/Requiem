@@ -30,6 +30,11 @@ public class Goon : AIBehaviour
 
     }
 
+    protected override void Update()
+    {
+        base.Update();
+    }
+
 
     /***** PUBLIC *****/
 
@@ -72,6 +77,11 @@ public class Goon : AIBehaviour
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
+        else if(Random.value < Aggression)
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+        }
     }
 
     protected override void reactToFoeChange()
@@ -92,9 +102,9 @@ public class Goon : AIBehaviour
         {
             return;
         }
-        else if (mainWep.Action == Weapon.ActionAnim.QuickCoil && checkMyWeaponInRange() && Random.value >= Aggression)
+        else if (checkMyWeaponInRange())
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());            
+            //_MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());            
         }
         else if(Random.value >= Aggression || mainWep.Action == Weapon.ActionAnim.Idle)
         {
@@ -103,6 +113,17 @@ public class Goon : AIBehaviour
         }
     }
 
+    private bool timeoutCheckMyWeaponInRange()
+    {
+        if (checkMyWeaponInRange())
+        {
+            return true;
+        }
+        else
+        {
+            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 5;
+        }
+    }
 
     /***** PRIVATE *****/
 

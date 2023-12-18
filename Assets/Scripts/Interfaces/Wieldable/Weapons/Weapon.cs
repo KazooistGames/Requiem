@@ -61,6 +61,7 @@ public abstract class Weapon : Wieldable
     private float tempoCharge = 0;
     public float tempoChargePeriod = 0.5f;
     public float tempoChargeExponent = 1.75f;
+    private bool tempoChargeONS = true;
     //private bool attackChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.94f;
     public float TempoTargetWidth { get; private set; } = 0.1f;
@@ -232,7 +233,6 @@ public abstract class Weapon : Wieldable
                         {
                             playHeavySwing();
                         }
-
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
                 }
@@ -747,7 +747,14 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("StrongCoil"))
         {
-            return ActionAnim.StrongCoil;
+            if (nextAnimation.IsTag("StrongAttack"))
+            {
+                return ActionAnim.StrongAttack;
+            }
+            else
+            {
+                return ActionAnim.StrongCoil;
+            }
         }
         else if (currentAnimation.IsTag("QuickCoil"))
         {
@@ -771,6 +778,10 @@ public abstract class Weapon : Wieldable
         else if (currentAnimation.IsTag("StrongAttack"))
         {
             if (nextAnimation.IsTag("Guard"))
+            {
+                return ActionAnim.Recovering;
+            }
+            else if (nextAnimation.IsTag("Idel"))
             {
                 return ActionAnim.Recovering;
             }
@@ -819,15 +830,23 @@ public abstract class Weapon : Wieldable
     private void chargeTempo()
     {
         Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, tempoChargeExponent), 0, 1);
+        TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
         if (Action == ActionAnim.StrongCoil)
         {
-            tempoCharge += Time.deltaTime / tempoChargePeriod;
-            TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth/2;
+            if (tempoChargeONS)
+            {
+                tempoChargeONS = false;
+            }
+            else
+            {
+                tempoCharge += (Time.deltaTime / tempoChargePeriod);
+            }
         }
         else if(Action != ActionAnim.StrongAttack)
         {
             TrueStrike = false;
             tempoCharge = 0;
+            tempoChargeONS = true;
         }
     }
 

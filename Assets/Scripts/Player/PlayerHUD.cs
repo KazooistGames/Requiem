@@ -35,7 +35,7 @@ public class PlayerHUD : MonoBehaviour
         tempoBarTransforms[3].sizeDelta = new Vector2(10, 25);
         tempoBarTransforms[3].anchoredPosition = new Vector2(0, -11);        
         tempoBarTransforms[1].sizeDelta = new Vector2(40, 25);
-        tempoBarTransforms[1].anchoredPosition = new Vector2(4, -11);
+        tempoBarTransforms[1].anchoredPosition = new Vector2(0, -11);
     }
     void Update()
     {
@@ -43,8 +43,10 @@ public class PlayerHUD : MonoBehaviour
         _SoundService.SOUND_MASTER_VOLUME = SoundSlider.value;
         Text[] metrics = Info.GetComponentsInChildren<Text>();
         metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
-        metrics[1].text = "Bones:  " + Player.INSTANCE.BonesCollected.ToString();
-        metrics[2].text = "Time:   " + Requiem.INSTANCE.GameClock.ToString("0.00");
+        //metrics[2].text = "Kills:  " + Player.INSTANCE.BonesCollected.ToString();
+        metrics[1].text = "Time:   " + Requiem.INSTANCE.GameClock.ToString("0.00");
+        metrics[2].enabled = false;
+
         if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
             statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);

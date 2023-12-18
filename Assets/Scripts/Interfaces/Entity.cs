@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using System;
 using static Weapon;
 using UnityEngine.TextCore.Text;
+using static PlayerProgression;
 
 public class Entity : MonoBehaviour
 {
@@ -115,7 +116,7 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
-    private static float POISE_REGEN_BASE_PERIOD = 1;
+    private static float POISE_REGEN_BASE_PERIOD = 2;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
@@ -480,6 +481,25 @@ public class Entity : MonoBehaviour
         }
     }
 
+    public void alterPoise(float value, bool impactful = true)
+    {
+        float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
+        Poise += value;
+        Poise = Mathf.Clamp(Poise, -1, Strength);
+        if (impactful && value * existingDelta >= 0)
+        {
+            float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
+            float scalar = 5;
+            float newBounce = scaledRatio * scalar;
+            float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
+            if (newBounce >= remainingBounce)
+            {
+                poiseDebouncePeriod = newBounce;
+                poiseDebounceTimer = 0.0f;
+            }
+        }
+        updatePosture();
+    }
     public virtual void Damage(float magnitude)
     {
         if (magnitude > 0)
@@ -578,25 +598,7 @@ public class Entity : MonoBehaviour
 
     /*** PRIVATE ***/
 
-    private void alterPoise(float value, bool impactful = true)
-    {
-        float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
-        Poise += value;
-        Poise = Mathf.Clamp(Poise, -1, Strength);
-        if (impactful && value * existingDelta >= 0)
-        {
-            float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
-            float scalar = 5;
-            float newBounce = scaledRatio * scalar;
-            float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
-            if (newBounce >= remainingBounce)
-            {
-                poiseDebouncePeriod = newBounce;
-                poiseDebounceTimer = 0.0f;
-            }
-        }
-        updatePosture();
-    }
+
 
     private void indicatorManagement()
     {
@@ -855,7 +857,11 @@ public class Entity : MonoBehaviour
         //{
             //alterPoise(-myWeapon.Heft / 4);
         //}
-
+        if(myWeapon.Action == ActionAnim.StrongAttack)
+        {
+            float poiseDrainFromTempo = Mathf.Clamp(myWeapon.Tempo * myWeapon.Power, 0, myWeapon.Power);
+            alterPoise(-poiseDrainFromTempo);
+        }
     }
 
     private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)

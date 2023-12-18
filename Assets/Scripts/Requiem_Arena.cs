@@ -4,34 +4,30 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEditor.Experimental.GraphView;
 
 public class Requiem_Arena : Requiem
 {
-    public int RadiusOfCrypts;
-    public int LengthOfCorridors;
-    public int CountOfChambers;
-    public int CountOfCoves;
+    public static new Requiem_Arena INSTANCE;
+    public static int RadiusOfArena = 2;
+    public static int RadiusOfCrypt = 1;
+    public static int LengthOfCorridor = 1;
+    //public int CountOfChambers;
+    //public int CountOfCoves;
 
-    public Hextile StartingChamber;
+    public Hextile StartingTile;
     public Landmark_Gate StartingGate;
-    public List<List<Hextile>> crypt1 = new List<List<Hextile>>();
-    private List<List<Hextile>> crypt2 = new List<List<Hextile>>();
-    //private List<List<Hextile>> crypt3 = new List<List<Hextile>>();
-    public List<Hextile> corridor1 = new List<Hextile>();
-    //private List<Hextile> corridor2 = new List<Hextile>();
-    //private List<Hextile> corridor3 = new List<Hextile>();
+    public List<List<Hextile>> ArenaTiles = new List<List<Hextile>>();
+    private List<List<Hextile>> CryptTiles = new List<List<Hextile>>();
+    public List<Hextile> CorridorTiles = new List<Hextile>();
     public List<Hextile> chambers = new List<Hextile>();
     public List<Hextile> coves = new List<Hextile>();
+    //private List<KeyValuePair<Hextile, Hextile.HexPosition>> chamberCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
+    //private List<KeyValuePair<Hextile, Hextile.HexPosition>> coveCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
 
-    private List<KeyValuePair<Hextile, Hextile.HexPosition>> chamberCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
-    private List<KeyValuePair<Hextile, Hextile.HexPosition>> coveCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
-
-    private Hextile centerTile;
-    private Landmark_Alter alter;
-    private Landmark_Well well;
-    private Idol idol;
-
-    
+    public Hextile CenterTile;
+    public Landmark_Alter Alter;
+    public Landmark_Well BloodWell;
 
     private Spawner PatrolSpawner;
     private Spawner MobSpawner;
@@ -40,54 +36,46 @@ public class Requiem_Arena : Requiem
 
     public int Wave = 0;
 
-        protected override void Start()
+    protected override void Start()
     {
         base.Start();
+        INSTANCE = this;
         StartCoroutine(SetupGame());
     }
 
     protected override void Update()
     {
         base.Update();
-        if (StateOfGame != GameState.Liminal)
-        {
-            GameClock += Time.deltaTime;
-        }
+
     }
 
     protected IEnumerator SetupGame()
     {
         yield return null;
 
-        centerTile = Hextile.GenerateRootTile();
+        CenterTile = Hextile.GenerateRootTile();
         yield return null;
 
         Hextile.HexPosition startingDirection = (Hextile.HexPosition)1;
         Hextile.HexPosition offsetBy3 = Hextile.RotateHexPosition(startingDirection, 3);
-        yield return Hextile.DrawCircle(RadiusOfCrypts, Hextile.LastGeneratedTile, Tiles: crypt1); //crypt1
+        yield return Hextile.DrawCircle(RadiusOfArena, Hextile.LastGeneratedTile, Tiles: ArenaTiles); //crypt1
         StartingGate = new GameObject().AddComponent<Landmark_Gate>();
-        StartingGate.AssignToTile(crypt1[0][0].Edge(startingDirection));
+        StartingGate.AssignToTile(ArenaTiles[0][0].Edge(startingDirection));
         StartingGate.SetPositionOnTile(startingDirection);
-        yield return Hextile.DrawCircle(1, crypt1[0][0].Edge(startingDirection), startingDirection, crypt2);
-        StartingChamber = crypt2[0][0];
-        well = new GameObject().AddComponent<Landmark_Well>();
-        well.AssignToTile(StartingChamber);
+        yield return Hextile.DrawCircle(RadiusOfCrypt, ArenaTiles[0][0].Edge(startingDirection), startingDirection, CryptTiles);
 
-        List<Hextile> cryptChamberKeys = new List<Hextile>();
-        chamberCandidates.AddRange(crypt1[0][0].AdjacentTiles.Where(x => x.Value != startingDirection && x.Value != offsetBy3).ToList());
-
-
-        AllTilesInPlay.AddRange(crypt1.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
+        AllTilesInPlay.AddRange(ArenaTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
+        AllTilesInPlay.AddRange(CryptTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
         AllTilesInPlay.AddRange(chambers);
 
-        yield return cryptLandmarks(crypt1);
+        yield return buildArenaLandmarks(ArenaTiles);
+        yield return buildCryptLandmarks(CryptTiles);
 
         yield return new WaitForSeconds(0.5f);
+
         new GameObject().AddComponent<Player>();
-        idol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
-        Hextile randomTile = crypt1[crypt1.Count - 1][UnityEngine.Random.Range(0, crypt1[crypt1.Count - 1].Count)];
-        idol.transform.position = RAND_POS_IN_TILE(randomTile);
-        randomTile = crypt1[crypt1.Count - 1][UnityEngine.Random.Range(0, crypt1[crypt1.Count - 1].Count)];
+        Hextile randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
+        randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
         SPAWN(typeof(Shade), typeof(Janitor), RAND_POS_IN_TILE(randomTile));
         configureSpawners();
         Commissioned = true;
@@ -104,21 +92,29 @@ public class Requiem_Arena : Requiem
         yield break;
     }
 
-    private IEnumerator cryptLandmarks(List<List<Hextile>> rings)
+    private IEnumerator buildCryptLandmarks(List<List<Hextile>> cryptTileRings)
     {
-        foreach (List<Hextile> ring in rings)
+        StartingTile = cryptTileRings[0][0];
+        BloodWell = new GameObject().AddComponent<Landmark_Well>();
+        BloodWell.AssignToTile(StartingTile);
+        yield break;
+    }
+
+    private IEnumerator buildArenaLandmarks(List<List<Hextile>> arenaTileRings)
+    {
+        foreach (List<Hextile> ring in arenaTileRings)
         {
-            int ringNum = rings.IndexOf(ring);
+            int ringNum = arenaTileRings.IndexOf(ring);
             switch (ringNum)
             {
                 case 0:
-                    alter = new GameObject().AddComponent<Landmark_Alter>();
-                    alter.AssignToTile(ring[0]);
+                    Alter = new GameObject().AddComponent<Landmark_Alter>();
+                    Alter.AssignToTile(ring[0]);
                     break;
                 case 1:
                     foreach (Hextile tile in ring)
                     {
-                        Hextile.HexPosition position = rings[0][0].AdjacentTiles.First(x => x.Key == tile).Value;
+                        Hextile.HexPosition position = arenaTileRings[0][0].AdjacentTiles.First(x => x.Key == tile).Value;
                         if ((int)position % 2 == 0)
                         {
                             new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
@@ -151,28 +147,28 @@ public class Requiem_Arena : Requiem
     {
         yield return new WaitUntil(() => Commissioned);
         Torch.Toggle(true);
-        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(StartingChamber);
+        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(StartingTile);
         Player.INSTANCE.HostEntity.Vitality = 1;
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
         MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
         EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
         StateOfGame = GameState.Lobby;
-        yield return new WaitUntil(() => well.Used);
+        yield return new WaitUntil(() => BloodWell.Used);
         while (true)
         {
             StateOfGame = GameState.Liminal;
-            alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
+            Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             Wave++;
             StartingGate.OpenDoor();
             yield return null;
-            yield return new WaitUntil(() => alter.Used && alter.Energized);
+            yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             StateOfGame = GameState.Wave;
-            alter.DesiredOffering = alter.TopStep;
+            Alter.DesiredOffering = Alter.TopStep;
             StartingGate.CloseDoor();
             spawnedMobs = spawnMobs();
             yield return new WaitUntil(() => spawnedMobs.Count(x => x != null) == 0);
-            well.Volume = 100;
+            BloodWell.Volume = 100;
         }
     }
 
@@ -207,24 +203,27 @@ public class Requiem_Arena : Requiem
         { typeof(Skelly), 100 },
         { typeof(Nephalim), 200 },
         { typeof(Skully), 25 },
+        { typeof(Wraith), 150 },
     };
     public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
         { typeof(Biter), 2 },
         { typeof(Bully), 4 },
+        { typeof(Revanent), 7 },
     };
     public Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
     {
         {typeof(Goon),typeof(Skelly) },
         {typeof(Biter),typeof(Skully) },
-        {typeof(Bully),typeof(Nephalim) }
+        {typeof(Bully),typeof(Nephalim) },
+        {typeof(Revanent),typeof(Wraith) },
     };
     public Dictionary<int, int> WaveStrengths = new Dictionary<int, int>()
     {
         {1, 500 },
         {2, 800 },
-        {3, 1200 },
+        {0, 1200 },
     };
 
     public List<Type> UnlockedEntities = new List<Type>();
@@ -265,13 +264,9 @@ public class Requiem_Arena : Requiem
         //sort by max HP
         chosenAIsForWave = chosenAIsForWave.OrderByDescending(x => EntityStrengths[AIEntityPairings[x]]).ToList();
 
-        //spawn 1 of highest
-        //spawn other types in order of highest to lowest HP to match highest HP enemy
-        //loop back through until at population
-        int spawnIndex = 0;
-        //int strengthSpawnedSoFar = 0;
-
         WaveMobs = new List<GameObject>();
+        int spawnIndex = 0;
+        List<Hextile> viableSpawnTiles = ArenaTiles.Aggregate(new List<Hextile>(), (ring, result) => result.Concat(ring).ToList());
         while (TotalStrengthOfWave > 0)
         {
             int strengthOfSpawnChunk = Mathf.Min(TotalStrengthOfWave, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
@@ -281,7 +276,8 @@ public class Requiem_Arena : Requiem
                 Type spawnedEntity = AIEntityPairings[spawnedAI];
                 TotalStrengthOfWave -= EntityStrengths[spawnedEntity];
                 strengthOfSpawnChunk -= EntityStrengths[spawnedEntity];
-                WaveMobs.Add(SPAWN(spawnedEntity, spawnedAI, alter.transform.position));
+                Hextile randomTile = viableSpawnTiles[UnityEngine.Random.Range(0, viableSpawnTiles.Count)];
+                WaveMobs.Add(SPAWN(spawnedEntity, spawnedAI, RAND_POS_IN_TILE(randomTile)));
             }      
             spawnIndex++;
             if(spawnIndex >= chosenAIsForWave.Count)

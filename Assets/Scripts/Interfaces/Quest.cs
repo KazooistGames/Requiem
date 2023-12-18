@@ -13,13 +13,13 @@ public class Quest : MonoBehaviour
     public UnityEvent InteractionGo;
     public UnityEvent CompletionGo;
 
-    public enum States
-    {
-        Dormant,
-        Interaction,
-        Completed
-    }
-    States State;
+    //public enum States
+    //{
+    //    Dormant,
+    //    Interaction,
+    //    Completed
+    //}
+    //States State;
 
     public float Goal;
     public float GoalProgress;
@@ -38,19 +38,19 @@ public class Quest : MonoBehaviour
         { 
             if (completionTrigger())
             {
-                State = States.Completed;
+                //State = States.Completed;
                 CompletionGo.Invoke();
                 yield return new WaitWhile(() => completionTrigger());
             }
             if (interactionTrigger())
             {
-                State = States.Interaction;
+                //State = States.Interaction;
                 InteractionGo.Invoke();
                 yield return new WaitWhile(() => interactionTrigger());
             }
             else
             {
-                State = States.Dormant;
+                //State = States.Dormant;
                 DormantGo.Invoke();
                 yield return new WaitUntil(()=> interactionTrigger() || completionTrigger());
             }

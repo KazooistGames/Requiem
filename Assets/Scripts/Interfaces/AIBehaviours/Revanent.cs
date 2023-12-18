@@ -11,8 +11,8 @@ public class Revanent : AIBehaviour
 
     private float Aggression = 0.75f;
 
-    private float patternTimer = 0.0f;
-    private float patternPeriod = 0.0f;
+    //private float patternTimer = 0.0f;
+    //private float patternPeriod = 0.0f;
 
     public enum Pattern
     {
