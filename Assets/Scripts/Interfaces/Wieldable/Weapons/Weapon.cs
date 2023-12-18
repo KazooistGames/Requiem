@@ -837,9 +837,11 @@ public abstract class Weapon : Wieldable
             {
                 tempoChargeONS = false;
             }
-            else
+            else if(tempoCharge < 1)
             {
-                tempoCharge += (Time.deltaTime / tempoChargePeriod);
+                float increment = (Time.deltaTime / tempoChargePeriod);
+                tempoCharge += increment;
+                Wielder.alterPoise(-increment * BasePower, impactful: false);
             }
         }
         else if(Action != ActionAnim.StrongAttack)

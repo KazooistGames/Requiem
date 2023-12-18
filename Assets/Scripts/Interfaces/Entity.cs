@@ -486,11 +486,11 @@ public class Entity : MonoBehaviour
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
         Poise += value;
         Poise = Mathf.Clamp(Poise, -1, Strength);
-        if (impactful && value * existingDelta >= 0)
+        if (value * existingDelta >= 0)
         {
             float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
             float scalar = 5;
-            float newBounce = scaledRatio * scalar;
+            float newBounce = impactful ? scaledRatio * scalar : Time.deltaTime;
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
             if (newBounce >= remainingBounce)
             {
@@ -857,11 +857,11 @@ public class Entity : MonoBehaviour
         //{
             //alterPoise(-myWeapon.Heft / 4);
         //}
-        if(myWeapon.Action == ActionAnim.StrongAttack)
-        {
-            float poiseDrainFromTempo = Mathf.Clamp(myWeapon.Tempo * myWeapon.Power, 0, myWeapon.Power);
-            alterPoise(-poiseDrainFromTempo);
-        }
+        //if(myWeapon.Action == ActionAnim.StrongAttack)
+        //{
+        //    float poiseDrainFromTempo = Mathf.Clamp(myWeapon.Tempo * myWeapon.Power, 0, myWeapon.Power);
+        //    alterPoise(-poiseDrainFromTempo);
+        //}
     }
 
     private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)
