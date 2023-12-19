@@ -831,6 +831,7 @@ public abstract class Weapon : Wieldable
     {
         Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, tempoChargeExponent), 0, 1);
         TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
+        tempoChargePeriod = Heft / Wielder.Strength;
         if (Action == ActionAnim.StrongCoil)
         {
             if (tempoChargeONS)
@@ -841,7 +842,11 @@ public abstract class Weapon : Wieldable
             {
                 float increment = (Time.deltaTime / tempoChargePeriod);
                 tempoCharge += increment;
-                Wielder.alterPoise(-increment * BasePower, impactful: false);
+                Wielder.alterPoise(-increment * Heft / 2, impactful: false);
+            }
+            else
+            {
+                Wielder.alterPoise(0, impactful: false);
             }
         }
         else if(Action != ActionAnim.StrongAttack)

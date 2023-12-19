@@ -59,12 +59,12 @@ public class Goon : AIBehaviour
         else if (Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);       
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }      
@@ -79,7 +79,7 @@ public class Goon : AIBehaviour
         }
         else if(Random.value < Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -102,11 +102,7 @@ public class Goon : AIBehaviour
         {
             return;
         }
-        else if (checkMyWeaponInRange())
-        {
-            //_MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());            
-        }
-        else if(Random.value >= Aggression || mainWep.Action == Weapon.ActionAnim.Idle)
+        else if(mainWep.Action == Weapon.ActionAnim.Idle || mainWep.Action == Weapon.ActionAnim.Recoiling)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());

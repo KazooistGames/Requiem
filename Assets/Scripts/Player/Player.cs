@@ -374,10 +374,11 @@ public class Player : MonoBehaviour
         {
             Entity impaledFoe = HostWeapon.ImpaledObject.GetComponent<Entity>();
             Wieldable impaledObject = HostWeapon.ImpaledObject.GetComponent<Wieldable>();
+            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 0.25f);
             if (impaledFoe)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
-                impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
+                impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
             }
             else if (impaledObject)
             {
@@ -387,7 +388,7 @@ public class Player : MonoBehaviour
             else
             {
                 Vector3 disposition = HostWeapon.transform.position - transform.position;
-                HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * Entity.Min_Velocity_Of_Dash);
+                HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
             }
         }
         else

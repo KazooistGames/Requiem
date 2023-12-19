@@ -58,7 +58,6 @@ public class _MartialController : MonoBehaviour
                 bool completedRequisite = kvp.Value.Prerequisite == null ? true : kvp.Value.Prerequisite();
                 if (Debounce_Timers[weapon] > debounce && completedRequisite)
                 {
-                    Debounce_Timers[weapon] = 0;
                     KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
                 }
                 else
@@ -89,7 +88,7 @@ public class _MartialController : MonoBehaviour
             else if (Weapon_Queues[weapon].Count > 0)
             {
                 Weapon_Actions[weapon] = Weapon_Queues[weapon].Dequeue();
-
+                Debounce_Timers[weapon] = 0;
             }
         }
 

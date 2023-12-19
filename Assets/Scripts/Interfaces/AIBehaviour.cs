@@ -296,9 +296,9 @@ public class AIBehaviour : MonoBehaviour
             return false;
         }
     }
-    protected float getPausePeriod()
+    protected float getPausePeriod(float min = 1, float randScalar = 1)
     {
-        return 0.5f + Random.value;
+        return min + Random.value * randScalar;
     }
     protected virtual void queueNextRoundOfActions(Weapon weapon)
     {

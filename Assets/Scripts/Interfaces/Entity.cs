@@ -443,7 +443,7 @@ public class Entity : MonoBehaviour
     {
         if (A && B)
         {
-            return Mathf.Pow(A.Strength / B.Strength, 1/3);
+            return Mathf.Pow(A.Strength / B.Strength, 1/2);
         }
         else
         {
@@ -490,7 +490,7 @@ public class Entity : MonoBehaviour
         {
             float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
             float scalar = 5;
-            float newBounce = impactful ? scaledRatio * scalar : Time.deltaTime;
+            float newBounce = impactful ? scaledRatio * scalar : Time.deltaTime * 5;
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
             if (newBounce >= remainingBounce)
             {
@@ -685,7 +685,7 @@ public class Entity : MonoBehaviour
     {
         GameObject other = collision.gameObject;
         Entity foe = other.GetComponent<Entity>();
-        if (foe ? foe.Allegiance != Allegiance : false)
+        if (foe)
         {
             Vector3 disposition = foe.transform.position - transform.position;
             float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
@@ -698,18 +698,17 @@ public class Entity : MonoBehaviour
                 Vector3 ShoveVector = disposition.normalized * impactRatio * Max_Velocity_Of_Dash;
                 ShoveVector *= 0.75f;
                 foe.Shove(ShoveVector);
-                foe.EventCrashed.Invoke();
-                float damage = CRASH_DAMAGE * impactRatio;
-                if (foe.requiemPlayer ? false : !foe.Foe)
+                if(foe.Allegiance != Allegiance)
                 {
-                    foe.Vitality = 0;
+                    foe.EventCrashed.Invoke();
+                    float damage = CRASH_DAMAGE * impactRatio;
+                    if (foe.requiemPlayer ? false : !foe.Foe)
+                    {
+                        foe.Vitality = 0;
+                    }
+                    foe.applyDamageToPoiseThenVitality(damage);
+                    EventLandedDashHit.Invoke(foe, damage);
                 }
-                foe.applyDamageToPoiseThenVitality(damage);
-                //if (foe.Posture == PostureStrength.Weak)
-                //{
-                //    foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
-                //}
-                EventLandedDashHit.Invoke(foe, damage);
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
             }
         }
@@ -885,15 +884,23 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (theirWeapon.Action == ActionAnim.StrongAttack)
+        float impact = theirWeapon.Heft * theirWeapon.Tempo;
+        if (theirWeapon.TrueStrike)
         {
-            float totalPower = theirWeapon.Power * (1 + theirWeapon.Tempo);
-            alterPoise(-totalPower);
-            if(Posture == PostureStrength.Weak)
-            {
-                float impact = theirWeapon.Heft * (1 + theirWeapon.Tempo);
-                Stagger(Mathf.Sqrt(impact / Strength));
-            }
+            Disarm();
+        }
+        if(theirWeapon.Action != ActionAnim.StrongAttack)
+        {
+
+        }
+        else if (Posture == PostureStrength.Weak)
+        {
+
+            Stagger(Mathf.Sqrt(impact / Strength));
+        }
+        else
+        {
+            alterPoise(-impact);
         }
     }
 
@@ -909,26 +916,27 @@ public class Entity : MonoBehaviour
     {
         if (myWeapon.TrueStrike)
         {
-
+            return;
         }
-        else 
+        else if(myWeapon.Action == ActionAnim.StrongAttack)
         {
-            if (Posture == PostureStrength.Weak)
-            {
-                Disarm();
-            }
-            else
-            {
-                Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
-            }
-            alterPoise(-myWeapon.Heft);
+            return;
         }
+        else if (Posture == PostureStrength.Weak)
+        {
+            Disarm();
+        }
+        else
+        {
+            Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
+        }
+        alterPoise(-myWeapon.Heft);     
     }
 
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
-        float totalPower = myWeapon.Power * (1 + myWeapon.Tempo);
+        float totalPower = myWeapon.Power + (myWeapon.Heft * myWeapon.Tempo);
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
         {
@@ -936,7 +944,7 @@ public class Entity : MonoBehaviour
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
-            if (Posture == PostureStrength.Weak)
+            if (foe.Posture == PostureStrength.Weak)
             {
                 float impact = myWeapon.Heft * vitalityDamage/totalPower;
                 foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));

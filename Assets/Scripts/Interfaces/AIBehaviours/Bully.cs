@@ -32,16 +32,19 @@ public class Bully : AIBehaviour
         base.Update();
         float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 3;
 
-        if (dashingCooldownTimer > period && entity.Foe)
+        if (dashingCooldownTimer < period || !entity.Foe)
         {
-            if (!mainWep)
-            {
 
-            }
-            else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || dashingDesiredDirection != Vector3.zero)
-            {
-                dashingDesiredDirection = entity.Foe.transform.position - transform.position;
-            }
+        }
+        else if (!mainWep)
+        {
+            dashingChargePeriod = 0.5f;
+            dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+        }
+        else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || dashingDesiredDirection != Vector3.zero)
+        {
+            dashingChargePeriod = 1f;
+            dashingDesiredDirection = entity.Foe.transform.position - transform.position;
         }
     }
 
