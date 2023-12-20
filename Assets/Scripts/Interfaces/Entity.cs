@@ -805,6 +805,7 @@ public class Entity : MonoBehaviour
                 playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
                 yield return new WaitWhile(() => Shoved);
             }
+            yield return null;
             FinalDash = false;
             modSpeed[key] = 0.0f;
             Dashing = false;
