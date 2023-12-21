@@ -150,6 +150,7 @@ public class Landmark_Alter : Landmark
             Used = true;
             ritualFlame.FlameStyle(0);
             yield return new WaitWhile(() => Energized);
+            Used = false;
             float fadeOutTimer = 0;
             float fadeOutPeriod = 3;
             float ratio;

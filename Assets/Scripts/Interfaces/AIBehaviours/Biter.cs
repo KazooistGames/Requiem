@@ -6,6 +6,7 @@ public class Biter : AIBehaviour
 {
 
     private bool charged = false;
+    private float chargePeriod = 0;
     protected override void Awake()
     {
         base.Awake();
@@ -20,6 +21,8 @@ public class Biter : AIBehaviour
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0;
         tangoDeadbandingEnabled = false;
+        tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
+        tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
@@ -35,18 +38,18 @@ public class Biter : AIBehaviour
         base.Update();
         if (entity.Foe)
         {
+            charged = dashingCooldownTimer >= chargePeriod;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
-            charged = dashingCooldownTimer >= Mathf.Lerp(2,4, Random.value);
-            if (charged)
-            {
-            }
             bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
-
             if (charged && inPosition && !entity.Shoved)
             {
                 dashingDesiredDirection = disposition;
             }
-
+            if (entity.Dashing)
+            {
+                chargePeriod = Mathf.Lerp(2, 4, Random.value);
+                tangoDeadbanded = false;
+            }
         }
     }
 
@@ -60,8 +63,6 @@ public class Biter : AIBehaviour
         else
         {
             tangoStrafeEnabled = true;
-            tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
-            tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         }
     }
 

@@ -734,9 +734,9 @@ public class AIBehaviour : MonoBehaviour
             {
                 tangoTimer += ReflexRate;
             }
-            bool deadbandHold = tangoDeadbanded && (tangoOuterRange >= disposition.magnitude && disposition.magnitude >= tangoInnerRange);
+            //bool deadbandHold = tangoDeadbanded && (tangoOuterRange >= disposition.magnitude && disposition.magnitude >= tangoInnerRange);
             bool deadbandSet = !tangoDeadbanded && ((tangoNearStart && disposition.magnitude > tangoTargetDisposition) || (tangoFarStart && disposition.magnitude <= tangoTargetDisposition));
-            tangoDeadbanded = tangoDeadbanded || deadbandSet;
+            tangoDeadbanded = tangoDeadbandingEnabled && (tangoDeadbanded || deadbandSet);
             tangoNearStart = tangoDeadbanded ? disposition.magnitude <= tangoTargetDisposition : tangoNearStart;
             tangoFarStart = tangoDeadbanded ?  disposition.magnitude > tangoTargetDisposition : tangoFarStart;
             float delta = disposition.magnitude - tangoTargetDisposition;

@@ -702,6 +702,10 @@ public class Entity : MonoBehaviour
                 {
                     foe.EventCrashed.Invoke();
                     float damage = CRASH_DAMAGE * impactRatio;
+                    if (FinalDash)
+                    {
+                        damage += Resolve;
+                    }
                     if (foe.requiemPlayer ? false : !foe.Foe)
                     {
                         foe.Vitality = 0;
@@ -737,10 +741,10 @@ public class Entity : MonoBehaviour
             {
                 float impactToFoe = Strength_Ratio(this, otherEntity) * velocityRatio / 2;
                 otherEntity.Shove(-collision.relativeVelocity.normalized * impactToFoe);
-                otherEntity.Damage(impactToFoe * CRASH_DAMAGE);
+                otherEntity.applyDamageToPoiseThenVitality(impactToFoe * CRASH_DAMAGE);
                 float impactToSelf = Strength_Ratio(otherEntity, this) * velocityRatio / 2;
                 Shove(collision.relativeVelocity.normalized * impactToSelf);
-                Damage(impactToSelf * CRASH_DAMAGE);
+                applyDamageToPoiseThenVitality(impactToSelf * CRASH_DAMAGE);
                 EventCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
@@ -758,7 +762,7 @@ public class Entity : MonoBehaviour
                     alterPoise(-velocityRatio * CRASH_DAMAGE);
                     if(Posture == PostureStrength.Weak)
                     {
-                        Damage(velocityRatio * CRASH_DAMAGE);
+                        applyDamageToPoiseThenVitality(velocityRatio * CRASH_DAMAGE);
                     }
                     EventCrashed.Invoke();
                 }
@@ -901,7 +905,12 @@ public class Entity : MonoBehaviour
         }
         else
         {
+            float poiseOverkill = impact - Poise;
             alterPoise(-impact);
+            if(poiseOverkill >= 0)
+            {
+                Stagger(Mathf.Sqrt(poiseOverkill / Strength));
+            }
         }
     }
 
@@ -938,6 +947,10 @@ public class Entity : MonoBehaviour
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float totalPower = myWeapon.Power + (myWeapon.Heft * myWeapon.Tempo);
+        if (myWeapon.TrueStrike)
+        {
+            totalPower += Resolve;
+        }
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
         {

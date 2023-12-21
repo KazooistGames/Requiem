@@ -51,16 +51,16 @@ public class Goon : AIBehaviour
         {
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
         }
-        else if (entity.Posture == Entity.PostureStrength.Weak)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
-        }
         else if (Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);       
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+        }
+        else if (entity.Posture == Entity.PostureStrength.Weak)
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
         }
         else
         {
@@ -111,13 +111,22 @@ public class Goon : AIBehaviour
 
     private bool timeoutCheckMyWeaponInRange()
     {
-        if (checkMyWeaponInRange())
+        if (!mainWep)
+        {
+            return false;
+        }
+        else if (checkMyWeaponInRange())
         {
             return true;
         }
-        else
+        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
+             
         {
             return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 5;
+        }
+        else
+        {
+            return false;
         }
     }
 

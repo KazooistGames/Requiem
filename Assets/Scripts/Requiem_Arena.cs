@@ -34,6 +34,8 @@ public class Requiem_Arena : Requiem
     private Spawner EliteSpawner;
     private Spawner BossSpawner;
 
+    public float SpeedTimeGateTimeLeft = 0;
+
     public int Wave = 0;
 
     protected override void Start()
@@ -143,6 +145,7 @@ public class Requiem_Arena : Requiem
         }
     }
 
+    private GameObject blurbIndicator;
     protected IEnumerator gameLoop()
     {
         yield return new WaitUntil(() => Commissioned);
@@ -151,8 +154,11 @@ public class Requiem_Arena : Requiem
         Player.INSTANCE.HostEntity.Vitality = 1;
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
-        MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
-        EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
+        blurbIndicator = _BlurbService.createBlurb(Requiem_Arena.INSTANCE.Alter.TopStep, "Test", Color.red, sizeScalar: 3);
+        blurbIndicator.SetActive(false);
+        blurbIndicator.GetComponent<Text>().text = "0:00";
+        //MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
+        //EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
         StateOfGame = GameState.Lobby;
         yield return new WaitUntil(() => BloodWell.Used);
         while (true)
@@ -166,9 +172,36 @@ public class Requiem_Arena : Requiem
             StateOfGame = GameState.Wave;
             Alter.DesiredOffering = Alter.TopStep;
             StartingGate.CloseDoor();
-            spawnedMobs = spawnMobs();
+            TotalStrengthOfWave = WaveStrengths[Wave % 3];
+            SpeedTimeGateTimeLeft = TotalStrengthOfWave / 5;
+            spawnedMobs = spawnMobs(TotalStrengthOfWave);
+            blurbIndicator.SetActive(true);
+            while (Requiem.INSTANCE.StateOfGame == GameState.Wave && SpeedTimeGateTimeLeft > 0)
+            {
+                int minutesLeft = (int)SpeedTimeGateTimeLeft / 60;
+                int secondsLeft = (int)SpeedTimeGateTimeLeft % 60;
+                string timeLeftText = minutesLeft.ToString() + ":" + secondsLeft.ToString();
+                blurbIndicator.GetComponent<Text>().text = timeLeftText;
+                yield return new WaitForSeconds(1f);
+                spawnedMobs.RemoveAll(x => x == null);
+                int minStrength = TotalStrengthOfWave / 2;
+                if (spawnedMobs.Aggregate(0f, (result, x) => result += x.GetComponent<Entity>().Strength) < minStrength)
+                {
+                    int respawnStrength = TotalStrengthOfWave / 2;
+                    spawnedMobs.AddRange(spawnMobs(respawnStrength));
+                }
+                SpeedTimeGateTimeLeft -= 1;
+            }
+            foreach(GameObject mob in spawnedMobs)
+            {
+                if (mob)
+                {
+                    mob.GetComponent<Entity>().Vitality = 0;
+                }
+            }
             yield return new WaitUntil(() => spawnedMobs.Count(x => x != null) == 0);
             BloodWell.Volume = 100;
+            blurbIndicator.SetActive(false);
         }
     }
 
@@ -232,23 +265,8 @@ public class Requiem_Arena : Requiem
     public int TotalStrengthOfWave;
     public List<Type> chosenAIsForWave = new List<Type>();
     public List<GameObject> WaveMobs = new List<GameObject>();
-    private List<GameObject> spawnMobs()
-    {      
-        switch(Wave % 3)
-        {
-            case 1:
-                TotalStrengthOfWave = 500;
-                break;
-            case 2:
-                TotalStrengthOfWave = 800;
-                break;
-            case 0:
-                TotalStrengthOfWave = 1200;
-                break;
-            default:
-                TotalStrengthOfWave = 0;
-                break;  
-        }
+    private List<GameObject> spawnMobs(int strengthToSpawn)
+    {
 
         List<Type> viableAIs = new List<Type>();
         viableAIs = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
@@ -267,14 +285,14 @@ public class Requiem_Arena : Requiem
         WaveMobs = new List<GameObject>();
         int spawnIndex = 0;
         List<Hextile> viableSpawnTiles = ArenaTiles.Aggregate(new List<Hextile>(), (ring, result) => result.Concat(ring).ToList());
-        while (TotalStrengthOfWave > 0)
+        while (strengthToSpawn > 0)
         {
-            int strengthOfSpawnChunk = Mathf.Min(TotalStrengthOfWave, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
+            int strengthOfSpawnChunk = Mathf.Min(strengthToSpawn, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
             while (strengthOfSpawnChunk > 0)
             {
                 Type spawnedAI = chosenAIsForWave[spawnIndex];
                 Type spawnedEntity = AIEntityPairings[spawnedAI];
-                TotalStrengthOfWave -= EntityStrengths[spawnedEntity];
+                strengthToSpawn -= EntityStrengths[spawnedEntity];
                 strengthOfSpawnChunk -= EntityStrengths[spawnedEntity];
                 Hextile randomTile = viableSpawnTiles[UnityEngine.Random.Range(0, viableSpawnTiles.Count)];
                 WaveMobs.Add(SPAWN(spawnedEntity, spawnedAI, RAND_POS_IN_TILE(randomTile)));
