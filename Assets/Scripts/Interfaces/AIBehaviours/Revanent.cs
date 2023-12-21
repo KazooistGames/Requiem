@@ -68,8 +68,10 @@ public class Revanent : AIBehaviour
                     if (entity.Posture == Entity.PostureStrength.Strong)
                     {
                         CurrentPattern = Pattern.Overpowering;
+                        _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
+                        _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
                     }
-                    if (mainWep.Action == Weapon.ActionAnim.Recovering && dashingCooldownTimer >= 1)
+                    if ((mainWep.Action == Weapon.ActionAnim.Recovering || mainWep.Action == Weapon.ActionAnim.Recoiling) && dashingCooldownTimer >= 0.5f)
                     {
                         dashingChargePeriod = 0f;
                         dashingDesiredDirection = transform.position - entity.Foe.transform.position;
@@ -172,15 +174,15 @@ public class Revanent : AIBehaviour
 
     protected override void reactToIncomingDash()
     {
-        if(entity.Posture == Entity.PostureStrength.Weak)
+        if(entity.Posture != Entity.PostureStrength.Weak)
         {
 
         }
-        if (dashingCooldownTimer > 0.5f)
+        else if (dashingCooldownTimer > 0.5f)
         {
             dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
-            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 120;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 135;
             dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
     }
@@ -199,11 +201,13 @@ public class Revanent : AIBehaviour
                 }
                 else
                 {
-                    _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
+                    _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
                 }
                 break;
             case Pattern.Overpowering:
                 CurrentPattern = Pattern.Dueling;
+                _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
+                _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
                 break;
         }
         

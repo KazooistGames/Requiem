@@ -20,9 +20,6 @@ public class Biter : AIBehaviour
         RestingState = AIState.seek;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0;
-        tangoDeadbandingEnabled = false;
-        tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
-        tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
@@ -64,6 +61,8 @@ public class Biter : AIBehaviour
         {
             tangoStrafeEnabled = true;
         }
+        tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
+        tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
     }
 
 }
