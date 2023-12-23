@@ -87,7 +87,7 @@ public class Champion : AIBehaviour
         }
         else
         {
-            footFlame.FlameStyle(flameLevel);
+            footFlame.SetFlameStyle(flameLevel);
         }
 
         if (entity.MainHand ? entity.MainHand.GetComponent<Weapon>() : false)
@@ -110,7 +110,7 @@ public class Champion : AIBehaviour
         else
         {
             mainHandFlame.transform.SetParent(transform);
-            mainHandFlame.FlameStyle(0);
+            mainHandFlame.SetFlameStyle(0);
         }
 
         if (entity.OffHand ? entity.OffHand.GetComponent<Weapon>() : false)
@@ -134,7 +134,7 @@ public class Champion : AIBehaviour
         else
         {
             offHandFlame.transform.SetParent(transform);
-            offHandFlame.FlameStyle(0);
+            offHandFlame.SetFlameStyle(0);
         }
     }
 

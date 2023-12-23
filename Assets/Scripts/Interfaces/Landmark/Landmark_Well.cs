@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Landmark_Well : Landmark
 {
@@ -20,6 +21,7 @@ public class Landmark_Well : Landmark
     private float bloodWaveYspeed = 0.1f;
 
     private GameObject gulpSound;
+    private bool gulping = false;
 
     private List<GameObject> bloodSplatters = new List<GameObject>();
     protected static GameObject BLOOD_SPLATTER_PREFAB;
@@ -41,27 +43,15 @@ public class Landmark_Well : Landmark
     protected void OnTriggerStay(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
-        if(entity ? Volume > 0 && entity.Interacting : false)
+        if(entity ? Volume > 0 && entity.Interacting && !gulping : false)
         {
-            if (!gulpSound)
-            {
-                playGulp();
-                if(UnityEngine.Random.value > 0.5f)
-                {
-                    Vector3 disposition = entity.transform.position - transform.position;
-                    Vector3 tinyOffset = new Vector3(UnityEngine.Random.value * 0.1f - 0.05f, 0, UnityEngine.Random.value * 0.1f - 0.05f);
-                    float scale = 0.05f + UnityEngine.Random.value * 0.15f;
-                    splatter(disposition + tinyOffset, scale);
-                }
-            }
-            Energized = true;
-            float increment = Time.deltaTime / fullDrinkPeriod;
-            Volume -= 100 * increment;
-            entity.Vitality += entity.Strength * increment;
+            gulping = true;
+            StartCoroutine(gulp(entity, 20));
         }
         else
         {
             Energized = false;
+
         }
 
     }
@@ -100,6 +90,36 @@ public class Landmark_Well : Landmark
 
 
     /***** PRIVATE *****/
+    private IEnumerator gulp(Entity benefactor, float amount)
+    {
+        while(amount > 0 && Volume > 0)
+        {
+            gulping = true;
+            if (!Requiem.INSTANCE.Paused)
+            {
+                if (!gulpSound)
+                {
+                    playGulp();
+                    if (UnityEngine.Random.value > 0.5f)
+                    {
+                        Vector3 disposition = benefactor.transform.position - transform.position;
+                        Vector3 tinyOffset = new Vector3(UnityEngine.Random.value * 0.1f - 0.05f, 0, UnityEngine.Random.value * 0.1f - 0.05f);
+                        float scale = 0.05f + UnityEngine.Random.value * 0.15f;
+                        splatter(disposition + tinyOffset, scale);
+                    }
+                }
+                Energized = true;
+                float increment = Time.deltaTime / fullDrinkPeriod;
+                amount -= 100 * increment;
+                Volume -= 100 * increment;
+                benefactor.Vitality += benefactor.Strength * increment;
+            }
+            yield return null;
+        }
+        gulping = false;
+        yield break;
+    }
+
     private GameObject splatter(Vector3 position, float size)
     {
         if (!BLOOD_SPLATTER_PREFAB)
@@ -120,7 +140,7 @@ public class Landmark_Well : Landmark
     private void playGulp()
     {
         gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
-        gulpSound.GetComponent<AudioSource>().time = 0.8f;
+        gulpSound.GetComponent<AudioSource>().time = 0.75f;
     }
 
     private void playSlurp()

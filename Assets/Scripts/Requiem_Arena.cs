@@ -28,13 +28,14 @@ public class Requiem_Arena : Requiem
     public Hextile CenterTile;
     public Landmark_Alter Alter;
     public Landmark_Well BloodWell;
+    public Shade QuestGiver;
 
     private Spawner PatrolSpawner;
     private Spawner MobSpawner;
     private Spawner EliteSpawner;
     private Spawner BossSpawner;
 
-    public float SpeedTimeGateTimeLeft = 0;
+    public float TimeGateTimeLeft = 0;
 
     public int Wave = 0;
 
@@ -120,7 +121,7 @@ public class Requiem_Arena : Requiem
                         if ((int)position % 2 == 0)
                         {
                             new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
-                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile.Extend(position));
+                            //new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile.Extend(position));
                         }
                         else
                         {
@@ -173,24 +174,27 @@ public class Requiem_Arena : Requiem
             Alter.DesiredOffering = Alter.TopStep;
             StartingGate.CloseDoor();
             TotalStrengthOfWave = WaveStrengths[Wave % 3];
-            SpeedTimeGateTimeLeft = TotalStrengthOfWave / 5;
+            TimeGateTimeLeft = 10 + TotalStrengthOfWave / 10;
             spawnedMobs = spawnMobs(TotalStrengthOfWave);
             blurbIndicator.SetActive(true);
-            while (Requiem.INSTANCE.StateOfGame == GameState.Wave && SpeedTimeGateTimeLeft > 0)
+            while (Requiem.INSTANCE.StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
             {
-                int minutesLeft = (int)SpeedTimeGateTimeLeft / 60;
-                int secondsLeft = (int)SpeedTimeGateTimeLeft % 60;
-                string timeLeftText = minutesLeft.ToString() + ":" + secondsLeft.ToString();
-                blurbIndicator.GetComponent<Text>().text = timeLeftText;
-                yield return new WaitForSeconds(1f);
-                spawnedMobs.RemoveAll(x => x == null);
-                int minStrength = TotalStrengthOfWave / 2;
-                if (spawnedMobs.Aggregate(0f, (result, x) => result += x.GetComponent<Entity>().Strength) < minStrength)
+                if (!Paused)
                 {
-                    int respawnStrength = TotalStrengthOfWave / 2;
-                    spawnedMobs.AddRange(spawnMobs(respawnStrength));
+                    int minutesLeft = (int)TimeGateTimeLeft / 60;
+                    int secondsLeft = (int)TimeGateTimeLeft % 60;
+                    string timeLeftText = minutesLeft.ToString() + ":" + secondsLeft.ToString();
+                    blurbIndicator.GetComponent<Text>().text = timeLeftText;
+                    yield return new WaitForSeconds(1f);
+                    spawnedMobs.RemoveAll(x => x == null);
+                    int minStrength = TotalStrengthOfWave / 2;
+                    if (spawnedMobs.Aggregate(0f, (result, x) => result += x.GetComponent<Entity>().Strength) < minStrength)
+                    {
+                        int respawnStrength = TotalStrengthOfWave / 2;
+                        spawnedMobs.AddRange(spawnMobs(respawnStrength));
+                    }
+                    TimeGateTimeLeft -= 1;
                 }
-                SpeedTimeGateTimeLeft -= 1;
             }
             foreach(GameObject mob in spawnedMobs)
             {

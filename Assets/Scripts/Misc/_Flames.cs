@@ -28,6 +28,7 @@ public class _Flames : MonoBehaviour
         Magic = 3
     }
     public FlameStyles FlamePresentationStyle = FlameStyles.Magic;
+    private FlameStyles cachedFlameStye;
 
     public GameObject boundObject;
 
@@ -51,6 +52,10 @@ public class _Flames : MonoBehaviour
 
     private void Update()
     {
+        if(FlamePresentationStyle != cachedFlameStye) 
+        {
+            SetFlameStyle(FlamePresentationStyle);
+        }
         if (boundObject)
         {
             //setFlamePreset(FlameStyle);
@@ -61,11 +66,11 @@ public class _Flames : MonoBehaviour
                 emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.Action == Weapon.ActionAnim.Parrying;
                 if (boundWeapon.TrueStrike)
                 {
-                    FlameStyle(FlameStyles.Inferno);
+                    SetFlameStyle(FlameStyles.Inferno);
                 }
                 else if (boundWeapon.Action == Weapon.ActionAnim.Parrying)
                 {
-                    FlameStyle(FlameStyles.Inferno);
+                    SetFlameStyle(FlameStyles.Inferno);
                 }
             }
             else if (boundEntity)
@@ -76,15 +81,11 @@ public class _Flames : MonoBehaviour
             {
                 emissionModule.enabled = true;
             }
-        }
-        else
-        {
-            emissionModule.enabled = false;
-        }        
+        }    
     }
 
     /***** PUBLIC *****/
-    public void FlameStyle(FlameStyles preset)
+    public void SetFlameStyle(FlameStyles preset, float intensityOverride = 5f)
     {
         if(gradients.Count == 0)
         {
@@ -95,26 +96,27 @@ public class _Flames : MonoBehaviour
         switch (preset)
         {
             case FlameStyles.Inferno:
-                particleLight.intensity = 7.5f;
+                particleLight.intensity = intensityOverride;
                 flameGradient.mode = ParticleSystemGradientMode.Gradient;
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
             case FlameStyles.Soulless:
-                particleLight.intensity = 5f;
+                particleLight.intensity = intensityOverride;
                 flameGradient.mode = ParticleSystemGradientMode.Gradient;
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
             case FlameStyles.Magic:
-                particleLight.intensity = 7.5f;
+                particleLight.intensity = intensityOverride;
                 flameGradient.mode = ParticleSystemGradientMode.TwoGradients;
                 flameGradient.gradientMin = gradients[0];
                 flameGradient.gradientMax = gradients[1];
                 break;
         }
         colorModule.color = flameGradient;
-        FlamePresentationStyle = preset;    
+        FlamePresentationStyle = preset;
+        cachedFlameStye = preset;
     }
 
     public void bindToObject(GameObject bindingObject)
@@ -122,7 +124,7 @@ public class _Flames : MonoBehaviour
         if (!bindingObject) { return; }
         boundObject = bindingObject;
         buildGradients();
-        FlameStyle(FlamePresentationStyle);
+        SetFlameStyle(FlamePresentationStyle);
         transform.SetParent(boundObject.transform, false);
         Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
         Wieldable boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
@@ -205,6 +207,6 @@ public class _Flames : MonoBehaviour
             );
             gradients.Add(gradientThree);
         }
-        FlameStyle(FlamePresentationStyle);
+        SetFlameStyle(FlamePresentationStyle);
     }
 }

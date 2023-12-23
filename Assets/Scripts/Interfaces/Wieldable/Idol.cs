@@ -80,7 +80,7 @@ public class Idol : Wieldable
         equipType = EquipType.Burdensome;
         pitchScalar = 0.6f;
         flames = GetComponentInChildren<_Flames>();
-        flames.FlameStyle(_Flames.FlameStyles.Soulless);
+        flames.SetFlameStyle(_Flames.FlameStyles.Soulless);
         flames.boundObject = gameObject;
         StartCoroutine(banter());
         Body.mass = 3f;
@@ -92,7 +92,7 @@ public class Idol : Wieldable
         base.Update();
         if (mobEntity)
         {
-            flames.FlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless);
+            flames.SetFlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless);
         }
         else if (Wielder ? Wielder.requiemPlayer : false)
         {

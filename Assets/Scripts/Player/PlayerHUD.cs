@@ -7,6 +7,7 @@ using System.Linq;
 public class PlayerHUD : MonoBehaviour
 {
     public RawImage Curtains;
+    public GameObject Score;
     public GameObject PauseMenu;
     public GameObject Info;
     public GameObject StatBar;
@@ -22,6 +23,7 @@ public class PlayerHUD : MonoBehaviour
 
     private RectTransform[] statBarTransforms;
     private RectTransform[] tempoBarTransforms;
+    private RectTransform[] scoreTransforms;
 
     private void Start()
     {
@@ -32,6 +34,7 @@ public class PlayerHUD : MonoBehaviour
         MainMenuButton.onClick.AddListener(Requiem.INSTANCE.QuitGame);
         statBarTransforms = StatBar.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms = TempoBar.GetComponentsInChildren<RectTransform>();
+        scoreTransforms = Score.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms[3].sizeDelta = new Vector2(10, 25);
         tempoBarTransforms[3].anchoredPosition = new Vector2(0, -11);        
         tempoBarTransforms[1].sizeDelta = new Vector2(40, 25);
@@ -46,42 +49,9 @@ public class PlayerHUD : MonoBehaviour
         //metrics[2].text = "Kills:  " + Player.INSTANCE.BonesCollected.ToString();
         metrics[1].text = "Time:   " + Requiem.INSTANCE.GameClock.ToString("0.00");
         metrics[2].enabled = false;
-
-        if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
-        {
-            statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
-            statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
-            statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
-            statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Entity.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
-            transform.GetChild(0).GetComponent<Text>().text = Scoreboard.INSTANCE.Score.ToString();
-            if (Player.INSTANCE.HostWeapon)
-            {
-                updateTempoBar();
-            }   
-        }
-        else
-        {
-            statBarTransforms[1].anchorMax = new Vector2(0, 1f);
-            statBarTransforms[3].anchorMax = new Vector2(0, 1f);
-        }
-        int i = 0;
-        foreach (Text indicator in StatusIndicators.Values)
-        {
-            indicator.transform.SetParent(transform, false);
-            indicator.transform.localScale = Vector3.one;
-            RectTransform position = indicator.GetComponent<RectTransform>();
-            position.anchorMin = new Vector2(0, 1);
-            position.anchorMax = new Vector2(0, 1);
-            position.sizeDelta = new Vector2(420, 30);
-            position.anchoredPosition = new Vector2(position.sizeDelta.x / 2 + 15, -130 - 30 * i);
-            indicator.fontSize = 20;
-            indicator.fontStyle = FontStyle.Bold;
-            indicator.color = new Color(1, 0.5f, 1 / 3f);
-            if (indicator.enabled)
-            {
-                i++;
-            }
-        }
+        updateStatBars();
+        updateScore();
+        updateIndicators();
         if (Requiem.INSTANCE.Paused)
         {
             PauseMenu.SetActive(true);
@@ -116,6 +86,56 @@ public class PlayerHUD : MonoBehaviour
     /***** PROTECTED *****/
    
     /***** PRIVATE *****/
+    private void updateIndicators()
+    {
+        int i = 0;
+        foreach (Text indicator in StatusIndicators.Values)
+        {
+            indicator.transform.SetParent(transform, false);
+            indicator.transform.localScale = Vector3.one;
+            RectTransform position = indicator.GetComponent<RectTransform>();
+            position.anchorMin = new Vector2(0, 1);
+            position.anchorMax = new Vector2(0, 1);
+            position.sizeDelta = new Vector2(420, 30);
+            position.anchoredPosition = new Vector2(position.sizeDelta.x / 2 + 15, -130 - 30 * i);
+            indicator.fontSize = 20;
+            indicator.fontStyle = FontStyle.Bold;
+            indicator.color = new Color(1, 0.5f, 1 / 3f);
+            if (indicator.enabled)
+            {
+                i++;
+            }
+        }
+    }
+
+    private void updateStatBars()
+    {
+
+        if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
+        {
+            statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
+            statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Entity.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
+            if (Player.INSTANCE.HostWeapon)
+            {
+                updateTempoBar();
+            }
+        }
+        else
+        {
+            statBarTransforms[1].anchorMax = new Vector2(0, 1f);
+            statBarTransforms[3].anchorMax = new Vector2(0, 1f);
+        }
+    }
+
+    private void updateScore()
+    {
+        scoreTransforms[1].GetComponent<Text>().text = Scoreboard.INSTANCE.Score.ToString();
+        scoreTransforms[2].GetComponent<Text>().text = Scoreboard.INSTANCE.KillMultiplier.ToString();
+        scoreTransforms[3].GetComponent<Text>().text = Requiem_Arena.INSTANCE.Wave.ToString();
+    }
+
     private void updateTempoBar()
     {
         TempoBar.SetActive(true);

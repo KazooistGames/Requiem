@@ -92,8 +92,7 @@ public class Landmark_Alter : Landmark
         ritualFlame.transform.SetParent(Tile.gameObject.transform, false);
         ritualFlame.shapeModule.shapeType = ParticleSystemShapeType.Donut;
         ritualFlame.shapeModule.scale = flameScale;
-        ritualFlame.FlameStyle(0);
-        ritualFlame.particleLight.intensity = 1f;
+        ritualFlame.SetFlameStyle(_Flames.FlameStyles.Soulless, 0.75f);
         LineRenderer Lines;
         Lines = gameObject.AddComponent<LineRenderer>();
         Lines.enabled = false;
@@ -110,16 +109,16 @@ public class Landmark_Alter : Landmark
             AIBehaviour.angleToDirection(342) * 0.4f * pentagramRadius,
             AIBehaviour.angleToDirection(198) * 0.4f * pentagramRadius,
         };
-        _Flames.FlameStyles flamePreset = _Flames.FlameStyles.Magic;
         yield return null;
         while (true)
         {
             float drawTimer = 0.0f;
             float timerRatio;
             Used = false;
-            ritualFlame.FlameStyle(flamePreset);
             ritualFlame.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
+            ritualFlame.emissionModule.enabled = false;
             yield return new WaitUntil(() => Energized);
+            ritualFlame.emissionModule.enabled = true;
             ritualFlame.shapeModule.scale = flameScale;
             ritualFlame.shapeModule.position = points[0];
             while (drawTimer < RitualDurationSeconds)
@@ -146,10 +145,9 @@ public class Landmark_Alter : Landmark
                 yield return null;
             }
             ritualFlame.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
-            ritualFlame.FlameStyle(flamePreset);
             Used = true;
-            ritualFlame.FlameStyle(0);
             yield return new WaitWhile(() => Energized);
+            ritualFlame.emissionModule.enabled = false;
             Used = false;
             float fadeOutTimer = 0;
             float fadeOutPeriod = 3;
