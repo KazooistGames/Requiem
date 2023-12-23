@@ -123,7 +123,7 @@ public class Entity : MonoBehaviour
 
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
 
-    public GameObject Location;
+    public Hextile TileLocation;
     public GameObject head;
 
     public bool FinalDashEnabled = false;
@@ -255,7 +255,7 @@ public class Entity : MonoBehaviour
             {
                 Poise -= increment;
             }
-            else if (Poise < restingValue)
+            else if (Poise < restingValue && !Staggered)
             {
                 Poise += increment;
             }
@@ -359,7 +359,15 @@ public class Entity : MonoBehaviour
         if (Physics.Raycast(hoverRayInit, Vector3.down, out hoverHit, Hextile.Thickness, (1 << Requiem.layerTile), QueryTriggerInteraction.Ignore))
         {
             floorHeight = hoverHit.point.y + hoverActual * scaleActual;
-            Location = hoverHit.collider.gameObject;
+            if (hoverHit.collider.gameObject.GetComponent<Hextile>())
+            {
+                TileLocation = hoverHit.collider.gameObject.GetComponent<Hextile>();
+            }
+            else if (hoverHit.collider.gameObject.GetComponent<Landmark>())
+            {
+                TileLocation = hoverHit.collider.gameObject.GetComponent<Landmark>().Tile;
+            }
+            
         }
         transform.position = new Vector3(transform.position.x, floorHeight, transform.position.z);
         float effectiveAccel = AccelerationActual;

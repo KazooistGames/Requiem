@@ -170,7 +170,7 @@ public class Requiem_Arena : Requiem
             Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             Wave++;
             StartingGate.OpenDoor();
-            yield return null;
+            yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             StateOfGame = GameState.Wave;
             Alter.DesiredOffering = Alter.TopStep;
@@ -209,7 +209,6 @@ public class Requiem_Arena : Requiem
             Scoreboard.KillMultiplier += WaveKillMultiplierBonus;
             BloodWell.Volume = 100;
             blurbIndicator.SetActive(false);
-            yield return null;
         }
     }
 
@@ -292,7 +291,8 @@ public class Requiem_Arena : Requiem
 
         WaveMobs = new List<GameObject>();
         int spawnIndex = 0;
-        List<Hextile> viableSpawnTiles = ArenaTiles.Aggregate(new List<Hextile>(), (ring, result) => result.Concat(ring).ToList());
+        Hextile playerTile = Player.INSTANCE.HostEntity.TileLocation;
+        List<Hextile> viableSpawnTiles = ArenaTiles.Aggregate(new List<Hextile>(), (ring, result) => result.Concat(ring.Where(tile => tile != playerTile && !tile.AdjacentTiles.ContainsKey(playerTile)).ToList()).ToList());
         while (strengthToSpawn > 0)
         {
             int strengthOfSpawnChunk = Mathf.Min(strengthToSpawn, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);

@@ -1071,7 +1071,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1285575790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1971,7 +1971,8 @@ MonoBehaviour:
   CenterTile: {fileID: 0}
   Alter: {fileID: 0}
   BloodWell: {fileID: 0}
-  SpeedTimeGateTimeLeft: 0
+  QuestGiver: {fileID: 0}
+  TimeGateTimeLeft: 0
   Wave: 0
   TotalStrengthOfWave: 0
   WaveMobs: []
@@ -2035,6 +2036,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 488971b86d070214db3e43c62458569e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Score: 0
-  KillMultiplier: 1
-  SpeedBonus: 0

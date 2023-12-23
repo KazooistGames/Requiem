@@ -17,6 +17,9 @@ public class Scoreboard : MonoBehaviour
     {
         INSTANCE = this;
         Entity.EntityVanquished.AddListener(ADD_POINTS_FOR_KILL);
+        Score = 0;
+        KillMultiplier = 1;
+        SpeedBonus = 0;
     }
 
     void Update()

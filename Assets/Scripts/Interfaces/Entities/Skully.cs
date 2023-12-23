@@ -31,7 +31,7 @@ public class Skully : Entity
     protected override void Update()
     {
         base.Update();
-        BaseAcceleration = Dashing ? 6 : 4;
+        BaseAcceleration = Dashing ? 6 : 3;
     }
 
     protected override void FixedUpdate()
