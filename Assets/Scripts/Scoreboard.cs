@@ -7,12 +7,10 @@ public class Scoreboard : MonoBehaviour
 {
 
     public static Scoreboard INSTANCE;
-    public int Score = 0;
-    public int KillMultiplier = 1;
+    public static int Score = 0;
 
-    public int SpeedBonus = 0;
-
-
+    public static float KillMultiplier = 1;
+    public static float SpeedBonus = 0;
 
     
     void Start()
@@ -23,7 +21,7 @@ public class Scoreboard : MonoBehaviour
 
     void Update()
     {
-
+        KillMultiplier = Mathf.Max(1.0f, KillMultiplier);
     }
 
 
@@ -40,7 +38,7 @@ public class Scoreboard : MonoBehaviour
     {
         if(vanquishedEntity.Allegiance != Player.INSTANCE.HostEntity.Allegiance)
         {
-            INSTANCE.Score += (int)vanquishedEntity.Strength;
+            Score += Mathf.RoundToInt(vanquishedEntity.Strength * KillMultiplier);
         }
     }
 

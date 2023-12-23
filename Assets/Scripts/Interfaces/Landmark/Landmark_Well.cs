@@ -46,6 +46,7 @@ public class Landmark_Well : Landmark
         if(entity ? Volume > 0 && entity.Interacting && !gulping : false)
         {
             gulping = true;
+            Scoreboard.KillMultiplier = 1.0f;
             StartCoroutine(gulp(entity, 20));
         }
         else

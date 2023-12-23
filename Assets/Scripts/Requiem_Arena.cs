@@ -39,6 +39,8 @@ public class Requiem_Arena : Requiem
 
     public int Wave = 0;
 
+    private float WaveKillMultiplierBonus = 0.25f;
+
     protected override void Start()
     {
         base.Start();
@@ -183,7 +185,7 @@ public class Requiem_Arena : Requiem
                 {
                     int minutesLeft = (int)TimeGateTimeLeft / 60;
                     int secondsLeft = (int)TimeGateTimeLeft % 60;
-                    string timeLeftText = minutesLeft.ToString() + ":" + secondsLeft.ToString();
+                    string timeLeftText = minutesLeft.ToString("0") + ":" + secondsLeft.ToString("00");
                     blurbIndicator.GetComponent<Text>().text = timeLeftText;
                     yield return new WaitForSeconds(1f);
                     spawnedMobs.RemoveAll(x => x == null);
@@ -204,8 +206,10 @@ public class Requiem_Arena : Requiem
                 }
             }
             yield return new WaitUntil(() => spawnedMobs.Count(x => x != null) == 0);
+            Scoreboard.KillMultiplier += WaveKillMultiplierBonus;
             BloodWell.Volume = 100;
             blurbIndicator.SetActive(false);
+            yield return null;
         }
     }
 
