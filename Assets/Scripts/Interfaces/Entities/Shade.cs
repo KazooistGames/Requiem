@@ -27,7 +27,7 @@ public class Shade : Entity
             shadeAnimations = Resources.Load<RuntimeAnimatorController>("Animation/Shade/shadeAnimation");
         }
         anim.runtimeAnimatorController = shadeAnimations;
-        EventVanquished.AddListener(Dissipate);
+        JustVanquished.AddListener(Dissipate);
     }
 
     protected override void Update()

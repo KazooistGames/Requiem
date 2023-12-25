@@ -7,19 +7,22 @@ public class Scoreboard : MonoBehaviour
 {
 
     public static Scoreboard INSTANCE;
-    public static int Score = 0;
+    public static float Score = 0;
 
     public static float KillMultiplier = 1;
     public static float SpeedBonus = 0;
 
-    
+    private static List<Entity> validEntitiesToScoreFromKilling = new List<Entity>();
+
     void Start()
     {
         INSTANCE = this;
-        Entity.EntityVanquished.AddListener(ADD_POINTS_FOR_KILL);
         Score = 0;
         KillMultiplier = 1;
-        SpeedBonus = 0;
+        SpeedBonus = 0; 
+        validEntitiesToScoreFromKilling = new List<Entity>();
+        Entity.EntityVanquished.AddListener(Score_Entity_Kill);
+        Entity.EntityWounded.AddListener(Score_Weapon_Hit);
     }
 
     void Update()
@@ -29,19 +32,31 @@ public class Scoreboard : MonoBehaviour
 
 
     /***** PUBLIC *****/
-
+    public static void Score_Weapon_Hit(Entity entity, float magnitude)
+    {
+        validEntitiesToScoreFromKilling.Add(entity);
+        if(magnitude > entity.Strength) //overkill gives bonus points
+        {
+            ADD_SCORE(magnitude - entity.Vitality);
+        }
+    }
 
     /***** PROTECTED *****/
 
 
     /***** PRIVATE *****/
-
-
-    private static void ADD_POINTS_FOR_KILL(Entity vanquishedEntity)
+    private static void ADD_SCORE(float baseScore)
     {
-        if(vanquishedEntity.Allegiance != Player.INSTANCE.HostEntity.Allegiance)
+        Score += baseScore * KillMultiplier;
+    }
+
+
+    private static void Score_Entity_Kill(Entity vanquishedEntity)
+    {
+        if(validEntitiesToScoreFromKilling.Contains(vanquishedEntity))
         {
-            Score += Mathf.RoundToInt(vanquishedEntity.Strength * KillMultiplier);
+            ADD_SCORE(vanquishedEntity.Strength);
+            validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
         }
     }
 

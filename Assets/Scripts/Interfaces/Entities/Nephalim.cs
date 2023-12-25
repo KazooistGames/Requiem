@@ -27,7 +27,7 @@ public class Nephalim : Entity
         base.Start();
         createSkeleton();
         gameObject.name = "Nephy";  
-        EventWounded.AddListener(CRUMBLE);
+        JustWounded.AddListener(CRUMBLE);
 
     }
 

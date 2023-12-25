@@ -268,7 +268,7 @@ public class Wieldable : MonoBehaviour
             yield break;
         }
         Wielder = newOwner;
-        Wielder.EventPickedUpWieldable.Invoke(this);
+        Wielder.JustPickedUpWieldable.Invoke(this);
         if (!Wielder.leftStorage && !Wielder.rightStorage && !Wielder.backStorage)
         {
             Wielder.wieldMode = Entity.WieldMode.OneHanders;

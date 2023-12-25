@@ -23,7 +23,7 @@ public class Skelly : Entity
         createSkeleton();
         Haste = 0.75f;
         gameObject.name = "Skelly";
-        EventWounded.AddListener(CRUMBLE);
+        JustWounded.AddListener(CRUMBLE);
     }
 
     protected override void Update()

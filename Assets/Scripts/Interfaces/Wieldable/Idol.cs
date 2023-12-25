@@ -149,13 +149,13 @@ public class Idol : Wieldable
         transform.localEulerAngles = Vector3.zero;
         transform.localScale /= Entity.Scale;
 
-        mobEntity.EventVanquished.AddListener(BecomeItem);
+        mobEntity.JustVanquished.AddListener(BecomeItem);
         mobEntity.FinalDashEnabled = true;
     }
 
     public void BecomeItem()
     {
-        mobEntity.EventVanquished.RemoveListener(BecomeItem);
+        mobEntity.JustVanquished.RemoveListener(BecomeItem);
         togglePhysicsBox(true);
         Body.isKinematic = false;
         StartCoroutine(reviveMob(15));

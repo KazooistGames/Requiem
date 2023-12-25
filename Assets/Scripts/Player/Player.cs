@@ -59,9 +59,10 @@ public class Player : MonoBehaviour
         {
             updateChainlink();
         }
-        if (HostEntity ? HostEntity.MainHand : false)
+        else if (HostEntity ? HostEntity.MainHand : false)
         {
             HostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
+            HostWeapon.Hitting.AddListener(Scoreboard.Score_Weapon_Hit);
         }
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {

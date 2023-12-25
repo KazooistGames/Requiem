@@ -30,8 +30,8 @@ public class Ghosty : Entity
         base.Start();
         createProfile();
         gameObject.name = "Ghosty";
-        EventVanquished.AddListener(Dematerialize);
-        Disarmed.AddListener(Die);
+        JustVanquished.AddListener(Dematerialize);
+        JustDisarmed.AddListener(Die);
     }
 
     protected override void Update()

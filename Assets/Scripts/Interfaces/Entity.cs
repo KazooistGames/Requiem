@@ -11,6 +11,7 @@ using static PlayerProgression;
 public class Entity : MonoBehaviour
 {
     public static UnityEvent<Entity> EntityVanquished = new UnityEvent<Entity> { };
+    public static UnityEvent<Entity, float> EntityWounded = new UnityEvent<Entity, float> { };
 
     public Player requiemPlayer;
 
@@ -44,12 +45,12 @@ public class Entity : MonoBehaviour
     public float heightActual { get; private set; }
     public float hoverActual { get; private set; }
 
-    public UnityEvent Disarmed = new UnityEvent();
-    public UnityEvent EventVanquished = new UnityEvent();
-    public UnityEvent<float> EventWounded = new UnityEvent<float>();
-    public UnityEvent EventCrashed = new UnityEvent();
-    public UnityEvent<Entity, float> EventLandedDashHit = new UnityEvent<Entity, float>();
-    public UnityEvent<Wieldable> EventPickedUpWieldable = new UnityEvent<Wieldable>();
+    public UnityEvent JustDisarmed = new UnityEvent();
+    public UnityEvent JustVanquished = new UnityEvent();
+    public UnityEvent<float> JustWounded = new UnityEvent<float>();
+    public UnityEvent JustCrashed = new UnityEvent();
+    public UnityEvent<Entity, float> JustLandedDashHit = new UnityEvent<Entity, float>();
+    public UnityEvent<Wieldable> JustPickedUpWieldable = new UnityEvent<Wieldable>();
 
     public Entity Foe;
     public bool Aggressive = true;
@@ -225,7 +226,7 @@ public class Entity : MonoBehaviour
         flames.gameObject.SetActive(false);
         Poise = Strength;
         StartCoroutine(routineDashHandler());
-        EventPickedUpWieldable.AddListener(handleWeaponPickedUp);
+        JustPickedUpWieldable.AddListener(handleWeaponPickedUp);
     }
 
     protected virtual void Update()
@@ -512,9 +513,9 @@ public class Entity : MonoBehaviour
     {
         if (magnitude > 0)
         {
-
+            JustWounded.Invoke(magnitude);
+            EntityWounded.Invoke(this, magnitude);
             Vitality -= magnitude;
-            EventWounded.Invoke(magnitude);
         }
     }
 
@@ -542,7 +543,7 @@ public class Entity : MonoBehaviour
         {
             offWep.DropItem(yeet: true, magnitude: yeetMagnitude);
         }
-        Disarmed.Invoke();
+        JustDisarmed.Invoke();
     }
 
     public void Shove(Vector3 VelocityChange, bool Dash = false)
@@ -597,7 +598,7 @@ public class Entity : MonoBehaviour
         {
             OffHand.DropItem();
         }
-        EventVanquished.Invoke();
+        JustVanquished.Invoke();
         Destroy(gameObject);
     }
 
@@ -708,7 +709,7 @@ public class Entity : MonoBehaviour
                 foe.Shove(ShoveVector);
                 if(foe.Allegiance != Allegiance)
                 {
-                    foe.EventCrashed.Invoke();
+                    foe.JustCrashed.Invoke();
                     float damage = CRASH_DAMAGE * impactRatio;
                     if (FinalDash)
                     {
@@ -719,7 +720,7 @@ public class Entity : MonoBehaviour
                         foe.Vitality = 0;
                     }
                     foe.applyDamageToPoiseThenVitality(damage);
-                    EventLandedDashHit.Invoke(foe, damage);
+                    JustLandedDashHit.Invoke(foe, damage);
                 }
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
             }
@@ -753,7 +754,7 @@ public class Entity : MonoBehaviour
                 float impactToSelf = Strength_Ratio(otherEntity, this) * velocityRatio / 2;
                 Shove(collision.relativeVelocity.normalized * impactToSelf);
                 applyDamageToPoiseThenVitality(impactToSelf * CRASH_DAMAGE);
-                EventCrashed.Invoke();
+                JustCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
@@ -772,7 +773,7 @@ public class Entity : MonoBehaviour
                     {
                         applyDamageToPoiseThenVitality(velocityRatio * CRASH_DAMAGE);
                     }
-                    EventCrashed.Invoke();
+                    JustCrashed.Invoke();
                 }
                 CrashEnvironmentONS = false;
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));

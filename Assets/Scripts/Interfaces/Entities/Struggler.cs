@@ -23,7 +23,7 @@ public class Struggler : Entity
         base.Start();
         createProfile();
         gameObject.name = "Struggler";
-        EventWounded.AddListener(fleshWound);
+        JustWounded.AddListener(fleshWound);
         MyHalberd = new GameObject().AddComponent<Halberd>();
         MyHalberd.PickupItem(this);
     }

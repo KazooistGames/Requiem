@@ -23,7 +23,7 @@ public class Devil : Entity
         base.Start();
         createProfile();
         gameObject.name = "Devil";
-        EventWounded.AddListener(fleshWound);
+        JustWounded.AddListener(fleshWound);
 
     }
 

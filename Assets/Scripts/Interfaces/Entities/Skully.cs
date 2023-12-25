@@ -12,7 +12,7 @@ public class Skully : Entity
         Strength = 25f;
         berthScalar = 0.80f;
         Haste = 1.25f;
-
+        heightScalar = 0.4f;
     }
 
     protected override void Start()
@@ -24,7 +24,7 @@ public class Skully : Entity
         }
         anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animation/entities/skully/skullyAnimation");
         gameObject.name = "Skully";
-        hurtBox.height = 0;
+        hurtBox.height = 0.7f;
         hurtBox.center = Vector3.up * 0.2f;
     }
 

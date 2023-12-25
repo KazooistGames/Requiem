@@ -543,8 +543,8 @@ public abstract class Weapon : Wieldable
                 {
                     togglePhysicsBox(false);
                     alreadyHit.Add(foe.gameObject);
-                    foe.EventCrashed.AddListener(impale_doupleDipDamage);
-                    foe.EventVanquished.AddListener(ImpaleRelease);
+                    foe.JustCrashed.AddListener(impale_doupleDipDamage);
+                    foe.JustVanquished.AddListener(ImpaleRelease);
                     foe.modSpeed[key] = -(Heft/foe.Strength);
                     foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
                     yield return new WaitWhile(() => foe ? foe.Posture != Entity.PostureStrength.Strong : false);
@@ -583,8 +583,8 @@ public abstract class Weapon : Wieldable
         if (foe)
         {
             string key = "impaled" + gameObject.GetHashCode().ToString();
-            foe.EventCrashed.RemoveListener(impale_doupleDipDamage);
-            foe.EventVanquished.RemoveListener(ImpaleRelease);
+            foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
+            foe.JustVanquished.RemoveListener(ImpaleRelease);
             foe.modSpeed.Remove(key);
             foe.BleedingWounds.Remove(key);
         }
@@ -603,7 +603,7 @@ public abstract class Weapon : Wieldable
         Entity foe = ImpaledObject.GetComponent<Entity>();
         if (foe)
         {
-            foe.EventCrashed.RemoveListener(impale_doupleDipDamage);
+            foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
             foe.Damage(Power);
             playSlap(transform.position);
         }
@@ -781,7 +781,7 @@ public abstract class Weapon : Wieldable
             {
                 return ActionAnim.Recovering;
             }
-            else if (nextAnimation.IsTag("Idel"))
+            else if (nextAnimation.IsTag("Idle"))
             {
                 return ActionAnim.Recovering;
             }

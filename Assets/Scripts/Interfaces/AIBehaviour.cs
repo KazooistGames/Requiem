@@ -97,7 +97,7 @@ public class AIBehaviour : MonoBehaviour
         patrolMask = 1 << Requiem.layerWall + (1 << Requiem.layerObstacle);
         StartCoroutine(Think());
         StartCoroutine(stateHandler());
-        entity.EventWounded.AddListener((float damage) => sensoryAlerted = true);
+        entity.JustWounded.AddListener((float damage) => sensoryAlerted = true);
         martialFoeVulnerable.AddListener(reactToFoeVulnerable);
         martialFoeAttacking.AddListener(reactToIncomingAttack);
         martialFoeDashing.AddListener(reactToIncomingDash);
