@@ -262,7 +262,7 @@ public class Entity : MonoBehaviour
             }
         }  
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
-        Poise = Mathf.Clamp(Poise, 0, Strength);
+        Poise = Mathf.Clamp(Poise, -1f, Strength);
         Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier));
         updatePosture();
         if (Vitality <= 0)
@@ -493,8 +493,11 @@ public class Entity : MonoBehaviour
     public void alterPoise(float value, bool impactful = true)
     {
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
-        Poise += value;
-        Poise = Mathf.Clamp(Poise, -1, Strength);
+        if(impactful || Poise + value > 0)
+        {
+            Poise += value;
+        }
+        Poise = Mathf.Clamp(Poise, -1f, Strength);
         if (value * existingDelta >= 0)
         {
             float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
@@ -509,6 +512,7 @@ public class Entity : MonoBehaviour
         }
         updatePosture();
     }
+
     public virtual void Damage(float magnitude)
     {
         if (magnitude > 0)

@@ -9,6 +9,8 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public class Landmark_Well : Landmark
 {
+    public static UnityEvent<Entity, float> JustGulped = new UnityEvent<Entity, float>();
+
     public float Volume = 100;
     private float fullDrinkPeriod = 4.0f;
     protected static GameObject WellModelTemplate;
@@ -46,7 +48,6 @@ public class Landmark_Well : Landmark
         if(entity ? Volume > 0 && entity.Interacting && !gulping : false)
         {
             gulping = true;
-            Scoreboard.KillMultiplier = 1.0f;
             StartCoroutine(gulp(entity, 20));
         }
         else
@@ -91,9 +92,10 @@ public class Landmark_Well : Landmark
 
 
     /***** PRIVATE *****/
-    private IEnumerator gulp(Entity benefactor, float amount)
+    private IEnumerator gulp(Entity benefactor, float volumeToGulp)
     {
-        while(amount > 0 && Volume > 0)
+        JustGulped.Invoke(benefactor, volumeToGulp);
+        while(volumeToGulp > 0 && Volume > 0)
         {
             gulping = true;
             if (!Requiem.INSTANCE.Paused)
@@ -101,17 +103,14 @@ public class Landmark_Well : Landmark
                 if (!gulpSound)
                 {
                     playGulp();
-                    if (UnityEngine.Random.value > 0.5f)
-                    {
-                        Vector3 disposition = benefactor.transform.position - transform.position;
-                        Vector3 tinyOffset = new Vector3(UnityEngine.Random.value * 0.1f - 0.05f, 0, UnityEngine.Random.value * 0.1f - 0.05f);
-                        float scale = 0.05f + UnityEngine.Random.value * 0.15f;
-                        splatter(disposition + tinyOffset, scale);
-                    }
+                    Vector3 disposition = benefactor.transform.position - transform.position;
+                    Vector3 tinyOffset = new Vector3(UnityEngine.Random.value- 0.5f, 0, UnityEngine.Random.value - 0.5f) * 0.1f;
+                    float scale = 0.05f + UnityEngine.Random.value * 0.15f;
+                    splatter(disposition + tinyOffset, scale);
                 }
                 Energized = true;
                 float increment = Time.deltaTime / fullDrinkPeriod;
-                amount -= 100 * increment;
+                volumeToGulp -= 100 * increment;
                 Volume -= 100 * increment;
                 benefactor.Vitality += benefactor.Strength * increment;
             }

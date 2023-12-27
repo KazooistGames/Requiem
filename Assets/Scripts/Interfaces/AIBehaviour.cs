@@ -101,6 +101,7 @@ public class AIBehaviour : MonoBehaviour
         martialFoeVulnerable.AddListener(reactToFoeVulnerable);
         martialFoeAttacking.AddListener(reactToIncomingAttack);
         martialFoeDashing.AddListener(reactToIncomingDash);
+        martialFoeThrowing.AddListener(reactToFoeThrowing);
         sensoryFoeSpotted.AddListener(reactToFoeChange);
         sensoryFoeLost.AddListener(reactToFoeChange);
         _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
@@ -321,6 +322,11 @@ public class AIBehaviour : MonoBehaviour
     }
 
     protected virtual void reactToIncomingDash()
+    {
+
+    }
+
+    protected virtual void reactToFoeThrowing()
     {
 
     }
@@ -781,11 +787,13 @@ public class AIBehaviour : MonoBehaviour
     public UnityEvent martialFoeDashing = new UnityEvent();    
     public UnityEvent martialFoeEnteredRange = new UnityEvent();    
     public UnityEvent martialEnteredRange = new UnityEvent();
+    public UnityEvent martialFoeThrowing = new UnityEvent();
     protected bool martialFoeVulnerableLatch = false;
     protected bool martialFoeAttackingLatch = false;
     protected bool martialFoeChargingLatch = false;
     protected bool martialFoeEnteredRangeLatch = false;
     protected bool martialEnteredRangeLatch = false;
+    protected bool martialFoeThrowingLatch = false;
     protected Weapon mainWep;
     protected Weapon offWep;
     protected Weapon matchupMain;
@@ -810,10 +818,16 @@ public class AIBehaviour : MonoBehaviour
             bool foeAttacking = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickAttack : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickAttack : false);
             bool foeCoiling = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickCoil || matchupMain.Action == Weapon.ActionAnim.StrongCoil : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickCoil || matchupOff.Action == Weapon.ActionAnim.StrongCoil : false);
             bool foeWindingUp = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickWindup || matchupMain.Action == Weapon.ActionAnim.StrongWindup : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickWindup || matchupOff.Action == Weapon.ActionAnim.StrongWindup : false);          
-            bool foeAiming = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.Aiming : false) || (matchupOff ? matchupMain.Action == Weapon.ActionAnim.Aiming : false);         
+            bool foeAiming = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.Aiming : false) || (matchupOff ? matchupMain.Action == Weapon.ActionAnim.Aiming : false);
             //bool foeCharging = (matchupMain ? matchupMain.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false) || (matchupOff ? matchupOff.ActionAnimated == Weapon.ActionAnimation.StrongWindup : false);
 
-            if(!martialEnteredRangeLatch && inRange)
+            bool instantaneousFoeThrowing = foeFacing && foeAiming;
+            if (!martialFoeThrowingLatch && instantaneousFoeThrowing)
+            {
+                martialFoeThrowing.Invoke();
+            }
+            martialFoeThrowingLatch = instantaneousFoeThrowing;
+            if (!martialEnteredRangeLatch && inRange)
             {
                 martialEnteredRange.Invoke();
             }

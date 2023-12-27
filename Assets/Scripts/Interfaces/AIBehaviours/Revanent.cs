@@ -213,6 +213,27 @@ public class Revanent : AIBehaviour
         
     }
 
+
+    protected override void reactToFoeThrowing()
+    {
+        if (checkMyWeaponInRange())
+        {
+            
+        }
+        else if(dashingCooldownTimer > 0.5f && mainWep.Action != Weapon.ActionAnim.Guarding)
+        {
+            dashingChargePeriod = 0;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+            dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
+        }
+        else
+        {
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+        }
+        
+    }
+
     /***** PRIVATE *****/
 
 

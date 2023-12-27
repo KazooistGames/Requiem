@@ -23,6 +23,7 @@ public class Scoreboard : MonoBehaviour
         validEntitiesToScoreFromKilling = new List<Entity>();
         Entity.EntityVanquished.AddListener(Score_Entity_Kill);
         Entity.EntityWounded.AddListener(Score_Weapon_Hit);
+        Landmark_Well.JustGulped.AddListener(PENALIZE_GULP);
     }
 
     void Update()
@@ -45,6 +46,14 @@ public class Scoreboard : MonoBehaviour
 
 
     /***** PRIVATE *****/
+    private static void PENALIZE_GULP(Entity entity, float amountGulped)
+    {
+        if(entity == Player.INSTANCE.HostEntity)
+        {
+            KillMultiplier -= amountGulped / 100f;
+        }
+    }
+
     private static void ADD_SCORE(float baseScore)
     {
         Score += baseScore * KillMultiplier;

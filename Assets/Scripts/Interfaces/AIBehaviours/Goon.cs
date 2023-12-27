@@ -109,6 +109,17 @@ public class Goon : AIBehaviour
         }
     }
 
+    protected override void reactToFoeThrowing()
+    {
+        if (!checkMyWeaponInRange() && Random.value >= Aggression)
+        {
+            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f), () => !martialFoeThrowingLatch);
+        }
+    }
+
+
+    /***** PRIVATE *****/
     private bool timeoutCheckMyWeaponInRange()
     {
         if (!mainWep)
@@ -120,7 +131,7 @@ public class Goon : AIBehaviour
             return true;
         }
         else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
-             
+
         {
             return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 5;
         }
@@ -129,8 +140,6 @@ public class Goon : AIBehaviour
             return false;
         }
     }
-
-    /***** PRIVATE *****/
 
 
 }
