@@ -730,9 +730,12 @@ public class Entity : MonoBehaviour
                     }
                     if (foe.requiemPlayer ? false : !foe.Foe)
                     {
-                        foe.Vitality = 0;
+                        foe.Damage(damage);
                     }
-                    foe.applyDamageToPoiseThenVitality(damage);
+                    else
+                    {
+                        foe.applyDamageToPoiseThenVitality(damage);
+                    }
                     JustLandedDashHit.Invoke(foe, damage);
                 }
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
