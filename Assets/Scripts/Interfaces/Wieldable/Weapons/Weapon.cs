@@ -301,13 +301,13 @@ public abstract class Weapon : Wieldable
             {
                 if (RESOLVE_HIT(this, foe))
                 {
-                    StartCoroutine(ImpaleRoutine(collision));
+                    checkImpale(collision);
                 }
             }
             else if (collision.gameObject.layer == Requiem.layerObstacle || collision.gameObject.layer == Requiem.layerTile || collision.gameObject.layer == Requiem.layerWall || collision.gameObject.layer == Requiem.layerItem)
             {
                 playTink();
-                StartCoroutine(ImpaleRoutine(collision));
+                checkImpale(collision);
             }
         }
         else if (collision.collider.gameObject.layer == Requiem.layerTile && contact.thisCollider == blade)
@@ -505,74 +505,77 @@ public abstract class Weapon : Wieldable
         alreadyHit.Add(obstacle);
     }
 
-    private IEnumerator ImpaleRoutine(Collision collision)
+    private void checkImpale(Collision collision)
     {
-        setHighlightColor(Color.black);
         Entity foe = collision.gameObject.GetComponent<Entity>();
+        setHighlightColor(Color.black);
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
         bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.25f : 0.5f) : true);
         if (cleanhit && !ImpaledObject)
         {
-            if (foe)
-            {
-                Hitting.Invoke(this, foe);
-            }
-            ImpaledObject = collision.gameObject;
-            Thrown = false;
-            //ImpalingSomething = true;
-            Body.isKinematic = true;
-            transform.SetParent(collision.gameObject.transform, true);
-            togglePhysicsBox(false);
-            Vector3 bladeLocation = transform.TransformPoint((blade as BoxCollider).center);
-            Vector3 disposition = contact.point - bladeLocation;
-            Vector3 checkDisposition = contact.point - MostRecentWielder.transform.position;
-            if (Vector3.Dot(disposition, checkDisposition) > 0)
-            {
-                transform.position += disposition * 1.25f;
-            }
-            else
-            {
-                transform.position += disposition;
-            }
-            if (foe)
-            {
-                foe.EventAttemptPickup.AddListener(PickupItem);
-                string key = "impaled" + gameObject.GetHashCode().ToString();
-                if (foe.Vitality > 0)
-                {
-                    togglePhysicsBox(false);
-                    alreadyHit.Add(foe.gameObject);
-                    foe.JustCrashed.AddListener(impale_doupleDipDamage);
-                    foe.JustVanquished.AddListener(ImpaleRelease);
-                    foe.modSpeed[key] = -(Heft/foe.Strength);
-                    foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
-                    yield return new WaitWhile(() => foe ? foe.Posture != Entity.PostureStrength.Strong : false);
-                    if (foe)
-                    {
-                        ImpaleRelease();
-                    }
-                }
-                else
-                {
-                    ImpaleRelease();
-                }
-                yield break;           
-            }
-            else
-            {
-                HitBox.enabled = true;
-                GameObject impaledObject = collision.gameObject;
-                yield return new WaitUntil(() => Wielder || !impaledObject);
-                //ImpalingSomething = false;
-                togglePhysicsBox(!Wielder);
-                yield break;
-            }
+            StartCoroutine(ImpaleRoutine(collision.gameObject, contact.point));
+        }
+    }
+
+    private IEnumerator ImpaleRoutine(GameObject collidedObject, Vector3 contactPoint)
+    {
+        Entity foe = collidedObject.GetComponent<Entity>();
+        if (foe)
+        {
+            Hitting.Invoke(this, foe);
+        }
+        ImpaledObject = collidedObject;
+        Thrown = false;
+        //ImpalingSomething = true;
+        Body.isKinematic = true;
+        transform.SetParent(collidedObject.transform, true);
+        togglePhysicsBox(false);
+        Vector3 bladeLocation = transform.TransformPoint((blade as BoxCollider).center);
+        Vector3 disposition = contactPoint - bladeLocation;
+        Vector3 checkDisposition = contactPoint - MostRecentWielder.transform.position;
+        if (Vector3.Dot(disposition, checkDisposition) > 0)
+        {
+            transform.position += disposition * 1.25f;
         }
         else
         {
+            transform.position += disposition;
+        }
+        if (foe)
+        {
+            foe.EventAttemptPickup.AddListener(PickupItem);
+            string key = "impaled" + gameObject.GetHashCode().ToString();
+            if (foe.Vitality > 0)
+            {
+                togglePhysicsBox(false);
+                alreadyHit.Add(foe.gameObject);
+                foe.JustCrashed.AddListener(impale_doupleDipDamage);
+                foe.JustVanquished.AddListener(ImpaleRelease);
+                foe.modSpeed[key] = -(Heft/foe.Strength);
+                foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
+                yield return new WaitWhile(() => foe ? foe.Posture != Entity.PostureStrength.Strong : false);
+                if (foe)
+                {
+                    ImpaleRelease();
+                }
+            }
+            else
+            {
+                ImpaleRelease();
+            }
+            yield break;           
+        }
+        else
+        {
+            HitBox.enabled = true;
+            GameObject impaledObject = collidedObject;
+            yield return new WaitUntil(() => Wielder || !impaledObject);
+            //ImpalingSomething = false;
+            togglePhysicsBox(!Wielder);
             yield break;
-        }         
+        }
+    
     }
 
     public void ImpaleRelease()

@@ -23,12 +23,13 @@ public class _Flames : MonoBehaviour
     private static List<Color> colors = new List<Color>();
     public enum FlameStyles
     {
+        none = -1,
         Inferno = 1,
         Soulless = 2,
         Magic = 3
     }
     public FlameStyles FlamePresentationStyle = FlameStyles.Magic;
-    private FlameStyles cachedFlameStye;
+    private FlameStyles cachedFlameStye = FlameStyles.none;
 
     public GameObject boundObject;
 
@@ -66,11 +67,13 @@ public class _Flames : MonoBehaviour
                 emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.Action == Weapon.ActionAnim.Parrying;
                 if (boundWeapon.TrueStrike)
                 {
-                    SetFlameStyle(FlameStyles.Inferno);
+                    //SetFlameStyle(FlameStyles.Inferno);
+                    emissionModule.enabled = true;
                 }
                 else if (boundWeapon.Action == Weapon.ActionAnim.Parrying)
                 {
-                    SetFlameStyle(FlameStyles.Inferno);
+                    //SetFlameStyle(FlameStyles.Inferno);
+                    emissionModule.enabled = true;
                 }
             }
             else if (boundEntity)
@@ -91,7 +94,6 @@ public class _Flames : MonoBehaviour
         {
             buildGradients();
         }
-        if(preset == FlamePresentationStyle) { return; }
         ParticleSystem.MinMaxGradient flameGradient = colorModule.color;
         switch (preset)
         {

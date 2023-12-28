@@ -11,6 +11,7 @@ public class Struggler : Entity
     protected GameObject torso;
     protected GameObject leg1;
     protected GameObject leg2;
+
     protected override void Awake()
     {
         base.Awake();

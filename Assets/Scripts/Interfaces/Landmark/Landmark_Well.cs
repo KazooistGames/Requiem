@@ -12,7 +12,7 @@ public class Landmark_Well : Landmark
     public static UnityEvent<Entity, float> JustGulped = new UnityEvent<Entity, float>();
 
     public float Volume = 100;
-    private float fullDrinkPeriod = 4.0f;
+    private float fullDrinkPeriod = 5.0f;
     protected static GameObject WellModelTemplate;
     protected GameObject Model;
     protected MeshRenderer bloodPoolRenderer;
@@ -23,7 +23,7 @@ public class Landmark_Well : Landmark
     private float bloodWaveYspeed = 0.1f;
 
     private GameObject gulpSound;
-    private bool gulping = false;
+    private float gulpSize = 20;
 
     private List<GameObject> bloodSplatters = new List<GameObject>();
     protected static GameObject BLOOD_SPLATTER_PREFAB;
@@ -35,27 +35,38 @@ public class Landmark_Well : Landmark
     protected void Update()
     {
         Volume = Mathf.Clamp(Volume, 0, 100);
-        Used = Volume <= 0;
         bloodPoolRenderer.gameObject.transform.localPosition = Vector3.up * Mathf.Lerp(bloodMinHeight, bloodMaxHeight, Volume / 100f);
         bumpMapOffset = new Vector2(Mathf.Sin(Time.time * bloodWaveXspeed), Mathf.Cos(Time.time * bloodWaveYspeed));
         bloodPoolRenderer.material.SetTextureOffset("_MainTex", bumpMapOffset);
         bloodPoolRenderer.gameObject.transform.Rotate(Vector3.up, Time.deltaTime * 5);
     }
 
-    protected void OnTriggerStay(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
-        if(entity ? Volume > 0 && entity.Interacting && !gulping : false)
+        if (entity)
         {
-            gulping = true;
-            StartCoroutine(gulp(entity, 20));
+            entity.Interact.AddListener(gulp);
         }
-        else
+    }
+
+    protected void OnTriggerExit(Collider other)
+    {
+        Entity entity = other.gameObject.GetComponent<Entity>();
+        if (entity)
         {
+            entity.Interact.RemoveListener(gulp);
             Energized = false;
-
         }
 
+    }
+
+    protected void OnTriggerStay(Collider other)
+    {
+        if (!Energized)
+        {
+            Energized = other.gameObject.GetComponent<Entity>();
+        }
     }
 
     /***** PUBLIC *****/
@@ -84,7 +95,6 @@ public class Landmark_Well : Landmark
     {
         Volume = Mathf.Clamp(Volume + addedVolume, 0, 100);
         Energized = false;
-        Used = false;
     }
 
 
@@ -92,17 +102,23 @@ public class Landmark_Well : Landmark
 
 
     /***** PRIVATE *****/
-    private IEnumerator gulp(Entity benefactor, float volumeToGulp)
+    private void gulp(Entity benefactor)
     {
+        StartCoroutine(gulpRoutine(benefactor, gulpSize));
+    }
+
+    private IEnumerator gulpRoutine(Entity benefactor, float volumeToGulp)
+    {
+        if (Used) { yield break; }
         JustGulped.Invoke(benefactor, volumeToGulp);
         while(volumeToGulp > 0 && Volume > 0)
         {
-            gulping = true;
+            Used = true;
             if (!Requiem.INSTANCE.Paused)
             {
                 if (!gulpSound)
                 {
-                    playGulp();
+                    playGulpSound(benefactor);
                     Vector3 disposition = benefactor.transform.position - transform.position;
                     Vector3 tinyOffset = new Vector3(UnityEngine.Random.value- 0.5f, 0, UnityEngine.Random.value - 0.5f) * 0.1f;
                     float scale = 0.05f + UnityEngine.Random.value * 0.15f;
@@ -116,7 +132,7 @@ public class Landmark_Well : Landmark
             }
             yield return null;
         }
-        gulping = false;
+        Used = false;
         yield break;
     }
 
@@ -137,10 +153,11 @@ public class Landmark_Well : Landmark
     }
 
 
-    private void playGulp()
+    private void playGulpSound(Entity benefactor)
     {
-        gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
+        gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 0.8f, 0.8f, _SoundService.Instance.DefaultAudioRange / 4);
         gulpSound.GetComponent<AudioSource>().time = 0.75f;
+        gulpSound.transform.SetParent(benefactor.transform);
     }
 
     private void playSlurp()

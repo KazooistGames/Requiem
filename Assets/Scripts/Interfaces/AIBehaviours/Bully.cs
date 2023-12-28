@@ -65,7 +65,7 @@ public class Bully : AIBehaviour
         }
         else if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if(checkMyWeaponInRange())
@@ -75,14 +75,13 @@ public class Bully : AIBehaviour
         }
         else if(Random.value <= Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongAttack);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
         }
         else
         {
-
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -108,26 +107,28 @@ public class Bully : AIBehaviour
         }
     }
 
-    //protected override void reactToIncomingAttack()
-    //{
-    //    if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnimation.Guarding || entity.Posture != Entity.PostureStrength.Weak)
-    //    {
-    //        return;
-    //    }
-    //    else if (mainWep.Action == Weapon.ActionAnimation.QuickCoil && checkMyWeaponInRange())
-    //    {
-    //        _MartialController.Queue_Action(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
-    //    }
-    //    else
-    //    {
-    //        _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-    //        _MartialController.Override_Queue(mainWep, Weapon.ActionAnimation.Guarding, getPausePeriod());
-    //    }
-    //}
-
 
     /***** PRIVATE *****/
+    private bool timeoutCheckMyWeaponInRange()
+    {
+        if (!mainWep)
+        {
+            return false;
+        }
+        else if (checkMyWeaponInRange())
+        {
+            return true;
+        }
+        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
 
+        {
+            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 
 }

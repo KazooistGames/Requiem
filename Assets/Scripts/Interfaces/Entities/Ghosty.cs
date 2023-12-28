@@ -38,7 +38,7 @@ public class Ghosty : Entity
     {
         base.Update();
         lifeTimer += Time.deltaTime;
-        if (!Player.INSTANCE)
+        if (Player.INSTANCE ? !Player.INSTANCE.HostEntity : true)
         {
 
         }

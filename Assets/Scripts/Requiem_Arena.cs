@@ -10,34 +10,19 @@ public class Requiem_Arena : Requiem
 {
     public static new Requiem_Arena INSTANCE;
     public static int RadiusOfArena = 2;
-    public static int RadiusOfCrypt = 1;
-    public static int LengthOfCorridor = 1;
-    //public int CountOfChambers;
-    //public int CountOfCoves;
 
-    public Hextile StartingTile;
-    public Landmark_Gate StartingGate;
     public List<List<Hextile>> ArenaTiles = new List<List<Hextile>>();
-    private List<List<Hextile>> CryptTiles = new List<List<Hextile>>();
-    public List<Hextile> CorridorTiles = new List<Hextile>();
-    public List<Hextile> chambers = new List<Hextile>();
-    public List<Hextile> coves = new List<Hextile>();
-    //private List<KeyValuePair<Hextile, Hextile.HexPosition>> chamberCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
-    //private List<KeyValuePair<Hextile, Hextile.HexPosition>> coveCandidates = new List<KeyValuePair<Hextile, Hextile.HexPosition>>();
+    public List<Landmark_Gate> Gates;
+    public List<Hextile> Chambers = new List<Hextile>();
 
     public Hextile CenterTile;
     public Landmark_Alter Alter;
     public Landmark_Well BloodWell;
     public Shade QuestGiver;
 
-    private Spawner PatrolSpawner;
-    private Spawner MobSpawner;
-    private Spawner EliteSpawner;
-    private Spawner BossSpawner;
-
     public float TimeGateTimeLeft = 0;
 
-    public int Wave = 0;
+    public int Ritual = 0;
 
     private float WaveKillMultiplierBonus = 0.25f;
 
@@ -60,21 +45,38 @@ public class Requiem_Arena : Requiem
 
         CenterTile = Hextile.GenerateRootTile();
         yield return null;
+        yield return Hextile.DrawCircle(RadiusOfArena, Hextile.LastGeneratedTile, Tiles: ArenaTiles);
 
-        Hextile.HexPosition startingDirection = (Hextile.HexPosition)1;
-        Hextile.HexPosition offsetBy3 = Hextile.RotateHexPosition(startingDirection, 3);
-        yield return Hextile.DrawCircle(RadiusOfArena, Hextile.LastGeneratedTile, Tiles: ArenaTiles); //crypt1
-        StartingGate = new GameObject().AddComponent<Landmark_Gate>();
-        StartingGate.AssignToTile(ArenaTiles[0][0].Edge(startingDirection));
-        StartingGate.SetPositionOnTile(startingDirection);
-        yield return Hextile.DrawCircle(RadiusOfCrypt, ArenaTiles[0][0].Edge(startingDirection), startingDirection, CryptTiles);
+        Hextile.HexPosition firstGateDirection = (Hextile.HexPosition)1;
+        Hextile edgeOne = ArenaTiles[0][0].Edge(firstGateDirection);
+        Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
+        Gates[0].AssignToTile(edgeOne);
+        Gates[0].SetPositionOnTile(firstGateDirection);
+        Chambers.Add(edgeOne.Extend(firstGateDirection));
+        BloodWell = new GameObject().AddComponent<Landmark_Well>();
+        BloodWell.AssignToTile(Chambers[0]);
+
+        Hextile.HexPosition secondGateDirection = Hextile.RotateHexPosition(firstGateDirection, 2);
+        Hextile edgeTwo = ArenaTiles[0][0].Edge(secondGateDirection);
+        Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
+        Gates[1].AssignToTile(edgeTwo);
+        Gates[1].SetPositionOnTile(secondGateDirection);  
+        Chambers.Add(edgeTwo.Extend(secondGateDirection));
+
+        Hextile.HexPosition thirdGateDirection = Hextile.RotateHexPosition(secondGateDirection, 2);
+        Hextile edgeThree = ArenaTiles[0][0].Edge(thirdGateDirection);
+        Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
+        Gates[2].AssignToTile(edgeThree);
+        Gates[2].SetPositionOnTile(thirdGateDirection);
+        Chambers.Add(edgeThree.Extend(thirdGateDirection));
+        //yield return Hextile.DrawCircle(RadiusOfCrypt, ArenaTiles[0][0].Edge(startingDirection), startingDirection, CryptTiles);
 
         AllTilesInPlay.AddRange(ArenaTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        AllTilesInPlay.AddRange(CryptTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        AllTilesInPlay.AddRange(chambers);
+        //AllTilesInPlay.AddRange(CryptTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
+        AllTilesInPlay.AddRange(Chambers);
 
         yield return buildArenaLandmarks(ArenaTiles);
-        yield return buildCryptLandmarks(CryptTiles);
+        //yield return buildCryptLandmarks(CryptTiles);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -82,28 +84,11 @@ public class Requiem_Arena : Requiem
         Hextile randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
         randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
         SPAWN(typeof(Shade), typeof(Janitor), RAND_POS_IN_TILE(randomTile));
-        configureSpawners();
         Commissioned = true;
 
         yield return gameLoop();
     }
 
-    private IEnumerator corridorLandmarks(List<Hextile> tiles)
-    {
-        foreach (Hextile tile in tiles)
-        {
-            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
-        }
-        yield break;
-    }
-
-    private IEnumerator buildCryptLandmarks(List<List<Hextile>> cryptTileRings)
-    {
-        StartingTile = cryptTileRings[0][0];
-        BloodWell = new GameObject().AddComponent<Landmark_Well>();
-        BloodWell.AssignToTile(StartingTile);
-        yield break;
-    }
 
     private IEnumerator buildArenaLandmarks(List<List<Hextile>> arenaTileRings)
     {
@@ -153,7 +138,7 @@ public class Requiem_Arena : Requiem
     {
         yield return new WaitUntil(() => Commissioned);
         Torch.Toggle(true);
-        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(StartingTile);
+        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(Chambers[0]);
         Player.INSTANCE.HostEntity.Vitality = 1;
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
@@ -163,19 +148,19 @@ public class Requiem_Arena : Requiem
         //MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
         //EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
         StateOfGame = GameState.Lobby;
-        yield return new WaitUntil(() => BloodWell.Used);
+        yield return new WaitUntil(() => BloodWell.Volume == 0);
         while (true)
         {
             StateOfGame = GameState.Liminal;
             Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
-            Wave++;
-            StartingGate.OpenDoor();
+            Ritual++;
+            Gates[0].OpenDoor();
             yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             StateOfGame = GameState.Wave;
             Alter.DesiredOffering = Alter.TopStep;
-            StartingGate.CloseDoor();
-            TotalStrengthOfWave = WaveStrengths[Wave % 3];
+            Gates[0].CloseDoor();
+            TotalStrengthOfWave = RitualStrengths[Ritual % 3];
             TimeGateTimeLeft = 10 + TotalStrengthOfWave / 10;
             spawnedMobs = spawnMobs(TotalStrengthOfWave);
             blurbIndicator.SetActive(true);
@@ -213,31 +198,6 @@ public class Requiem_Arena : Requiem
     }
 
 
-    private void configureSpawners()
-    {
-        PatrolSpawner = gameObject.AddComponent<Spawner>();
-        PatrolSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skully));
-        PatrolSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Biter));
-        PatrolSpawner.transform.position = RandomPositionInRandomTileInPlay();
-        PatrolSpawner.JustSpawned.AddListener(x => PatrolSpawner.transform.position = RandomPositionInRandomTileInPlay());
-
-        MobSpawner = gameObject.AddComponent<Spawner>();
-        MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Skelly));
-        MobSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Goon));
-        MobSpawner.JustSpawned.AddListener(x => PatrolSpawner.transform.position = RandomPositionInRandomTileInPlay());
-
-        EliteSpawner = gameObject.AddComponent<Spawner>();
-        EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Nephalim));
-        EliteSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Bully));
-        EliteSpawner.JustSpawned.AddListener(x => PatrolSpawner.transform.position = RandomPositionInRandomTileInPlay());
-
-        BossSpawner = gameObject.AddComponent<Spawner>();
-        BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Wraith));
-        BossSpawner.ListOfComponentsAddedToSpawnedObjects.Add(typeof(Revanent));
-        BossSpawner.transform.position = RandomPositionInRandomTileInPlay();
-    }
-
-
     public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
     {
         { typeof(Skelly), 100 },
@@ -259,13 +219,18 @@ public class Requiem_Arena : Requiem
         {typeof(Bully),typeof(Nephalim) },
         {typeof(Revanent),typeof(Wraith) },
     };
-    public Dictionary<int, int> WaveStrengths = new Dictionary<int, int>()
+    public Dictionary<int, int> RitualStrengths = new Dictionary<int, int>()
     {
         {1, 500 },
         {2, 800 },
-        {0, 1200 },
+        {0, 1000 },
     };
-
+    public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
+    {
+        {1, 60 },
+        {2, 90 },
+        {0, 120 },
+    };
     public List<Type> UnlockedEntities = new List<Type>();
     public List<Type> UnlockedAIs = new List<Type>();
 
@@ -276,10 +241,10 @@ public class Requiem_Arena : Requiem
     {
 
         List<Type> viableAIs = new List<Type>();
-        viableAIs = AIDifficulties.Where(x => x.Value <= Wave).Select(x => x.Key).ToList();
+        viableAIs = AIDifficulties.Where(x => x.Value <= Ritual).Select(x => x.Key).ToList();
 
         chosenAIsForWave = new List<Type>();
-        while(chosenAIsForWave.Count < Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Wave))))
+        while(chosenAIsForWave.Count < Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Ritual))))
         {
             int randomIndexFromViableAIs = UnityEngine.Random.Range(0, viableAIs.Count);
             chosenAIsForWave.Add(viableAIs[randomIndexFromViableAIs]);

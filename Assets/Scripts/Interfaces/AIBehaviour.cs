@@ -671,7 +671,7 @@ public class AIBehaviour : MonoBehaviour
 
     //grab
     protected bool grabEnabled = false;
-    protected float grabSlowScalar = 1.0f;
+    protected float grabSlowScalar = 0.5f;
     public float grabDPS = 15f;
     protected Entity grabLastVictim;
     protected void grab(BehaviourType key)

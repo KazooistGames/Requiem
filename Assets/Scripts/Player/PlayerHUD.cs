@@ -133,7 +133,7 @@ public class PlayerHUD : MonoBehaviour
     {
         scoreTransforms[1].GetComponent<Text>().text = Scoreboard.Score.ToString("0");
         scoreTransforms[2].GetComponent<Text>().text = "x " + Scoreboard.KillMultiplier.ToString("0.00");
-        scoreTransforms[3].GetComponent<Text>().text = "Ritual " + Requiem_Arena.INSTANCE.Wave.ToString();
+        scoreTransforms[3].GetComponent<Text>().text = "Ritual " + Requiem_Arena.INSTANCE.Ritual.ToString();
     }
 
     private void updateTempoBar()

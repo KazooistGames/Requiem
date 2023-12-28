@@ -62,6 +62,7 @@ public class Player : MonoBehaviour
         else if (HostEntity ? HostEntity.MainHand : false)
         {
             HostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
+            HostWeapon.playShing();
         }
         if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
         {
@@ -226,7 +227,15 @@ public class Player : MonoBehaviour
         }
         else if (CurrentKeyboard.eKey.wasPressedThisFrame)
         {
-            yankWeapon();
+            if (HostWeapon)
+            {
+                yankWeapon();
+            }
+            else
+            {
+                HostEntity.EventAttemptPickup.Invoke(HostEntity);
+            }
+
         }
         else if (CurrentKeyboard.qKey.wasPressedThisFrame)
         {

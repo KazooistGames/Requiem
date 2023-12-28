@@ -202,7 +202,7 @@ public class Entity : MonoBehaviour
         personalBox.height = heightActual * 1.5f;
         gameObject.layer = Requiem.layerEntity;
         transform.localScale = Vector3.one * scaleActual;
-        transform.localEulerAngles = new Vector3(0, 0, 0);
+        transform.localEulerAngles = new Vector3(0, UnityEngine.Random.value * 360, 0);
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         body.useGravity = true;
         body.constraints = (RigidbodyConstraints)(64 + 32 + 16 + 4);
@@ -333,7 +333,7 @@ public class Entity : MonoBehaviour
         modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
         SpeedActual = Agility * SpeedScalarGlobal;
-        hurtBox.radius = Shoved ? berthActual * 0.8f : berthActual;
+        hurtBox.radius = Shoved ? berthActual * 1f : berthActual;
         if (Shoved)
         {
             if (shoveRecoveryTimer >= shoveRecoveryPeriod || (body.velocity.magnitude <= baseSpeed * 0.1f && shoveRecoveryTimer >= 0.1f * shoveRecoveryPeriod))
@@ -435,7 +435,7 @@ public class Entity : MonoBehaviour
             Entity foe = collision.gameObject.GetComponent<Entity>();
             if (Dashing && foe)
             {
-                resolveDashHit(collision, instant: true);
+                resolveDashHit(collision, instantaneousCollision: true);
             }
         }
     }
@@ -452,7 +452,7 @@ public class Entity : MonoBehaviour
     {
         if (A && B)
         {
-            return Mathf.Pow(A.Strength / B.Strength, 1/2);
+            return Mathf.Pow(A.Strength / B.Strength, 0.4f);
         }
         else
         {
@@ -694,21 +694,30 @@ public class Entity : MonoBehaviour
         }
     }
 
-    private void resolveDashHit(Collision collision, bool instant = false)
+    private void resolveDashHit(Collision collision, bool instantaneousCollision = false)
     {
         GameObject other = collision.gameObject;
         Entity foe = other.GetComponent<Entity>();
         if (foe)
         {
             Vector3 disposition = foe.transform.position - transform.position;
-            float minMag = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
-            //float maxMag = FinalDash ? Max_Velocity_Of_Dash * FINALDASH_POWER_SCALAR : Max_Velocity_Of_Dash;
-            bool crash = instant || collision.relativeVelocity.magnitude >= minMag;
-            float actualMag = instant ? Mathf.Lerp(minMag, Max_Velocity_Of_Dash, DashPower) : collision.relativeVelocity.magnitude;
-            if (crash && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
+            float actualMag;
+            float crashThresholdVelocity = Mathf.Lerp(Haste * SpeedScalarGlobal, Min_Velocity_Of_Dash, 0.5f);
+            bool crash = collision.relativeVelocity.magnitude >= crashThresholdVelocity;
+            if (instantaneousCollision)
             {
-                float impactRatio = Strength_Ratio(this, foe) * actualMag / Max_Velocity_Of_Dash;
-                Vector3 ShoveVector = disposition.normalized * impactRatio * Max_Velocity_Of_Dash;
+                float maximumRegisterableVelocity = FinalDash ? Max_Velocity_Of_Dash * FINAL_DASH_RATIO : Max_Velocity_Of_Dash;
+                actualMag = Mathf.Lerp(crashThresholdVelocity, maximumRegisterableVelocity, DashPower);
+                crash = true;
+            }
+            else
+            {
+                actualMag = collision.relativeVelocity.magnitude;
+            }
+            if ((crash || instantaneousCollision) && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
+            {
+                float impactRatio = Strength_Ratio(this, foe) * (actualMag / Max_Velocity_Of_Dash);
+                Vector3 ShoveVector = disposition.normalized * (impactRatio * Max_Velocity_Of_Dash);
                 ShoveVector *= 0.75f;
                 foe.Shove(ShoveVector);
                 if(foe.Allegiance != Allegiance)
@@ -870,33 +879,11 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponSwing(Weapon myWeapon)
     {
-        //if(myWeapon.TrueStrike)
-        //{
-            //alterPoise(-myWeapon.Heft / 4);
-        //}
-        //if(myWeapon.Action == ActionAnim.StrongAttack)
-        //{
-        //    float poiseDrainFromTempo = Mathf.Clamp(myWeapon.Tempo * myWeapon.Power, 0, myWeapon.Power);
-        //    alterPoise(-poiseDrainFromTempo);
-        //}
+
     }
 
     private void handleWeaponClash(Weapon myWeapon, Weapon theirWeapon)
     {
-        //if (myWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-        //{
-        //    if (theirWeapon.Wielder)
-        //    {
-        //        theirWeapon.Wielder.Stagger(Mathf.Sqrt(myWeapon.Heft / theirWeapon.Wielder.Strength));
-        //    }
-        //}
-        //else if (myWeapon.ActionAnimated == ActionAnimation.QuickAttack)
-        //{
-        //    if (theirWeapon.ActionAnimated == ActionAnimation.StrongAttack)
-        //    {
-        //        Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
-        //    }
-        //}
 
     }
 

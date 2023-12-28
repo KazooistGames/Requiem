@@ -133,7 +133,7 @@ public class Goon : AIBehaviour
         else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
 
         {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 5;
+            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
         }
         else
         {
