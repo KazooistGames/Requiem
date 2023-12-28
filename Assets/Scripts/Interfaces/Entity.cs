@@ -896,6 +896,7 @@ public class Entity : MonoBehaviour
         if (theirWeapon.TrueStrike)
         {
             Disarm();
+            impact += Resolve;
         }
         if(theirWeapon.Action != ActionAnim.StrongAttack)
         {
@@ -923,6 +924,19 @@ public class Entity : MonoBehaviour
         {
             theirWeapon.Wielder.alterPoise(-Resolve);
         }
+        if (theirWeapon.TrueStrike)
+        {
+            float poiseOverkill = theirWeapon.Heft - Poise;
+            alterPoise(-theirWeapon.Heft);
+            if (poiseOverkill >= 0)
+            {
+                Stagger(Mathf.Sqrt(poiseOverkill / Strength));
+            }
+        }
+        else if(theirWeapon.Action == ActionAnim.StrongAttack)
+        {
+            alterPoise(-theirWeapon.Heft * theirWeapon.Tempo);
+        }
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
@@ -931,15 +945,11 @@ public class Entity : MonoBehaviour
         {
             return;
         }
-        else if(myWeapon.Action == ActionAnim.StrongAttack)
-        {
-            return;
-        }
         else if (Posture == PostureStrength.Weak)
         {
             Disarm();
         }
-        else
+        else if(myWeapon.Action == ActionAnim.QuickAttack)
         {
             Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
         }

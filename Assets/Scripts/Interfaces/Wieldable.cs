@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Wieldable : MonoBehaviour
 {    
@@ -50,6 +51,7 @@ public class Wieldable : MonoBehaviour
     public AnimatorStateInfo currentAnimation;
     public AnimatorStateInfo nextAnimation;
 
+    private GameObject blurbInteractPrompt;
     public enum EquipType
     {
         OneHanded = 1,
@@ -78,6 +80,9 @@ public class Wieldable : MonoBehaviour
             defaultAnimController2H = Resources.Load<RuntimeAnimatorController>("Animation/items/ItemDefault2H/ItemDefaultController2H");
         }
         StartCoroutine(throwHandler());
+        blurbInteractPrompt = _BlurbService.createBlurb(gameObject, "F", Color.white, sizeScalar: 2);
+        blurbInteractPrompt.GetComponent<Text>().text = equipType == EquipType.Burdensome ? "F" : "E";
+        blurbInteractPrompt.SetActive(false);
     }
 
     protected virtual void Update()
@@ -163,6 +168,11 @@ public class Wieldable : MonoBehaviour
                 else
                 {
                     entity.EventAttemptPickup.AddListener(PickupItem);
+
+                }
+                if (entity == Player.INSTANCE.HostEntity && (!Player.INSTANCE.HostWeapon || equipType == EquipType.Burdensome) && blurbInteractPrompt)
+                {
+                    blurbInteractPrompt.SetActive(true);
                 }
             }
         }
@@ -181,7 +191,10 @@ public class Wieldable : MonoBehaviour
             {
                 entity.EventAttemptPickup.RemoveListener(PickupItem);
             }
-
+            if (entity == Player.INSTANCE.HostEntity && blurbInteractPrompt)
+            {
+                blurbInteractPrompt.SetActive(false);
+            }
             //setHighlightColor(Color.black);
         }
     }
@@ -262,6 +275,7 @@ public class Wieldable : MonoBehaviour
     /***** PROTECTED *****/
     protected virtual IEnumerator pickupHandler(Entity newOwner)
     {
+        blurbInteractPrompt.SetActive(false);
         Thrown = false;
         if (Wielder || !newOwner)
         {

@@ -12,7 +12,7 @@ public class Landmark_Well : Landmark
     public static UnityEvent<Entity, float> JustGulped = new UnityEvent<Entity, float>();
 
     public float Volume = 100;
-    private float fullDrinkPeriod = 5.0f;
+    private float fullDrinkPeriod = 4.0f;
     protected static GameObject WellModelTemplate;
     protected GameObject Model;
     protected MeshRenderer bloodPoolRenderer;
@@ -28,9 +28,13 @@ public class Landmark_Well : Landmark
     private List<GameObject> bloodSplatters = new List<GameObject>();
     protected static GameObject BLOOD_SPLATTER_PREFAB;
 
+    private GameObject blurbInteractPrompt;
+
     protected void Start()
     {
         splatter(Vector3.zero, 0.25f);
+        blurbInteractPrompt = _BlurbService.createBlurb(gameObject, "F", Color.white, sizeScalar: 2);
+        blurbInteractPrompt.SetActive(false);
     }
     protected void Update()
     {
@@ -44,18 +48,20 @@ public class Landmark_Well : Landmark
     protected void OnTriggerEnter(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
-        if (entity)
+        if (entity ? entity == Player.INSTANCE.HostEntity : false)
         {
             entity.Interact.AddListener(gulp);
+            blurbInteractPrompt.SetActive(true);
         }
     }
 
     protected void OnTriggerExit(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
-        if (entity)
+        if (entity ? entity == Player.INSTANCE.HostEntity : false)
         {
             entity.Interact.RemoveListener(gulp);
+            blurbInteractPrompt.SetActive(false);
             Energized = false;
         }
 
@@ -156,7 +162,7 @@ public class Landmark_Well : Landmark
     private void playGulpSound(Entity benefactor)
     {
         gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 0.8f, 0.8f, _SoundService.Instance.DefaultAudioRange / 4);
-        gulpSound.GetComponent<AudioSource>().time = 0.75f;
+        gulpSound.GetComponent<AudioSource>().time = 0.85f;
         gulpSound.transform.SetParent(benefactor.transform);
     }
 
