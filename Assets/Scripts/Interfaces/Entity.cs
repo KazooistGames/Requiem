@@ -313,7 +313,7 @@ public class Entity : MonoBehaviour
             anim.SetFloat("dashCharge", Dashing ? 0 : DashPower);
             anim.SetBool("moving", body.velocity.magnitude > magnitudeOfVirtuallyStopped / 20f ? true : false);
             anim.SetFloat("velocity", Mathf.Max(body.velocity.magnitude, Haste * SpeedScalarGlobal / 4f));
-            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AIBehaviour.angleToDirection(AIBehaviour.getAngle(LookDirection) - AIBehaviour.getAngle(body.velocity) + 90);
+            Vector3 relativeDirection = body.velocity == Vector3.zero ? Vector3.zero : AIBehaviour.angleToVector(AIBehaviour.getAngle(LookDirection) - AIBehaviour.getAngle(body.velocity) + 90);
             if(relativeDirection.magnitude < magnitudeOfVirtuallyStopped)
             {
                 relativeDirection = Vector3.zero;

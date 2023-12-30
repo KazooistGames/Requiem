@@ -60,7 +60,7 @@ public abstract class Weapon : Wieldable
     public float Tempo;
     private float tempoCharge = 0;
     public float tempoChargePeriod = 0.5f;
-    public float tempoChargeExponent = 1.75f;
+    public float tempoChargeExponent = 3/4f;
     private bool tempoChargeONS = true;
     //private bool attackChargeONS = true;
     public float TempoTargetCenter { get; private set; } = 0.94f;

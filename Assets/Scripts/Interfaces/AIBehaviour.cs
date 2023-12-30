@@ -146,7 +146,7 @@ public class AIBehaviour : MonoBehaviour
             LookAngle = getAngle(actualMovementDirection);
         }
         entity.WalkDirection = actualMovementDirection;
-        entity.LookDirection = angleToDirection(LookAngle);
+        entity.LookDirection = angleToVector(LookAngle);
         if (Enthralled)
         {
             StateTransition(AIState.enthralled);
@@ -393,7 +393,7 @@ public class AIBehaviour : MonoBehaviour
             for (int increment = -(int)(flipflop * (patrolScanAngle / 2)); increment != (int)(flipflop * (patrolScanAngle / 2)); increment += flipflop)
             {
                 RaycastHit rayhit;
-                bool wideOpen = !Physics.SphereCast(new Ray(transform.position, angleToDirection(startAngle + increment)), entity.berthActual * entity.scaleActual ,out rayhit, maxDistance: lookRange, layerMask: patrolMask, QueryTriggerInteraction.Ignore);
+                bool wideOpen = !Physics.SphereCast(new Ray(transform.position, angleToVector(startAngle + increment)), entity.berthActual * entity.scaleActual ,out rayhit, maxDistance: lookRange, layerMask: patrolMask, QueryTriggerInteraction.Ignore);
                 if (wideOpen)
                 {
                     if (lookRange > bestDistance || increment == 0)
@@ -409,7 +409,7 @@ public class AIBehaviour : MonoBehaviour
                 }
             }
             patrolCurrentAngle = bestAngle % 360;
-            Vector3 outputDirection = angleToDirection(patrolCurrentAngle);
+            Vector3 outputDirection = angleToVector(patrolCurrentAngle);
             Directives[key] = (outputDirection, behaviourParams[key].Item2);
             behaviourParams[key] = (false, 0);
         }
@@ -749,7 +749,7 @@ public class AIBehaviour : MonoBehaviour
             float approachOffset = tangoDeadbanded ? 0 : Mathf.Clamp(delta / tangoTargetDisposition + Mathf.Sign(delta)*0.15f, -1, 1);
             if (tangoStrafeEnabled && !tangoStrafePaused)
             {
-                outputDirection = angleToDirection(getAngle(disposition) - (90 * tangoStrafeFlipFlop) + (approachOffset * 90 * tangoStrafeFlipFlop));
+                outputDirection = angleToVector(getAngle(disposition) - (90 * tangoStrafeFlipFlop) + (approachOffset * 90 * tangoStrafeFlipFlop));
             }
             else
             {
@@ -1325,7 +1325,7 @@ public class AIBehaviour : MonoBehaviour
         }
     }
 
-    public static Vector3 angleToDirection(float degrees)
+    public static Vector3 angleToVector(float degrees)
     {
         degrees = degrees % 360f;
         float rads = degrees * (Mathf.PI / 180);

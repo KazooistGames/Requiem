@@ -103,11 +103,11 @@ public class Landmark_Alter : Landmark
         Lines.widthMultiplier = 0.015f;
         List<Vector3> points = new List<Vector3>()
         {
-            AIBehaviour.angleToDirection(54) * 0.4f * pentagramRadius,
-            AIBehaviour.angleToDirection(270) * 0.4f * pentagramRadius,
-            AIBehaviour.angleToDirection(126) * 0.4f * pentagramRadius,
-            AIBehaviour.angleToDirection(342) * 0.4f * pentagramRadius,
-            AIBehaviour.angleToDirection(198) * 0.4f * pentagramRadius,
+            AIBehaviour.angleToVector(54) * 0.4f * pentagramRadius,
+            AIBehaviour.angleToVector(270) * 0.4f * pentagramRadius,
+            AIBehaviour.angleToVector(126) * 0.4f * pentagramRadius,
+            AIBehaviour.angleToVector(342) * 0.4f * pentagramRadius,
+            AIBehaviour.angleToVector(198) * 0.4f * pentagramRadius,
         };
         yield return null;
         while (true)

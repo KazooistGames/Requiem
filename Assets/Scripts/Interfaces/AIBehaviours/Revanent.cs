@@ -183,7 +183,7 @@ public class Revanent : AIBehaviour
             dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 135;
-            dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
+            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
     }
 
@@ -197,7 +197,7 @@ public class Revanent : AIBehaviour
                     dashingChargePeriod = 0;
                     Vector3 disposition = entity.Foe.transform.position - transform.position;
                     float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
-                    dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
+                    dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
                 }
                 else
                 {
@@ -225,7 +225,7 @@ public class Revanent : AIBehaviour
             dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
-            dashingDesiredDirection = angleToDirection(getAngle(disposition.normalized) + randomLeftRightOffset);
+            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
         else
         {

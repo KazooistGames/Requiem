@@ -12,7 +12,7 @@ public class Landmark_Well : Landmark
     public static UnityEvent<Entity, float> JustGulped = new UnityEvent<Entity, float>();
 
     public float Volume = 100;
-    private float fullDrinkPeriod = 4.0f;
+    private float fullDrinkPeriod = 3.0f;
     protected static GameObject WellModelTemplate;
     protected GameObject Model;
     protected MeshRenderer bloodPoolRenderer;
@@ -162,7 +162,7 @@ public class Landmark_Well : Landmark
     private void playGulpSound(Entity benefactor)
     {
         gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 0.8f, 0.8f, _SoundService.Instance.DefaultAudioRange / 4);
-        gulpSound.GetComponent<AudioSource>().time = 0.85f;
+        gulpSound.GetComponent<AudioSource>().time = 1f;
         gulpSound.transform.SetParent(benefactor.transform);
     }
 
