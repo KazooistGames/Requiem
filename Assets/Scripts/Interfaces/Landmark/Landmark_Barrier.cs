@@ -59,7 +59,7 @@ public class Landmark_Barrier : Landmark
             float angle = hexPositionToAngle(barrierPosition) + 30;
             barrierModel.transform.localEulerAngles = Vector3.up * angle;
             Vector3 verticalOffset = Vector3.up * Hextile.Thickness / 2;
-            Vector3 horizontalOffset = Vector3.RotateTowards(Vector3.forward, Vector3.back, -Mathf.Deg2Rad * angle, 0).normalized * Hextile.Radius * (1-Mathf.Cos(Mathf.Deg2Rad * 30));
+            Vector3 horizontalOffset = Vector3.RotateTowards(Vector3.forward, Vector3.back, -Mathf.Deg2Rad * angle, 0).normalized * Hextile.Radius * (1-Mathf.Cos(Mathf.Deg2Rad * 24.5f));
             barrierModel.transform.localPosition = verticalOffset + horizontalOffset;
             innerBarrierModels.Add(barrierPosition, barrierModel);
         }

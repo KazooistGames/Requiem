@@ -48,9 +48,10 @@ public class Scoreboard : MonoBehaviour
     /***** PRIVATE *****/
     private static void PENALIZE_GULP(Entity entity, float amountGulped)
     {
-        if(entity == Player.INSTANCE.HostEntity)
+        if(entity == Player.INSTANCE.HostEntity && KillMultiplier > 1)
         {
             KillMultiplier -= amountGulped / 100f;
+            KillMultiplier = Mathf.Max(1, KillMultiplier);
         }
     }
 
@@ -65,6 +66,10 @@ public class Scoreboard : MonoBehaviour
         if(validEntitiesToScoreFromKilling.Contains(vanquishedEntity))
         {
             ADD_SCORE(vanquishedEntity.Strength);
+            if (vanquishedEntity.Staggered)
+            {
+                ADD_SCORE(vanquishedEntity.Strength / 4);
+            }
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
         }
     }

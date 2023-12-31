@@ -83,18 +83,31 @@ public class Skelly : Entity
 
     protected override void Die()
     {
-        foreach (MeshFilter bone in bodyParts)
+
+        if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * 0.05f)
         {
-            if (bone && !bone.GetComponent<Rigidbody>())
+            foreach (MeshFilter bone in bodyParts)
             {
-                Debone(bone.gameObject);
+                if (bone && !bone.GetComponent<Rigidbody>())
+                {
+                    Debone(bone.gameObject);
+                }
             }
+            head = null;
+            torso = null;
+            waist = null;
+            leg1 = null;
+            leg2 = null;
+            base.Die();
         }
-        head = null;
-        torso = null;
-        waist = null;
-        leg1 = null;
-        leg2 = null;     
-        base.Die();
+        else
+        {
+            Vitality = Strength;
+            Destroy(GetComponent<AIBehaviour>());
+            gameObject.AddComponent<Assassin>();
+            Debone(head);
+            head = null;
+        }
     }
+
 }

@@ -65,8 +65,15 @@ public class Bully : AIBehaviour
         }
         else if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            if(Random.value <= Aggression)
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            }
+            else
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
+            }
         }
         else if(checkMyWeaponInRange())
         {
@@ -122,7 +129,7 @@ public class Bully : AIBehaviour
         else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
 
         {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
+            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 3;
         }
         else
         {

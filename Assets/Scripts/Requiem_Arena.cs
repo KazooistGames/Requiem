@@ -161,7 +161,7 @@ public class Requiem_Arena : Requiem
             Alter.DesiredOffering = Alter.TopStep;
             Gates[0].CloseDoor();
             TotalStrengthOfWave = RitualStrengths[Ritual % 3];
-            TimeGateTimeLeft = 10 + TotalStrengthOfWave / 10;
+            TimeGateTimeLeft = RitualTimes[Ritual % 3];
             spawnedMobs = spawnMobs(TotalStrengthOfWave);
             blurbIndicator.SetActive(true);
             while (Requiem.INSTANCE.StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
@@ -208,8 +208,8 @@ public class Requiem_Arena : Requiem
     public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
-        { typeof(Biter), 2 },
-        { typeof(Bully), 4 },
+        { typeof(Bully), 2 },
+        //{ typeof(Biter), 2 },
         { typeof(Revanent), 7 },
     };
     public Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
@@ -221,15 +221,15 @@ public class Requiem_Arena : Requiem
     };
     public Dictionary<int, int> RitualStrengths = new Dictionary<int, int>()
     {
-        {1, 500 },
+        {1, 600 },
         {2, 800 },
         {0, 1000 },
     };
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
-        {1, 60 },
+        {1, 80 },
         {2, 90 },
-        {0, 120 },
+        {0, 100 },
     };
     public List<Type> UnlockedEntities = new List<Type>();
     public List<Type> UnlockedAIs = new List<Type>();

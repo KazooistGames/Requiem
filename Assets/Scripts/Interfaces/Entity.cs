@@ -242,6 +242,7 @@ public class Entity : MonoBehaviour
             Staggered = false;
         }
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
+        berthActual = DashCharging || Dashing ? 0.8f * Berth * berthScalar : Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
             float scalingRegenRate = POISE_REGEN_BASE_PERIOD + Mathf.FloorToInt((Strength - Vitality) / 20);

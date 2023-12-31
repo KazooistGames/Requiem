@@ -12,7 +12,7 @@ d 1.000000
 illum 2
 map_Kd C:\\Unity\\Projects\\Requiem_Alpha\\Assets\\Resources\\Textures\\shelf_broken.png
 
-newmtl stone.002
+newmtl stone.004
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
