@@ -15,23 +15,21 @@ public class PlayerHUD : MonoBehaviour
     public GameObject RageBar;
     public GameObject CenterPopup;
     public GameObject SidePopup;
-    public GameObject Message;
-    public Button MainMenuButton;
+    public Button QuitButton;
     public Slider MouseSlider;
     public Slider SoundSlider;
     public Dictionary<string, Text> StatusIndicators = new Dictionary<string, Text>();
 
-    private RectTransform[] statBarTransforms;
-    private RectTransform[] tempoBarTransforms;
-    private RectTransform[] scoreTransforms;
+    public RectTransform[] statBarTransforms;
+    public RectTransform[] tempoBarTransforms;
+    public RectTransform[] scoreTransforms;
 
     private void Start()
     {
         CenterPopup.SetActive(false);
         SidePopup.SetActive(false);
-        Message.SetActive(false);
         //MainMenuButton.onClick.AddListener(Requiem.Instance.gotoTitle);        
-        MainMenuButton.onClick.AddListener(Requiem.INSTANCE.QuitGame);
+        QuitButton.onClick.AddListener(Requiem.INSTANCE.Restart);
         statBarTransforms = StatBar.GetComponentsInChildren<RectTransform>();
         tempoBarTransforms = TempoBar.GetComponentsInChildren<RectTransform>();
         scoreTransforms = Score.GetComponentsInChildren<RectTransform>();
@@ -52,7 +50,19 @@ public class PlayerHUD : MonoBehaviour
         updateStatBars();
         updateScore();
         updateIndicators();
-        if (Requiem.INSTANCE.Paused)
+        if (Player.INSTANCE.Dead)
+        {
+            PauseMenu.GetComponent<Text>().text = "Dead..";
+            PauseMenu.SetActive(true);
+            QuitButton.gameObject.SetActive(Curtains.color.a == 1);
+            TempoBar.SetActive(false);
+            StatBar.SetActive(false);
+            MouseSlider.gameObject.SetActive(false);
+            SoundSlider.gameObject.SetActive(false);
+            scoreTransforms[2].gameObject.SetActive(false);
+            scoreTransforms[3].gameObject.SetActive(false);
+        }
+        else if (Requiem.INSTANCE.Paused)
         {
             PauseMenu.SetActive(true);
         }
@@ -60,11 +70,7 @@ public class PlayerHUD : MonoBehaviour
         {
             PauseMenu.SetActive(false);
         }
-        if (Player.INSTANCE.Dead)
-        {
-            Message.SetActive(true);
-            Message.GetComponent<Text>().text = "Dead..";
-        }
+
     }
     /***** PUBLIC *****/
     public Text setIndicatorOnHUD(string key, string text)

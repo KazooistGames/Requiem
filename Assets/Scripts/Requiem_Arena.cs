@@ -142,14 +142,14 @@ public class Requiem_Arena : Requiem
         Player.INSTANCE.HostEntity.Vitality = 1;
         List<GameObject> spawnedMobs = new List<GameObject>();
         List<GameObject> spawnedElites = new List<GameObject>();
-        blurbIndicator = _BlurbService.createBlurb(Requiem_Arena.INSTANCE.Alter.TopStep, "Test", Color.red, sizeScalar: 3);
+        blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
         blurbIndicator.SetActive(false);
         blurbIndicator.GetComponent<Text>().text = "0:00";
         //MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
         //EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
         StateOfGame = GameState.Lobby;
         yield return new WaitUntil(() => BloodWell.Volume == 0);
-        while (true)
+        while (Player.INSTANCE.HostEntity)
         {
             StateOfGame = GameState.Liminal;
             Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
@@ -164,7 +164,7 @@ public class Requiem_Arena : Requiem
             TimeGateTimeLeft = RitualTimes[Ritual % 3];
             spawnedMobs = spawnMobs(TotalStrengthOfWave);
             blurbIndicator.SetActive(true);
-            while (Requiem.INSTANCE.StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
+            while (StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
             {
                 if (!Paused)
                 {
@@ -195,7 +195,7 @@ public class Requiem_Arena : Requiem
                 yield return null;
             }
             Scoreboard.KillMultiplier += WaveKillMultiplierBonus;
-            BloodWell.Volume = 100;
+            BloodWell.UnGulp();
             blurbIndicator.SetActive(false);
         }
     }
@@ -204,16 +204,18 @@ public class Requiem_Arena : Requiem
     public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
     {
         { typeof(Skelly), 100 },
-        { typeof(Nephalim), 200 },
+        { typeof(Nephalim), 150 },
         { typeof(Skully), 25 },
         { typeof(Wraith), 150 },
+        { typeof(Imp), 125 },
     };
     public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
-        { typeof(Bully), 2 },
-        //{ typeof(Biter), 2 },
-        { typeof(Revanent), 7 },
+        { typeof(Bully), 3 },
+        { typeof(Sentinel), 6 },
+        { typeof(Revanent), 10 },
+        //{ typeof(Biter), 10 },
     };
     public Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
     {
@@ -221,18 +223,19 @@ public class Requiem_Arena : Requiem
         {typeof(Biter),typeof(Skully) },
         {typeof(Bully),typeof(Nephalim) },
         {typeof(Revanent),typeof(Wraith) },
+        {typeof(Sentinel),typeof(Imp) },
     };
     public Dictionary<int, int> RitualStrengths = new Dictionary<int, int>()
     {
         {1, 600 },
-        {2, 800 },
-        {0, 1000 },
+        {2, 900 },
+        {0, 1200 },
     };
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
-        {1, 80 },
+        {1, 90 },
         {2, 90 },
-        {0, 100 },
+        {0, 90 },
     };
     public List<Type> UnlockedEntities = new List<Type>();
     public List<Type> UnlockedAIs = new List<Type>();

@@ -68,7 +68,12 @@ public class Requiem: MonoBehaviour
 
     protected virtual void Update()
     {
-        if (Paused)
+        if (Player.INSTANCE ? Player.INSTANCE.Dead : false)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else if (Paused)
         {
             Time.timeScale = 0;
             Cursor.visible = true;

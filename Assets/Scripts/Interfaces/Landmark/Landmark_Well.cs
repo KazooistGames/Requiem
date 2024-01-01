@@ -97,9 +97,9 @@ public class Landmark_Well : Landmark
         bloodPoolRenderer.sharedMaterial = Instantiate(Resources.Load<Material>("Materials/FX/bloodPool"));
     }
 
-    public void Refill(float addedVolume = 100)
+    public void UnGulp()
     {
-        Volume = Mathf.Clamp(Volume + addedVolume, 0, 100);
+        Volume = Mathf.Clamp(Volume + gulpSize, 0, 100);
         Energized = false;
     }
 

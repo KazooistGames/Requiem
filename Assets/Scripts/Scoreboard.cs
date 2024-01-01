@@ -36,10 +36,6 @@ public class Scoreboard : MonoBehaviour
     public static void Score_Weapon_Hit(Entity entity, float magnitude)
     {
         validEntitiesToScoreFromKilling.Add(entity);
-        if(magnitude > entity.Vitality) //overkill gives bonus points
-        {
-            ADD_SCORE(magnitude - entity.Vitality);
-        }
     }
 
     /***** PROTECTED *****/
@@ -66,10 +62,6 @@ public class Scoreboard : MonoBehaviour
         if(validEntitiesToScoreFromKilling.Contains(vanquishedEntity))
         {
             ADD_SCORE(vanquishedEntity.Strength);
-            if (vanquishedEntity.Staggered)
-            {
-                ADD_SCORE(vanquishedEntity.Strength / 4);
-            }
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
         }
     }

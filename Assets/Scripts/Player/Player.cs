@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -64,7 +65,7 @@ public class Player : MonoBehaviour
             HostWeapon = HostEntity.MainHand.GetComponent<Weapon>();
             HostWeapon.playShing();
         }
-        if (CurrentKeyboard.escapeKey.wasPressedThisFrame)
+        if (CurrentKeyboard.pKey.wasPressedThisFrame)
         {
             Requiem.INSTANCE.Paused = !Requiem.INSTANCE.Paused;
         }
@@ -114,9 +115,15 @@ public class Player : MonoBehaviour
         }
     }
 
+
+    /***** PUBLIC *****/
+
+    /***** PROTECTED *****/
+
+    /***** PRIVATE *****/
+
     private void inputCamera()
     {
-
         float differenceCap = 0f;
         Vector2 cameraFlat = new Vector2(Cam.transform.forward.x, Cam.transform.forward.z).normalized;
         Vector2 hostFlat = new Vector2(HostEntity.LookDirection.x, HostEntity.LookDirection.z).normalized;
@@ -332,13 +339,15 @@ public class Player : MonoBehaviour
         {
             HUD.Curtains.enabled = true;
             HUD.Curtains.color = new Color(0, 0, 0, fadeTimer / fadePeriod);
+            HUD.scoreTransforms[1].GetComponent<Text>().fontSize = (int)Mathf.Lerp(54, 162, fadeTimer / fadePeriod);
             fadeTimer += Time.deltaTime;
             yield return null;
         }
-        Requiem.INSTANCE.Restart();
+        HUD.Curtains.color = new Color(0, 0, 0, 1);
+        HUD.scoreTransforms[1].GetComponent<Text>().fontSize = 162;
+        _BlurbService.Toggle_Blurbs(false);
+        //Requiem.INSTANCE.Restart();
     }
-
-    /***** PRIVATE *****/
 
     private void recallWeapon()
     {

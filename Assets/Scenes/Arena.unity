@@ -198,6 +198,9 @@ MonoBehaviour:
   martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -236,22 +239,22 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
-  Disarmed:
+  JustDisarmed:
     m_PersistentCalls:
       m_Calls: []
-  EventVanquished:
+  JustVanquished:
     m_PersistentCalls:
       m_Calls: []
-  EventWounded:
+  JustWounded:
     m_PersistentCalls:
       m_Calls: []
-  EventCrashed:
+  JustCrashed:
     m_PersistentCalls:
       m_Calls: []
-  EventLandedDashHit:
+  JustLandedDashHit:
     m_PersistentCalls:
       m_Calls: []
-  EventPickedUpWieldable:
+  JustPickedUpWieldable:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
@@ -282,7 +285,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  Location: {fileID: 0}
+  TileLocation: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
   FinalDash: 0
@@ -690,6 +693,9 @@ MonoBehaviour:
   martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -728,22 +734,22 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
-  Disarmed:
+  JustDisarmed:
     m_PersistentCalls:
       m_Calls: []
-  EventVanquished:
+  JustVanquished:
     m_PersistentCalls:
       m_Calls: []
-  EventWounded:
+  JustWounded:
     m_PersistentCalls:
       m_Calls: []
-  EventCrashed:
+  JustCrashed:
     m_PersistentCalls:
       m_Calls: []
-  EventLandedDashHit:
+  JustLandedDashHit:
     m_PersistentCalls:
       m_Calls: []
-  EventPickedUpWieldable:
+  JustPickedUpWieldable:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
@@ -774,7 +780,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  Location: {fileID: 0}
+  TileLocation: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
   FinalDash: 0
@@ -883,7 +889,7 @@ GameObject:
   m_Component:
   - component: {fileID: 844573217}
   - component: {fileID: 844573216}
-  - component: {fileID: 844573215}
+  - component: {fileID: 844573218}
   m_Layer: 0
   m_Name: skelly
   m_TagString: Untagged
@@ -891,7 +897,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &844573215
+--- !u!114 &844573216
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -900,7 +906,97 @@ MonoBehaviour:
   m_GameObject: {fileID: 844573214}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b392d430f8d865748b45db5b1bbfb331, type: 3}
+  m_Script: {fileID: 11500000, guid: 0484fa1a56cb43e40b92e889dacb2a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  JustDisarmed:
+    m_PersistentCalls:
+      m_Calls: []
+  JustVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  JustWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  JustCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  JustLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  JustPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  Aggressive: 1
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  Interact:
+    m_PersistentCalls:
+      m_Calls: []
+  Interacting: 0
+  personalBox: {fileID: 0}
+  model: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  DashCharging: 0
+  Dashing: 0
+  TileLocation: {fileID: 0}
+  head: {fileID: 0}
+  FinalDashEnabled: 0
+  FinalDash: 0
+  Posture: 1
+  wieldMode: 1
+  Allegiance: -1
+  flames: {fileID: 0}
+--- !u!4 &844573217
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844573214}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &844573218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844573214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01cbd58ddc0a9004c8057318a4f6829d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   State: 0
@@ -948,6 +1044,9 @@ MonoBehaviour:
   martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -965,96 +1064,6 @@ MonoBehaviour:
   wallCrawlCrowding: 0
   wallCrawlAvoidFoe: 1
   wallCrawlObstacles: []
---- !u!114 &844573216
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 844573214}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0484fa1a56cb43e40b92e889dacb2a56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  requiemPlayer: {fileID: 0}
-  Strength: 100
-  Resolve: 10
-  Haste: 1
-  Xp: 0
-  Lvl: 0
-  Vitality: 0
-  Agility: 0
-  Poise: 0
-  Disarmed:
-    m_PersistentCalls:
-      m_Calls: []
-  EventVanquished:
-    m_PersistentCalls:
-      m_Calls: []
-  EventWounded:
-    m_PersistentCalls:
-      m_Calls: []
-  EventCrashed:
-    m_PersistentCalls:
-      m_Calls: []
-  EventLandedDashHit:
-    m_PersistentCalls:
-      m_Calls: []
-  EventPickedUpWieldable:
-    m_PersistentCalls:
-      m_Calls: []
-  Foe: {fileID: 0}
-  Aggressive: 1
-  WalkDirection: {x: 0, y: 0, z: 0}
-  LookDirection: {x: 0, y: 0, z: 0}
-  TurnSpeed: 0
-  MainHand: {fileID: 0}
-  OffHand: {fileID: 0}
-  leftStorage: {fileID: 0}
-  rightStorage: {fileID: 0}
-  backStorage: {fileID: 0}
-  EventAttemptPickup:
-    m_PersistentCalls:
-      m_Calls: []
-  Interact:
-    m_PersistentCalls:
-      m_Calls: []
-  Interacting: 0
-  personalBox: {fileID: 0}
-  model: {fileID: 0}
-  body: {fileID: 0}
-  indicator: {fileID: 0}
-  statBar: {fileID: 0}
-  Shoved: 0
-  shoveRecoveryPeriod: 0
-  Staggered: 0
-  dashDirection: {x: 0, y: 0, z: 0}
-  DashCharging: 0
-  Dashing: 0
-  Location: {fileID: 0}
-  head: {fileID: 0}
-  FinalDashEnabled: 0
-  FinalDash: 0
-  Posture: 1
-  wieldMode: 1
-  Allegiance: -1
-  flames: {fileID: 0}
---- !u!4 &844573217
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 844573214}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 0.5001569, z: 4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1285575789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1316,6 +1325,9 @@ MonoBehaviour:
   martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1354,22 +1366,22 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
-  Disarmed:
+  JustDisarmed:
     m_PersistentCalls:
       m_Calls: []
-  EventVanquished:
+  JustVanquished:
     m_PersistentCalls:
       m_Calls: []
-  EventWounded:
+  JustWounded:
     m_PersistentCalls:
       m_Calls: []
-  EventCrashed:
+  JustCrashed:
     m_PersistentCalls:
       m_Calls: []
-  EventLandedDashHit:
+  JustLandedDashHit:
     m_PersistentCalls:
       m_Calls: []
-  EventPickedUpWieldable:
+  JustPickedUpWieldable:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
@@ -1400,7 +1412,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  Location: {fileID: 0}
+  TileLocation: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
   FinalDash: 0
@@ -1498,6 +1510,9 @@ MonoBehaviour:
   martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1537,22 +1552,22 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
-  Disarmed:
+  JustDisarmed:
     m_PersistentCalls:
       m_Calls: []
-  EventVanquished:
+  JustVanquished:
     m_PersistentCalls:
       m_Calls: []
-  EventWounded:
+  JustWounded:
     m_PersistentCalls:
       m_Calls: []
-  EventCrashed:
+  JustCrashed:
     m_PersistentCalls:
       m_Calls: []
-  EventLandedDashHit:
+  JustLandedDashHit:
     m_PersistentCalls:
       m_Calls: []
-  EventPickedUpWieldable:
+  JustPickedUpWieldable:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
@@ -1583,7 +1598,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  Location: {fileID: 0}
+  TileLocation: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
   FinalDash: 0
@@ -1804,6 +1819,9 @@ MonoBehaviour:
   martialEnteredRange:
     m_PersistentCalls:
       m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
   itemManagementSeekItems: 0
   itemManagementGreedy: 0
   itemManagementPreferredType: 0
@@ -1842,22 +1860,22 @@ MonoBehaviour:
   Vitality: 0
   Agility: 0
   Poise: 0
-  Disarmed:
+  JustDisarmed:
     m_PersistentCalls:
       m_Calls: []
-  EventVanquished:
+  JustVanquished:
     m_PersistentCalls:
       m_Calls: []
-  EventWounded:
+  JustWounded:
     m_PersistentCalls:
       m_Calls: []
-  EventCrashed:
+  JustCrashed:
     m_PersistentCalls:
       m_Calls: []
-  EventLandedDashHit:
+  JustLandedDashHit:
     m_PersistentCalls:
       m_Calls: []
-  EventPickedUpWieldable:
+  JustPickedUpWieldable:
     m_PersistentCalls:
       m_Calls: []
   Foe: {fileID: 0}
@@ -1888,7 +1906,7 @@ MonoBehaviour:
   dashDirection: {x: 0, y: 0, z: 0}
   DashCharging: 0
   Dashing: 0
-  Location: {fileID: 0}
+  TileLocation: {fileID: 0}
   head: {fileID: 0}
   FinalDashEnabled: 0
   FinalDash: 0
@@ -1963,17 +1981,14 @@ MonoBehaviour:
   Paused: 0
   TimeScale: 0
   StateOfGame: 0
-  StartingTile: {fileID: 0}
-  StartingGate: {fileID: 0}
-  CorridorTiles: []
-  chambers: []
-  coves: []
+  Gates: []
+  Chambers: []
   CenterTile: {fileID: 0}
   Alter: {fileID: 0}
   BloodWell: {fileID: 0}
   QuestGiver: {fileID: 0}
   TimeGateTimeLeft: 0
-  Wave: 0
+  Ritual: 0
   TotalStrengthOfWave: 0
   WaveMobs: []
 --- !u!114 &2128541363

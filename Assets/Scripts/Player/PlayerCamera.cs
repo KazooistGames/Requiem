@@ -48,7 +48,7 @@ public class PlayerCamera : MonoBehaviour
         Eyes.nearClipPlane = 0.01f;
         Eyes.farClipPlane = 10f;
         Eyes.fieldOfView = 0;
-        _BlurbService.Instance.blurbCamera = Eyes;
+        _BlurbService.INSTANCE.blurbCamera = Eyes;
     }
 
  
@@ -78,7 +78,7 @@ public class PlayerCamera : MonoBehaviour
             temp.x = temp.x * 0.95f;
             transform.localEulerAngles = temp;
         }
-        _BlurbService.Instance.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
+        _BlurbService.INSTANCE.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)

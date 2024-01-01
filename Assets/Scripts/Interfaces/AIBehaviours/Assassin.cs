@@ -5,7 +5,6 @@ using UnityEngine;
 public class Assassin : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.0f;
     private float Aggression = 0.5f;
 
     protected override void Awake()
@@ -56,8 +55,8 @@ public class Assassin : AIBehaviour
         }
         else if (Random.value <= Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
         }
@@ -72,13 +71,13 @@ public class Assassin : AIBehaviour
     {
         if (checkMyWeaponInRange())
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed); 
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil); 
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if (Random.value < Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -87,7 +86,7 @@ public class Assassin : AIBehaviour
     {
         if (entity.Foe)
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
         else
         {
@@ -97,23 +96,37 @@ public class Assassin : AIBehaviour
 
     protected override void reactToIncomingAttack()
     {
-        if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnim.Guarding)
+        if(dashingCooldownTimer < 0.5f)
         {
-            return;
+
+        }
+        else if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnim.Guarding)
+        {
+                dashingChargePeriod = 0.25f;
+                Vector3 disposition = entity.Foe.transform.position - transform.position;
+                dashingDesiredDirection = angleToVector(getAngle(disposition.normalized));
         }
         else if (mainWep.Action == Weapon.ActionAnim.Idle || mainWep.Action == Weapon.ActionAnim.Recoiling)
         {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+            dashingChargePeriod = 0;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);      
         }
     }
 
     protected override void reactToFoeThrowing()
     {
-        if (!checkMyWeaponInRange() && Random.value >= Aggression)
+        if (_MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding)
         {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
+            return;
+        }
+        else if (dashingCooldownTimer < 0.5f)
+        {
+            dashingChargePeriod = 0;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
     }
 
@@ -130,26 +143,6 @@ public class Assassin : AIBehaviour
 
 
     /***** PRIVATE *****/
-    private bool timeoutCheckMyWeaponInRange()
-    {
-        if (!mainWep)
-        {
-            return false;
-        }
-        else if (checkMyWeaponInRange())
-        {
-            return true;
-        }
-        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
-
-        {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
 
 }
