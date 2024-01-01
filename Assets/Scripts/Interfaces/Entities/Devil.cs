@@ -31,7 +31,7 @@ public class Devil : Entity
     /***** PUBLIC *****/
 
     /***** PROTECTED *****/
-    protected override void Die()
+    public override void Die()
     {
         if (model)
         {

@@ -97,6 +97,7 @@ public class _MartialController : MonoBehaviour
     /***** PUBLIC *****/
     public static void Queue_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null)
     {
+        if(weapon == null) { return; }
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite};
         if (!Weapon_Actions.ContainsKey(weapon))
         {
@@ -124,6 +125,7 @@ public class _MartialController : MonoBehaviour
 
     public static void Override_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null)
     {
+        if (weapon == null) { return; }
         MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite };
         Weapon_Actions[weapon] = newJob;
         Debounce_Timers[weapon] = 0;
@@ -131,6 +133,7 @@ public class _MartialController : MonoBehaviour
 
     public static void Cancel_Actions(Weapon weapon)
     {
+        if (weapon == null) { return; }
         if (Weapon_Actions.ContainsKey(weapon))
         {
             Weapon_Actions.Remove(weapon);
@@ -147,6 +150,7 @@ public class _MartialController : MonoBehaviour
 
     public static Weapon.ActionAnim Get_Next_Action(Weapon weapon)
     {
+        if (weapon == null) { return Weapon.ActionAnim.error; }
         if (Weapon_Queues[weapon].Count > 0)
         {
             return Weapon_Queues[weapon].Peek().Action; 
@@ -164,6 +168,7 @@ public class _MartialController : MonoBehaviour
     /***** PRIVATE *****/
     private static void createNewWeaponKey(Weapon weapon, MartialJob newJob)
     {
+        if (weapon == null) { return; }
         if (Weapon_Actions.ContainsKey(weapon)) { return; }
         Weapon_Actions[weapon] = newJob;
         Weapon_Queues[weapon] = new Queue<MartialJob>();

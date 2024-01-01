@@ -63,7 +63,7 @@ public class Skully : Entity
         head.layer = gameObject.layer;
     }
 
-    protected override void Die()
+    public override void Die()
     {
         Debone(head);
         head = null;

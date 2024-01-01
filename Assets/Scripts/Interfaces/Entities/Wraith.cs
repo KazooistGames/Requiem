@@ -75,7 +75,7 @@ public class Wraith : Entity
         }
     }
 
-    protected override void Die()
+    public override void Die()
     {
         foreach (MeshFilter bone in bodyparts)
         {

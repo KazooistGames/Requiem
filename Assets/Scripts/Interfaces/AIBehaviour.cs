@@ -287,7 +287,11 @@ public class AIBehaviour : MonoBehaviour
     }
     protected bool checkMyWeaponInRange()
     {
-        if (mainWep && entity.Foe)
+        if (!this)
+        {
+            return false;
+        }
+        else if (mainWep && entity.Foe)
         {
             float disposition = (entity.Foe.transform.position - transform.position).magnitude;
             return disposition <= mainWep.Range;

@@ -10,6 +10,7 @@ using static PlayerProgression;
 
 public class Entity : MonoBehaviour
 {
+
     public static UnityEvent<Entity> EntityVanquished = new UnityEvent<Entity> { };
     public static UnityEvent<Entity, float> EntityWounded = new UnityEvent<Entity, float> { };
 
@@ -577,7 +578,7 @@ public class Entity : MonoBehaviour
         }
     }
 
-    protected virtual void Die()
+    public virtual void Die()
     {
         if (!requiemPlayer)
         {
@@ -1006,7 +1007,7 @@ public class Entity : MonoBehaviour
 
     private GameObject playPunch(float pitch)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, onSoundSpawn: sound => sound.layer = Requiem.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         sound.GetComponent<AudioSource>().time = 0.075f;
         sound.transform.SetParent(transform);
         return sound;

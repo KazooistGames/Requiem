@@ -33,7 +33,7 @@ public class Struggler : Entity
     /***** PUBLIC *****/
 
     /***** PROTECTED *****/
-    protected override void Die()
+    public override void Die()
     {
         if (model)
         {

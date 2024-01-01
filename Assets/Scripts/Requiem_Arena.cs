@@ -183,14 +183,17 @@ public class Requiem_Arena : Requiem
                     TimeGateTimeLeft -= 1;
                 }
             }
-            foreach(GameObject mob in spawnedMobs)
+            while(spawnedMobs.Count(x => x != null) != 0)
             {
-                if (mob)
+                foreach (GameObject mob in spawnedMobs)
                 {
-                    mob.GetComponent<Entity>().Vitality = 0;
+                    if (mob)
+                    {
+                        mob.GetComponent<Entity>().Vitality = 0;
+                    }
                 }
+                yield return null;
             }
-            yield return new WaitUntil(() => spawnedMobs.Count(x => x != null) == 0);
             Scoreboard.KillMultiplier += WaveKillMultiplierBonus;
             BloodWell.Volume = 100;
             blurbIndicator.SetActive(false);

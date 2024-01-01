@@ -52,7 +52,7 @@ public class Nephalim : Entity
 
 
     /***** PROTECTED *****/
-    protected override void Die()
+    public override void Die()
     {
         foreach (MeshFilter bone in bones)
         {

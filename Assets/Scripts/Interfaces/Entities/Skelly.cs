@@ -81,7 +81,7 @@ public class Skelly : Entity
         }
     }
 
-    protected override void Die()
+    public override void Die()
     {
 
         if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * 0.05f)
@@ -103,6 +103,7 @@ public class Skelly : Entity
         else
         {
             Vitality = Strength;
+            Poise = Strength;
             Destroy(GetComponent<AIBehaviour>());
             gameObject.AddComponent<Assassin>();
             Debone(head);

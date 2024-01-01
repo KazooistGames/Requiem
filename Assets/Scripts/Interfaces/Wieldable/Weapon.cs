@@ -832,7 +832,7 @@ public abstract class Weapon : Wieldable
 
     private void chargeTempo()
     {
-        Tempo = Mathf.Clamp(Mathf.Pow(tempoCharge, tempoChargeExponent), 0, 1);
+        Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
         TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
         tempoChargePeriod = Heft / Wielder.Strength;
         if (Action == ActionAnim.StrongCoil)
@@ -860,25 +860,35 @@ public abstract class Weapon : Wieldable
         }
     }
 
+    private float convertChargeToTempo(float charge)
+    {
+        float frequencyVariable = Mathf.PI * charge;
+        float frequencyConstant = Mathf.PI / 2;
+        float amplitudeScalar = 0.5f;
+        float amplitudeConstant = 0.5f;
+        float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
+        return 1 - function;
+    }
+
     private void playClang(float pitchScalar = 2.0f)
     {
         if (playClashSoundONS)
         {
             playClashSoundONS = false;
-            _SoundService.PlayAmbientSound(clangClip, transform.position, clangPitch * pitchScalar, clangVolume, onSoundSpawn: sound => sound.layer = Requiem.layerEntity);
+            _SoundService.PlayAmbientSound(clangClip, transform.position, clangPitch * pitchScalar, clangVolume, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         }
         
     }
 
     public void playShing(float pichScalar = 1.0f)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Heft, 0.25f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Heft, 0.25f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
         sound.GetComponent<AudioSource>().time = 0.15f;
     }
 
     private void playSlap(Vector3 position)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.25f, onSoundSpawn: sound => sound.layer = Requiem.layerEntity);
+        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
     }
 
     private void playTink()
@@ -886,17 +896,17 @@ public abstract class Weapon : Wieldable
         if (playClashSoundONS)
         {
             playClashSoundONS = false;
-            _SoundService.PlayAmbientSound(tinkClip, transform.position, tinkPitch + (tinkPitch * 0.25f) * (UnityEngine.Random.value - 0.5f), 0.25f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+            _SoundService.PlayAmbientSound(tinkClip, transform.position, tinkPitch + (tinkPitch * 0.25f) * (UnityEngine.Random.value - 0.5f), 0.25f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
         }  
     }
 
     private void playLightSwing()
     {
-        _SoundService.PlayAmbientSound(lightSwingClip, transform.position, swingPitch, 1.0f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        _SoundService.PlayAmbientSound(lightSwingClip, transform.position, swingPitch, 1.0f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
     }
     private void playHeavySwing()
     {
-        _SoundService.PlayAmbientSound(heavySwingClip, transform.position, swingPitch, 1.0f, onSoundSpawn: sound => sound.layer = gameObject.layer);
+        _SoundService.PlayAmbientSound(heavySwingClip, transform.position, swingPitch, 1.0f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
     }
     
 }

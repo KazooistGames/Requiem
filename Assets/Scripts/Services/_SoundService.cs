@@ -30,7 +30,7 @@ public class _SoundService : MonoBehaviour
 
     /***** PUBLIC *****/
 
-    public static GameObject PlayAmbientSound(string path, Vector3 position, float pitch, float volume, float range = -1, soundSpawnDelegate onSoundSpawn = null)
+    public static GameObject PlayAmbientSound(string path, Vector3 position, float pitch, float volume, float range = -1, soundSpawnDelegate soundSpawnCallback = null)
     {
         if (Instance && FindObjectOfType(typeof(AudioListener)))
         {
@@ -40,7 +40,7 @@ public class _SoundService : MonoBehaviour
 
             }
             AudioClip clip = SOUND_CLIPS[path];
-            return PlayAmbientSound(SOUND_CLIPS[path], position, pitch, volume, range, onSoundSpawn);
+            return PlayAmbientSound(SOUND_CLIPS[path], position, pitch, volume, range, soundSpawnCallback);
             //if (!Instance.soundSources.ContainsKey(clip))
             //{
             //    Instance.soundSources[clip] = new List<AudioSource>();

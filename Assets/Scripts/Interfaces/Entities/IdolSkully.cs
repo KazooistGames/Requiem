@@ -57,7 +57,7 @@ public class IdolSkully : Skully
         Destroy(head);
         Die();
     }
-    protected override void Die()
+    public override void Die()
     {
         Debone(head);
         head = null;

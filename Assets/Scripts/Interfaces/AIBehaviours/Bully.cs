@@ -20,6 +20,7 @@ public class Bully : AIBehaviour
         meanderPauseFrequency = 0;
         itemManagementSeekItems = true;
         itemManagementPreferredType = Entity.WieldMode.TwoHanders;
+        itemManagementNoSingles = true;
         martialFoeVulnerable.AddListener(reactToFoeVulnerable);
         martialFoeAttacking.AddListener(reactToIncomingAttack);
         sensoryFoeSpotted.AddListener(reactToFoeChange);
