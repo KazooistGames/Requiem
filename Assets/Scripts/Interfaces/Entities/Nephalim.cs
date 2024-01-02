@@ -15,7 +15,7 @@ public class Nephalim : Entity
     protected override void Awake()
     {
         base.Awake();
-        Strength = 150f;
+        Strength = 200f;
         Resolve = 20f;
         Haste = 1.0f;
         hoverScalar = 1.125f;

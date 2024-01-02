@@ -56,14 +56,15 @@ public class Assassin : AIBehaviour
         else if (Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0.25f);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
         }
     }
 
@@ -100,13 +101,13 @@ public class Assassin : AIBehaviour
         {
 
         }
-        else if (_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnim.Guarding)
+        else if (_MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding)
         {
                 dashingChargePeriod = 0.25f;
                 Vector3 disposition = entity.Foe.transform.position - transform.position;
-                dashingDesiredDirection = angleToVector(getAngle(disposition.normalized));
+                dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized));
         }
-        else if (mainWep.Action == Weapon.ActionAnim.Idle || mainWep.Action == Weapon.ActionAnim.Recoiling)
+        else
         {
             dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;

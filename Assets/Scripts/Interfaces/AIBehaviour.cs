@@ -222,6 +222,14 @@ public class AIBehaviour : MonoBehaviour
         {
             entity.Foe.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = 0;
         }
+        if (mainWep)
+        {
+            _MartialController.Cancel_Actions(mainWep);
+        }
+        if (offWep)
+        {
+            _MartialController.Cancel_Actions(offWep);
+        }
     }
 
     protected virtual void OnTriggerEnter(Collider other)

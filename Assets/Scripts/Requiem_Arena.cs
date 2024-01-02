@@ -24,7 +24,7 @@ public class Requiem_Arena : Requiem
 
     public int Ritual = 0;
 
-    private float WaveKillMultiplierBonus = 0.25f;
+    private Idol idol;
 
     protected override void Start()
     {
@@ -194,9 +194,13 @@ public class Requiem_Arena : Requiem
                 }
                 yield return null;
             }
-            Scoreboard.KillMultiplier += WaveKillMultiplierBonus;
+            Scoreboard.Wave_Completed_Rewards();
             BloodWell.UnGulp();
             blurbIndicator.SetActive(false);
+            if (!idol && Ritual % 3 == 0)
+            {
+                idol = spawnIdol();
+            }
         }
     }
 
@@ -204,9 +208,9 @@ public class Requiem_Arena : Requiem
     public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
     {
         { typeof(Skelly), 100 },
-        { typeof(Nephalim), 150 },
+        { typeof(Nephalim), 200 },
         { typeof(Skully), 25 },
-        { typeof(Wraith), 150 },
+        { typeof(Wraith), 250 },
         { typeof(Imp), 125 },
     };
     public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
@@ -233,9 +237,9 @@ public class Requiem_Arena : Requiem
     };
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
-        {1, 90 },
+        {1, 80 },
         {2, 90 },
-        {0, 90 },
+        {0, 100 },
     };
     public List<Type> UnlockedEntities = new List<Type>();
     public List<Type> UnlockedAIs = new List<Type>();
@@ -245,21 +249,16 @@ public class Requiem_Arena : Requiem
     public List<GameObject> WaveMobs = new List<GameObject>();
     private List<GameObject> spawnMobs(int strengthToSpawn)
     {
-
-        List<Type> viableAIs = new List<Type>();
-        viableAIs = AIDifficulties.Where(x => x.Value <= Ritual).Select(x => x.Key).ToList();
-
+        int numberOfUniqueTypesToSpawn = 1 + Mathf.FloorToInt(Mathf.Sqrt(Ritual));
+        List<Type> viableAIs = AIDifficulties.Where(x => x.Value <= Ritual).Select(x => x.Key).ToList();
         chosenAIsForWave = new List<Type>();
-        while(chosenAIsForWave.Count < Mathf.Min(viableAIs.Count, Mathf.FloorToInt(Mathf.Sqrt(Ritual))))
+        while(chosenAIsForWave.Count <= Mathf.Min(viableAIs.Count, numberOfUniqueTypesToSpawn))
         {
             int randomIndexFromViableAIs = UnityEngine.Random.Range(0, viableAIs.Count);
             chosenAIsForWave.Add(viableAIs[randomIndexFromViableAIs]);
             viableAIs.RemoveAt(randomIndexFromViableAIs);
         }
-
-        //sort by max HP
         chosenAIsForWave = chosenAIsForWave.OrderByDescending(x => EntityStrengths[AIEntityPairings[x]]).ToList();
-
         WaveMobs = new List<GameObject>();
         int spawnIndex = 0;
         Hextile playerTile = Player.INSTANCE.HostEntity.TileLocation;
@@ -282,9 +281,15 @@ public class Requiem_Arena : Requiem
                 spawnIndex = 0;
             }
         }
-
         return WaveMobs;
     }
 
-
+    private Idol spawnIdol()
+    {
+        Idol newIdol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
+        List<Hextile> spawnCandidates = ArenaTiles[2].Where(x => x.Landmarks.FirstOrDefault(x => x.GetComponent<Landmark_Barrier>())).ToList();
+        Hextile spawnTile = spawnCandidates[UnityEngine.Random.Range(0, spawnCandidates.Count)];
+        newIdol.transform.position = RAND_POS_IN_TILE(spawnTile);
+        return newIdol;
+    }
 }

@@ -35,7 +35,6 @@ public class Janitor : AIBehaviour
         {
             TaskList = Hextile.Tiles;
         }
-
         behaviourParams[BehaviourType.wallCrawl] = (false, 0);
         behaviourParams[BehaviourType.sensory] = (false, 0f);
         waypointCommanded = true;
@@ -57,15 +56,19 @@ public class Janitor : AIBehaviour
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        Wieldable item = other.GetComponent<Wieldable>();
-        if(item ? item.GetComponent<Weapon>() || (item.GetType() == typeof(Bone) && item != Idol.INSTANCE): false)
+        Weapon weapon = other.GetComponent<Weapon>();
+        if (weapon)
         {
-            Vector3 playerDispo = item.transform.position - Player.INSTANCE.transform.position;
-            bool inUse = item.Wielder || item.MountTarget || item.ImpaledObject || item.Telecommuting || item.Thrown || item == Player.INSTANCE.HostWeapon;
-            if (playerDispo.magnitude >= Hextile.Radius && !inUse)
+            //Vector3 playerDispo = item.transform.position - Player.INSTANCE.transform.position;
+            bool inUse = weapon.Wielder || weapon.MountTarget || weapon.ImpaledObject || weapon.Telecommuting || weapon.Thrown || weapon == Player.INSTANCE.HostWeapon;
+            if (!inUse)
             {
-                item.Telecommute(gameObject, 3.0f, (x) => Destroy(x.gameObject));
+                weapon.Telecommute(gameObject, 3.0f, (x) => Destroy(x.gameObject));
             }
+        }
+        else if (other.GetComponent<Bone>())
+        {
+            other.GetComponent<Bone>().Collect(gameObject, 3.0f, (x) => Destroy(x.gameObject));
         }
     }
 

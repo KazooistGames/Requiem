@@ -13,6 +13,7 @@ public class Scoreboard : MonoBehaviour
     public static float SpeedBonus = 0;
 
     private static List<Entity> validEntitiesToScoreFromKilling = new List<Entity>();
+    private static float WAVE_MULTIPLIER_BONUS = 0.25f;
 
     void Start()
     {
@@ -35,7 +36,16 @@ public class Scoreboard : MonoBehaviour
     /***** PUBLIC *****/
     public static void Score_Weapon_Hit(Entity entity, float magnitude)
     {
-        validEntitiesToScoreFromKilling.Add(entity);
+        //validEntitiesToScoreFromKilling.Add(entity);
+        if(magnitude > entity.Vitality)
+        {
+            ADD_SCORE(entity.Strength);
+        }
+    }
+
+    public static void Wave_Completed_Rewards()
+    {
+        KillMultiplier += WAVE_MULTIPLIER_BONUS;
     }
 
     /***** PROTECTED *****/

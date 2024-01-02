@@ -12,6 +12,8 @@ public class Skelly : Entity
     protected GameObject leg1;
     protected GameObject leg2;
 
+    public float MutationChancePerRitual = 0.025f;
+
     protected override void Awake()
     {
         base.Awake();
@@ -84,7 +86,7 @@ public class Skelly : Entity
     public override void Die()
     {
 
-        if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * 0.05f)
+        if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * MutationChancePerRitual)
         {
             foreach (MeshFilter bone in bodyParts)
             {
@@ -104,6 +106,7 @@ public class Skelly : Entity
         {
             Vitality = Strength;
             Poise = Strength;
+            Haste = 1.5f;
             Destroy(GetComponent<AIBehaviour>());
             gameObject.AddComponent<Assassin>();
             Debone(head);

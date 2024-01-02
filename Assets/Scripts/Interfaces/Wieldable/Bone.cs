@@ -10,7 +10,7 @@ public class Bone : MonoBehaviour
     public float pitchScalar = 1.0f;
     public float NoiseImpulse = 0.015f;
 
-    public Player collectTarget;
+    public GameObject collectTarget;
     public bool Telecommuting = false;
 
     public List<Collider> PhysicsBoxes = new List<Collider>();
@@ -58,7 +58,7 @@ public class Bone : MonoBehaviour
     {
         if(other.gameObject == Player.INSTANCE.gameObject && allowCollect && !collectTarget)
         {
-            Collect(Player.INSTANCE, 0.5f, Consume);
+            //Collect(Player.INSTANCE, 0.5f, Consume);
         }
     }
 
@@ -74,14 +74,14 @@ public class Bone : MonoBehaviour
     {
         if (bone.collectTarget) 
         {
-            bone.collectTarget.BonesCollected += bone.Value;
+            //bone.collectTarget.BonesCollected += bone.Value;
             bone.Rattle();
             Destroy(bone.gameObject);
         }
 
     }
 
-    public void Collect(Player target, float telecommuteScalar, Action<Bone> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
+    public void Collect(GameObject target, float telecommuteScalar, Action<Bone> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
     {
         StartCoroutine(collectRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
@@ -91,7 +91,7 @@ public class Bone : MonoBehaviour
 
 
     /*** PRIVATE ***/
-    private IEnumerator collectRoutine(Player target, float teleScalar, Action<Bone> callback, bool enablePhysics, bool useScalarAsSpeed)
+    private IEnumerator collectRoutine(GameObject target, float teleScalar, Action<Bone> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
         collectTarget = target;
         Telecommuting = true;

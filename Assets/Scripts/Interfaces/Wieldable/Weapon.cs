@@ -63,8 +63,8 @@ public abstract class Weapon : Wieldable
     public float tempoChargeExponent = 3/4f;
     private bool tempoChargeONS = true;
     //private bool attackChargeONS = true;
-    public float TempoTargetCenter { get; private set; } = 0.94f;
-    public float TempoTargetWidth { get; private set; } = 0.1f;
+    public float TempoTargetCenter { get; private set; } = 0.974f;
+    public float TempoTargetWidth { get; private set; } = 0.05f;
 
 
     protected string lightSwingClip;
@@ -456,13 +456,14 @@ public abstract class Weapon : Wieldable
         {
             RESOLVE_PARRY(Attacker, Defender);
         }
-        else if(Defender.Action == ActionAnim.Guarding)
+        else if (Defender.Action == ActionAnim.Guarding || Defender.Action == ActionAnim.Recovering)
         {
             RESOLVE_BLOCK(Attacker, Defender);
         }
         else
         {
-            Attacker.itemCollisionONS(Defender);
+            //Attacker.itemCollisionONS(Defender);
+            RESOLVE_BLOCK(Attacker, Defender);
         }
     }
 

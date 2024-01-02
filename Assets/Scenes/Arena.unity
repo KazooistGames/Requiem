@@ -230,6 +230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5b96bfb979cce046b8cb6b84c63969a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MutationChance: 0.025
   requiemPlayer: {fileID: 0}
   Strength: 100
   Resolve: 10
@@ -725,6 +726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5b96bfb979cce046b8cb6b84c63969a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MutationChance: 0.025
   requiemPlayer: {fileID: 0}
   Strength: 100
   Resolve: 10
@@ -819,7 +821,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &786075281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -909,6 +911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0484fa1a56cb43e40b92e889dacb2a56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MutationChance: 0.025
   requiemPlayer: {fileID: 0}
   Strength: 100
   Resolve: 10
@@ -972,6 +975,7 @@ MonoBehaviour:
   wieldMode: 1
   Allegiance: -1
   flames: {fileID: 0}
+  MutationChancePerRitual: 0.025
 --- !u!4 &844573217
 Transform:
   m_ObjectHideFlags: 0
@@ -1172,6 +1176,193 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1413234527
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1413234530}
+  - component: {fileID: 1413234529}
+  - component: {fileID: 1413234528}
+  m_Layer: 0
+  m_Name: skelly (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1413234528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413234527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01cbd58ddc0a9004c8057318a4f6829d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  stateRunTimer: 0
+  ReflexRate: 0.2
+  Intelligence: 0
+  Enthralled: 0
+  actualMovementDirection: {x: 0, y: 0, z: 0}
+  actualMovementAngle: 0
+  DesiredDirection: {x: 0, y: 0, z: 0}
+  TotalWeight: 0
+  LookAngle: 0
+  excitement: 0
+  RestingState: 3
+  meanderDirection: {x: 0, y: 0, z: 0}
+  meanderPaused: 0
+  meanderPauseFrequency: 0.5
+  sensoryFoeSpotted:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryFoeLost:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryAlerted: 0
+  pursueStoppingDistance: 0
+  trackingEyesOnTarget: 0
+  trackingTrailCold: 1
+  grabDPS: 15
+  tangoDeadbanded: 0
+  tangoStrafeEnabled: 1
+  martialCurrentState: 0
+  martialPreferredState: 0
+  martialFoeVulnerable:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeAttacking:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeDashing:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
+  itemManagementSeekItems: 0
+  itemManagementGreedy: 0
+  itemManagementPreferredType: 0
+  followVIP: {fileID: 0}
+  followRecall: 0
+  followNutHug: 0
+  followDistance: 0
+  waypointCoordinates: {x: 0, y: 0, z: 0}
+  waypointCommanded: 0
+  waypointDeadbanded: 0
+  waypointDeadbandingScalar: 2
+  waypointInnerlimit: 1
+  waypointOuterLimit: 2
+  wallCrawlDrawRays: 0
+  wallCrawlCrowding: 0
+  wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
+--- !u!114 &1413234529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413234527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0484fa1a56cb43e40b92e889dacb2a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MutationChance: 0.025
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1.5
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  JustDisarmed:
+    m_PersistentCalls:
+      m_Calls: []
+  JustVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  JustWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  JustCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  JustLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  JustPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  Aggressive: 1
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  Interact:
+    m_PersistentCalls:
+      m_Calls: []
+  Interacting: 0
+  personalBox: {fileID: 0}
+  model: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  DashCharging: 0
+  Dashing: 0
+  TileLocation: {fileID: 0}
+  head: {fileID: 0}
+  FinalDashEnabled: 0
+  FinalDash: 0
+  Posture: 1
+  wieldMode: 1
+  Allegiance: -1
+  flames: {fileID: 0}
+  MutationChancePerRitual: 0.025
+--- !u!4 &1413234530
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413234527}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 15
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1728748821
 GameObject:
   m_ObjectHideFlags: 0
@@ -1357,6 +1548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5b96bfb979cce046b8cb6b84c63969a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MutationChance: 0.025
   requiemPlayer: {fileID: 0}
   Strength: 100
   Resolve: 10
@@ -1543,6 +1735,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80f4bad6f7246d440ba8376f57b01686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MutationChance: 0.025
   requiemPlayer: {fileID: 0}
   Strength: 100
   Resolve: 10
@@ -1620,6 +1813,192 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1873149652
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1873149655}
+  - component: {fileID: 1873149654}
+  - component: {fileID: 1873149653}
+  m_Layer: 0
+  m_Name: imp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1873149653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873149652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9599e41eed1b724cb805879b392434d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  stateRunTimer: 0
+  ReflexRate: 0.2
+  Intelligence: 0
+  Enthralled: 0
+  actualMovementDirection: {x: 0, y: 0, z: 0}
+  actualMovementAngle: 0
+  DesiredDirection: {x: 0, y: 0, z: 0}
+  TotalWeight: 0
+  LookAngle: 0
+  excitement: 0
+  RestingState: 3
+  meanderDirection: {x: 0, y: 0, z: 0}
+  meanderPaused: 0
+  meanderPauseFrequency: 0.5
+  sensoryFoeSpotted:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryFoeLost:
+    m_PersistentCalls:
+      m_Calls: []
+  sensoryAlerted: 0
+  pursueStoppingDistance: 0
+  trackingEyesOnTarget: 0
+  trackingTrailCold: 1
+  grabDPS: 15
+  tangoDeadbanded: 0
+  tangoStrafeEnabled: 1
+  martialCurrentState: 0
+  martialPreferredState: 0
+  martialFoeVulnerable:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeAttacking:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeDashing:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialEnteredRange:
+    m_PersistentCalls:
+      m_Calls: []
+  martialFoeThrowing:
+    m_PersistentCalls:
+      m_Calls: []
+  itemManagementSeekItems: 0
+  itemManagementGreedy: 0
+  itemManagementPreferredType: 0
+  followVIP: {fileID: 0}
+  followRecall: 0
+  followNutHug: 0
+  followDistance: 0
+  waypointCoordinates: {x: 0, y: 0, z: 0}
+  waypointCommanded: 0
+  waypointDeadbanded: 0
+  waypointDeadbandingScalar: 2
+  waypointInnerlimit: 1
+  waypointOuterLimit: 2
+  wallCrawlDrawRays: 0
+  wallCrawlCrowding: 0
+  wallCrawlAvoidFoe: 1
+  wallCrawlObstacles: []
+--- !u!114 &1873149654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873149652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2169de0b2e74384f8133beb767c251e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MutationChance: 0.025
+  requiemPlayer: {fileID: 0}
+  Strength: 100
+  Resolve: 10
+  Haste: 1
+  Xp: 0
+  Lvl: 0
+  Vitality: 0
+  Agility: 0
+  Poise: 0
+  JustDisarmed:
+    m_PersistentCalls:
+      m_Calls: []
+  JustVanquished:
+    m_PersistentCalls:
+      m_Calls: []
+  JustWounded:
+    m_PersistentCalls:
+      m_Calls: []
+  JustCrashed:
+    m_PersistentCalls:
+      m_Calls: []
+  JustLandedDashHit:
+    m_PersistentCalls:
+      m_Calls: []
+  JustPickedUpWieldable:
+    m_PersistentCalls:
+      m_Calls: []
+  Foe: {fileID: 0}
+  Aggressive: 1
+  WalkDirection: {x: 0, y: 0, z: 0}
+  LookDirection: {x: 0, y: 0, z: 0}
+  TurnSpeed: 0
+  MainHand: {fileID: 0}
+  OffHand: {fileID: 0}
+  leftStorage: {fileID: 0}
+  rightStorage: {fileID: 0}
+  backStorage: {fileID: 0}
+  EventAttemptPickup:
+    m_PersistentCalls:
+      m_Calls: []
+  Interact:
+    m_PersistentCalls:
+      m_Calls: []
+  Interacting: 0
+  personalBox: {fileID: 0}
+  model: {fileID: 0}
+  body: {fileID: 0}
+  indicator: {fileID: 0}
+  statBar: {fileID: 0}
+  Shoved: 0
+  shoveRecoveryPeriod: 0
+  Staggered: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  DashCharging: 0
+  Dashing: 0
+  TileLocation: {fileID: 0}
+  head: {fileID: 0}
+  FinalDashEnabled: 0
+  FinalDash: 0
+  Posture: 1
+  wieldMode: 1
+  Allegiance: -1
+  flames: {fileID: 0}
+--- !u!4 &1873149655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873149652}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2008132592
 GameObject:
@@ -1851,6 +2230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c318eaa0c9cf2648aa6438c52142db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MutationChance: 0.025
   requiemPlayer: {fileID: 0}
   Strength: 100
   Resolve: 1

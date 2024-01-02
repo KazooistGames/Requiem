@@ -10,7 +10,6 @@ using static PlayerProgression;
 
 public class Entity : MonoBehaviour
 {
-
     public static UnityEvent<Entity> EntityVanquished = new UnityEvent<Entity> { };
     public static UnityEvent<Entity, float> EntityWounded = new UnityEvent<Entity, float> { };
 
@@ -20,7 +19,6 @@ public class Entity : MonoBehaviour
     public float Resolve = 10.0f;
     public float Haste = 1.0f;
 
-    public float Xp = 0f;
     public int Lvl = 0;
 
     public float Vitality;
@@ -29,7 +27,7 @@ public class Entity : MonoBehaviour
 
     public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
-    public static float Berth { get; private set; } = 0.25f;
+    public static float Berth { get; private set; } = 0.225f;
     public static float Height { get; private set; } = 1.25f;
     public static float DefaultTurnSpeed { get; private set; } = 900f;
     public static float HoverHeight { get; private set; } = 0.725f;
@@ -243,7 +241,7 @@ public class Entity : MonoBehaviour
             Staggered = false;
         }
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
-        berthActual = DashCharging || Dashing ? 0.8f * Berth * berthScalar : Berth * berthScalar;
+        berthActual = Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
             float scalingRegenRate = POISE_REGEN_BASE_PERIOD + Mathf.FloorToInt((Strength - Vitality) / 20);
@@ -265,7 +263,7 @@ public class Entity : MonoBehaviour
         }  
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
         Poise = Mathf.Clamp(Poise, -1f, Strength);
-        Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Haste, (result, multiplier) => result *= 1 + multiplier));
+        Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Mathf.Sqrt(Haste), (result, multiplier) => result *= 1 + multiplier));
         updatePosture();
         if (Vitality <= 0)
         {

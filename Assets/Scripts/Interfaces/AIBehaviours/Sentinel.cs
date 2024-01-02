@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sentinel : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.5f;
+    private float CombatSpeed = 0.25f;
     private float Aggression = 0.5f;
 
     protected override void Awake()
@@ -54,7 +54,7 @@ public class Sentinel : AIBehaviour
         else if (Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
@@ -64,7 +64,7 @@ public class Sentinel : AIBehaviour
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
@@ -79,7 +79,7 @@ public class Sentinel : AIBehaviour
         }
         else if (Random.value < Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -120,26 +120,6 @@ public class Sentinel : AIBehaviour
 
 
     /***** PRIVATE *****/
-    private bool timeoutCheckMyWeaponInRange()
-    {
-        if (!mainWep)
-        {
-            return false;
-        }
-        else if (checkMyWeaponInRange())
-        {
-            return true;
-        }
-        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
-
-        {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
 }
 

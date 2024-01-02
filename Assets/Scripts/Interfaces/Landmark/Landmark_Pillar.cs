@@ -9,8 +9,28 @@ public class Landmark_Pillar : Landmark
 
     protected Rigidbody body;
 
-    /********** pillar functions *************/
+    private GameObject brokeTop;
+    private GameObject brokeBottom;
 
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Weapon weapon = other.GetComponent<Weapon>();
+        if(weapon ? weapon.TrueStrike : false)
+        {
+            body.isKinematic = true;
+            model.GetComponent<MeshRenderer>().enabled = false;
+            foreach(Collider collider in model.GetComponents<Collider>())
+            {
+                collider.enabled = false;
+            }
+            brokeTop.SetActive(true);
+            brokeBottom.SetActive(true);
+            Impacted();
+        }
+    }
+
+    /***** PUBLIC *****/
     public override void AssignToTile(Hextile Tile)
     {
         base.AssignToTile(Tile);
@@ -21,34 +41,22 @@ public class Landmark_Pillar : Landmark
         {
             PillarModels = Resources.LoadAll<GameObject>("Prefabs/Pillars/").ToList();
         }
-        model = Instantiate(PillarModels[Random.Range(0, PillarModels.Count)]);
+        model = Instantiate(PillarModels[0]);
         model.transform.SetParent(transform, false);
         model.transform.localEulerAngles = Vector3.up * Random.value * 360;
         body = GetComponent<Rigidbody>() ? GetComponent<Rigidbody>() : gameObject.AddComponent<Rigidbody>();
         body.mass = model.tag == "Broken" ? 100 : 150;
         body.collisionDetectionMode = CollisionDetectionMode.Discrete;
-        //transform.LookAt(Game.Instance.Board.RootTile.transform.position, Vector3.up);
-        //body.freezeRotation = true;
         Vector3 temp = transform.localEulerAngles;
         transform.localEulerAngles = new Vector3(0, temp.y, 0);
-        //torch = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/torch")).GetComponent<Torch>();
-        if (model.tag == "Broken")
-        {
-            //torch.transform.position = transform.position + new Vector3(0, 0.35f, 0.07f);
-            GameObject otherHalf = Instantiate(model);
-            otherHalf.transform.position = model.transform.position + Vector3.up;
-            otherHalf.transform.Rotate(new Vector3(Random.value * 180, Random.value * 180, Random.value * 180));
-            Rigidbody body = otherHalf.AddComponent<Rigidbody>();
-            body.mass = model.tag == "Broken" ? 100 : 150;
-            body.collisionDetectionMode = CollisionDetectionMode.Discrete;
-            otherHalf.transform.SetParent(transform.parent);
-        }
-        else
-        {
-            //torch.Mount(gameObject, new Vector3(0, 0.35f, 0.07f));
-        }
-        //torch.transform.localEulerAngles = new Vector3(45, 0, 0);
-        //torch.Lit = false;
+        brokeTop = model.transform.GetChild(1).gameObject;
+        brokeBottom = model.transform.GetChild(2).gameObject;
     }
+
+
+    /***** PROTECTED *****/
+
+    
+    /***** PRIVATE *****/
 }
 
