@@ -618,7 +618,7 @@ public abstract class Weapon : Wieldable
 
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float scalar = 1.0f)
     {
-        if (!foe) { return; }
+        if (!foe || !weapon.MostRecentWielder) { return; }
         float impactPower = weapon.Heft * (1 + weapon.Tempo);
         Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
         Vector3 disposition = foe.transform.position - origin;

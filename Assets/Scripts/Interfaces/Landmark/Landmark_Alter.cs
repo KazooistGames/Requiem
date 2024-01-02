@@ -7,6 +7,8 @@ using UnityEditor;
 
 public class Landmark_Alter : Landmark
 {
+
+
     public GameObject DesiredOffering;
     public GameObject TopStep;
     public GameObject Podium;
@@ -21,12 +23,18 @@ public class Landmark_Alter : Landmark
     private List<GameObject> steps = new List<GameObject>();
     private CapsuleCollider offeringDetectionCollider;
 
+    LineRenderer PentagramLines;
+    public Color PentagramLineColor = Color.red;
+    _Flames PentagramFlames;
+
     private void Update()
     {
         if (DesiredOffering)
         {
             Energized = offeringDetectionCollider.bounds.Contains(DesiredOffering.transform.position);
+
         }
+
         //else if(Player.INSTANCE)
         //{
         //    Energized = offeringDetectionCollider.bounds.Contains(Player.INSTANCE.HostEntity.transform.position) && Player.INSTANCE.HostEntity.Interacting;
@@ -59,12 +67,11 @@ public class Landmark_Alter : Landmark
         TopStep = lastStep;
         //create podium for idol
         //createCenterPodium();
-
         offeringDetectionCollider = gameObject.AddComponent<CapsuleCollider>();
         offeringDetectionCollider.isTrigger = true;
         offeringDetectionCollider.radius = Hextile.Radius * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount);
         offeringDetectionCollider.height = Hextile.Thickness * 2 + StepHeight*StepCount;
-
+        setupRitual();
         StartCoroutine(RitualCycler());
     }
 
@@ -86,21 +93,7 @@ public class Landmark_Alter : Landmark
 
         float pentagramRadius = (Hextile.Radius * 2) * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount-1);
         float pentagramHeight = (Hextile.Thickness / 2) + (StepCount + 1) * StepHeight;
-        Vector3 flameScale = new Vector3(0.05f, 0.1f, 0.05f);
-        _Flames ritualFlame;
-        ritualFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
-        ritualFlame.transform.SetParent(Tile.gameObject.transform, false);
-        ritualFlame.shapeModule.shapeType = ParticleSystemShapeType.Donut;
-        ritualFlame.shapeModule.scale = flameScale;
-        ritualFlame.SetFlameStyle(_Flames.FlameStyles.Soulless, 0.75f);
-        LineRenderer Lines;
-        Lines = gameObject.AddComponent<LineRenderer>();
-        Lines.enabled = false;
-        Lines.useWorldSpace = false;
-        Lines.startColor = new Color(1.0f, 0.0f, 0.0f, 0.75f);
-        Lines.endColor = new Color(1.0f, 0.0f, 0.0f, 0.75f);
-        Lines.material = Resources.Load<Material>("Materials/FX/LineRenderer");
-        Lines.widthMultiplier = 0.015f;
+        Vector3 flameScale = new Vector3(0.05f, 0.1f, 0.05f);    
         List<Vector3> points = new List<Vector3>()
         {
             AIBehaviour.angleToVector(54) * 0.4f * pentagramRadius,
@@ -115,17 +108,16 @@ public class Landmark_Alter : Landmark
             float drawTimer = 0.0f;
             float timerRatio;
             Used = false;
-            ritualFlame.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
-            ritualFlame.emissionModule.enabled = false;
+            PentagramFlames.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
+            PentagramFlames.emissionModule.enabled = false;
             yield return new WaitUntil(() => Energized);
-            ritualFlame.emissionModule.enabled = true;
-            ritualFlame.shapeModule.scale = flameScale;
-            ritualFlame.shapeModule.position = points[0];
+            PentagramFlames.emissionModule.enabled = true;
+            PentagramFlames.shapeModule.position = points[0];
+            PentagramLines.startColor = PentagramLineColor;
+            PentagramLines.endColor = PentagramLineColor;
             while (drawTimer < RitualDurationSeconds)
             {
-                Lines.enabled = true;
-                Lines.startColor = new Color(1.0f, 0.0f, 0.0f, 0.75f);
-                Lines.endColor = new Color(1.0f, 0.0f, 0.0f, 0.75f);
+                PentagramLines.enabled = true;
                 timerRatio = drawTimer / RitualDurationSeconds;
                 List<Vector3> positions = new List<Vector3>();
                 positions.Add(points[0] + Vector3.up * pentagramHeight);
@@ -137,30 +129,49 @@ public class Landmark_Alter : Landmark
                     positions.Add(Vector3.Lerp(lastPoint, newPoint, temp) + Vector3.up * pentagramHeight);
                     lastPoint = newPoint;
                 }
-                Lines.positionCount = positions.Count;
-                Lines.SetPositions(positions.ToArray());
-                ritualFlame.shapeModule.position = drawTimer == 0 ? Vector3.zero + Vector3.up * pentagramHeight : positions[positions.Count - 1];
+                PentagramLines.positionCount = positions.Count;
+                PentagramLines.SetPositions(positions.ToArray());
+                PentagramFlames.shapeModule.position = drawTimer == 0 ? Vector3.zero + Vector3.up * pentagramHeight : positions[positions.Count - 1];
                 drawTimer += Energized ? Time.deltaTime : -Time.deltaTime;
                 drawTimer = Mathf.Clamp(drawTimer, 0, RitualDurationSeconds);
                 yield return null;
             }
-            ritualFlame.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
+            PentagramFlames.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
             Used = true;
             yield return new WaitWhile(() => Energized);
-            ritualFlame.emissionModule.enabled = false;
+            PentagramFlames.emissionModule.enabled = false;
             Used = false;
             float fadeOutTimer = 0;
             float fadeOutPeriod = 3;
             float ratio;
+            Color endColor = PentagramLineColor;
+            endColor.a = 0;
             while (fadeOutTimer < fadeOutPeriod)
             {
                 ratio = fadeOutTimer / fadeOutPeriod;
-                Lines.startColor = new Color(1.0f, 0.0f, 0.0f, Mathf.Lerp(0.75f, 0.0f, ratio));
-                Lines.endColor = new Color(1.0f, 0.0f, 0.0f, Mathf.Lerp(0.75f, 0.0f, ratio));
+                //PentagramLines.startColor = new Color(1.0f, 0.0f, 0.0f, Mathf.Lerp(0.75f, 0.0f, ratio));
+                //PentagramLines.endColor = new Color(1.0f, 0.0f, 0.0f, Mathf.Lerp(0.75f, 0.0f, ratio));
+                PentagramLines.startColor = Color.Lerp(PentagramLineColor, endColor, ratio);
+                PentagramLines.endColor = Color.Lerp(PentagramLineColor, endColor, ratio);
                 fadeOutTimer += Time.deltaTime;
                 yield return null;
             }
         }       
     }
 
+    private void setupRitual()
+    {
+        Vector3 flameScale = new Vector3(0.05f, 0.1f, 0.05f);
+        PentagramFlames = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        PentagramFlames.transform.SetParent(Tile.gameObject.transform, false);
+        PentagramFlames.shapeModule.shapeType = ParticleSystemShapeType.Donut;
+        PentagramFlames.shapeModule.scale = flameScale;
+        PentagramFlames.SetFlameStyle(_Flames.FlameStyles.Soulless, 0.75f);
+
+        PentagramLines = gameObject.AddComponent<LineRenderer>();
+        PentagramLines.enabled = false;
+        PentagramLines.useWorldSpace = false;
+        PentagramLines.material = Resources.Load<Material>("Materials/FX/LineRenderer");
+        PentagramLines.widthMultiplier = 0.015f;
+    }
 }

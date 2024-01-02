@@ -14,54 +14,58 @@ public class Idol : Wieldable
     public float pitchScalar = 1.0f;
     public float NoiseImpulse = 0.015f;
 
+    public Entity mobEntity;
+
     private GameObject prompt;
     private GameObject currentBlurb;
-    private List<string> greetings = new List<string>()
+
+    public enum ActivityLevel
     {
+        Inert,
+        Approached,
+        Active,
+        Aggro,
+    }
+    public ActivityLevel activityLevel = ActivityLevel.Inert;
+
+    private List<string> approachedMessages = new List<string>()
+    {
+        "Take me to the alter.",
+    };
+    private List<string> activeMessages = new List<string>()
+    {   
         "And so the struggler returns...",
-        "Greetings, struggler.",     
+        "Greetings, struggler.",
         "Come back for more?",
         "Awoken again, have we?",
         "...",
-        "Welcome back.",       
+        "Welcome back.",
         "Back in the saddle, I see",
         "Go away.",
         "What eon is it?",
-        "Something wicked this way comes."
-    };
-    private List<string> conversation = new List<string>()
-    {
-        "Never sated for long, are you?",
+        "Something wicked this way comes.",
+        "Never sated for long",
         "It is no surprise to see you here again, struggler.",
         "I was getting lonely.",
         "I have been waiting for your return.",
         "How far will you make it this time?",     
-        "I thought you might give up this time... imagine",     
-        "What technique do you prefer these days?",        
+        "I thought you might give up this time... imagine",          
         "You may yet escape.",
-        "Take me to the alter.",
         "Return me to the alter",
         "Complete the ritual. Close the circle.",
-        "End this torment.",
         "Destroy the pillars of this realm.",
         "Things look a bit different around here.. but you look the same.",
         "You still look the same.",
-        "It is like you dont age..",
-        "Will we find the singularity?",
         "All this has happened before, in some way or another.",
         "Remind us all of why you are here.",
         "Blood is the price, blood is prize.",
         "Death comes.",
         "Show me your worth!",
         "Get to work.",
-        "This reminds me of our first battle...",
-        "Relive your life, reinvent your death.",
         "They are coming.",
         "Enter the fray.",
         "Show them no mercy.",
     };
-
-    private Entity mobEntity;
 
     protected override void Awake()
     {
@@ -69,6 +73,7 @@ public class Idol : Wieldable
         PhysicsBoxes.Add(GetComponent<BoxCollider>() ? GetComponent<BoxCollider>() : gameObject.AddComponent<BoxCollider>());
         Renderer = GetComponent<MeshRenderer>() ? GetComponent<MeshRenderer>() : gameObject.AddComponent<MeshRenderer>();
     }
+
     protected override void Start()
     {
         base.Start();
@@ -81,7 +86,6 @@ public class Idol : Wieldable
         pitchScalar = 0.6f;
         flames = GetComponentInChildren<_Flames>();
         flames.SetFlameStyle(_Flames.FlameStyles.Soulless);
-        flames.boundObject = gameObject;
         StartCoroutine(banter());
         Body.mass = 3f;
         PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
@@ -92,15 +96,20 @@ public class Idol : Wieldable
         base.Update();
         if (mobEntity)
         {
-            flames.SetFlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless);
+            flames.SetFlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless); 
+            activityLevel = ActivityLevel.Aggro;
         }
         else if (Wielder ? Wielder.requiemPlayer : false)
         {
-            
+            activityLevel = ActivityLevel.Active;
         }
-        else if (prompt)
+        else if((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius / 2)
         {
-            Destroy(prompt);
+            activityLevel = ActivityLevel.Approached;
+        }
+        else
+        {
+            activityLevel = ActivityLevel.Inert;
         }
     }
 
@@ -178,21 +187,41 @@ public class Idol : Wieldable
 
     private IEnumerator banter()
     {
-        yield return new WaitUntil(() => Player.INSTANCE);
-        flames.emissionModule.enabled = false;
-        float timeOfLastBlurb = 0;
-        yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
-        flames.emissionModule.enabled = true;
-        timeOfLastBlurb = SayShit(greetings);
-        yield return new WaitUntil(() => (Time.time - timeOfLastBlurb) > 30 || Wielder == Player.INSTANCE.HostEntity);
         while (true)
         {
-            yield return new WaitUntil(() => (Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius);
-            if (Wielder == Player.INSTANCE.HostEntity)
+            switch (activityLevel)
             {
-                timeOfLastBlurb = SayShit(conversation);
-                yield return new WaitWhile(() => Wielder == Player.INSTANCE.HostEntity || Time.time - timeOfLastBlurb >= 30);
-            }       
+                case ActivityLevel.Inert:
+                    if (currentBlurb)
+                    {
+                        Destroy(currentBlurb);
+                    }
+                    flames.emissionModule.enabled = false;
+                    yield return new WaitWhile(() => activityLevel == ActivityLevel.Inert);
+                    break;
+                case ActivityLevel.Approached:
+                    if (currentBlurb)
+                    {
+                        Destroy(currentBlurb);
+                    }
+                    flames.emissionModule.enabled = true;
+                    SayShit(approachedMessages);
+                    yield return new WaitWhile(() => activityLevel == ActivityLevel.Approached);
+                    break;
+                case ActivityLevel.Active:
+                    if (currentBlurb)
+                    {
+                        Destroy(currentBlurb);
+                    }
+                    flames.emissionModule.enabled = true;
+                    SayShit(activeMessages);
+                    yield return new WaitWhile(() => activityLevel == ActivityLevel.Active);
+                    break;
+                case ActivityLevel.Aggro:
+                    flames.emissionModule.enabled = true;
+                    yield return new WaitWhile(() => activityLevel == ActivityLevel.Aggro);
+                    break;
+            }
             yield return null;
         }
     }

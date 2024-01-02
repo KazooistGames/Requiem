@@ -56,9 +56,17 @@ public class Janitor : AIBehaviour
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        Weapon weapon = other.GetComponent<Weapon>();
-        if (weapon)
+        if (!Player.INSTANCE)
         {
+
+        }
+        else if ((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius/2)
+        {
+
+        }
+        else if (other.GetComponent<Weapon>())
+        {
+            Weapon weapon = other.GetComponent<Weapon>();
             //Vector3 playerDispo = item.transform.position - Player.INSTANCE.transform.position;
             bool inUse = weapon.Wielder || weapon.MountTarget || weapon.ImpaledObject || weapon.Telecommuting || weapon.Thrown || weapon == Player.INSTANCE.HostWeapon;
             if (!inUse)

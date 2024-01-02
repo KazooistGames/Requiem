@@ -36,9 +36,13 @@ public class Requiem_Arena : Requiem
     protected override void Update()
     {
         base.Update();
+        determineAlterOffering();
 
     }
 
+    /***** PUBLIC *****/
+
+    /***** PROTECTED *****/
     protected IEnumerator SetupGame()
     {
         yield return null;
@@ -89,7 +93,28 @@ public class Requiem_Arena : Requiem
         yield return gameLoop();
     }
 
+    /***** PRIVATE *****/
+    private void determineAlterOffering()
+    {
+        if (!Alter || !Player.INSTANCE)
+        {
 
+        }
+        else if (StateOfGame == GameState.Wave)
+        {
+            Alter.DesiredOffering = Alter.TopStep;
+        }
+        else if(idol ? idol.Wielder : false)
+        {
+            Alter.DesiredOffering = idol.gameObject;
+            Alter.PentagramLineColor = Color.blue;
+        }
+        else if(Player.INSTANCE.HostEntity)
+        {
+            Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
+            Alter.PentagramLineColor = Color.red;
+        }
+    }
     private IEnumerator buildArenaLandmarks(List<List<Hextile>> arenaTileRings)
     {
         foreach (List<Hextile> ring in arenaTileRings)
@@ -108,7 +133,7 @@ public class Requiem_Arena : Requiem
                         if ((int)position % 2 == 0)
                         {
                             new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
-                            //new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile.Extend(position));
+                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                         }
                         else
                         {
@@ -122,6 +147,10 @@ public class Requiem_Arena : Requiem
                     foreach (Hextile tile in ring)
                     {
                         if (tile.Landmarks.Count == 0)
+                        {
+                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
+                        }
+                        else
                         {
                             new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                         }
@@ -145,20 +174,17 @@ public class Requiem_Arena : Requiem
         blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
         blurbIndicator.SetActive(false);
         blurbIndicator.GetComponent<Text>().text = "0:00";
-        //MobSpawner.FinishedPeriodicSpawning.AddListener((mobs) => spawnedMobs = mobs);
-        //EliteSpawner.FinishedPeriodicSpawning.AddListener((elites) => spawnedElites = elites);
         StateOfGame = GameState.Lobby;
         yield return new WaitUntil(() => BloodWell.Volume == 0);
         while (Player.INSTANCE.HostEntity)
         {
             StateOfGame = GameState.Liminal;
-            Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
+
             Ritual++;
             Gates[0].OpenDoor();
             yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             StateOfGame = GameState.Wave;
-            Alter.DesiredOffering = Alter.TopStep;
             Gates[0].CloseDoor();
             TotalStrengthOfWave = RitualStrengths[Ritual % 3];
             TimeGateTimeLeft = RitualTimes[Ritual % 3];

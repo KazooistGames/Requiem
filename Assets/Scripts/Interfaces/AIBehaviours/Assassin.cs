@@ -101,7 +101,7 @@ public class Assassin : AIBehaviour
         {
 
         }
-        else if (_MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding)
+        else if (_MartialController.Weapon_Actions.ContainsKey(mainWep) ? _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding : true)
         {
                 dashingChargePeriod = 0.25f;
                 Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -118,7 +118,7 @@ public class Assassin : AIBehaviour
 
     protected override void reactToFoeThrowing()
     {
-        if (_MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding)
+        if (_MartialController.Weapon_Actions.ContainsKey(mainWep) ? _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding : true)
         {
             return;
         }
