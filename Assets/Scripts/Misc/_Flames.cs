@@ -88,7 +88,7 @@ public class _Flames : MonoBehaviour
     }
 
     /***** PUBLIC *****/
-    public void SetFlameStyle(FlameStyles preset, float intensityOverride = 5f)
+    public void SetFlameStyle(FlameStyles preset)
     {
         if(gradients.Count == 0)
         {
@@ -98,19 +98,16 @@ public class _Flames : MonoBehaviour
         switch (preset)
         {
             case FlameStyles.Inferno:
-                particleLight.intensity = intensityOverride;
                 flameGradient.mode = ParticleSystemGradientMode.Gradient;
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
             case FlameStyles.Soulless:
-                particleLight.intensity = intensityOverride;
                 flameGradient.mode = ParticleSystemGradientMode.Gradient;
                 particleLight.color = colors[(int)preset - 1];
                 flameGradient.gradient = gradients[(int)preset - 1];
                 break;
             case FlameStyles.Magic:
-                particleLight.intensity = intensityOverride;
                 flameGradient.mode = ParticleSystemGradientMode.TwoGradients;
                 flameGradient.gradientMin = gradients[0];
                 flameGradient.gradientMax = gradients[1];

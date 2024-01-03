@@ -56,11 +56,7 @@ public class Janitor : AIBehaviour
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        if (!Player.INSTANCE)
-        {
-
-        }
-        else if ((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius/2)
+        if (getIfPlayerIsTooCloseToObj(other.gameObject))
         {
 
         }
@@ -80,6 +76,17 @@ public class Janitor : AIBehaviour
         }
     }
 
-
+    /***** PRIVATE *****/
+    private bool getIfPlayerIsTooCloseToObj(GameObject obj)
+    {
+        if (!Player.INSTANCE)
+        {
+            return false;
+        }
+        else
+        {
+            return (Player.INSTANCE.transform.position - obj.transform.position).magnitude <= Hextile.Radius / 2;
+        }
+    }
 
 }

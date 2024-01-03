@@ -4,72 +4,74 @@ using UnityEngine;
 
 public class Nemesis : AIBehaviour
 {
-
+    private float timeToRecoverFromDash = 0;
     protected override void Awake()
     {
         base.Awake();
+        entity = GetComponent<Entity>() ? GetComponent<Entity>() : gameObject.AddComponent<Entity>();
+
     }
     protected override void Start()
     {
         base.Start();
-        Intelligence = 1f;
-        ReflexRate = 0.05f;
-        tangoStrafeEnabled = false;
+        Intelligence = 0.5f;
+        RestingState = AIState.seek;
+        tangoStrafeEnabled = true;
+        tangoStrafePauseFreq = 0;
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
+        meanderPauseFrequency = 0.5f;
         itemManagementSeekItems = false;
+        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
         grabEnabled = false;
+        dashingChargePeriod = 0.75f;
     }
 
     protected override void Update()
     {
         base.Update();
-        if (Enthralled)
+        if (entity.Foe)
         {
-            StateTransition(AIState.enthralled);
-        }
-        switch (State)
-        {
-            case AIState.none:
-                StateTransition(AIState.seek);
-                break;
-            case AIState.seek:
-                if (entity.Foe)
-                {
-                    StateTransition(AIState.aggro);
-                }
-                else
-                {
-
-                }
-                break;
-            case AIState.aggro:
-                if (trackingTrailCold)
-                {
-                    StateTransition(AIState.seek);
-                }
-                else
-                {
-                    pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
-                    if (entity.Foe)
-                    {
-                        Vector3 disposition = entity.Foe.transform.position - transform.position;
-                        //dashingInitiate = (disposition.magnitude < pursueStoppingDistance || entity.DashCharging) && !entity.Shoved;
-                        //if (entity.DashCharging)
-                        //{
-                        //    dashingCooldownPeriod = 1;
-                        //}
-                        //else if (entity.FinalDash)
-                        //{
-                        //    dashingCooldownPeriod = 5;
-                        //}
-                    }
-                }
-                break;
-
+            if (entity.Dashing)
+            {
+                tangoDeadbanded = false;
+            }
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
+            bool shortDashTrigger = inPosition && dashingCooldownTimer > 2;
+            bool finalDashTrigger = dashingCooldownTimer > 5;
+            if (finalDashTrigger)
+            {
+                dashingChargePeriod = 2f;
+                dashingDesiredDirection = disposition;
+                timeToRecoverFromDash = 5;
+            }
+            else if(shortDashTrigger)
+            {
+                dashingChargePeriod = 0.5f;
+                dashingDesiredDirection = disposition;
+                timeToRecoverFromDash = 2;
+            }
         }
     }
+
+    protected override void SetTangoParameters()
+    {
+        if (dashingCooldownTimer >= timeToRecoverFromDash)
+        {
+            tangoStrafeEnabled = false;
+            tangoInnerRange = tangoOuterRange = 0;
+        }
+        else
+        {
+            tangoStrafeEnabled = true;
+        }
+        tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
+        tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+    }
+
+
 
 }
 

@@ -135,7 +135,7 @@ public class Idol : Wieldable
         return Time.time;
     }
 
-    public void BecomeMob()
+    public Entity BecomeMob()
     {
         DropItem();
         togglePhysicsBox(false);
@@ -160,6 +160,7 @@ public class Idol : Wieldable
 
         mobEntity.JustVanquished.AddListener(BecomeItem);
         mobEntity.FinalDashEnabled = true;
+        return mobEntity;
     }
 
     public void BecomeItem()
@@ -167,7 +168,7 @@ public class Idol : Wieldable
         mobEntity.JustVanquished.RemoveListener(BecomeItem);
         togglePhysicsBox(true);
         Body.isKinematic = false;
-        StartCoroutine(reviveMob(15));
+        //StartCoroutine(reviveMob(15));
         flames.FlamePresentationStyle = _Flames.FlameStyles.Soulless;
     }
 

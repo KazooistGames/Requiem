@@ -93,6 +93,96 @@ public class Requiem_Arena : Requiem
         yield return gameLoop();
     }
 
+    protected IEnumerator gameLoop()
+    {
+        yield return new WaitUntil(() => Commissioned);
+        Torch.Toggle(true);
+        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(Chambers[0]);
+        Player.INSTANCE.HostEntity.Vitality = 1;
+
+        blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
+        blurbIndicator.SetActive(false);
+        blurbIndicator.GetComponent<Text>().text = "0:00";
+        StateOfGame = GameState.Lobby;
+        yield return new WaitUntil(() => BloodWell.Volume == 0);
+        while (Player.INSTANCE.HostEntity)
+        {
+            StateOfGame = GameState.Liminal;
+            Ritual++;
+            Gates[0].OpenDoor();
+            yield return new WaitUntil(() => !Alter.Energized);
+            yield return new WaitUntil(() => Alter.Used && Alter.Energized);
+            Gates[0].CloseDoor();
+            if (Alter.DesiredOffering == Player.INSTANCE.HostEntity.gameObject)
+            {
+                StateOfGame = GameState.Wave;
+                yield return waveRoutine();
+            }
+            else if(idol ? Alter.DesiredOffering == idol.gameObject : false)
+            {
+                StateOfGame = GameState.Boss;
+                yield return bossRoutine();
+            }
+        }
+    }
+
+    protected IEnumerator waveRoutine()
+    {
+        List<GameObject> spawnedMobs = new List<GameObject>();
+        TotalStrengthOfWave = RitualStrengths[Ritual % 3];
+        TimeGateTimeLeft = RitualTimes[Ritual % 3];
+        spawnedMobs = spawnMobs(TotalStrengthOfWave);
+        blurbIndicator.SetActive(true);
+        while (StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
+        {
+            if (!Paused)
+            {
+                int minutesLeft = (int)TimeGateTimeLeft / 60;
+                int secondsLeft = (int)TimeGateTimeLeft % 60;
+                string timeLeftText = minutesLeft.ToString("0") + ":" + secondsLeft.ToString("00");
+                blurbIndicator.GetComponent<Text>().text = timeLeftText;
+                yield return new WaitForSeconds(1f);
+                spawnedMobs.RemoveAll(x => x == null);
+                int minStrength = TotalStrengthOfWave / 2;
+                if (spawnedMobs.Aggregate(0f, (result, x) => result += x.GetComponent<Entity>().Strength) < minStrength)
+                {
+                    int respawnStrength = TotalStrengthOfWave / 2;
+                    spawnedMobs.AddRange(spawnMobs(respawnStrength));
+                }
+                TimeGateTimeLeft -= 1;
+            }
+        }
+        while (spawnedMobs.Count(x => x != null) != 0)
+        {
+            foreach (GameObject mob in spawnedMobs)
+            {
+                if (mob)
+                {
+                    mob.GetComponent<Entity>().Vitality = 0;
+                }
+            }
+            yield return null;
+        }
+        Scoreboard.Wave_Completed_Rewards();
+        BloodWell.UnGulp();
+        blurbIndicator.SetActive(false);
+        if (!idol && Ritual % 3 == 0)
+        {
+            idol = spawnIdol();
+        }
+    }
+
+    protected IEnumerator bossRoutine()
+    {
+        List<GameObject> spawnedSkulls = new List<GameObject>();
+        idol.BecomeMob();
+        while (idol.mobEntity)
+        {
+            yield return null;
+        }
+    }
+
+
     /***** PRIVATE *****/
     private void determineAlterOffering()
     {
@@ -100,7 +190,7 @@ public class Requiem_Arena : Requiem
         {
 
         }
-        else if (StateOfGame == GameState.Wave)
+        else if (StateOfGame == GameState.Wave || StateOfGame == GameState.Boss)
         {
             Alter.DesiredOffering = Alter.TopStep;
         }
@@ -108,11 +198,13 @@ public class Requiem_Arena : Requiem
         {
             Alter.DesiredOffering = idol.gameObject;
             Alter.PentagramLineColor = Color.blue;
+            Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
         }
         else if(Player.INSTANCE.HostEntity)
         {
             Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
             Alter.PentagramLineColor = Color.red;
+            Alter.PentagramFlameStyle = _Flames.FlameStyles.Soulless;
         }
     }
     private IEnumerator buildArenaLandmarks(List<List<Hextile>> arenaTileRings)
@@ -152,7 +244,9 @@ public class Requiem_Arena : Requiem
                         }
                         else
                         {
-                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
+                            Landmark_Barrier newBarrier = new GameObject().AddComponent<Landmark_Barrier>();
+                            newBarrier.OuterBarriersOnWallsOnly = true;
+                            newBarrier.AssignToTile(tile);
                         }
                         yield return new WaitForFixedUpdate();
                         yield return null;
@@ -163,72 +257,7 @@ public class Requiem_Arena : Requiem
     }
 
     private GameObject blurbIndicator;
-    protected IEnumerator gameLoop()
-    {
-        yield return new WaitUntil(() => Commissioned);
-        Torch.Toggle(true);
-        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(Chambers[0]);
-        Player.INSTANCE.HostEntity.Vitality = 1;
-        List<GameObject> spawnedMobs = new List<GameObject>();
-        List<GameObject> spawnedElites = new List<GameObject>();
-        blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
-        blurbIndicator.SetActive(false);
-        blurbIndicator.GetComponent<Text>().text = "0:00";
-        StateOfGame = GameState.Lobby;
-        yield return new WaitUntil(() => BloodWell.Volume == 0);
-        while (Player.INSTANCE.HostEntity)
-        {
-            StateOfGame = GameState.Liminal;
 
-            Ritual++;
-            Gates[0].OpenDoor();
-            yield return new WaitUntil(() => !Alter.Energized);
-            yield return new WaitUntil(() => Alter.Used && Alter.Energized);
-            StateOfGame = GameState.Wave;
-            Gates[0].CloseDoor();
-            TotalStrengthOfWave = RitualStrengths[Ritual % 3];
-            TimeGateTimeLeft = RitualTimes[Ritual % 3];
-            spawnedMobs = spawnMobs(TotalStrengthOfWave);
-            blurbIndicator.SetActive(true);
-            while (StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
-            {
-                if (!Paused)
-                {
-                    int minutesLeft = (int)TimeGateTimeLeft / 60;
-                    int secondsLeft = (int)TimeGateTimeLeft % 60;
-                    string timeLeftText = minutesLeft.ToString("0") + ":" + secondsLeft.ToString("00");
-                    blurbIndicator.GetComponent<Text>().text = timeLeftText;
-                    yield return new WaitForSeconds(1f);
-                    spawnedMobs.RemoveAll(x => x == null);
-                    int minStrength = TotalStrengthOfWave / 2;
-                    if (spawnedMobs.Aggregate(0f, (result, x) => result += x.GetComponent<Entity>().Strength) < minStrength)
-                    {
-                        int respawnStrength = TotalStrengthOfWave / 2;
-                        spawnedMobs.AddRange(spawnMobs(respawnStrength));
-                    }
-                    TimeGateTimeLeft -= 1;
-                }
-            }
-            while(spawnedMobs.Count(x => x != null) != 0)
-            {
-                foreach (GameObject mob in spawnedMobs)
-                {
-                    if (mob)
-                    {
-                        mob.GetComponent<Entity>().Vitality = 0;
-                    }
-                }
-                yield return null;
-            }
-            Scoreboard.Wave_Completed_Rewards();
-            BloodWell.UnGulp();
-            blurbIndicator.SetActive(false);
-            if (!idol && Ritual % 3 == 0)
-            {
-                idol = spawnIdol();
-            }
-        }
-    }
 
 
     public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()

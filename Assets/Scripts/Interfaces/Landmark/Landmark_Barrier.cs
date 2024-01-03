@@ -8,6 +8,8 @@ public class Landmark_Barrier : Landmark
 {
     public static List<GameObject> BarrierModelTemplates = new List<GameObject>();
 
+    public bool OuterBarriersOnWallsOnly = false;
+
     private int InnerBarrierAttempts = 3;
     private int OuterBarrierAttempts = 3;
 
@@ -32,7 +34,6 @@ public class Landmark_Barrier : Landmark
             InnerBarrierAttempts = 0;
         }
         setupBarrierModels();
-
     }
 
 
@@ -72,7 +73,8 @@ public class Landmark_Barrier : Landmark
     private void attemptToSpawnOuterBarrier()
     {
         Hextile.HexPosition barrierPosition = (Hextile.HexPosition)Random.Range(1, 7);
-        if (!outerBarrierModels.ContainsKey(barrierPosition))
+        bool gateAlreadyOnWall = Tile.Landmarks.FirstOrDefault(x => x.GetComponent<Landmark_Gate>() && x.PositionOnTile == barrierPosition);
+        if (!outerBarrierModels.ContainsKey(barrierPosition) && !gateAlreadyOnWall)
         {
             GameObject barrierModel = Instantiate(BarrierModelTemplates[(int)(Random.value * BarrierModelTemplates.Count)]);
             barrierModel.transform.SetParent(transform);

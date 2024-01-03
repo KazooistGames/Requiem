@@ -9,8 +9,9 @@ public class IdolSkully : Skully
     protected override void Awake()
     {
         base.Awake();
-        Strength = 400f;
+        Strength = 300f;
         Haste = 0.75f;
+        Resolve = 50;
         BaseAcceleration = 8f;
         scaleScalar = 1.0f;
         berthScalar = 1.1f;
