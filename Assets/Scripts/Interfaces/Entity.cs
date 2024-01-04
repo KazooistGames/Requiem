@@ -47,6 +47,7 @@ public class Entity : MonoBehaviour
     public UnityEvent JustDisarmed = new UnityEvent();
     public UnityEvent JustVanquished = new UnityEvent();
     public UnityEvent<float> JustWounded = new UnityEvent<float>();
+    public UnityEvent<float> JustHit = new UnityEvent<float>();
     public UnityEvent JustCrashed = new UnityEvent();
     public UnityEvent<Entity, float> JustLandedDashHit = new UnityEvent<Entity, float>();
     public UnityEvent<Wieldable> JustPickedUpWieldable = new UnityEvent<Wieldable>();
@@ -160,6 +161,8 @@ public class Entity : MonoBehaviour
 
     public _Flames flames;
 
+    private float immortalityTimer = 0;
+
     //******************Functions*************************
     protected virtual void Awake()
     {
@@ -265,7 +268,11 @@ public class Entity : MonoBehaviour
         Poise = Mathf.Clamp(Poise, -1f, Strength);
         Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Mathf.Sqrt(Haste), (result, multiplier) => result *= 1 + multiplier));
         updatePosture();
-        if (Vitality <= 0)
+        if((immortalityTimer += Time.deltaTime) < 0.25f)
+        {
+            Vitality = Strength;
+        }
+        else if (Vitality <= 0)
         {
             Physics.autoSimulation = false;
             Physics.Simulate(Time.deltaTime);
@@ -472,21 +479,23 @@ public class Entity : MonoBehaviour
             }
             //Entity entity = bone.transform.parent.parent.GetComponent<Entity>();
             Entity entity = bone.GetComponentInParent<Entity>();
-            Animator anim = entity.GetComponent<Animator>();
-            Vector3 newScale = bone.transform.localScale * entity.scaleActual;
-            Vector3 newPosition = bone.transform.position;
-            bone.transform.parent = entity.transform.parent;
-            anim.Rebind();
-            bone.transform.localScale = newScale;
-            bone.transform.position = newPosition;
-            bone.layer = Requiem.layerItem;
-
-            bone.GetComponent<Rigidbody>().velocity = entity.body.velocity.normalized * Mathf.Pow(entity.body.velocity.magnitude, 0.75f);
-            if (entity.Shoved)
+            if (entity)
             {
-                Vector3 direction = entity.Foe ? entity.Foe.transform.position - entity.transform.position : new Vector3(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f);
-                bone.GetComponent<Rigidbody>().AddForce(-direction.normalized * 0.75f, ForceMode.VelocityChange);
+                Animator anim = entity.GetComponent<Animator>();
+                Vector3 newScale = bone.transform.localScale * entity.scaleActual;
+                Vector3 newPosition = bone.transform.position;
+                bone.transform.parent = entity.transform.parent;
+                anim.Rebind();
+                bone.transform.localScale = newScale;
+                bone.transform.position = newPosition;
+                bone.GetComponent<Rigidbody>().velocity = entity.body.velocity.normalized * Mathf.Pow(entity.body.velocity.magnitude, 0.75f);
+                if (entity.Shoved)
+                {
+                    Vector3 direction = entity.Foe ? entity.Foe.transform.position - entity.transform.position : new Vector3(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f);
+                    bone.GetComponent<Rigidbody>().AddForce(-direction.normalized * 0.75f, ForceMode.VelocityChange);
+                }
             }
+            bone.layer = Requiem.layerItem;
         }
     }
 
@@ -964,6 +973,7 @@ public class Entity : MonoBehaviour
         {
             totalPower += Resolve;
         }
+
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
         {
@@ -990,6 +1000,7 @@ public class Entity : MonoBehaviour
 
     private float applyDamageToPoiseThenVitality(float totalPower)
     {
+        JustHit.Invoke(totalPower);
         float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
         float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
         if(poiseDamage != 0)

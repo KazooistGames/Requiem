@@ -5,6 +5,9 @@ using UnityEngine;
 public class Nemesis : AIBehaviour
 {
     private float timeToRecoverFromDash = 0;
+    private float finalDashRecoveryTime = 5;
+    private float quickDashRecoveryTime = 2;
+
     protected override void Awake()
     {
         base.Awake();
@@ -39,19 +42,19 @@ public class Nemesis : AIBehaviour
             }
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
-            bool shortDashTrigger = inPosition && dashingCooldownTimer > 2;
-            bool finalDashTrigger = dashingCooldownTimer > 5;
+            bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
+            bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
             if (finalDashTrigger)
             {
                 dashingChargePeriod = 2f;
                 dashingDesiredDirection = disposition;
-                timeToRecoverFromDash = 5;
+                timeToRecoverFromDash = quickDashRecoveryTime;
             }
             else if(shortDashTrigger)
             {
                 dashingChargePeriod = 0.5f;
                 dashingDesiredDirection = disposition;
-                timeToRecoverFromDash = 2;
+                timeToRecoverFromDash = finalDashRecoveryTime;
             }
         }
     }

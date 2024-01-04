@@ -4994,7 +4994,7 @@ MeshRenderer:
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!95 &7397704714686599929
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5011,7 +5011,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!54 &6673809087601494210
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5062,7 +5063,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -5070,6 +5070,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -5083,10 +5084,12 @@ MonoBehaviour:
   MostRecentWielder: {fileID: 0}
   Telecommuting: 0
   Thrown: 0
-  equipType: -1
+  equipType: 3
   flames: {fileID: 0}
   pitchScalar: 1
   NoiseImpulse: 0.015
+  mobEntity: {fileID: 0}
+  activityLevel: 0
 --- !u!65 &7976157581576396476
 BoxCollider:
   m_ObjectHideFlags: 0

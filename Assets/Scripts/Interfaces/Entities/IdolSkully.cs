@@ -21,10 +21,12 @@ public class IdolSkully : Skully
     {
         base.Start();
         gameObject.name = "IdolSkully";
+        JustWounded.AddListener((x) => SpawnAdds(1));
+        JustHit.AddListener(spawnAddsIfDamageMakesWeak);
     }
 
     protected override void Update()
-    {
+    { 
         base.Update();
     }
 
@@ -38,33 +40,44 @@ public class IdolSkully : Skully
         base.OnDestroy();
     }
 
-    //CUSTOM FUNCTIONS!!!!!!!!!!!!!
+    /***** PUBLIC *****/
     public override void Damage(float damage)
     {
         base.Damage(damage);
         _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
     }
 
-
-    protected void Mutate()
+    public void SpawnAdds(int count)
     {
-        for(int i = 0; i < 2; i++)
+        for (int i = 0; i < count; i++)
         {
             Entity entity;
             entity = Requiem.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
             entity.Poise = entity.Strength;
-            entity.Shove(AIBehaviour.RandomDirection() * 1);
+            Vector3 randomOffset = new Vector3(UnityEngine.Random.value - 0.5f, 0, UnityEngine.Random.value - 0.5f) * 0.1f;
+            entity.transform.position += randomOffset;
+            entity.Shoved = false;
         }
-        Destroy(head);
-        Die();
-    }
-    public override void Die()
-    {
-        Debone(head);
-        head = null;
-        base.Die();
     }
 
+
+    public override void Die()
+    {
+        base.Die();
+        SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+        Destroy(head);
+    }
+
+    /***** PROTECTED *****/
+
+    /***** PRIVATE *****/
+    private void spawnAddsIfDamageMakesWeak(float totalDamage)
+    {
+        if(totalDamage > Poise)
+        {
+            SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+        }
+    } 
 
 }
 

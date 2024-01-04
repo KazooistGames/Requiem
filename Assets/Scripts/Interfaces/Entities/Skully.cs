@@ -66,7 +66,7 @@ public class Skully : Entity
     public override void Die()
     {
         Debone(head);
-        head = null;
+        //head = null;
         base.Die();
     }
 

@@ -80,8 +80,7 @@ public class Wieldable : MonoBehaviour
             defaultAnimController2H = Resources.Load<RuntimeAnimatorController>("Animation/items/ItemDefault2H/ItemDefaultController2H");
         }
         StartCoroutine(throwHandler());
-        blurbInteractPrompt = _BlurbService.createBlurb(gameObject, "F", Color.white, sizeScalar: 2);
-        blurbInteractPrompt.GetComponent<Text>().text = equipType == EquipType.Burdensome ? "F" : "E";
+        blurbInteractPrompt = _BlurbService.createBlurb(gameObject, "E", Color.white, sizeScalar: 2);
         blurbInteractPrompt.SetActive(false);
     }
 
@@ -172,6 +171,7 @@ public class Wieldable : MonoBehaviour
                 }
                 if (entity == Player.INSTANCE.HostEntity && (!Player.INSTANCE.HostWeapon || equipType == EquipType.Burdensome) && blurbInteractPrompt)
                 {
+                    blurbInteractPrompt.GetComponent<Text>().text = equipType == EquipType.Burdensome ? "F" : "E";
                     blurbInteractPrompt.SetActive(true);
                 }
             }

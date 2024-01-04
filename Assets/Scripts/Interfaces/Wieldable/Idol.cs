@@ -137,6 +137,10 @@ public class Idol : Wieldable
 
     public Entity BecomeMob()
     {
+        if (Wielder)
+        {
+            Wielder.Interact.RemoveListener(PickupItem);
+        }
         DropItem();
         togglePhysicsBox(false);
         Body.isKinematic = true;
@@ -160,6 +164,7 @@ public class Idol : Wieldable
 
         mobEntity.JustVanquished.AddListener(BecomeItem);
         mobEntity.FinalDashEnabled = true;
+
         return mobEntity;
     }
 

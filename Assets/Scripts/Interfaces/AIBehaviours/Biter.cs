@@ -44,7 +44,7 @@ public class Biter : AIBehaviour
             }
             if (entity.Dashing)
             {
-                chargePeriod = Mathf.Lerp(2, 4, Random.value);
+                chargePeriod = Mathf.Lerp(1.5f, 3, Random.value);
                 tangoDeadbanded = false;
             }
         }
