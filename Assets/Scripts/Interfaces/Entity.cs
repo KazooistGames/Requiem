@@ -233,6 +233,7 @@ public class Entity : MonoBehaviour
 
     protected virtual void Update()
     {
+        immortalityTimer += Time.deltaTime;
         equipmentManagement();
         indicatorManagement();
         if (!Staggered)
@@ -268,11 +269,7 @@ public class Entity : MonoBehaviour
         Poise = Mathf.Clamp(Poise, -1f, Strength);
         Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Mathf.Sqrt(Haste), (result, multiplier) => result *= 1 + multiplier));
         updatePosture();
-        if((immortalityTimer += Time.deltaTime) < 0.25f)
-        {
-            Vitality = Strength;
-        }
-        else if (Vitality <= 0)
+        if (Vitality <= 0)
         {
             Physics.autoSimulation = false;
             Physics.Simulate(Time.deltaTime);
@@ -501,6 +498,7 @@ public class Entity : MonoBehaviour
 
     public void alterPoise(float value, bool impactful = true)
     {
+        if (immortalityTimer < 0.25f) { return; }
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
         if(impactful || Poise + value > 0)
         {
@@ -524,6 +522,7 @@ public class Entity : MonoBehaviour
 
     public virtual void Damage(float magnitude)
     {
+        if (immortalityTimer < 0.25f) { return; }
         if (magnitude > 0)
         {
             JustWounded.Invoke(magnitude);
@@ -1000,6 +999,7 @@ public class Entity : MonoBehaviour
 
     private float applyDamageToPoiseThenVitality(float totalPower)
     {
+        if(immortalityTimer < 0.25f) { return 0; }
         JustHit.Invoke(totalPower);
         float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
         float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);

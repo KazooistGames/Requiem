@@ -2,32 +2,20 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.IO.LowLevel.Unsafe;
 
 public class Hellfire : MonoBehaviour
 {
-    public bool debug = false;
     public enum Form
     {
-        none = 0,
-        Beam = 1,
-        Blast = 2,
-        Wield = 3,
-        ForceField = 4,
+        Off,
+        Preheat,
+        Beam,
     }
 
-    public Form form = Form.none;
-    public Player Wielder;
-    public bool Wielded = false;
-    public bool Depleted = false;
-    public Vector3 CrownOffset = new Vector3(0, 1.2f, 0);
-    public Vector3 CrownAngle = Vector3.zero;
-    public bool PrimaryTrigger = false;
-    public bool SecondaryTrigger = false;
-    public bool TertiaryTrigger = false;
-    public float Guzzle;
-    public float Heat;
+    public Form form = Form.Off;
+    public bool FireTrigger = false;
     public float Juice = 0;
-    private float thrust;
 
     protected ParticleSystem particles;
     protected ParticleSystem.VelocityOverLifetimeModule velocity;
@@ -47,30 +35,16 @@ public class Hellfire : MonoBehaviour
     public Color idleColorSecondKey;
     public Color idleColorThirdKey;
 
-    private float primaryTimer = 0f;
-    private float primaryPeakVelocity = 12f;
-    private List<GameObject> primaryHits = new List<GameObject>();
-    public Gradient primaryColorGradient = new Gradient();
-    public AnimationCurve primarySpeedCurve;
-    public float primaryRange;
-    private bool primaryLatch = false;
+    private float beamSpinupTimer = 0f;
+    private float beamPeakVelocity = 12f;
+    public Gradient beamColorGradient = new Gradient();
+    public AnimationCurve beamSpeedCurve;
+    public float beamRange;
 
-    private bool secondaryChargeLatch = false;
-    private float secondaryTimer = 0f;
-    private float secondaryPeriod = 1f;
-    private bool secondaryCharged = false;
-    private bool secondaryReleaseLatch = false;
-    private List<GameObject> secondaryHits = new List<GameObject>();
-    private Gradient secondaryColorGradient = new Gradient();
-    public Color secondaryColorFirstKey;
-    public Color secondaryColorSecondKey;
-    public Color secondaryColorThirdKey;
-
-    private bool tertiaryTriggerLatch = false;
-    public bool tertiaryActiveLatch = false;
-
-    private List<GameObject> tertiaryHits;
-    private Weapon tertiaryItem;
+    public float sputterAttemptPeriod = 0.5f;
+    public float sputterAttemptTimer;
+    public float sputterChance = 0.5f;
+    public float sputterResetValue = 0.5f;
 
     void Awake()
     {
@@ -88,10 +62,7 @@ public class Hellfire : MonoBehaviour
 
     void Start()
     {
-        gameObject.name = "Halo";
-        Guzzle = 5f;
-        Heat = 100f;
-        thrust = 5f;
+        gameObject.name = "Hellfire";
         idleColorFirstKey = new Color(1.0f, 0.7f, 0.0f);
         idleColorSecondKey = new Color(1.0f, 0.5f, 0.5f);
         idleColorThirdKey = new Color(1.0f, 0.7f, 0.0f);
@@ -111,8 +82,8 @@ public class Hellfire : MonoBehaviour
                 new GradientAlphaKey(0.1f, 1.0f)
             }
         );
-        primaryColorGradient = new Gradient();
-        primaryColorGradient.SetKeys
+        beamColorGradient = new Gradient();
+        beamColorGradient.SetKeys
             (
                 new GradientColorKey[]
                 {
@@ -127,30 +98,21 @@ public class Hellfire : MonoBehaviour
                     new GradientAlphaKey(0.75f, 1.0f)
                 }
             );
-        secondaryColorFirstKey = new Color(1.0f, 1.0f, 1.0f);
-        secondaryColorSecondKey = new Color(0.5f, 0.7f, 1.0f);
-        secondaryColorThirdKey = new Color(0.55f, 0f, 1f);
 
     }
 
     void Update()
     {
-        Juice = Mathf.Clamp(Juice, 0, 100);
-        main.startSize = Mathf.Lerp(0.05f, 0.1f, Juice / 100);
-        if (Wielder)
+        if (Player.INSTANCE)
         {
-            crownWielder();
-            if (Juice <= 0)
+            form = Player.INSTANCE.CurrentKeyboard.rKey.isPressed ? Form.Beam : Form.Preheat;
+        }
+        if((sputterAttemptTimer += Time.deltaTime) >= sputterAttemptPeriod)
+        {
+            sputterAttemptTimer = 0;
+            if (Random.value <= sputterChance)
             {
-                Depleted = true;
-                if (debug)
-                {
-                    Juice = 100f;
-                }
-            }
-            else if (Juice == 100f)
-            {
-                Depleted = false;
+                beamSpinupTimer = sputterResetValue;
             }
         }
 
@@ -158,58 +120,55 @@ public class Hellfire : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Wielder)
+        switch (form)
         {
-            switch (form)
-            {
-                case Form.none:
-                    idleFunction();
-                    break;
-                case Form.Beam:
-                    beam();
-                    break;
-                case Form.Blast:
-                    blast();
-                    break;
-                case Form.Wield:
-                    wield();
-                    break;
-                case Form.ForceField:
-                    forceField();
-                    break;
-            }
+            case Form.Off:
+                idleFunction();
+                break;
+            case Form.Preheat:
+                preheat();
+                break;
+            case Form.Beam:
+                beam();
+                break;
         }
     }
 
 
     void OnParticleCollision(GameObject other)
     {
-        Entity entity = other.GetComponent<Entity>();
-        Rigidbody body = other.GetComponent<Rigidbody>();
-        Vector3 disposition = (other.transform.position - transform.position);
-        if (PrimaryTrigger)
+        if (FireTrigger)
         {
             List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
             ParticlePhysicsExtensions.GetCollisionEvents(particles, other, collisionEvents);
             float range = 0;
             foreach (ParticleCollisionEvent colEvent in collisionEvents)
             {
-                range += (colEvent.intersection - Wielder.transform.position).magnitude;
+                range += (colEvent.intersection - transform.position).magnitude;
             }
             range /= collisionEvents.Count;
-            if(range > primaryRange)
+            if(range > beamRange)
             {
-                primaryRange = range;
+                beamRange = range;
             }
         }
     }
 
-    ////////// particle system manipulation ////////////
+    /***** PUBLIC *****/
+
+    /***** PROTECTED *****/
+
+    /***** PRIVATE *****/
+
 
     private void idleFunction()
     {
-        primaryTimer = 0f;
-        primaryRange = 0f;
+        emission.enabled = false;
+    }
+
+    private void preheat()
+    {
+        beamSpinupTimer = 0f;
         main.startLifetime = 0.5f;
         main.startSpeed = 0f;
         main.maxParticles = 1500;
@@ -217,7 +176,7 @@ public class Hellfire : MonoBehaviour
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         velocity.xMultiplier = 0;
         velocity.zMultiplier = 0;
-        velocity.yMultiplier = Depleted ? 0 : 0.5f;
+        velocity.yMultiplier = 0.5f;
         velocity.radial = 0f;
         ParticleSystem.MinMaxCurve velocityCurve = velocity.speedModifier;
         velocityCurve.mode = ParticleSystemCurveMode.Constant;
@@ -228,19 +187,19 @@ public class Hellfire : MonoBehaviour
         gradient.gradient = idleColorGradient;
         color.color = gradient;
         shape.shapeType = ParticleSystemShapeType.Circle;
-        shape.arcSpeed = Depleted ? 10 : idleArcSpeed;
-        shape.arcMode = Depleted ? ParticleSystemShapeMultiModeValue.Random : ParticleSystemShapeMultiModeValue.Random;
+        shape.arcSpeed = idleArcSpeed;
+        shape.arcMode = ParticleSystemShapeMultiModeValue.Random;
         shape.radiusThickness = 0f;
-        shape.radius = Mathf.Lerp(0.025f, 0.05f, Juice/100f);
+        shape.radius = Mathf.Lerp(0.025f, 0.05f, Juice / 100f);
         shape.scale = Vector3.one;
         shape.rotation = Vector3.right * 90f;
         lights.ratio = 0.1f;
         lights.maxLights = 250;
         emission.rateOverTime = 250;
         emission.enabled = true;
-        size.sizeMultiplier = Wielded ? 0.75f : 0.5f;
+        size.sizeMultiplier = 0.75f;
         trails.widthOverTrail = 0.5f;
-        collision.collidesWith = ~(1 << Wielder.gameObject.layer);
+        collision.collidesWith = int.MaxValue;
         collision.colliderForce = 0f;
         collision.multiplyColliderForceByCollisionAngle = false;
         collision.multiplyColliderForceByParticleSize = false;
@@ -250,48 +209,29 @@ public class Hellfire : MonoBehaviour
         collision.sendCollisionMessages = false;
     }
 
-
     private void beam()
     {
-        //Requiem.Players.Find(x => x == Wielder).manualAimingTriggers["hellbeam"] = Wielded;    
-        if (Wielded && ! Depleted)
+        if(beamSpinupTimer < 1)
         {
-            CrownOffset = new Vector3(0, 0, 0.5f);
-            CrownAngle = new Vector3(-90, 0, 0);
-        }
-        else
-        {
-            CrownOffset = new Vector3(0, 1.2f, 0);
-            CrownAngle = new Vector3(0, 0, 0);
-        }
-        if (PrimaryTrigger && !Depleted)
-        {
-            CrownOffset = new Vector3(0, 0, 0.3f);
-            CrownAngle = new Vector3(-90, 0, 0);
-            primaryHits = new List<GameObject>();
-            primaryLatch = true;
-            Heat = 100f;
-            Guzzle = 20f;
-            Juice -= Guzzle * Time.fixedDeltaTime;
-            primaryTimer += Time.fixedDeltaTime*3;
-            main.startLifetime = Mathf.Lerp(0.4f, 0.5f, primaryTimer);
-            main.startSpeed = Mathf.Lerp(0.0f, primaryPeakVelocity, primaryTimer);
-            shape.angle = Mathf.Lerp(90, 0, primaryTimer*3);
-            size.sizeMultiplier = Mathf.Lerp(0.75f, 0.25f, primaryTimer);
+            beamSpinupTimer += Time.fixedDeltaTime * 3;
+            main.startLifetime = Mathf.Lerp(0.4f, 0.5f, beamSpinupTimer);
+            main.startSpeed = Mathf.Lerp(0.0f, beamPeakVelocity, beamSpinupTimer);
+            shape.angle = Mathf.Lerp(90, 0, beamSpinupTimer * 3);
+            size.sizeMultiplier = Mathf.Lerp(0.75f, 0.25f, beamSpinupTimer);
             ParticleSystem.MinMaxCurve velocityCurve = velocity.speedModifier;
             velocityCurve.mode = ParticleSystemCurveMode.Curve;
-            velocityCurve.curve = primarySpeedCurve;
+            velocityCurve.curve = beamSpeedCurve;
             velocity.speedModifier = velocityCurve;
             velocity.speedModifierMultiplier = 2.0f;
             ParticleSystem.MinMaxGradient gradient = color.color;
             gradient.mode = ParticleSystemGradientMode.Gradient;
-            gradient.gradient = primaryColorGradient;
+            gradient.gradient = beamColorGradient;
             color.color = gradient;
             shape.shapeType = ParticleSystemShapeType.Cone;
             shape.arcSpeed = 5f;
             shape.arcMode = ParticleSystemShapeMultiModeValue.Random;
             shape.radiusThickness = 1f;
-            shape.radius = Mathf.Lerp(0.00f, 0.05f, Juice/100f);
+            shape.radius = Mathf.Lerp(0.00f, 0.05f, Juice / 100f);
             lights.ratio = 0.1f;
             lights.maxLights = 250;
             emission.rateOverTime = 750;
@@ -300,216 +240,13 @@ public class Hellfire : MonoBehaviour
             trails.dieWithParticles = false;
             collision.dampen = 0.5f;
             collision.bounce = 0f;
-            collision.sendCollisionMessages = true;
-            collision.lifetimeLossMultiplier = 0.25f;
-            RaycastHit castHit;
-            Ray castRay = new Ray(Wielder.transform.position, Wielder.HostEntity.LookDirection);
-            float castRadius = shape.radius + (main.startSize.constant * size.sizeMultiplier/2);
-            Debug.DrawLine(castRay.origin, transform.position + castRay.direction * primaryRange, Color.blue);
-            if (Physics.SphereCast(castRay, castRadius, out castHit, primaryRange, (1 << Requiem.layerEntity) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerWall), QueryTriggerInteraction.Ignore))
-            {
-                GameObject other = castHit.collider.gameObject;
-                Entity entity = other.GetComponent<Entity>();
-                if (entity ? entity.Allegiance != Wielder.HostEntity.Allegiance : false)
-                {
-                    primaryHits.Add(other);
-                    Vector3 disposition = other.transform.position - transform.position;
-                    float damage = Heat * Time.fixedDeltaTime;
-                    Vector3 forceVector = (disposition.normalized / disposition.magnitude) * (Juice / 100f);
-                    entity.Damage(damage);
-                    entity.Shove(forceVector * thrust * Time.fixedDeltaTime);
-                }
-            }
+            collision.sendCollisionMessages = false;
+            collision.lifetimeLossMultiplier = 0.0f;
         }
-        else if(primaryLatch)
-        {
-            if(particles.particleCount == 0)
-            {
-                emission.enabled = true;
-                primaryLatch = false;
-            }
-            else
-            {
-                idleFunction();
-                emission.enabled = false;
-            }
-        }
-        else
-        {
-            idleFunction();
-        }     
     }
 
 
-    private void blast()
-    {
-        Heat = 100f;
-        Guzzle = 10f;
-        if ((SecondaryTrigger || secondaryChargeLatch) && !secondaryReleaseLatch && particles.particleCount >= 0.5f * main.startLifetime.constant * emission.rateOverTime.constant && !secondaryCharged)
-        {
-            secondaryChargeLatch = true;
-            secondaryReleaseLatch = false;
-            if (secondaryTimer >= secondaryPeriod)
-            {
-                secondaryCharged = true;
-            }
-            else
-            {
-                secondaryTimer += Time.fixedDeltaTime;
-            }
-            Juice -= Guzzle * Time.fixedDeltaTime;
-            float ratio = secondaryTimer / secondaryPeriod;
-            main.startLifetime = Mathf.Lerp(0.25f, 1f, ratio);
-            shape.radius = Mathf.Lerp(0.04f, 0.04f + 0.12f * Juice, ratio);
-            size.sizeMultiplier = Mathf.Lerp(1.0f, 2.0f, ratio);
-            secondaryColorGradient.SetKeys
-            (
-                new GradientColorKey[]
-                {
-                    new GradientColorKey(Color.Lerp(idleColorFirstKey, secondaryColorFirstKey, ratio), 0.0f),
-                    new GradientColorKey(Color.Lerp(idleColorSecondKey,secondaryColorSecondKey, ratio), 0.7f),
-                    new GradientColorKey(Color.Lerp(idleColorThirdKey, secondaryColorThirdKey, ratio), 1.0f),
-                },
-                new GradientAlphaKey[]
-                {
-                    new GradientAlphaKey(0.5f, 0.0f),
-                    new GradientAlphaKey(0.25f, 0.7f),
-                    new GradientAlphaKey(0.75f, 1.0f)
-                }
-            );
-            ParticleSystem.MinMaxGradient gradient = color.color;
-            gradient.mode = ParticleSystemGradientMode.Gradient;
-            gradient.gradient = secondaryColorGradient;
-            color.color = gradient;
-            main.startSpeed = 0f;
-            trails.widthOverTrail = 0;
-            shape.arcSpeed = 1f;
-            shape.arcMode = ParticleSystemShapeMultiModeValue.Random;
-            shape.radiusThickness = 1f;
-            shape.shapeType = ParticleSystemShapeType.Sphere;
-            collision.dampen = 0.5f;
-            collision.bounce = 0f;      
-        }
-        else if(secondaryCharged)
-        {
-            emission.enabled = false;
-            secondaryChargeLatch = false;
-            secondaryCharged = false;
-            secondaryReleaseLatch = true;
-            velocity.xMultiplier = Mathf.Sin(Mathf.Deg2Rad * Wielder.transform.eulerAngles.y) * 8f;
-            velocity.zMultiplier = Mathf.Cos(Mathf.Deg2Rad * Wielder.transform.eulerAngles.y) * 8f;
-        }
-        else if(secondaryReleaseLatch && particles.particleCount == 0)
-        {
-            secondaryHits = new List<GameObject>();
-            secondaryTimer = 0f;
-            secondaryReleaseLatch = false;
-            emission.enabled = true;
-        }
-        else if(emission.enabled)
-        {
-            idleFunction();
-        }         
-    }
-
-    private void wield()
-    {
-        Heat = 50f;
-        Guzzle = 2.5f;
-        if (Depleted)
-        {
-            wieldExit();
-        }
-        else if (TertiaryTrigger)
-        {
-            tertiaryTriggerLatch = true;
-        }
-        else
-        {
-            if (tertiaryTriggerLatch)
-            {
-                tertiaryTriggerLatch = false;
-                tertiaryHits = new List<GameObject>();
-                if (!tertiaryActiveLatch)
-                {
-                    tertiaryActiveLatch = true;
-                    main.maxParticles = 5000;
-                    emission.rateOverTime = 5000;
-                    if (Wielder.HostEntity.rightStorage)
-                    {
-                        //tertiaryItem = Wielder.HostEntity.RightHand;
-                        main.startLifetime = 0.1f;
-                        shape.shapeType = ParticleSystemShapeType.Mesh;
-                        shape.meshShapeType = ParticleSystemMeshShapeType.Triangle;
-                        shape.scale = tertiaryItem.transform.localScale*Wielder.HostEntity.scaleActual;
-                        shape.mesh = Wielder.HostEntity.rightStorage.GetComponent<MeshFilter>().mesh;
-                        shape.rotation = Vector3.zero;
-                        trails.mode = ParticleSystemTrailMode.Ribbon;
-                    }
-                    else
-                    {
-                        transform.localPosition = Vector3.zero;
-                        main.startLifetime = 0.2f;
-                        shape.shapeType = ParticleSystemShapeType.Sphere;
-                        shape.radius = Wielder.HostEntity.berthActual;
-                        shape.radiusThickness = 0f;
-                    }
-                }
-                else
-                {
-                    wieldExit();
-                }
-            }
-            else if(tertiaryActiveLatch)
-            {
-                if (Wielder.HostEntity.rightStorage)
-                {
-                    if(tertiaryItem != Wielder.HostEntity.rightStorage)
-                    {
-                        wieldExit();
-                    }
-                    //else if (Wielder.HostEntity.RightHand.Attacking)
-                    //{
-                    //}
-                    else
-                    {
-                        tertiaryHits = new List<GameObject>();
-                    }
-                    transform.localPosition = Vector3.Lerp(transform.localPosition, tertiaryItem.transform.localPosition, 0.15f);
-                    transform.localEulerAngles = tertiaryItem.transform.localEulerAngles;
-                }
-                else if(transform.parent == Wielder.transform)
-                {
-                    tertiaryHits = new List<GameObject>();
-                }
-                else
-                {
-                    wieldExit();
-                }
-            }
-        }
-    }
-    private void wieldExit()
-    {
-        tertiaryActiveLatch = false;
-        transform.parent = Wielder.transform;
-        main.maxParticles = 1500;
-        velocity.radial = 0f;
-        trails.mode = ParticleSystemTrailMode.PerParticle;
-    }
-
-    private void forceField()
-    {
-
-    }
-
-    public void crownWielder()
-    {
-        transform.SetParent(Wielder.transform);
-        transform.localScale = Vector3.one;
-        transform.localPosition = Vector3.Lerp(transform.localPosition, CrownOffset * Wielder.HostEntity.scaleActual, 0.15f);
-        transform.localEulerAngles = CrownAngle;
-    }
+   
 
 }
 

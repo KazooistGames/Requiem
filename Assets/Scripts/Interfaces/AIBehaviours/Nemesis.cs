@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class Nemesis : AIBehaviour
 {
+    public Hellfire hellfire;
+
     private float timeToRecoverFromDash = 0;
     private float finalDashRecoveryTime = 5;
     private float quickDashRecoveryTime = 2;
+
+    public enum Cycle
+    {
+        DashAttack,
+        BeamAttack,
+    }
+    public Cycle BattleCycle = Cycle.DashAttack;
 
     protected override void Awake()
     {
@@ -24,11 +33,12 @@ public class Nemesis : AIBehaviour
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensorySightRangeScalar = 1.0f;
-        meanderPauseFrequency = 0.5f;
+        meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
         grabEnabled = false;
-        dashingChargePeriod = 0.75f;
+        dashingChargePeriod = 1f;
+        hellfire = Instantiate(Resources.Load<GameObject>("Prefabs/Hellfire")).GetComponent<Hellfire>();
     }
 
     protected override void Update()
@@ -36,29 +46,24 @@ public class Nemesis : AIBehaviour
         base.Update();
         if (entity.Foe)
         {
-            if (entity.Dashing)
+            switch (BattleCycle)
             {
-                tangoDeadbanded = false;
-            }
-            Vector3 disposition = entity.Foe.transform.position - transform.position;
-            bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
-            bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
-            bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
-            if (finalDashTrigger)
-            {
-                dashingChargePeriod = 2f;
-                dashingDesiredDirection = disposition;
-                timeToRecoverFromDash = quickDashRecoveryTime;
-            }
-            else if(shortDashTrigger)
-            {
-                dashingChargePeriod = 0.5f;
-                dashingDesiredDirection = disposition;
-                timeToRecoverFromDash = finalDashRecoveryTime;
+                case Cycle.DashAttack:
+                    dashCycleUpdates();
+                    break;
+                case Cycle.BeamAttack:
+                    beamCycleUpdates();
+                    break;
             }
         }
     }
 
+
+
+    /***** PUBLIC *****/
+
+
+    /***** PROTECTED *****/
     protected override void SetTangoParameters()
     {
         if (dashingCooldownTimer >= timeToRecoverFromDash)
@@ -74,7 +79,35 @@ public class Nemesis : AIBehaviour
         tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
     }
 
+    /***** PRIVATE *****/
+    private void dashCycleUpdates()
+    {
+        if (entity.Dashing)
+        {
+            tangoDeadbanded = false;
+        }
+        Vector3 disposition = entity.Foe.transform.position - transform.position;
+        bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
+        bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
+        bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
+        if (finalDashTrigger)
+        {
+            dashingChargePeriod = 2f;
+            dashingDesiredDirection = disposition;
+            timeToRecoverFromDash = quickDashRecoveryTime;
+        }
+        else if (shortDashTrigger)
+        {
+            dashingChargePeriod = 0.5f;
+            dashingDesiredDirection = disposition;
+            timeToRecoverFromDash = finalDashRecoveryTime;
+        }
+    }
 
+    private void beamCycleUpdates()
+    {
+
+    }
 
 }
 

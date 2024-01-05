@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7440301761517794360}
   - component: {fileID: -3551126905823558540}
   m_Layer: 0
-  m_Name: Halo
+  m_Name: Hellfire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3846,10 +3846,10 @@ ParticleSystem:
         m_RotationOrder: 4
     minKillSpeed: 0
     maxKillSpeed: 10000
-    radiusScale: 1
+    radiusScale: 2
     collidesWith:
       serializedVersion: 2
-      m_Bits: 4294967294
+      m_Bits: 4294967295
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -4889,19 +4889,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f35fb8a4d7e0f4ea08de602edec7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debug: 0
   form: 0
-  Wielder: {fileID: 0}
-  Wielded: 0
-  Depleted: 0
-  CrownOffset: {x: 0, y: 1.2, z: 0}
-  CrownAngle: {x: 0, y: 0, z: 0}
-  PrimaryTrigger: 0
-  SecondaryTrigger: 0
-  TertiaryTrigger: 0
-  Guzzle: 0
-  Heat: 0
-  Juice: 0
+  FireTrigger: 0
+  Juice: 50
   idleColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -4936,7 +4926,7 @@ MonoBehaviour:
   idleColorFirstKey: {r: 0, g: 0, b: 0, a: 0}
   idleColorSecondKey: {r: 0, g: 0, b: 0, a: 0}
   idleColorThirdKey: {r: 0, g: 0, b: 0, a: 0}
-  primaryColorGradient:
+  beamColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
     key1: {r: 1, g: 1, b: 1, a: 1}
@@ -4965,14 +4955,32 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  primarySpeedCurve:
+  beamSpeedCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  primaryRange: 0
-  secondaryColorFirstKey: {r: 0, g: 0, b: 0, a: 0}
-  secondaryColorSecondKey: {r: 0, g: 0, b: 0, a: 0}
-  secondaryColorThirdKey: {r: 0, g: 0, b: 0, a: 0}
-  tertiaryActiveLatch: 0
+  beamRange: 1
+  sputterAttemptPeriod: 0.5
+  sputterAttemptTimer: 0
+  sputterChance: 0.5
+  sputterResetValue: 0.5
