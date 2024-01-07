@@ -5,17 +5,24 @@ using UnityEngine;
 public class Nemesis : AIBehaviour
 {
     public Hellfire hellfire;
+    public _Flames flames;
 
     private float timeToRecoverFromDash = 0;
     private float finalDashRecoveryTime = 5;
     private float quickDashRecoveryTime = 2;
 
+    private float beamDelayPeriod = 3;
+    private float beamDelayTimer = 0;
+
+    private float beamDuration = 5;
+    private float beamDurationTimer = 0;
+
     public enum Cycle
     {
-        DashAttack,
-        BeamAttack,
+        DashCycle,
+        BeamCycle,
     }
-    public Cycle BattleCycle = Cycle.DashAttack;
+    public Cycle BattleCycle = Cycle.DashCycle;
 
     protected override void Awake()
     {
@@ -32,13 +39,18 @@ public class Nemesis : AIBehaviour
         tangoStrafePauseFreq = 0;
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
-        sensorySightRangeScalar = 1.0f;
+        sensoryBaseRange = 1.5f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
         grabEnabled = false;
         dashingChargePeriod = 1f;
         hellfire = Instantiate(Resources.Load<GameObject>("Prefabs/Hellfire")).GetComponent<Hellfire>();
+        hellfire.transform.SetParent(transform, true);
+        hellfire.transform.localPosition = Vector3.forward;
+        hellfire.transform.localEulerAngles = Vector3.up * 90;
+        hellfire.transform.localScale = Vector3.one;
+        hellfire.Wielder = entity;
     }
 
     protected override void Update()
@@ -46,14 +58,26 @@ public class Nemesis : AIBehaviour
         base.Update();
         if (entity.Foe)
         {
+            BattleCycle = entity.Posture == Entity.PostureStrength.Weak ? Cycle.BeamCycle : Cycle.DashCycle;
             switch (BattleCycle)
             {
-                case Cycle.DashAttack:
+                case Cycle.DashCycle:
                     dashCycleUpdates();
                     break;
-                case Cycle.BeamAttack:
+                case Cycle.BeamCycle:
                     beamCycleUpdates();
                     break;
+            }
+            string key = "Beam!";
+            if (hellfire.form == Hellfire.Form.Beam)
+            {
+                entity.modSpeed[key] = -0.5f;
+                entity.modTurnSpeed[key] = -0.95f;
+            }
+            else
+            {
+                entity.modSpeed[key] = 0f;
+                entity.modTurnSpeed[key] = 0f;
             }
         }
     }
@@ -66,7 +90,13 @@ public class Nemesis : AIBehaviour
     /***** PROTECTED *****/
     protected override void SetTangoParameters()
     {
-        if (dashingCooldownTimer >= timeToRecoverFromDash)
+        if (BattleCycle == Cycle.BeamCycle)
+        {
+            tangoStrafeEnabled = true;
+            tangoInnerRange = sensoryBaseRange * sensorySightRangeScalar * 0.25f;
+            tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
+        }
+        else if (dashingCooldownTimer >= timeToRecoverFromDash)
         {
             tangoStrafeEnabled = false;
             tangoInnerRange = tangoOuterRange = 0;
@@ -74,14 +104,16 @@ public class Nemesis : AIBehaviour
         else
         {
             tangoStrafeEnabled = true;
+            tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
+            tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         }
-        tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
-        tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
     }
 
     /***** PRIVATE *****/
     private void dashCycleUpdates()
     {
+
+        hellfire.form = Hellfire.Form.Off;
         if (entity.Dashing)
         {
             tangoDeadbanded = false;
@@ -106,7 +138,21 @@ public class Nemesis : AIBehaviour
 
     private void beamCycleUpdates()
     {
-
+        if(beamDelayTimer < beamDelayPeriod)
+        {
+            beamDelayTimer += Time.deltaTime;
+            hellfire.form = Hellfire.Form.Preheat;
+        }
+        else if(beamDurationTimer < beamDuration)
+        {
+            beamDurationTimer += Time.deltaTime;
+            hellfire.form = Hellfire.Form.Beam;
+        }
+        else
+        {
+            beamDelayTimer = 0;
+            beamDurationTimer = 0;
+        }
     }
 
 }

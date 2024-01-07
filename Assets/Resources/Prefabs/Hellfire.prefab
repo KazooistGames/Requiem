@@ -170,7 +170,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -3850,7 +3850,7 @@ ParticleSystem:
     collidesWith:
       serializedVersion: 2
       m_Bits: 4294967295
-    maxCollisionShapes: 256
+    maxCollisionShapes: 64
     quality: 0
     voxelSize: 0.5
     collisionMessages: 0
@@ -4889,6 +4889,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f35fb8a4d7e0f4ea08de602edec7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Wielder: {fileID: 0}
+  DPS: 50
+  Thrust: 25
   form: 0
   FireTrigger: 0
   Juice: 50
@@ -4982,5 +4985,5 @@ MonoBehaviour:
   beamRange: 1
   sputterAttemptPeriod: 0.5
   sputterAttemptTimer: 0
-  sputterChance: 0.5
-  sputterResetValue: 0.5
+  sputterChance: 0.25
+  sputterResetValue: 0.25

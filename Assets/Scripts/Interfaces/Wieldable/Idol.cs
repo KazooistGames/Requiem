@@ -96,7 +96,7 @@ public class Idol : Wieldable
         base.Update();
         if (mobEntity)
         {
-            flames.SetFlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless); 
+            //flames.SetFlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless); 
             activityLevel = ActivityLevel.Aggro;
         }
         else if (Wielder ? Wielder.requiemPlayer : false)
@@ -149,7 +149,7 @@ public class Idol : Wieldable
         GameObject Mob = new GameObject("Nemesis");
         Mob.transform.position = transform.position;
         mobEntity = Mob.AddComponent<IdolSkully>();
-        Mob.AddComponent<Nemesis>();
+        Mob.AddComponent<Nemesis>().flames = flames;
 
         GameObject model = mobEntity.model = new GameObject("Model");
         model.transform.SetParent(mobEntity.transform, true);

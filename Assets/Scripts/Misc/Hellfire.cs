@@ -6,6 +6,10 @@ using Unity.IO.LowLevel.Unsafe;
 
 public class Hellfire : MonoBehaviour
 {
+    public Entity Wielder;
+    public float DPS = 25;
+    public float Thrust = 2;
+
     public enum Form
     {
         Off,
@@ -103,10 +107,6 @@ public class Hellfire : MonoBehaviour
 
     void Update()
     {
-        if (Player.INSTANCE)
-        {
-            form = Player.INSTANCE.CurrentKeyboard.rKey.isPressed ? Form.Beam : Form.Preheat;
-        }
         if((sputterAttemptTimer += Time.deltaTime) >= sputterAttemptPeriod)
         {
             sputterAttemptTimer = 0;
@@ -115,7 +115,7 @@ public class Hellfire : MonoBehaviour
                 beamSpinupTimer = sputterResetValue;
             }
         }
-
+        form = Player.INSTANCE.CurrentKeyboard.rKey.isPressed ? Form.Beam : Form.Preheat;
     }
 
     void FixedUpdate()
@@ -137,21 +137,21 @@ public class Hellfire : MonoBehaviour
 
     void OnParticleCollision(GameObject other)
     {
-        if (FireTrigger)
-        {
-            List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
-            ParticlePhysicsExtensions.GetCollisionEvents(particles, other, collisionEvents);
-            float range = 0;
-            foreach (ParticleCollisionEvent colEvent in collisionEvents)
-            {
-                range += (colEvent.intersection - transform.position).magnitude;
-            }
-            range /= collisionEvents.Count;
-            if(range > beamRange)
-            {
-                beamRange = range;
-            }
-        }
+        //if (form == Form.Beam)
+        //{
+        //    List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
+        //    ParticlePhysicsExtensions.GetCollisionEvents(particles, other, collisionEvents);
+        //    float range = 0;
+        //    foreach (ParticleCollisionEvent colEvent in collisionEvents)
+        //    {
+        //        range += (colEvent.intersection - transform.position).magnitude;
+        //    }
+        //    range /= collisionEvents.Count;
+        //    if(range > beamRange)
+        //    {
+        //        beamRange = range;
+        //    }
+        //}
     }
 
     /***** PUBLIC *****/
@@ -192,7 +192,7 @@ public class Hellfire : MonoBehaviour
         shape.radiusThickness = 0f;
         shape.radius = Mathf.Lerp(0.025f, 0.05f, Juice / 100f);
         shape.scale = Vector3.one;
-        shape.rotation = Vector3.right * 90f;
+        shape.rotation = Vector3.up * -90f;
         lights.ratio = 0.1f;
         lights.maxLights = 250;
         emission.rateOverTime = 250;
@@ -214,7 +214,7 @@ public class Hellfire : MonoBehaviour
         if(beamSpinupTimer < 1)
         {
             beamSpinupTimer += Time.fixedDeltaTime * 3;
-            main.startLifetime = Mathf.Lerp(0.4f, 0.5f, beamSpinupTimer);
+            main.startLifetime = Mathf.Lerp(0.3f, 0.5f, beamSpinupTimer);
             main.startSpeed = Mathf.Lerp(0.0f, beamPeakVelocity, beamSpinupTimer);
             shape.angle = Mathf.Lerp(90, 0, beamSpinupTimer * 3);
             size.sizeMultiplier = Mathf.Lerp(0.75f, 0.25f, beamSpinupTimer);
@@ -232,16 +232,34 @@ public class Hellfire : MonoBehaviour
             shape.arcMode = ParticleSystemShapeMultiModeValue.Random;
             shape.radiusThickness = 1f;
             shape.radius = Mathf.Lerp(0.00f, 0.05f, Juice / 100f);
+            shape.rotation = Vector3.up * -90f;
             lights.ratio = 0.1f;
             lights.maxLights = 250;
             emission.rateOverTime = 750;
             emission.enabled = true;
             trails.widthOverTrail = 2;
             trails.dieWithParticles = false;
-            collision.dampen = 0.5f;
+            collision.dampen = 0.75f;
             collision.bounce = 0f;
             collision.sendCollisionMessages = false;
-            collision.lifetimeLossMultiplier = 0.0f;
+            collision.lifetimeLossMultiplier = 0.5f;
+        }
+        else
+        {
+            RaycastHit hit;
+            Ray ray = new Ray();
+            ray.origin = transform.position;
+            ray.direction = Wielder.LookDirection;
+            Debug.DrawLine(ray.origin, ray.origin + ray.direction.normalized * 10, Color.white, 0.5f);
+            if (Physics.Raycast(ray, out hit, 10, 1 << Requiem.layerEntity, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
+            {
+                Entity foe = hit.collider.gameObject.GetComponent<Entity>();
+                if (foe ? foe.Allegiance != Wielder.Allegiance : false)
+                {
+                    foe.Damage(DPS * Time.fixedDeltaTime);
+                    foe.body.AddForce(ray.direction.normalized * Thrust * Time.fixedDeltaTime, ForceMode.VelocityChange);
+                }
+            }
         }
     }
 

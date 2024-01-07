@@ -60,9 +60,9 @@ public class Biter : AIBehaviour
         else
         {
             tangoStrafeEnabled = true;
+            tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
+            tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
         }
-        tangoInnerRange = entity.personalBox.radius * entity.scaleActual * 2;
-        tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
     }
 
 }

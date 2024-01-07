@@ -73,7 +73,7 @@ public class IdolSkully : Skully
     /***** PRIVATE *****/
     private void spawnAddsIfDamageMakesWeak(float totalDamage)
     {
-        if(totalDamage > Poise)
+        if(totalDamage > Poise && Posture != PostureStrength.Weak)
         {
             SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
         }
