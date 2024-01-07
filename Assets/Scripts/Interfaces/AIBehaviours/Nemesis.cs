@@ -8,14 +8,14 @@ public class Nemesis : AIBehaviour
     public _Flames flames;
 
     private float timeToRecoverFromDash = 0;
-    private float finalDashRecoveryTime = 5;
-    private float quickDashRecoveryTime = 2;
+    private float finalDashRecoveryTime = 4;
+    private float quickDashRecoveryTime = 1;
 
-    private float beamDelayPeriod = 3;
-    private float beamDelayTimer = 0;
+    private float beamDelayPeriod = 2;
+    private float beamDuration = 4;
 
-    private float beamDuration = 5;
     private float beamDurationTimer = 0;
+    private float beamDelayTimer = 0;
 
     public enum Cycle
     {
@@ -71,7 +71,7 @@ public class Nemesis : AIBehaviour
             string key = "Beam!";
             if (hellfire.form == Hellfire.Form.Beam)
             {
-                entity.modSpeed[key] = -0.5f;
+                entity.modSpeed[key] = -0.9f;
                 entity.modTurnSpeed[key] = -0.95f;
             }
             else
@@ -112,7 +112,8 @@ public class Nemesis : AIBehaviour
     /***** PRIVATE *****/
     private void dashCycleUpdates()
     {
-
+        beamDurationTimer = 0;
+        beamDelayTimer = 0;
         hellfire.form = Hellfire.Form.Off;
         if (entity.Dashing)
         {

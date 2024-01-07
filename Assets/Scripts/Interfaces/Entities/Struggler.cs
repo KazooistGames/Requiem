@@ -16,6 +16,7 @@ public class Struggler : Entity
     {
         base.Awake();
         Strength = 100f;
+        Resolve = 10f;
         Haste = 1.0f;
     }
 
@@ -24,15 +25,21 @@ public class Struggler : Entity
         base.Start();
         createProfile();
         gameObject.name = "Struggler";
-        JustWounded.AddListener(fleshWound);
         MyHalberd = new GameObject().AddComponent<Halberd>();
         MyHalberd.PickupItem(this);
     }
 
 
     /***** PUBLIC *****/
+    public override void Damage(float magnitude, bool silent = false)
+    {
+        base.Damage(magnitude, silent);
+        if (!silent)
+        {
+            fleshWound(magnitude);
+        }
+    }
 
-    /***** PROTECTED *****/
     public override void Die()
     {
         if (model)
@@ -58,6 +65,8 @@ public class Struggler : Entity
         _SoundService.PlayAmbientSound(Requiem.deathSounds[UnityEngine.Random.Range(0, Requiem.deathSounds.Length)], transform.position, 0.75f, 0.5f).layer = gameObject.layer;
         base.Die();
     }
+
+    /***** PROTECTED *****/
 
 
     /***** PRIVATE *****/

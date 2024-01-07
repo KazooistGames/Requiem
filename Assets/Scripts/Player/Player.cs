@@ -309,6 +309,7 @@ public class Player : MonoBehaviour
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;
         HostEntity.FinalDashEnabled = true;
+        HostEntity.JustLandedHit.AddListener(Scoreboard.Score_Hit);
         chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();
         chainRenderer.transform.SetParent(transform);
         chainRenderer.transform.localEulerAngles = Vector3.right * 90;
@@ -389,7 +390,7 @@ public class Player : MonoBehaviour
         {
 
         }
-        else if (interactBox.bounds.Contains(HostWeapon.transform.position))
+        else if (HostEntity.personalBox.bounds.Contains(HostWeapon.transform.position))
         {
             HostWeapon.PickupItem(HostEntity);
         }

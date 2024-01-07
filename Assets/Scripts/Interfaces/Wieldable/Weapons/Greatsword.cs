@@ -23,11 +23,9 @@ public class Greatsword : Weapon
         defendRadius = 0.1f;
         wHitBox.height = 0.6f;
         Range = 0.42f;
-        BasePower = 30f;
-        Heft = 60;
+        BasePower = 40f;
+        Heft = 40;
         equipType = EquipType.TwoHanded;
-        //EventHitting.AddListener((x) => { if (Wielder) { Wielder.alterTempo(Power / 200); } });
-        //EventParriedWeapon.AddListener((weapon) => { if (Wielder) { Wielder.alterTempo(weapon.Power / 200); } });
         base.Start();
     }
 

@@ -197,7 +197,7 @@ public class Requiem_Arena : Requiem
         else if(idol ? idol.Wielder : false)
         {
             Alter.DesiredOffering = idol.gameObject;
-            Alter.PentagramLineColor = Color.blue;
+            Alter.PentagramLineColor = new Color(1, 0, 0.75f);
             Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
         }
         else if(Player.INSTANCE.HostEntity)

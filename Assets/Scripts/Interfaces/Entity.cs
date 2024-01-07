@@ -49,7 +49,7 @@ public class Entity : MonoBehaviour
     public UnityEvent<float> JustWounded = new UnityEvent<float>();
     public UnityEvent<float> JustHit = new UnityEvent<float>();
     public UnityEvent JustCrashed = new UnityEvent();
-    public UnityEvent<Entity, float> JustLandedDashHit = new UnityEvent<Entity, float>();
+    public UnityEvent<Entity, float> JustLandedHit = new UnityEvent<Entity, float>();
     public UnityEvent<Wieldable> JustPickedUpWieldable = new UnityEvent<Wieldable>();
 
     public Entity Foe;
@@ -744,7 +744,7 @@ public class Entity : MonoBehaviour
                     {
                         foe.applyDamageToPoiseThenVitality(damage);
                     }
-                    JustLandedDashHit.Invoke(foe, damage);
+                    JustLandedHit.Invoke(foe, damage);
                 }
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
             }
@@ -968,6 +968,7 @@ public class Entity : MonoBehaviour
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float totalPower = myWeapon.Power + (myWeapon.Heft * myWeapon.Tempo);
+        JustLandedHit.Invoke(foe, totalPower);
         if (myWeapon.TrueStrike)
         {
             foe.Damage(Resolve);

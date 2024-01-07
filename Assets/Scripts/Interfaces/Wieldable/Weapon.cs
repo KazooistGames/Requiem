@@ -611,8 +611,8 @@ public abstract class Weapon : Wieldable
             foe.Damage(Power);
             playSlap(transform.position);
         }
-        ImpaleRelease();
-        DropItem(yeet: true, magnitude: 1);
+        //ImpaleRelease();
+        //DropItem(yeet: true, magnitude: 1);
     }
 
 

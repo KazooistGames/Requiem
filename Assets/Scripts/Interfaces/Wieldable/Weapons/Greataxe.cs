@@ -25,7 +25,7 @@ public class Greataxe : Weapon
         equipType = EquipType.TwoHanded;
         Range = 0.45F;
         BasePower = 35f;
-        Heft = 80;
+        Heft = 70;
         base.Start();
     }
 

@@ -62,10 +62,6 @@ public class Ghosty : Entity
 
     //CUSTOM FUNCTIONS!!!!!!!!!!!!!
 
-    public override void Damage(float damage, bool silent = false)
-    {
-        base.Damage(damage);
-    }
     private void createProfile()
     {
         model = model ? model : Instantiate(Resources.Load<GameObject>("Prefabs/Entities/ghostBody"));
