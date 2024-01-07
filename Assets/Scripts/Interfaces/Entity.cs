@@ -520,7 +520,7 @@ public class Entity : MonoBehaviour
         updatePosture();
     }
 
-    public virtual void Damage(float magnitude)
+    public virtual void Damage(float magnitude, bool silent = false)
     {
         if (immortalityTimer < 0.25f) { return; }
         if (magnitude > 0)
@@ -932,18 +932,20 @@ public class Entity : MonoBehaviour
         {
             theirWeapon.Wielder.alterPoise(-Resolve);
         }
+        float impact = theirWeapon.Heft * theirWeapon.Tempo;
         if (theirWeapon.TrueStrike)
         {
-            float poiseOverkill = theirWeapon.Heft - Poise;
             alterPoise(-theirWeapon.Heft);
+            Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
+        }
+        else if(theirWeapon.Action == ActionAnim.StrongAttack)
+        {
+            float poiseOverkill = impact - Poise;
+            alterPoise(-impact);
             if (poiseOverkill >= 0)
             {
                 Stagger(Mathf.Sqrt(poiseOverkill / Strength));
             }
-        }
-        else if(theirWeapon.Action == ActionAnim.StrongAttack)
-        {
-            alterPoise(-theirWeapon.Heft * theirWeapon.Tempo);
         }
     }
 
@@ -951,16 +953,14 @@ public class Entity : MonoBehaviour
     {
         if (myWeapon.TrueStrike)
         {
+            theirWeapon.Wielder.alterPoise(-Resolve);
             return;
         }
         else if (Posture == PostureStrength.Weak)
         {
             Disarm();
         }
-        else if(myWeapon.Action == ActionAnim.QuickAttack)
-        {
-            Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
-        }
+        Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
         alterPoise(-myWeapon.Heft);     
     }
 
@@ -970,9 +970,8 @@ public class Entity : MonoBehaviour
         float totalPower = myWeapon.Power + (myWeapon.Heft * myWeapon.Tempo);
         if (myWeapon.TrueStrike)
         {
-            totalPower += Resolve;
+            foe.Damage(Resolve);
         }
-
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
         {

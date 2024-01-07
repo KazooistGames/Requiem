@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bully : AIBehaviour
 {
-    private float CombatSpeed = 0.5f;
+    private float CombatSpeed = 0.25f;
     private float Aggression = 0.75f;
 
     protected override void Awake()

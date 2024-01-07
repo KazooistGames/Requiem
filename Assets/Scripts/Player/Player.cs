@@ -332,8 +332,13 @@ public class Player : MonoBehaviour
             fadeTimer += Time.deltaTime;
             yield return null;
         }
-        HUD.Curtains.enabled = false;
+        HUD.Curtains.gameObject.SetActive(false);
+        foreach(Transform child in HUD.Curtains.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
         yield return new WaitUntil(() => Dead);
+        HUD.Curtains.gameObject.SetActive(true);
         fadeTimer = 0.0f;
         while (fadeTimer < fadePeriod)
         {
@@ -392,7 +397,7 @@ public class Player : MonoBehaviour
         {
             Entity impaledFoe = HostWeapon.ImpaledObject.GetComponent<Entity>();
             Wieldable impaledObject = HostWeapon.ImpaledObject.GetComponent<Wieldable>();
-            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 0.25f);
+            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 0.5f);
             if (impaledFoe)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;

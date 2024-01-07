@@ -258,8 +258,6 @@ public class Requiem_Arena : Requiem
 
     private GameObject blurbIndicator;
 
-
-
     public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
     {
         { typeof(Skelly), 100 },
@@ -293,8 +291,8 @@ public class Requiem_Arena : Requiem
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
         {1, 80 },
-        {2, 90 },
-        {0, 100 },
+        {2, 60 },
+        {0, 40 },
     };
     public List<Type> UnlockedEntities = new List<Type>();
     public List<Type> UnlockedAIs = new List<Type>();

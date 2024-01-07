@@ -62,7 +62,7 @@ public class Ghosty : Entity
 
     //CUSTOM FUNCTIONS!!!!!!!!!!!!!
 
-    public override void Damage(float damage)
+    public override void Damage(float damage, bool silent = false)
     {
         base.Damage(damage);
     }

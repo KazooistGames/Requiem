@@ -45,10 +45,13 @@ public class Skully : Entity
     }
 
     //CUSTOM FUNCTIONS!!!!!!!!!!!!!
-    public override void Damage(float damage)
+    public override void Damage(float damage, bool silent = false)
     {
         base.Damage(damage);
-        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
+        if (!silent)
+        {
+            _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
+        }
     }
 
     private void createSkeleton()

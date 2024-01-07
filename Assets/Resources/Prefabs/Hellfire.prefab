@@ -4890,8 +4890,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Wielder: {fileID: 0}
-  DPS: 50
-  Thrust: 25
+  DPS: 25
+  Thrust: 20
   form: 0
   FireTrigger: 0
   Juice: 50

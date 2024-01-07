@@ -22,8 +22,8 @@ public class Scoreboard : MonoBehaviour
         KillMultiplier = 1;
         SpeedBonus = 0; 
         validEntitiesToScoreFromKilling = new List<Entity>();
-        Entity.EntityVanquished.AddListener(Score_Entity_Kill);
-        Entity.EntityWounded.AddListener(Score_Weapon_Hit);
+        Entity.EntityVanquished.AddListener(SCORE_KILL);
+        Entity.EntityWounded.AddListener(SCORE_HIT);
         Landmark_Well.JustGulped.AddListener(PENALIZE_GULP);
     }
 
@@ -34,14 +34,7 @@ public class Scoreboard : MonoBehaviour
 
 
     /***** PUBLIC *****/
-    public static void Score_Weapon_Hit(Entity entity, float magnitude)
-    {
-        //validEntitiesToScoreFromKilling.Add(entity);
-        if(magnitude > entity.Vitality)
-        {
-            ADD_SCORE(entity.Strength);
-        }
-    }
+
 
     public static void Wave_Completed_Rewards()
     {
@@ -67,12 +60,21 @@ public class Scoreboard : MonoBehaviour
     }
 
 
-    private static void Score_Entity_Kill(Entity vanquishedEntity)
+    private static void SCORE_KILL(Entity vanquishedEntity)
     {
         if(validEntitiesToScoreFromKilling.Contains(vanquishedEntity))
         {
             ADD_SCORE(vanquishedEntity.Strength);
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
+        }
+    }
+
+    private static void SCORE_HIT(Entity entity, float magnitude)
+    {
+        //validEntitiesToScoreFromKilling.Add(entity);
+        if (magnitude > entity.Vitality)
+        {
+            ADD_SCORE(entity.Strength);
         }
     }
 

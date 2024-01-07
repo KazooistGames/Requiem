@@ -115,7 +115,7 @@ public class Hellfire : MonoBehaviour
                 beamSpinupTimer = sputterResetValue;
             }
         }
-        form = Player.INSTANCE.CurrentKeyboard.rKey.isPressed ? Form.Beam : Form.Preheat;
+        //form = Player.INSTANCE.CurrentKeyboard.rKey.isPressed ? Form.Beam : Form.Preheat;
     }
 
     void FixedUpdate()
@@ -256,7 +256,7 @@ public class Hellfire : MonoBehaviour
                 Entity foe = hit.collider.gameObject.GetComponent<Entity>();
                 if (foe ? foe.Allegiance != Wielder.Allegiance : false)
                 {
-                    foe.Damage(DPS * Time.fixedDeltaTime);
+                    foe.Damage(DPS * Time.fixedDeltaTime, silent: true);
                     foe.body.AddForce(ray.direction.normalized * Thrust * Time.fixedDeltaTime, ForceMode.VelocityChange);
                 }
             }
