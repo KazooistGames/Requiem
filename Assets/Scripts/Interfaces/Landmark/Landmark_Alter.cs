@@ -19,7 +19,7 @@ public class Landmark_Alter : Landmark
     public float RitualDurationSeconds = 5;
 
     private List<GameObject> steps = new List<GameObject>();
-    private CapsuleCollider offeringDetectionCollider;
+    public CapsuleCollider OfferingBox;
 
     LineRenderer PentagramLines;
     public Color PentagramLineColor = Color.red;
@@ -30,7 +30,7 @@ public class Landmark_Alter : Landmark
     {
         if (DesiredOffering)
         {
-            Energized = offeringDetectionCollider.bounds.Contains(DesiredOffering.transform.position);
+            Energized = OfferingBox.bounds.Contains(DesiredOffering.transform.position);
         }
         PentagramFlames.FlamePresentationStyle = PentagramFlameStyle;
         //else if(Player.INSTANCE)
@@ -40,7 +40,7 @@ public class Landmark_Alter : Landmark
     }
 
 
-    /******** alter functions ***********/
+    /***** PUBLIC *****/
     public override void AssignToTile(Hextile tile)
     {
         base.AssignToTile(tile);
@@ -65,13 +65,25 @@ public class Landmark_Alter : Landmark
         TopStep = lastStep;
         //create podium for idol
         //createCenterPodium();
-        offeringDetectionCollider = gameObject.AddComponent<CapsuleCollider>();
-        offeringDetectionCollider.isTrigger = true;
-        offeringDetectionCollider.radius = Hextile.Radius * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount);
-        offeringDetectionCollider.height = Hextile.Thickness * 2 + StepHeight*StepCount;
+        OfferingBox = gameObject.AddComponent<CapsuleCollider>();
+        OfferingBox.isTrigger = true;
+        OfferingBox.radius = Hextile.Radius * AlterToTileRatio * Mathf.Pow(StepIngressRatio, StepCount);
+        OfferingBox.height = Hextile.Thickness * 2 + StepHeight*StepCount;
         setupRitual();
         StartCoroutine(RitualCycler());
     }
+
+    public void Consume(GameObject offering)
+    {
+        if (OfferingBox.bounds.Contains(offering.transform.position))
+        {
+            Destroy(offering);
+        }
+    }
+
+    /***** PROTECTED *****/
+
+    /***** PRIVATE *****/
 
     private void createCenterPodium()
     {
@@ -105,7 +117,6 @@ public class Landmark_Alter : Landmark
             float drawTimer = 0.0f;
             float timerRatio;
             Used = false;
-            PentagramFlames.shapeModule.scale = new Vector3(0.05f, 0.1f, 0.05f);
             PentagramFlames.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
             PentagramFlames.emissionModule.enabled = true;
             yield return new WaitUntil(() => Energized);
@@ -138,11 +149,12 @@ public class Landmark_Alter : Landmark
                 yield return null;
             }
             PentagramFlames.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
-            PentagramFlames.shapeModule.scale = new Vector3(0.1f, 0.1f, 0.1f);
+            PentagramFlames.shapeModule.radius = 0.75f;
             Used = true;
             Color latchedColor = PentagramLineColor;
             yield return new WaitWhile(() => Energized);
-            PentagramFlames.emissionModule.enabled = false;
+            //PentagramFlames.emissionModule.enabled = false;
+            PentagramFlames.shapeModule.radius = 0.0f;
             Used = false;
             float fadeOutTimer = 0;
             float fadeOutPeriod = 3;
@@ -167,9 +179,12 @@ public class Landmark_Alter : Landmark
         PentagramFlames = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
         PentagramFlames.transform.SetParent(Tile.gameObject.transform, false);
         PentagramFlames.shapeModule.shapeType = ParticleSystemShapeType.Donut;
-        PentagramFlames.shapeModule.scale = new Vector3(0.05f, 0.1f, 0.05f); 
+        PentagramFlames.shapeModule.scale = new Vector3(0.1f, 0.1f, 0.1f);
+        PentagramFlames.shapeModule.radius = 0.0f;
+        PentagramFlames.shapeModule.donutRadius = 0.1f;
         PentagramFlames.SetFlameStyle(_Flames.FlameStyles.Soulless);
         PentagramFlames.particleLight.intensity = 0.75f;
+        PentagramFlames.shapeModule.rotation = Vector3.right * 90;
         PentagramLines = gameObject.AddComponent<LineRenderer>();
         PentagramLines.enabled = false;
         PentagramLines.useWorldSpace = false;

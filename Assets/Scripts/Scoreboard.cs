@@ -50,7 +50,11 @@ public class Scoreboard : MonoBehaviour
 
     public static void Wave_Completed_Rewards()
     {
-        KillMultiplier += WAVE_MULTIPLIER_BONUS;
+        if(KillMultiplier < 2)
+        {
+            float availableBonus = Mathf.Min(2 - KillMultiplier, WAVE_MULTIPLIER_BONUS);
+            KillMultiplier += availableBonus;
+        }
     }
 
     /***** PROTECTED *****/

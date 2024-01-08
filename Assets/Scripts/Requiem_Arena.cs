@@ -37,7 +37,6 @@ public class Requiem_Arena : Requiem
     {
         base.Update();
         determineAlterOffering();
-
     }
 
     /***** PUBLIC *****/
@@ -109,9 +108,20 @@ public class Requiem_Arena : Requiem
         {
             StateOfGame = GameState.Liminal;
             Ritual++;
+            if(Ritual == 10)
+            {
+                foreach (Torch torch in FindObjectsOfType<Torch>())
+                {
+                    torch.Lit = false;
+                }
+            }
             Gates[0].OpenDoor();
             yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
+            if (!idol && Ritual >= 3)
+            {
+                idol = spawnIdol();
+            }
             Gates[0].CloseDoor();
             if (Alter.DesiredOffering == Player.INSTANCE.HostEntity.gameObject)
             {
@@ -137,6 +147,10 @@ public class Requiem_Arena : Requiem
         {
             if (!Paused)
             {
+                if (idol ? Alter.OfferingBox.bounds.Contains(idol.transform.position) : false)
+                {
+                    Alter.Consume(idol.gameObject);
+                }
                 int minutesLeft = (int)TimeGateTimeLeft / 60;
                 int secondsLeft = (int)TimeGateTimeLeft % 60;
                 string timeLeftText = minutesLeft.ToString("0") + ":" + secondsLeft.ToString("00");
@@ -166,10 +180,6 @@ public class Requiem_Arena : Requiem
         Scoreboard.Wave_Completed_Rewards();
         BloodWell.UnGulp();
         blurbIndicator.SetActive(false);
-        if (!idol && Ritual % 3 == 0)
-        {
-            idol = spawnIdol();
-        }
     }
 
     protected IEnumerator bossRoutine()
@@ -194,11 +204,13 @@ public class Requiem_Arena : Requiem
         {
             Alter.DesiredOffering = Alter.TopStep;
         }
-        else if(idol ? idol.Wielder : false)
+        else if(Ritual % 10 == 0 && Ritual > 0)
         {
             Alter.DesiredOffering = idol.gameObject;
             Alter.PentagramLineColor = new Color(1, 0, 0.75f);
             Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
+            idol.flames.FlamePresentationStyle = _Flames.FlameStyles.Inferno;
+            idol.flames.emissionModule.enabled = true;
         }
         else if(Player.INSTANCE.HostEntity)
         {
@@ -345,4 +357,5 @@ public class Requiem_Arena : Requiem
         newIdol.transform.position = RAND_POS_IN_TILE(spawnTile);
         return newIdol;
     }
+
 }

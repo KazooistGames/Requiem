@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Entity;
 
 public class Idol : Wieldable
 {
@@ -41,7 +42,6 @@ public class Idol : Wieldable
         "...",
         "Welcome back.",
         "Back in the saddle, I see",
-        "Go away.",
         "What eon is it?",
         "Something wicked this way comes.",
         "Never sated for long",
@@ -59,12 +59,19 @@ public class Idol : Wieldable
         "All this has happened before, in some way or another.",
         "Remind us all of why you are here.",
         "Blood is the price, blood is prize.",
-        "Death comes.",
         "Show me your worth!",
         "Get to work.",
         "They are coming.",
         "Enter the fray.",
         "Show them no mercy.",
+    };
+    private List<string> aggroMessages = new List<string>()
+    {   
+        "Go away.",
+        "Remind us all of why you are here.",
+        "Blood is the price, blood is prize.",
+        "Death comes.",
+        "Show me your worth!",
     };
 
     protected override void Awake()
@@ -89,6 +96,7 @@ public class Idol : Wieldable
         StartCoroutine(banter());
         Body.mass = 3f;
         PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
+
     }
 
     protected override void Update()
@@ -111,6 +119,13 @@ public class Idol : Wieldable
         {
             activityLevel = ActivityLevel.Inert;
         }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        Scoreboard.Score += 500;
+        SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
     }
 
     protected override void OnCollisionEnter(Collision collision)
@@ -164,7 +179,8 @@ public class Idol : Wieldable
 
         mobEntity.JustVanquished.AddListener(BecomeItem);
         mobEntity.FinalDashEnabled = true;
-
+        mobEntity.JustWounded.AddListener((x) => SpawnAdds(1));
+        mobEntity.JustHit.AddListener(spawnAddsIfDamageMakesWeak);
         return mobEntity;
     }
 
@@ -173,7 +189,6 @@ public class Idol : Wieldable
         mobEntity.JustVanquished.RemoveListener(BecomeItem);
         togglePhysicsBox(true);
         Body.isKinematic = false;
-        //StartCoroutine(reviveMob(15));
         flames.FlamePresentationStyle = _Flames.FlameStyles.Soulless;
     }
 
@@ -184,12 +199,6 @@ public class Idol : Wieldable
 
 
     /***** PRIVATE *****/
-    private IEnumerator reviveMob(float periodSeconds)
-    {
-        //float timer = 0;
-        yield return new WaitForSeconds(periodSeconds);
-        BecomeMob();
-    }
 
     private IEnumerator banter()
     {
@@ -224,15 +233,39 @@ public class Idol : Wieldable
                     yield return new WaitWhile(() => activityLevel == ActivityLevel.Active);
                     break;
                 case ActivityLevel.Aggro:
+                    if (currentBlurb)
+                    {
+                        Destroy(currentBlurb);
+                    }
                     flames.emissionModule.enabled = true;
+                    SayShit(aggroMessages);
                     yield return new WaitWhile(() => activityLevel == ActivityLevel.Aggro);
                     break;
             }
             yield return null;
         }
     }
+    /***** PUBLIC *****/
 
+    public void SpawnAdds(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Entity entity;
+            entity = Requiem.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
+            entity.Poise = entity.Strength;
+            Vector3 randomOffset = new Vector3(UnityEngine.Random.value - 0.5f, 0, UnityEngine.Random.value - 0.5f) * 0.1f;
+            entity.transform.position += randomOffset;
+            entity.Shoved = false;
+        }
+    }
 
-
+    private void spawnAddsIfDamageMakesWeak(float totalDamage)
+    {
+        if (totalDamage > mobEntity.Poise && mobEntity.Posture != PostureStrength.Weak)
+        {
+            SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+        }
+    }
 
 }

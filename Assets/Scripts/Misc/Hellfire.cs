@@ -7,8 +7,8 @@ using Unity.IO.LowLevel.Unsafe;
 public class Hellfire : MonoBehaviour
 {
     public Entity Wielder;
-    public float DPS = 25;
-    public float Thrust = 2;
+    public float DPS = 50;
+    public float Thrust = 20;
 
     public enum Form
     {

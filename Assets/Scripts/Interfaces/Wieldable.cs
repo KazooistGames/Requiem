@@ -201,6 +201,15 @@ public class Wieldable : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
+        if (Wielder)
+        {
+            Wielder.modSpeed["heft" + gameObject.GetHashCode().ToString()] = 0;
+            if (equipType == EquipType.Burdensome)
+            {
+                Wielder.modSpeed.Remove("burdensome" + GetHashCode().ToString());
+                Wielder.wieldMode = (Wielder.leftStorage || Wielder.rightStorage || Wielder.backStorage) ? Entity.WieldMode.OneHanders : Entity.WieldMode.EmptyHanded;
+            }
+        }
         StopAllCoroutines();
     }
 
@@ -309,6 +318,7 @@ public class Wieldable : MonoBehaviour
         }
         else if (equipType == EquipType.Burdensome)
         {
+            Wielder.modSpeed["burdensome" + GetHashCode().ToString()] = -0.5f;
             Wielder.wieldMode = Entity.WieldMode.Burdened;
             Wielder.MainHand = this;
             togglePhysicsBox(false);

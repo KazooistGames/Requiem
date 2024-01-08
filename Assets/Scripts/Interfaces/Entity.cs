@@ -997,7 +997,7 @@ public class Entity : MonoBehaviour
 
     }
 
-    private float applyDamageToPoiseThenVitality(float totalPower)
+    public float applyDamageToPoiseThenVitality(float totalPower)
     {
         if(immortalityTimer < 0.25f) { return 0; }
         JustHit.Invoke(totalPower);

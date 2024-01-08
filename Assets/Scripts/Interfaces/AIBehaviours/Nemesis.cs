@@ -8,8 +8,8 @@ public class Nemesis : AIBehaviour
     public _Flames flames;
 
     private float timeToRecoverFromDash = 0;
-    private float finalDashRecoveryTime = 4;
-    private float quickDashRecoveryTime = 1;
+    private float finalDashRecoveryTime = 3;
+    private float quickDashRecoveryTime = 1.5f;
 
     private float beamDelayPeriod = 2;
     private float beamDuration = 4;
@@ -39,7 +39,7 @@ public class Nemesis : AIBehaviour
         tangoStrafePauseFreq = 0;
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
-        sensoryBaseRange = 1.5f;
+        sensoryBaseRange = 2f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
@@ -51,6 +51,7 @@ public class Nemesis : AIBehaviour
         hellfire.transform.localEulerAngles = Vector3.up * 90;
         hellfire.transform.localScale = Vector3.one;
         hellfire.Wielder = entity;
+        entity.Foe = Player.INSTANCE.HostEntity;
     }
 
     protected override void Update()
@@ -72,7 +73,7 @@ public class Nemesis : AIBehaviour
             if (hellfire.form == Hellfire.Form.Beam)
             {
                 entity.modSpeed[key] = -0.9f;
-                entity.modTurnSpeed[key] = -0.95f;
+                entity.modTurnSpeed[key] = -0.9f;
             }
             else
             {
@@ -80,9 +81,14 @@ public class Nemesis : AIBehaviour
                 entity.modTurnSpeed[key] = 0f;
             }
         }
+        else
+        {
+            beamDurationTimer = 0;
+            beamDelayTimer = 0;
+            hellfire.form = Hellfire.Form.Off;
+            flames.particleLight.intensity = 5;
+        }
     }
-
-
 
     /***** PUBLIC *****/
 
@@ -118,6 +124,11 @@ public class Nemesis : AIBehaviour
         if (entity.Dashing)
         {
             tangoDeadbanded = false;
+            flames.particleLight.intensity = 8;
+        }
+        else
+        {
+            flames.particleLight.intensity = 5;
         }
         Vector3 disposition = entity.Foe.transform.position - transform.position;
         bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
@@ -125,6 +136,7 @@ public class Nemesis : AIBehaviour
         bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
         if (finalDashTrigger)
         {
+
             dashingChargePeriod = 2f;
             dashingDesiredDirection = disposition;
             timeToRecoverFromDash = quickDashRecoveryTime;
