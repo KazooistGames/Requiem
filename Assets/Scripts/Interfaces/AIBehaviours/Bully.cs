@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bully : AIBehaviour
 {
-    private float CombatSpeed = 0.25f;
+    private float CombatSpeed = 0f;
     private float Aggression = 0.75f;
 
     protected override void Awake()
@@ -39,8 +39,7 @@ public class Bully : AIBehaviour
         }
         else if (!mainWep)
         {
-            dashingChargePeriod = 0.5f;
-            dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+
         }
         else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || dashingDesiredDirection != Vector3.zero)
         {

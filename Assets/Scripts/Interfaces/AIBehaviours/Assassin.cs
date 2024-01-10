@@ -107,16 +107,16 @@ public class Assassin : AIBehaviour
         {
 
         }
-        else if (_MartialController.Weapon_Actions.ContainsKey(mainWep) ? _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding : true)
-        {
-            Vector3 disposition = entity.Foe.transform.position - transform.position;
-            dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized));
-        }
+        //else if (_MartialController.Weapon_Actions.ContainsKey(mainWep) ? _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding : true)
+        //{
+        //    Vector3 disposition = entity.Foe.transform.position - transform.position;
+        //    dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized));
+        //}
         else
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
-            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
-            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);      
+            float randomOffset = Mathf.Sign(Random.value - 0.5f) * 30;
+            dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized) + randomOffset);      
         }
     }
 

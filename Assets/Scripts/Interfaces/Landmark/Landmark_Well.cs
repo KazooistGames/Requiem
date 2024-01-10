@@ -115,7 +115,8 @@ public class Landmark_Well : Landmark
 
     private IEnumerator gulpRoutine(Entity benefactor, float volumeToGulp)
     {
-        if (Used) { yield break; }
+        volumeToGulp = Mathf.Min(volumeToGulp, Volume);
+        if (Used || volumeToGulp <= 0) { yield break; }
         JustGulped.Invoke(benefactor, volumeToGulp);
         while(volumeToGulp > 0 && Volume > 0)
         {

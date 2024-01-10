@@ -25,7 +25,7 @@ public class Skully : Entity
         anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animation/entities/skully/skullyAnimation");
         gameObject.name = "Skully";
         hurtBox.height = 0.7f;
-        hurtBox.center = Vector3.up * 0.2f;
+        hurtBox.center = Vector3.up * 0.225f;
     }
 
     protected override void Update()

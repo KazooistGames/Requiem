@@ -167,7 +167,7 @@ public class Entity : MonoBehaviour
     protected virtual void Awake()
     {
         Strength = 100f;
-        Resolve = 20;
+        Resolve = 10;
         Haste = 1.0f;
         BaseAcceleration = 8;
         hurtBox = gameObject.AddComponent<CapsuleCollider>();
@@ -972,6 +972,8 @@ public class Entity : MonoBehaviour
         if (myWeapon.TrueStrike)
         {
             foe.Damage(Resolve);
+            foe.Stagger(Mathf.Sqrt(totalPower / Strength));
+            foe.Disarm();
         }
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
@@ -982,18 +984,20 @@ public class Entity : MonoBehaviour
         {
             if (foe.Posture == PostureStrength.Weak)
             {
-                float impact = myWeapon.Heft * vitalityDamage/totalPower;
+                float impact = myWeapon.Heft * vitalityDamage / totalPower;
                 foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
             }
         }
-        else if(myWeapon.Action == ActionAnim.QuickAttack)
+        else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
-            //if (requiemPlayer)
-            //{
-            //    float duration = 5;
-            //    foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
-            //}
+            if (Dashing)
+            {
+                float duration = 3;
+                foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
+            }
         }
+        
+
 
     }
 

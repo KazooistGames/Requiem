@@ -23,7 +23,7 @@ public class Skelly : Entity
     {
         base.Start();
         createSkeleton();
-        Haste = 0.75f;
+        Haste = 0.8f;
         gameObject.name = "Skelly";
         JustWounded.AddListener(CRUMBLE);
     }
@@ -74,8 +74,7 @@ public class Skelly : Entity
     protected void Mutate()
     {
         Debone(head);
-        Haste *= 1.5f;
-        Strength *= 0.75f;
+
         if (GetComponent<AIBehaviour>())
         {
             Destroy(GetComponent<AIBehaviour>());
@@ -85,7 +84,6 @@ public class Skelly : Entity
 
     public override void Die()
     {
-
         if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * MutationChancePerRitual)
         {
             foreach (MeshFilter bone in bodyParts)
@@ -104,9 +102,10 @@ public class Skelly : Entity
         }
         else
         {
+            Haste *= 1.5f;
+            Strength *= 0.75f;
             Vitality = Strength;
             Poise = Strength;
-            Haste = 1.5f;
             Destroy(GetComponent<AIBehaviour>());
             gameObject.AddComponent<Assassin>();
             Debone(head);

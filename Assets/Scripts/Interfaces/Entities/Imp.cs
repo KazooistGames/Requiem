@@ -22,8 +22,9 @@ public class Imp : Entity
         base.Start();
         createSkeleton();
         Haste = 1.0f;
-        Strength = 125f;
-        Resolve = 25;
+        Strength = 150f;
+        Vitality = Strength;
+        Resolve = 20;
         gameObject.name = "Imp";
         JustWounded.AddListener(CRUMBLE);
     }
@@ -71,17 +72,6 @@ public class Imp : Entity
         }
     }
 
-    protected void Mutate()
-    {
-        Debone(head);
-        Haste *= 1.5f;
-        Strength *= 0.75f;
-        if (GetComponent<AIBehaviour>())
-        {
-            Destroy(GetComponent<AIBehaviour>());
-            gameObject.AddComponent<Assassin>();
-        }
-    }
 
     public override void Die()
     {

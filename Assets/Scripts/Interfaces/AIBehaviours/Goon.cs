@@ -102,7 +102,11 @@ public class Goon : AIBehaviour
         {
             return;
         }
-        else if(mainWep.Action == Weapon.ActionAnim.Idle || mainWep.Action == Weapon.ActionAnim.Recoiling)
+        else if(mainWep.Action != Weapon.ActionAnim.Idle && mainWep.Action != Weapon.ActionAnim.Recoiling)
+        {
+
+        }
+        else if(entity.Posture == Entity.PostureStrength.Weak || Random.value > Aggression)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));

@@ -225,6 +225,10 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
+                        if (TrueStrike)
+                        {
+                            Wielder.alterPoise(-Heft / 2);
+                        }
                         if(Action == ActionAnim.QuickAttack)
                         {
                             playLightSwing();
@@ -834,7 +838,8 @@ public abstract class Weapon : Wieldable
     private void chargeTempo()
     {
         Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
-        TrueStrike = Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
+        bool strong = Wielder ? Wielder.Posture != Entity.PostureStrength.Weak : false;
+        TrueStrike = strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
         tempoChargePeriod = Heft / Wielder.Strength;
         if (Action == ActionAnim.StrongCoil)
         {

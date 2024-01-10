@@ -166,6 +166,7 @@ public class Requiem_Arena : Requiem
                 TimeGateTimeLeft -= 1;
             }
         }
+        blurbIndicator.SetActive(false);
         while (spawnedMobs.Count(x => x != null) != 0)
         {
             foreach (GameObject mob in spawnedMobs)
@@ -177,9 +178,29 @@ public class Requiem_Arena : Requiem
             }
             yield return null;
         }
+        if(Ritual % 3 == 0)
+        {
+            StateOfGame = GameState.Boss;
+            GameObject Boss = null;
+            switch (Ritual)
+            {
+                case 3:
+                    Boss = SPAWN(typeof(Imp), typeof(Sentinel), CenterTile.transform.position);
+                    break;
+                case 6:
+                    Boss = SPAWN(typeof(Nephalim), typeof(Bully), CenterTile.transform.position);
+                    break;
+                case 9:
+                    Boss = SPAWN(typeof(Wraith), typeof(Revanent), CenterTile.transform.position);
+                    break;
+                default:
+                    break;
+            }
+            yield return new WaitWhile(() => Boss != null);
+        }
         Scoreboard.Wave_Completed_Rewards();
         BloodWell.UnGulp();
-        blurbIndicator.SetActive(false);
+
     }
 
     protected IEnumerator bossRoutine()
@@ -281,10 +302,9 @@ public class Requiem_Arena : Requiem
     public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
-        { typeof(Bully), 3 },
-        { typeof(Sentinel), 6 },
-        { typeof(Revanent), 10 },
-        //{ typeof(Biter), 10 },
+        //{ typeof(Bully), 3 },
+        //{ typeof(Sentinel), 6 },
+        //{ typeof(Revanent), 9 },
     };
     public Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
     {
@@ -302,9 +322,9 @@ public class Requiem_Arena : Requiem
     };
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
-        {1, 80 },
-        {2, 60 },
-        {0, 40 },
+        {1, 100 },
+        {2, 80 },
+        {0, 60 },
     };
     public List<Type> UnlockedEntities = new List<Type>();
     public List<Type> UnlockedAIs = new List<Type>();
