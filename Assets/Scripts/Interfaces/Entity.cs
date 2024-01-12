@@ -847,6 +847,10 @@ public class Entity : MonoBehaviour
                 }
                 Dashing = true;
                 Shove(dashDirection.normalized * scaledVelocity, true);
+                if (FinalDash)
+                {
+                    Stagger(shoveRecoveryPeriod);
+                }
                 playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
                 yield return new WaitWhile(() => Shoved);
             }
