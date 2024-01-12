@@ -75,32 +75,19 @@ public class Imp : Entity
 
     public override void Die()
     {
-
-        if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * 0.05f)
+        foreach (MeshFilter bone in bodyParts)
         {
-            foreach (MeshFilter bone in bodyParts)
+            if (bone && !bone.GetComponent<Rigidbody>())
             {
-                if (bone && !bone.GetComponent<Rigidbody>())
-                {
-                    Debone(bone.gameObject);
-                }
+                Debone(bone.gameObject);
             }
-            head = null;
-            torso = null;
-            waist = null;
-            leg1 = null;
-            leg2 = null;
-            base.Die();
         }
-        else
-        {
-            Vitality = Strength;
-            Poise = Strength;
-            Destroy(GetComponent<AIBehaviour>());
-            gameObject.AddComponent<Assassin>();
-            Debone(head);
-            head = null;
-        }
+        head = null;
+        torso = null;
+        waist = null;
+        leg1 = null;
+        leg2 = null;
+        base.Die();
     }
 
 }

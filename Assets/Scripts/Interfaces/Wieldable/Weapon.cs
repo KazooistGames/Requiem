@@ -225,10 +225,6 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
-                        if (TrueStrike)
-                        {
-                            Wielder.alterPoise(-Heft / 2);
-                        }
                         if(Action == ActionAnim.QuickAttack)
                         {
                             playLightSwing();

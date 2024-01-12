@@ -163,6 +163,8 @@ public class Entity : MonoBehaviour
 
     private float immortalityTimer = 0;
 
+    public bool Defending = false;
+
     //******************Functions*************************
     protected virtual void Awake()
     {
@@ -639,6 +641,7 @@ public class Entity : MonoBehaviour
 
     private void equipmentManagement()
     {
+
         if (leftStorage)
         {
             leftStorage.enabled = true;
@@ -700,6 +703,11 @@ public class Entity : MonoBehaviour
                 OffHand = null;
                 break;
         }
+        Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
+        Weapon offWep = OffHand ? MainHand.GetComponent<Weapon>() : null;
+        bool mainDefending = mainWep ? mainWep.Action == ActionAnim.Guarding : false;
+        bool offDefending = offWep ? offWep.Action == ActionAnim.Guarding : false;
+        Defending = mainDefending || offDefending;
     }
 
     private void resolveDashHit(Collision collision, bool instantaneousCollision = false)
@@ -973,7 +981,7 @@ public class Entity : MonoBehaviour
         {
             foe.Damage(Resolve);
             foe.Stagger(Mathf.Sqrt(totalPower / Strength));
-            foe.Disarm();
+            //foe.Disarm();
         }
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)

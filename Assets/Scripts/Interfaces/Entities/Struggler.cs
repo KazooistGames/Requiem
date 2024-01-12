@@ -16,7 +16,7 @@ public class Struggler : Entity
     {
         base.Awake();
         Strength = 100f;
-        Resolve = 10f;
+        Resolve = 15f;
         Haste = 1.0f;
     }
 
