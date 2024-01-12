@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bully : AIBehaviour
 {
-    private float CombatSpeed = 0f;
+    private float CombatSpeed = 0.5f;
     private float Aggression = 0.75f;
 
     protected override void Awake()
@@ -31,7 +31,7 @@ public class Bully : AIBehaviour
     protected override void Update()
     {
         base.Update();
-        float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 3;
+        float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 2;
 
         if (dashingCooldownTimer < period || !entity.Foe)
         {
@@ -67,7 +67,7 @@ public class Bully : AIBehaviour
         {
             if(Random.value <= Aggression)
             {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
             }
             else
@@ -77,7 +77,7 @@ public class Bully : AIBehaviour
         }
         else if(checkMyWeaponInRange())
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if(Random.value <= Aggression)
@@ -88,7 +88,7 @@ public class Bully : AIBehaviour
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -97,7 +97,7 @@ public class Bully : AIBehaviour
     {
         if (checkMyWeaponInRange())
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
