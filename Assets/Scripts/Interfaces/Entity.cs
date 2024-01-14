@@ -250,7 +250,7 @@ public class Entity : MonoBehaviour
         berthActual = Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
-            float scalingRegenRate = POISE_REGEN_BASE_PERIOD + Mathf.FloorToInt((Strength - Vitality) / 20);
+            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD, POISE_REGEN_BASE_PERIOD * 3, Vitality / Strength);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
@@ -760,7 +760,6 @@ public class Entity : MonoBehaviour
         dashAlreadyHit.Add(other);
     }
 
-
     private void resolveCrash(Collision collision)
     {
         if (!Shoved)
@@ -849,7 +848,7 @@ public class Entity : MonoBehaviour
                 Shove(dashDirection.normalized * scaledVelocity, true);
                 if (FinalDash)
                 {
-                    Stagger(shoveRecoveryPeriod);
+                    Stagger(shoveRecoveryPeriod/2);
                 }
                 playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
                 yield return new WaitWhile(() => Shoved);
@@ -924,7 +923,6 @@ public class Entity : MonoBehaviour
         }
         else if (Posture == PostureStrength.Weak)
         {
-
             Stagger(Mathf.Sqrt(impact / Strength));
         }
         else

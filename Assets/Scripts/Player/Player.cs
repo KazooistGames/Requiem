@@ -59,6 +59,7 @@ public class Player : MonoBehaviour
         if (HostWeapon)
         {
             updateChainlink();
+            HostWeapon.TrueStrikeEnabled = true;
         }
         else if (HostEntity ? HostEntity.MainHand : false)
         {

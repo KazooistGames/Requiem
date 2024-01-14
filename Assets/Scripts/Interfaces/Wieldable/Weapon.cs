@@ -56,6 +56,7 @@ public abstract class Weapon : Wieldable
 
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
 
+    public bool TrueStrikeEnabled = false;
     public bool TrueStrike = false;
     public float Tempo;
     private float tempoCharge = 0;
@@ -400,7 +401,6 @@ public abstract class Weapon : Wieldable
     }
 
     /**********PRIVATE**************/
-
     private static void RESOLVE_PARRY(Weapon Attacker, Weapon Parrier)
     {
         if (Attacker.Wielder)
@@ -456,14 +456,14 @@ public abstract class Weapon : Wieldable
         {
             RESOLVE_PARRY(Attacker, Defender);
         }
-        else if (Defender.Action == ActionAnim.Guarding || Defender.Action == ActionAnim.Recovering)
+        else if (Defender.Action == ActionAnim.Guarding)
         {
             RESOLVE_BLOCK(Attacker, Defender);
         }
         else
         {
-            //Attacker.itemCollisionONS(Defender);
-            RESOLVE_BLOCK(Attacker, Defender);
+            Attacker.itemCollisionONS(Defender);
+            //RESOLVE_BLOCK(Attacker, Defender);
         }
     }
 
@@ -480,13 +480,13 @@ public abstract class Weapon : Wieldable
             Weapon_Hit.Invoke(weapon);
             return true;
         }
-        else if (!obstruction.GetComponent<Weapon>())
+        else if (testBlockBetweenEntities(foe, weapon.Wielder))
         {
-            weapon.FullCollisionONS(foe.gameObject);
+            RESOLVE_BLOCK(weapon, obstruction.GetComponent<Weapon>());
         }
         else
         {
-            RESOLVE_CLASH(weapon, obstruction.GetComponent<Weapon>());
+            weapon.FullCollisionONS(foe.gameObject);
         }
         return false;      
     }
@@ -643,6 +643,14 @@ public abstract class Weapon : Wieldable
         alreadyHit.Add(item.gameObject);
     }
 
+    private static bool testBlockBetweenEntities(Entity target, Entity origin)
+    {
+        if(target == null || origin == null) { return false; }
+        float angle = Vector3.Angle(target.LookDirection, origin.LookDirection);
+        
+        return target.Defending && Mathf.Abs(angle) <= 45;    
+    }
+
     private static GameObject testObstructionBetweenEntities(Entity target, Entity origin)
     {
         if(!target || !origin) { return null; }
@@ -651,12 +659,10 @@ public abstract class Weapon : Wieldable
         Vector3 rayStart = origin.transform.position;
         rayStart.y = target.transform.position.y + 0.3f * target.scaleActual;
         RaycastHit hit;
-        if (Physics.Raycast(rayStart, disposition.normalized, out hit, disposition.magnitude, (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerItem), QueryTriggerInteraction.Collide))
+        if (Physics.Raycast(rayStart, disposition.normalized, out hit, disposition.magnitude, (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle), QueryTriggerInteraction.Collide))
         {
-            Wieldable item = hit.collider.GetComponent<Wieldable>();
-            bool opposingItem = item ? item.Allegiance != origin.Allegiance : false;
-            bool obstacle = !hit.collider.isTrigger && hit.collider.gameObject && hit.collider.gameObject.layer != Requiem.layerItem;
-            if (opposingItem || obstacle)
+            bool obstacle = !hit.collider.isTrigger && hit.collider.gameObject;
+            if (obstacle)
             {
                 return hit.collider.gameObject;
             }
@@ -835,7 +841,7 @@ public abstract class Weapon : Wieldable
     {
         Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
         bool strong = Wielder ? Wielder.Posture != Entity.PostureStrength.Weak : false;
-        TrueStrike = strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
+        TrueStrike = TrueStrikeEnabled && strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
         tempoChargePeriod = Heft / Wielder.Strength;
         if (Action == ActionAnim.StrongCoil)
         {

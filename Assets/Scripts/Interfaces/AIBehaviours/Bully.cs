@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Bully : AIBehaviour
 {
-    private float CombatSpeed = 0f;
-    private float Aggression = 0.75f;
+    private float CombatSpeed = 0.5f;
 
     protected override void Awake()
     {
@@ -65,9 +64,9 @@ public class Bully : AIBehaviour
         }
         else if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            if(Random.value <= Aggression)
+            if(Random.value <= 0.5f)
             {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
             }
             else
@@ -77,10 +76,10 @@ public class Bully : AIBehaviour
         }
         else if(checkMyWeaponInRange())
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
-        else if(Random.value <= Aggression)
+        else if(Random.value <= 0.75f)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongAttack);
@@ -88,7 +87,7 @@ public class Bully : AIBehaviour
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -129,7 +128,7 @@ public class Bully : AIBehaviour
         else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
 
         {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 3;
+            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
         }
         else
         {
@@ -137,6 +136,38 @@ public class Bully : AIBehaviour
         }
     }
 
+    protected override void SetTangoParameters()
+    {
+        if (mainWep || offWep)
+        {
+            Weapon wep = mainWep ? mainWep : offWep;
+            switch (martialCurrentState)
+            {
+                case martialState.none:
+                    tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    break;
+                case martialState.attacking:
+                    tangoInnerRange = wep.Range * 0.5f;
+                    tangoOuterRange = wep.Range * 0.75f;
+                    break;
+                case martialState.defending:
+                    tangoInnerRange = wep.Range * 1.0f;
+                    tangoOuterRange = wep.Range * 1.5f;
+                    break;
+                case martialState.throwing:
+                    tangoInnerRange = wep.Range * 2.0f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    break;
+            }
+            pursueStoppingDistance = tangoOuterRange;
+        }
+        else
+        {
+            tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
+            tangoOuterRange = sensorySightRangeScalar * sensoryBaseRange;
+        }
+    }
 
 }
 
