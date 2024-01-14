@@ -53,13 +53,13 @@ public class Sentinel : AIBehaviour
         }
         else if (Random.value <= Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            dashingChargePeriod = 0.0f;
+            dashingDesiredDirection = -(entity.Foe.transform.position - transform.position);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
         }
         else
@@ -106,6 +106,13 @@ public class Sentinel : AIBehaviour
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+        }
+        else if(dashingCooldownTimer > 3)
+        {
+            dashingChargePeriod = 0;
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
     }
 

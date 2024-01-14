@@ -57,7 +57,6 @@ GameObject:
   - component: {fileID: 6992131925933886767}
   - component: {fileID: 6992131925933886648}
   - component: {fileID: 6378344923530249510}
-  - component: {fileID: 8427014458585266300}
   - component: {fileID: 1373723435178343212}
   m_Layer: 8
   m_Name: item_block
@@ -149,50 +148,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &8427014458585266300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6992131925933887381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 628dc2eacc83d0245bd7aa3e53ef17a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EventDropped:
-    m_PersistentCalls:
-      m_Calls: []
-  EventPickedUp:
-    m_PersistentCalls:
-      m_Calls: []
-  EventThrown:
-    m_PersistentCalls:
-      m_Calls: []
-  Heft: 25
-  Idling: 1
-  Recoiling: 0
-  Wielder: {fileID: 0}
-  Allegiance: 0
-  Wielded: 0
-  MountTarget: {fileID: 0}
-  ImpaledObject: {fileID: 0}
-  PrimaryTrigger: 0
-  SecondaryTrigger: 0
-  TertiaryTrigger: 0
-  ThrowTrigger: 0
-  Anim: {fileID: 0}
-  Body: {fileID: 0}
-  HitBox: {fileID: 0}
-  PhysicsBoxes:
-  - {fileID: 1118139354825364352}
-  Filter: {fileID: 0}
-  Renderer: {fileID: 0}
-  MostRecentWielder: {fileID: 0}
-  Telecommuting: 0
-  Thrown: 0
-  equipType: 3
 --- !u!95 &1373723435178343212
 Animator:
   serializedVersion: 5

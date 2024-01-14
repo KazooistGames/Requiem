@@ -425,7 +425,15 @@ public abstract class Weapon : Wieldable
         Blocker.Blocking.Invoke(Blocker, Attacker);
         Attacker.Clashing.Invoke(Attacker, Blocker);
         APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: 0.5f);
-        Blocker.playTink();
+        if (Attacker.Action == ActionAnim.StrongAttack)
+        {
+            float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
+            Attacker.playClang(scalar);
+        }
+        else
+        {
+            Attacker.playTink();
+        }
         if (Blocker.Wielder)
         {
             Attacker.FullCollisionONS(Blocker.Wielder.gameObject);

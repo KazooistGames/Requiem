@@ -250,7 +250,7 @@ public class Entity : MonoBehaviour
         berthActual = Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
         {
-            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD, POISE_REGEN_BASE_PERIOD * 3, Vitality / Strength);
+            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 3, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
