@@ -643,7 +643,13 @@ public abstract class Weapon : Wieldable
         alreadyHit.Add(item.gameObject);
     }
 
+    private static bool testBlockBetweenEntities(Entity target, Entity origin)
+    {
+        if (target == null || origin == null) { return false; }
+        float angle = Vector3.Angle(target.LookDirection, origin.LookDirection);
 
+        return target.Defending && Mathf.Abs(angle) <= 45;
+    }
 
     private static GameObject testObstructionBetweenEntities(Entity target, Entity origin)
     {
