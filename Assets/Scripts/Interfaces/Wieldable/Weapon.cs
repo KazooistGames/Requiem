@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
+using static System.Collections.Specialized.BitVector32;
 
 public abstract class Weapon : Wieldable
 {
@@ -438,7 +439,7 @@ public abstract class Weapon : Wieldable
             Attacker.itemCollisionONS(Defender);
             return;
         }
-        GameObject obstruction = testObstructionBetweenEntities(Defender.Wielder, Attacker.MostRecentWielder);
+        GameObject obstruction = getObstructionBetweenEntities(Defender.Wielder, Attacker.MostRecentWielder);
         if (obstruction ? obstruction != Defender.gameObject : false)
         {
             return;
@@ -470,8 +471,11 @@ public abstract class Weapon : Wieldable
     private static bool RESOLVE_HIT(Weapon weapon, Entity foe)
     {
         if(foe.Allegiance == weapon.Allegiance) {  return false; }
-        GameObject obstruction = testObstructionBetweenEntities(foe, weapon.MostRecentWielder);
-        if (!obstruction)
+        if (testBlockBetweenEntities(foe, weapon.Wielder))
+        {
+            RESOLVE_BLOCK(weapon, foe.MainHand.GetComponent<Weapon>());
+        }
+        else if (!getObstructionBetweenEntities(foe, weapon.MostRecentWielder))
         {
             weapon.Hitting.Invoke(weapon, foe);
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe);
@@ -479,10 +483,6 @@ public abstract class Weapon : Wieldable
             weapon.FullCollisionONS(foe.gameObject);
             Weapon_Hit.Invoke(weapon);
             return true;
-        }
-        else if (testBlockBetweenEntities(foe, weapon.Wielder))
-        {
-            RESOLVE_BLOCK(weapon, obstruction.GetComponent<Weapon>());
         }
         else
         {
@@ -646,12 +646,13 @@ public abstract class Weapon : Wieldable
     private static bool testBlockBetweenEntities(Entity target, Entity origin)
     {
         if (target == null || origin == null) { return false; }
-        float angle = Vector3.Angle(target.LookDirection, origin.LookDirection);
-
-        return target.Defending && Mathf.Abs(angle) <= 45;
+        float targetVsOriginAngle = Mathf.Abs(Vector3.Angle(target.LookDirection, origin.LookDirection));
+        float marginFromHeadOn = 45;
+        float differenceFromHeadOnAngle = 180 - targetVsOriginAngle;
+        return target.Defending && differenceFromHeadOnAngle <= marginFromHeadOn;
     }
 
-    private static GameObject testObstructionBetweenEntities(Entity target, Entity origin)
+    private static GameObject getObstructionBetweenEntities(Entity target, Entity origin)
     {
         if(!target || !origin) { return null; }
         Vector3 disposition = target.transform.position - origin.transform.position;
