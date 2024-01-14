@@ -42,7 +42,7 @@ public class Revanent : AIBehaviour
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
-        itemManagementPreferredType = Entity.WieldMode.OneHanders;
+        itemManagementPreferredType = Entity.WieldMode.TwoHanders;
         sensorySightRangeScalar = 1.25f;
         entity.FinalDashEnabled = true;
         RestingState = AIState.seek;
