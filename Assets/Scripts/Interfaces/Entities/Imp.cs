@@ -19,12 +19,11 @@ public class Imp : Entity
 
     protected override void Start()
     {
-        base.Start();
-        createSkeleton();
         Haste = 1.0f;
         Strength = 150f;
-        Vitality = Strength;
         Resolve = 20;
+        base.Start();
+        createSkeleton();
         gameObject.name = "Imp";
         JustWounded.AddListener(CRUMBLE);
     }

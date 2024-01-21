@@ -1,12 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
     private float CombatSpeed = 0.5f;
     private float Aggression = 0.5f;
+
+    public static Type Standard_Weapon = typeof(Handaxe);
+    public static Type Alternative_Weapon = null;
+    public static float Alternative_Weapon_Frequency = 0.25f;
 
     protected override void Awake()
     {
@@ -16,7 +22,7 @@ public class Goon : AIBehaviour
     protected override void Start()
     {
         base.Start();
-        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
+        createSpawnWeapon();
         Intelligence = 0.75f;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
@@ -51,7 +57,7 @@ public class Goon : AIBehaviour
         {
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
         }
-        else if (Random.value <= Aggression)
+        else if (UnityEngine.Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);       
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
@@ -77,7 +83,7 @@ public class Goon : AIBehaviour
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
-        else if(Random.value < Aggression)
+        else if(UnityEngine.Random.value < Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
@@ -106,7 +112,7 @@ public class Goon : AIBehaviour
         {
 
         }
-        else if(entity.Posture == Entity.PostureStrength.Weak || Random.value > Aggression)
+        else if(entity.Posture == Entity.PostureStrength.Weak || UnityEngine.Random.value > Aggression)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
@@ -115,7 +121,7 @@ public class Goon : AIBehaviour
 
     protected override void reactToFoeThrowing()
     {
-        if (!checkMyWeaponInRange() && Random.value >= Aggression)
+        if (!checkMyWeaponInRange() && UnityEngine.Random.value >= Aggression)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
@@ -145,6 +151,16 @@ public class Goon : AIBehaviour
         }
     }
 
-
+    private void createSpawnWeapon()
+    {
+        if (UnityEngine.Random.value <= Alternative_Weapon_Frequency && Alternative_Weapon != null)
+        {
+            new GameObject().AddComponent(Alternative_Weapon).GetComponent<Weapon>().PickupItem(entity);
+        }
+        else
+        {
+            new GameObject().AddComponent(Standard_Weapon).GetComponent<Weapon>().PickupItem(entity);
+        }
+    }
 }
 

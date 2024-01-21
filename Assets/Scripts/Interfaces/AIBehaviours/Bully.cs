@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bully : AIBehaviour
 {
     private float CombatSpeed = 0.5f;
-
+    private float Aggression = 0.75f;
     protected override void Awake()
     {
         base.Awake();
@@ -24,6 +24,7 @@ public class Bully : AIBehaviour
         martialFoeAttacking.AddListener(reactToIncomingAttack);
         sensoryFoeSpotted.AddListener(reactToFoeChange);
         sensoryFoeLost.AddListener(reactToFoeChange);
+        entity.JustMadeWeak.AddListener(goDefensive);
         _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
@@ -64,22 +65,15 @@ public class Bully : AIBehaviour
         }
         else if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            if(Random.value <= 0.5f)
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            }
-            else
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod());
-            }
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack, requisite: () => entity.Posture != Entity.PostureStrength.Weak);
         }
         else if(checkMyWeaponInRange())
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle);
         }
-        else if(Random.value <= 0.75f)
+        else if(Random.value <= Aggression)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.StrongAttack);
@@ -89,6 +83,7 @@ public class Bully : AIBehaviour
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle);
         }
     }
 
@@ -114,7 +109,13 @@ public class Bully : AIBehaviour
     }
 
 
+
     /***** PRIVATE *****/
+    private void goDefensive()
+    {
+        _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 0.5f, randScalar: 0.5f));      
+    }
+
     private bool timeoutCheckMyWeaponInRange()
     {
         if (!mainWep)

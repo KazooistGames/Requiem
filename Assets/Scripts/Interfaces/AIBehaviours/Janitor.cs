@@ -56,14 +56,13 @@ public class Janitor : AIBehaviour
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        if (getIfPlayerIsTooCloseToObj(other.gameObject))
+        if (playerIsTooCloseToObj(other.gameObject))
         {
 
         }
         else if (other.GetComponent<Weapon>())
         {
             Weapon weapon = other.GetComponent<Weapon>();
-            //Vector3 playerDispo = item.transform.position - Player.INSTANCE.transform.position;
             bool inUse = weapon.Wielder || weapon.MountTarget || weapon.ImpaledObject || weapon.Telecommuting || weapon.Thrown || weapon == Player.INSTANCE.HostWeapon;
             if (!inUse)
             {
@@ -77,7 +76,7 @@ public class Janitor : AIBehaviour
     }
 
     /***** PRIVATE *****/
-    private bool getIfPlayerIsTooCloseToObj(GameObject obj)
+    private bool playerIsTooCloseToObj(GameObject obj)
     {
         if (!Player.INSTANCE)
         {

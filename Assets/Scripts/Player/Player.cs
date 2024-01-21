@@ -404,6 +404,7 @@ public class Player : MonoBehaviour
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
+                impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
             }
             else if (impaledObject)
             {

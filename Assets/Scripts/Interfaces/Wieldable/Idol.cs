@@ -124,8 +124,11 @@ public class Idol : Wieldable
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        Scoreboard.Score += 500;
-        SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+        if (!Player.INSTANCE.Dead)
+        {
+            Scoreboard.Score += 500;
+            SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+        }
     }
 
     protected override void OnCollisionEnter(Collision collision)
@@ -247,8 +250,9 @@ public class Idol : Wieldable
     }
     /***** PUBLIC *****/
 
-    public void SpawnAdds(int count)
+    public List<GameObject> SpawnAdds(int count)
     {
+        List<GameObject> skullies = new List<GameObject>();
         for (int i = 0; i < count; i++)
         {
             Entity entity;
@@ -257,7 +261,9 @@ public class Idol : Wieldable
             Vector3 randomOffset = new Vector3(UnityEngine.Random.value - 0.5f, 0, UnityEngine.Random.value - 0.5f) * 0.1f;
             entity.transform.position += randomOffset;
             entity.Shoved = false;
+            skullies.Add(entity.gameObject);
         }
+        return skullies;
     }
 
     private void spawnAddsIfDamageMakesWeak(float totalDamage)

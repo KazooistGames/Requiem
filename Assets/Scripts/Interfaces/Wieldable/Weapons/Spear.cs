@@ -25,7 +25,7 @@ public class Spear : Weapon
         defendRadius = 0.4f;
         Range = 0.52f;
         BasePower = 30f;
-        Heft = 20;
+        Heft = 30;
         equipType = EquipType.TwoHanded;
         base.Start();
     }

@@ -175,6 +175,7 @@ public class Requiem_Arena : Requiem
                 {
                     mob.GetComponent<Entity>().Vitality = 0;
                 }
+                yield return null;
             }
             yield return null;
         }
@@ -186,18 +187,22 @@ public class Requiem_Arena : Requiem
             {
                 case 3:
                     Boss = SPAWN(typeof(Imp), typeof(Sentinel), CenterTile.transform.position);
+                    Goon.Alternative_Weapon = typeof(Spear);
                     break;
                 case 6:
                     Boss = SPAWN(typeof(Nephalim), typeof(Bully), CenterTile.transform.position);
+                    Goon.Alternative_Weapon = typeof(Greataxe);
                     break;
                 case 9:
                     Boss = SPAWN(typeof(Wraith), typeof(Revanent), CenterTile.transform.position);
+                    Goon.Alternative_Weapon = typeof(Greatsword);
                     break;
                 default:
                     break;
             }
             yield return new WaitWhile(() => Boss != null);
         }
+        yield return null;
         Scoreboard.Wave_Completed_Rewards();
         BloodWell.UnGulp();
 

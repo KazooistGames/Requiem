@@ -36,7 +36,7 @@ public class Scoreboard : MonoBehaviour
     /***** PUBLIC *****/
     public static void Score_Kill(Entity vanquishedEntity)
     {
-        if (validEntitiesToScoreFromKilling.Contains(vanquishedEntity))
+        if (validEntitiesToScoreFromKilling.Contains(vanquishedEntity) && vanquishedEntity.Vitality < vanquishedEntity.Strength)
         {
             ADD_SCORE(vanquishedEntity.Strength);
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);

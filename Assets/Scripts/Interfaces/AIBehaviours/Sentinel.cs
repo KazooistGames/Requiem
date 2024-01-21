@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sentinel : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.25f;
+    private float CombatSpeed = 0.0f;
     private float Aggression = 0.5f;
 
     protected override void Awake()
@@ -27,14 +27,12 @@ public class Sentinel : AIBehaviour
         tangoStrafeEnabled = true;
         itemManagementSeekItems = true;
         itemManagementPreferredType = Entity.WieldMode.OneHanders;
-
     }
 
     protected override void Update()
     {
         base.Update();
     }
-
 
     /***** PUBLIC *****/
 
@@ -55,8 +53,10 @@ public class Sentinel : AIBehaviour
         {
             dashingChargePeriod = 0.0f;
             dashingDesiredDirection = -(entity.Foe.transform.position - transform.position);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
@@ -64,7 +64,8 @@ public class Sentinel : AIBehaviour
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);           
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
@@ -118,10 +119,14 @@ public class Sentinel : AIBehaviour
 
     protected override void reactToFoeThrowing()
     {
-        if (!checkMyWeaponInRange() && Random.value >= Aggression)
+        if (!checkMyWeaponInRange())
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
+        }
+        else
+        {
+            reactToIncomingAttack();
         }
     }
 

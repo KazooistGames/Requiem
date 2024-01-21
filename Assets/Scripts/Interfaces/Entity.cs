@@ -51,6 +51,7 @@ public class Entity : MonoBehaviour
     public UnityEvent JustCrashed = new UnityEvent();
     public UnityEvent<Entity, float> JustLandedHit = new UnityEvent<Entity, float>();
     public UnityEvent<Wieldable> JustPickedUpWieldable = new UnityEvent<Wieldable>();
+    public UnityEvent JustMadeWeak = new UnityEvent();
 
     public Entity Foe;
     public bool Aggressive = true;
@@ -573,6 +574,10 @@ public class Entity : MonoBehaviour
     {
         if (Poise <= 0)
         {
+            if(Posture != PostureStrength.Weak)
+            {
+                JustMadeWeak.Invoke();
+            }
             Posture = PostureStrength.Weak;
         }
         else if(Poise >= Strength)

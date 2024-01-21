@@ -562,7 +562,7 @@ public abstract class Weapon : Wieldable
                 foe.JustCrashed.AddListener(impale_doupleDipDamage);
                 foe.JustVanquished.AddListener(ImpaleRelease);
                 foe.modSpeed[key] = -(Heft/foe.Strength);
-                foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
+                //foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
                 yield return new WaitWhile(() => foe ? foe.Posture != Entity.PostureStrength.Strong : false);
                 if (foe)
                 {
@@ -590,7 +590,6 @@ public abstract class Weapon : Wieldable
     public void ImpaleRelease()
     {
         if (!ImpaledObject) { return; }
-
         Entity foe = ImpaledObject.GetComponent<Entity>();                                                                                                                                                                                   
         if (foe)
         {
@@ -598,7 +597,7 @@ public abstract class Weapon : Wieldable
             foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
             foe.JustVanquished.RemoveListener(ImpaleRelease);
             foe.modSpeed.Remove(key);
-            foe.BleedingWounds.Remove(key);
+            //foe.BleedingWounds.Remove(key);
         }
         transform.SetParent(Requiem.INSTANCE.transform.parent, true);
         togglePhysicsBox(true);

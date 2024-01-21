@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class Revanent : AIBehaviour
 {
-
-    private _Flames mainHandFlame;
-    private _Flames offHandFlame;
-    private _Flames footFlame;
+    //private _Flames footFlame;
 
     private float Aggression = 0.75f;
 
@@ -18,7 +15,7 @@ public class Revanent : AIBehaviour
     {
         Dueling,
         Overpowering,
-        //Dueling
+        Kiting,
     }
     public Pattern CurrentPattern = Pattern.Dueling;
 
@@ -30,9 +27,11 @@ public class Revanent : AIBehaviour
     protected override void Start()
     {
         base.Start();
-        mainHandFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
-        offHandFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
-        footFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        //footFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
+        //footFlame.boundObject = gameObject;
+        //footFlame.gameObject.SetActive(true);
+        entity.flames.gameObject.SetActive(true);
+        entity.flames.FlamePresentationStyle = _Flames.FlameStyles.Soulless;
         Intelligence = 1.0f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;
@@ -42,11 +41,13 @@ public class Revanent : AIBehaviour
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
         itemManagementGreedy = true;
-        itemManagementPreferredType = Entity.WieldMode.TwoHanders;
         sensorySightRangeScalar = 1.25f;
         entity.FinalDashEnabled = true;
         RestingState = AIState.seek;
+        entity.JustDisarmed.AddListener(reactToDisarm);
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
+        new GameObject().AddComponent<Shortsword>().PickupItem(entity);
+        new GameObject().AddComponent<Shortsword>().PickupItem(entity);
     }
 
     protected override void Update()
@@ -62,9 +63,15 @@ public class Revanent : AIBehaviour
         }
         else
         {
+            if (!_MartialController.Weapon_Actions.ContainsKey(mainWep))
+            {
+                queueNextRoundOfActions(mainWep);
+            }
             switch (CurrentPattern)
             {
                 case Pattern.Dueling:
+                    itemManagementNoSingles = false;
+                    itemManagementPreferredType = Entity.WieldMode.TwoHanders;
                     if (entity.Posture == Entity.PostureStrength.Strong)
                     {
                         CurrentPattern = Pattern.Overpowering;
@@ -78,6 +85,8 @@ public class Revanent : AIBehaviour
                     }
                     break;
                 case Pattern.Overpowering:
+                    itemManagementNoSingles = false;
+                    itemManagementPreferredType = Entity.WieldMode.TwoHanders;
                     if (mainWep.Action == Weapon.ActionAnim.StrongCoil && dashingCooldownTimer >= 1f)
                     {
                         dashingChargePeriod = 0.25f;
@@ -85,8 +94,16 @@ public class Revanent : AIBehaviour
                     }
                     else if (mainWep.Action == Weapon.ActionAnim.Guarding && dashingCooldownTimer >= 3f)
                     {
-                        dashingChargePeriod = 1f;
+                        dashingChargePeriod = 1.0f;
                         dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+                    }
+                    break;
+                case Pattern.Kiting:
+                    itemManagementNoSingles = true;
+                    itemManagementPreferredType = Entity.WieldMode.OneHanders;
+                    if(!entity.leftStorage && !entity.rightStorage && entity.backStorage)
+                    {
+                        CurrentPattern = Pattern.Dueling;
                     }
                     break;
             }
@@ -112,18 +129,10 @@ public class Revanent : AIBehaviour
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        if (footFlame)
-        {
-            Destroy(footFlame.gameObject);
-        } 
-        if (mainHandFlame)
-        {
-            Destroy(mainHandFlame.gameObject);
-        } 
-        if (offHandFlame)
-        {
-            Destroy(offHandFlame.gameObject);
-        }
+        //if (footFlame)
+        //{
+        //    Destroy(footFlame.gameObject);
+        //} 
     }
 
     /***** PUBLIC *****/
@@ -150,6 +159,13 @@ public class Revanent : AIBehaviour
                     else
                     {
                         _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 1 + Random.value); 
+                    }
+                    break;
+                case Pattern.Kiting:
+                    if(mainWep.equipType == Wieldable.EquipType.OneHanded)
+                    {
+                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Aiming, 0.5f, checkFoeNotDefending);
+                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Throwing);
                     }
                     break;
             }
@@ -209,6 +225,15 @@ public class Revanent : AIBehaviour
                 _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
                 _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
                 break;
+            case Pattern.Kiting:
+                if (Random.value <= Aggression && dashingCooldownTimer > 0.5f && mainWep.Action != Weapon.ActionAnim.Guarding)
+                {
+                    dashingChargePeriod = 0;
+                    Vector3 disposition = entity.Foe.transform.position - transform.position;
+                    float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
+                    dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
+                }
+                break;
         }
         
     }
@@ -235,8 +260,15 @@ public class Revanent : AIBehaviour
     }
 
     /***** PRIVATE *****/
+    private void reactToDisarm()
+    {
+        CurrentPattern = Pattern.Kiting;
+    }
 
-
+    private bool checkFoeNotDefending()
+    {
+        return entity.Foe ? !entity.Foe.Defending : true;
+    }
 
 }
 
