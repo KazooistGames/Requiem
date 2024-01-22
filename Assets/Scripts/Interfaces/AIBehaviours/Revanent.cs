@@ -105,6 +105,10 @@ public class Revanent : AIBehaviour
                     {
                         CurrentPattern = Pattern.Dueling;
                     }
+                    else if(mainWep.Action == Weapon.ActionAnim.Idle)
+                    {
+                        queueNextRoundOfActions(mainWep);
+                    }
                     break;
             }
         }
@@ -164,7 +168,7 @@ public class Revanent : AIBehaviour
                 case Pattern.Kiting:
                     if(mainWep.equipType == Wieldable.EquipType.OneHanded)
                     {
-                        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Aiming, 0.5f, checkFoeNotDefending);
+                        _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Aiming, 0.5f, checkFoeNotDefending);
                         _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Throwing);
                     }
                     break;
@@ -267,7 +271,18 @@ public class Revanent : AIBehaviour
 
     private bool checkFoeNotDefending()
     {
-        return entity.Foe ? !entity.Foe.Defending : true;
+        if (!entity.Foe)
+        {
+            return true;
+        }
+        else if (_MartialController.Debounce_Timers[mainWep] > 2)
+        {
+            return true;
+        }
+        else
+        {
+            return !entity.Foe.Defending;
+        }
     }
 
 }

@@ -330,7 +330,7 @@ public abstract class Weapon : Wieldable
             {
                 Entity foe = other.gameObject.GetComponent<Entity>();
                 Weapon foeWeapon = other.gameObject.GetComponent<Weapon>();
-                bool obstacle = (other.gameObject.layer == Requiem.layerObstacle || other.gameObject.layer == Requiem.layerWall);
+                bool obstacle = other.gameObject.layer == Requiem.layerObstacle || other.gameObject.layer == Requiem.layerWall;
                 if (foe || foeWeapon || obstacle)
                 {
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
@@ -358,7 +358,7 @@ public abstract class Weapon : Wieldable
                             RESOLVE_HIT(this, foe);
                         }
                     }
-                    else if (obstacle && (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack))
+                    else if (obstacle && (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack) && !other.isTrigger)
                     {
                         resolveObstacleHit(other.gameObject);
                     }
@@ -479,7 +479,7 @@ public abstract class Weapon : Wieldable
     private static bool RESOLVE_HIT(Weapon weapon, Entity foe)
     {
         if(foe.Allegiance == weapon.Allegiance) {  return false; }
-        if (testBlockBetweenEntities(foe, weapon.Wielder))
+        if (testBlockBetweenEntities(foe, weapon.MostRecentWielder))
         {
             RESOLVE_BLOCK(weapon, foe.MainHand.GetComponent<Weapon>());
         }

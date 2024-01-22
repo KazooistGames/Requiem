@@ -709,7 +709,7 @@ public class Entity : MonoBehaviour
                 break;
         }
         Weapon mainWep = MainHand ? MainHand.GetComponent<Weapon>() : null;
-        Weapon offWep = OffHand ? MainHand.GetComponent<Weapon>() : null;
+        Weapon offWep = OffHand ? OffHand.GetComponent<Weapon>() : null;
         bool mainDefending = mainWep ? mainWep.Action == ActionAnim.Guarding : false;
         bool offDefending = offWep ? offWep.Action == ActionAnim.Guarding : false;
         Defending = mainDefending || offDefending;

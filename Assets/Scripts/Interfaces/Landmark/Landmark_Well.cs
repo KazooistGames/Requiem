@@ -48,7 +48,7 @@ public class Landmark_Well : Landmark
     protected void OnTriggerEnter(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
-        if (entity ? entity == Player.INSTANCE.HostEntity : false)
+        if (entity ? entity == Player.INSTANCE.HostEntity && Volume > 0 : false)
         {
             entity.Interact.AddListener(gulp);
             blurbInteractPrompt.SetActive(true);
