@@ -6,7 +6,6 @@ using System.Linq;
 public class Janitor : AIBehaviour
 {
     public static Janitor INSTANCE;
-    public List<Hextile> TaskList = new List<Hextile>();
     public Hextile NextTask;
 
     protected SphereCollider CleanZone;
@@ -26,30 +25,24 @@ public class Janitor : AIBehaviour
     protected override void Update()
     {
         base.Update();
-        if(TaskList.Count > 0)
-        {
-            NextTask = Hextile.Tiles[0];
-            StateTransition(AIState.passive);
-        }
-        else
-        {
-            TaskList = Hextile.Tiles;
-        }
         behaviourParams[BehaviourType.wallCrawl] = (false, 0);
         behaviourParams[BehaviourType.sensory] = (false, 0f);
+        behaviourParams[BehaviourType.waypoint] = (true, 1);
+        behaviourParams[BehaviourType.meander] = (true, 0.5f);
         waypointCommanded = true;
         waypointDeadbandingScalar = 3.0f;
         meanderPauseFrequency = 0.0f;
-        meanderPeriod = 0.5f;
-        behaviourParams[BehaviourType.waypoint] = (true, 1);
-        behaviourParams[BehaviourType.meander] = (true, 0.5f);           
+        meanderPeriod = 0.5f;  
         if (waypointDeadbanded)
         {                       
-            int currentTaskIndex = TaskList.IndexOf(NextTask);
-            NextTask = currentTaskIndex >= TaskList.Count - 1 ? TaskList[0] : TaskList[currentTaskIndex + 1];
+            int currentTaskIndex = Hextile.Tiles.IndexOf(NextTask);
+            NextTask = currentTaskIndex >= Hextile.Tiles.Count - 1 ? Hextile.Tiles[0] : Hextile.Tiles[currentTaskIndex + 1];
             waypointCoordinates = NextTask.transform.position;
         }
-        entity.modSpeed["mosey"] = -0.5f;      
+        else
+        {
+            Debug.DrawLine(transform.position, NextTask.transform.position, Color.red);
+        }     
     }
 
 

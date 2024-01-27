@@ -23,7 +23,6 @@ public class Scoreboard : MonoBehaviour
         SpeedBonus = 0; 
         validEntitiesToScoreFromKilling = new List<Entity>();
         Entity.EntityVanquished.AddListener(Score_Kill);
-        //Entity.EntityWounded.AddListener(Score_Hit);
         Landmark_Well.JustGulped.AddListener(PENALIZE_GULP);
     }
 
@@ -32,6 +31,11 @@ public class Scoreboard : MonoBehaviour
         KillMultiplier = Mathf.Max(1.0f, KillMultiplier);
     }
 
+    private void OnDestroy()
+    {
+        Entity.EntityVanquished.RemoveListener(Score_Kill);
+        Landmark_Well.JustGulped.RemoveListener(PENALIZE_GULP);
+    }
 
     /***** PUBLIC *****/
     public static void Score_Kill(Entity vanquishedEntity)

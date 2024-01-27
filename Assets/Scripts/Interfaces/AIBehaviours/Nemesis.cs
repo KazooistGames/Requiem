@@ -17,6 +17,7 @@ public class Nemesis : AIBehaviour
     private float beamDurationTimer = 0;
     private float beamDelayTimer = 0;
 
+    private bool beamONS = true;
     public enum Cycle
     {
         DashCycle,
@@ -52,6 +53,7 @@ public class Nemesis : AIBehaviour
         hellfire.transform.localScale = Vector3.one;
         hellfire.Wielder = entity;
         entity.Foe = Player.INSTANCE.HostEntity;
+        playEvilLaugh(0.5f);
     }
 
     protected override void Update()
@@ -59,7 +61,7 @@ public class Nemesis : AIBehaviour
         base.Update();
         if (entity.Foe)
         {
-            BattleCycle = entity.Posture == Entity.PostureStrength.Weak ? Cycle.BeamCycle : Cycle.DashCycle;
+            //BattleCycle = entity.Posture == Entity.PostureStrength.Weak ? Cycle.BeamCycle : Cycle.DashCycle;
             switch (BattleCycle)
             {
                 case Cycle.DashCycle:
@@ -68,6 +70,15 @@ public class Nemesis : AIBehaviour
                 case Cycle.BeamCycle:
                     beamCycleUpdates();
                     break;
+            }
+            if (entity.Dashing)
+            {
+                tangoDeadbanded = false;
+                flames.particleLight.intensity = 8;
+            }
+            else
+            {
+                flames.particleLight.intensity = 5;
             }
             string key = "Beam!";
             if (hellfire.form == Hellfire.Form.Beam)
@@ -121,15 +132,7 @@ public class Nemesis : AIBehaviour
         beamDurationTimer = 0;
         beamDelayTimer = 0;
         hellfire.form = Hellfire.Form.Off;
-        if (entity.Dashing)
-        {
-            tangoDeadbanded = false;
-            flames.particleLight.intensity = 8;
-        }
-        else
-        {
-            flames.particleLight.intensity = 5;
-        }
+
         Vector3 disposition = entity.Foe.transform.position - transform.position;
         bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
         bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
@@ -147,17 +150,33 @@ public class Nemesis : AIBehaviour
             dashingDesiredDirection = disposition;
             timeToRecoverFromDash = finalDashRecoveryTime;
         }
+        else if (entity.Posture == Entity.PostureStrength.Weak)
+        {
+            BattleCycle = Cycle.BeamCycle;
+        }
+
     }
 
     private void beamCycleUpdates()
     {
+
         if(beamDelayTimer < beamDelayPeriod)
         {
+            beamONS = true;
             beamDelayTimer += Time.deltaTime;
             hellfire.form = Hellfire.Form.Preheat;
+            if (entity.Posture == Entity.PostureStrength.Strong)
+            {
+                BattleCycle = Cycle.DashCycle;
+            }
         }
         else if(beamDurationTimer < beamDuration)
         {
+            if (beamONS)
+            {
+                beamONS = false;
+                playGroan(0.5f);
+            }
             beamDurationTimer += Time.deltaTime;
             hellfire.form = Hellfire.Form.Beam;
         }
@@ -166,6 +185,20 @@ public class Nemesis : AIBehaviour
             beamDelayTimer = 0;
             beamDurationTimer = 0;
         }
+    }
+
+    private GameObject playEvilLaugh(float pitch)
+    {
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/ambience/ambience2", transform.position, pitch, 1.5f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        sound.transform.SetParent(Player.INSTANCE.transform);
+        return sound;
+    }
+
+    private GameObject playGroan(float pitch)
+    {
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/ambience/ambience1", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        sound.transform.SetParent(transform);
+        return sound;
     }
 
 }

@@ -337,10 +337,10 @@ public class Entity : MonoBehaviour
         //modSpeed["flow"] = posture == Posture.Flow ? Resolve / 100 : 0;
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
         modSpeed["staggered"] = Staggered ? Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 3) : 0;
-        modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.25f, -0.25f, body.velocity.magnitude / baseSpeed) : 0;
+        modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.35f, -0.35f, body.velocity.magnitude / baseSpeed) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
         SpeedActual = Agility * SpeedScalarGlobal;
-        hurtBox.radius = Shoved ? berthActual * 1f : berthActual;
+        //hurtBox.radius = Shoved ? berthActual * 1f : berthActual;
         if (Shoved)
         {
             if (shoveRecoveryTimer >= shoveRecoveryPeriod || (body.velocity.magnitude <= baseSpeed * 0.1f && shoveRecoveryTimer >= 0.1f * shoveRecoveryPeriod))
@@ -531,6 +531,10 @@ public class Entity : MonoBehaviour
             JustWounded.Invoke(magnitude);
             EntityWounded.Invoke(this, magnitude);
             Vitality -= magnitude;
+        }
+        if (!silent)
+        {
+            playCrunch(0.75f);
         }
     }
 
@@ -1016,7 +1020,7 @@ public class Entity : MonoBehaviour
 
     }
 
-    public float applyDamageToPoiseThenVitality(float totalPower)
+    public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
     {
         if(immortalityTimer < 0.25f) { return 0; }
         JustHit.Invoke(totalPower);
@@ -1028,7 +1032,7 @@ public class Entity : MonoBehaviour
         }
         if (vitalityDamage != 0)
         {
-            Damage(vitalityDamage);
+            Damage(vitalityDamage, silent);
         }
         return vitalityDamage;
     }
@@ -1047,6 +1051,13 @@ public class Entity : MonoBehaviour
         sound.layer = Requiem.layerItem;
         sound.transform.SetParent(transform);
         sound.GetComponent<AudioSource>().time = 0.05f;
+        return sound;
+    }
+
+    private GameObject playCrunch(float pitch)
+    {
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/crunch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        sound.transform.SetParent(transform);
         return sound;
     }
 

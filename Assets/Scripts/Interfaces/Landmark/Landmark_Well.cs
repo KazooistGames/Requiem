@@ -43,6 +43,7 @@ public class Landmark_Well : Landmark
         bumpMapOffset = new Vector2(Mathf.Sin(Time.time * bloodWaveXspeed), Mathf.Cos(Time.time * bloodWaveYspeed));
         bloodPoolRenderer.material.SetTextureOffset("_MainTex", bumpMapOffset);
         bloodPoolRenderer.gameObject.transform.Rotate(Vector3.up, Time.deltaTime * 5);
+        blurbInteractPrompt.SetActive(Energized && Volume > 0);
     }
 
     protected void OnTriggerEnter(Collider other)
@@ -52,6 +53,7 @@ public class Landmark_Well : Landmark
         {
             entity.Interact.AddListener(gulp);
             blurbInteractPrompt.SetActive(true);
+            Energized = true;
         }
     }
 
@@ -67,16 +69,9 @@ public class Landmark_Well : Landmark
 
     }
 
-    protected void OnTriggerStay(Collider other)
-    {
-        if (!Energized)
-        {
-            Energized = other.gameObject.GetComponent<Entity>();
-        }
-    }
+
 
     /***** PUBLIC *****/
-
     public override void AssignToTile(Hextile tile)
     {
         base.AssignToTile(tile);
@@ -100,7 +95,6 @@ public class Landmark_Well : Landmark
     public void UnGulp()
     {
         Volume = Mathf.Clamp(Volume + gulpSize, 0, 100);
-        Energized = false;
     }
 
 
@@ -131,7 +125,6 @@ public class Landmark_Well : Landmark
                     float scale = 0.05f + UnityEngine.Random.value * 0.15f;
                     splatter(disposition + tinyOffset, scale);
                 }
-                Energized = true;
                 float increment = Time.deltaTime / fullDrinkPeriod;
                 volumeToGulp -= 100 * increment;
                 Volume -= 100 * increment;
@@ -167,14 +160,5 @@ public class Landmark_Well : Landmark
         gulpSound.transform.SetParent(benefactor.transform);
     }
 
-    private void playSlurp()
-    {
-        _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
-    }
-    private void playChant()
-    {
-        _SoundService.PlayAmbientSound("Audio/well/low", transform.position, 1, 0.75f, _SoundService.Instance.DefaultAudioRange / 4);
-        //Mullet.PlayAmbientSound("Audio/well/high", transform.position, 1, 0.25f, Mullet.Instance.DefaultAudioRange / 4);
-    }
 
 }

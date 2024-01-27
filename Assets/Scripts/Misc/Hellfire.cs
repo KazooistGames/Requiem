@@ -50,6 +50,8 @@ public class Hellfire : MonoBehaviour
     public float sputterChance = 0.5f;
     public float sputterResetValue = 0.5f;
 
+    private GameObject beamSound;
+
     void Awake()
     {
         particles = GetComponent<ParticleSystem>();
@@ -164,10 +166,18 @@ public class Hellfire : MonoBehaviour
     private void idleFunction()
     {
         emission.enabled = false;
+        if (beamSound)
+        {
+            Destroy(beamSound);
+        }
     }
 
     private void preheat()
     {
+        if (beamSound)
+        {
+            Destroy(beamSound);
+        }
         beamSpinupTimer = 0f;
         main.startLifetime = 0.5f;
         main.startSpeed = 0f;
@@ -211,6 +221,10 @@ public class Hellfire : MonoBehaviour
 
     private void beam()
     {
+        if (!beamSound)
+        {
+            beamSound = playBeamSound(0.5f);
+        }
         if(beamSpinupTimer < 1)
         {
             beamSpinupTimer += Time.fixedDeltaTime * 3;
@@ -256,15 +270,21 @@ public class Hellfire : MonoBehaviour
                 Entity foe = hit.collider.gameObject.GetComponent<Entity>();
                 if (foe ? foe.Allegiance != Wielder.Allegiance : false)
                 {
-                    foe.Damage(DPS * Time.fixedDeltaTime, silent: true);
+                    foe.applyDamageToPoiseThenVitality(DPS * Time.fixedDeltaTime, silent: true);
                     foe.body.AddForce(ray.direction.normalized * Thrust * Time.fixedDeltaTime, ForceMode.VelocityChange);
                 }
             }
         }
     }
 
+    private GameObject playBeamSound(float pitch)
+    {
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/wretch", transform.position, pitch, 1.5f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        sound.GetComponent<AudioSource>().time = 0.5f;
+        sound.transform.SetParent(transform);
+        return sound;
+    }
 
-   
 
 }
 
