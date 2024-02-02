@@ -263,7 +263,7 @@ public class Entity : MonoBehaviour
             {
                 Poise -= increment;
             }
-            else if (Poise < restingValue && !Staggered)
+            else if (Poise < restingValue)
             {
                 Poise += increment;
             }
@@ -928,7 +928,7 @@ public class Entity : MonoBehaviour
         }
         if(theirWeapon.Action != ActionAnim.StrongAttack)
         {
-
+            theirWeapon.Wielder.alterPoise(-myWeapon.Heft / 4);
         }
         else if (Posture == PostureStrength.Weak)
         {

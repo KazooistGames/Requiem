@@ -46,6 +46,7 @@ public class Requiem_Arena : Requiem
     protected IEnumerator SetupGame()
     {
         yield return null;
+        Goon.Alternative_Weapon = null;
 
         CenterTile = Hextile.GenerateRootTile();
         yield return null;

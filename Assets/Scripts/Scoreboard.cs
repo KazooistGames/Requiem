@@ -38,11 +38,15 @@ public class Scoreboard : MonoBehaviour
     }
 
     /***** PUBLIC *****/
+    public static void Add_Score(float baseScore)
+    {
+        Score += baseScore * KillMultiplier;
+    }
     public static void Score_Kill(Entity vanquishedEntity)
     {
         if (validEntitiesToScoreFromKilling.Contains(vanquishedEntity) && vanquishedEntity.Vitality < vanquishedEntity.Strength)
         {
-            ADD_SCORE(vanquishedEntity.Strength);
+            Add_Score(vanquishedEntity.Strength);
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
         }
     }
@@ -74,10 +78,7 @@ public class Scoreboard : MonoBehaviour
         }
     }
 
-    private static void ADD_SCORE(float baseScore)
-    {
-        Score += baseScore * KillMultiplier;
-    }
+
 
 }
     

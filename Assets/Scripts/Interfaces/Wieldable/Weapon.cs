@@ -615,11 +615,11 @@ public abstract class Weapon : Wieldable
         if (foe)
         {
             foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
-            foe.Damage(Power);
+            foe.applyDamageToPoiseThenVitality(Power);
             playSlap(transform.position);
         }
-        //ImpaleRelease();
-        //DropItem(yeet: true, magnitude: 1);
+        ImpaleRelease();
+        DropItem(yeet: true, magnitude: 1);
     }
 
 

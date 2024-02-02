@@ -19,6 +19,13 @@ public class Landmark_Credits : Landmark
         float scaledRadius = Radius * Mathf.Sin(Mathf.PI / 3.1f);
         model.transform.localPosition = new Vector3(Mathf.Cos(rads) * scaledRadius, Thickness, Mathf.Sin(rads) * scaledRadius);
         model.transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 30 - 60 * (int)PositionOnTile, transform.localEulerAngles.z);
+        if (Player.INSTANCE)
+        {
+            float maxDistance = Radius / 3;
+            Vector3 Disposition = Player.INSTANCE.transform.position - model.transform.position;
+            model.SetActive(maxDistance >= Disposition.magnitude);
+        }
+
     }
 
 

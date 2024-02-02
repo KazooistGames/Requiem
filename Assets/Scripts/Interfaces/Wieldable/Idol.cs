@@ -59,7 +59,6 @@ public class Idol : Wieldable
         "All this has happened before, in some way or another.",
         "Remind us all of why you are here.",
         "Blood is the price, blood is prize.",
-        "Show me your worth!",
         "Get to work.",
         "They are coming.",
         "Enter the fray.",
@@ -111,7 +110,7 @@ public class Idol : Wieldable
         {
             activityLevel = ActivityLevel.Active;
         }
-        else if((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius / 2)
+        else if((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius)
         {
             activityLevel = ActivityLevel.Approached;
         }
@@ -126,7 +125,7 @@ public class Idol : Wieldable
         base.OnDestroy();
         if (!Player.INSTANCE.Dead)
         {
-            Scoreboard.Score += 500;
+            Scoreboard.Add_Score(500);
             SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
         }
     }
@@ -202,7 +201,6 @@ public class Idol : Wieldable
 
 
     /***** PRIVATE *****/
-
     private IEnumerator banter()
     {
         while (true)

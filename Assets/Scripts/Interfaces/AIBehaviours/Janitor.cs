@@ -19,6 +19,7 @@ public class Janitor : AIBehaviour
         CleanZone.isTrigger = true;
         CleanZone.radius = Hextile.Radius / Entity.Scale;
         waypointCoordinates = transform.position;
+        StartCoroutine(tipBlurpRoutine());
     }
 
 
@@ -79,6 +80,41 @@ public class Janitor : AIBehaviour
         {
             return (Player.INSTANCE.transform.position - obj.transform.position).magnitude <= Hextile.Radius / 2;
         }
+    }
+
+    private List<string> tips = new List<string>()
+    {
+        "You can heal between rituals\nat the bloodwell",
+        "You can bleed your foes\nby dashing with your quick-attacks",
+        "Parrying a weakened foe\nwill disarm them",
+        "Time your strong-attacks well\nand see them strike true",
+    };
+
+    private IEnumerator tipBlurpRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitUntil(() => Player.INSTANCE != null);
+            yield return new WaitUntil(() => (transform.position - Player.INSTANCE.transform.position).magnitude <= Hextile.Radius/2);
+            GameObject currentBlurb = produceTipBlurb();
+            yield return new WaitWhile(() => currentBlurb != null);
+            yield return new WaitForSeconds(5);
+        }
+    }
+
+    private GameObject produceTipBlurb()
+    {
+        string tipString;
+        if(Player.INSTANCE.HostEntity.Vitality < 50)
+        {
+            tipString = "Heal at the bloodwell!";
+        }
+        else
+        {
+            tipString = tips[Random.Range(0, tips.Count)];
+        }
+        float duration = Mathf.CeilToInt(1 + tipString.Length * 0.1f);
+        return _BlurbService.createBlurb(gameObject, tipString, new Color(1.0f, 1.0f, 0, 0.75f), duration, 0.8f);    
     }
 
 }

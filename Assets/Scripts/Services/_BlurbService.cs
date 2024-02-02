@@ -50,11 +50,11 @@ public class _BlurbService : MonoBehaviour
             tex.color = color;
             tex.font = INSTANCE.blurbFont;
             tex.fontStyle = FontStyle.Bold;
-            tex.fontSize = (int)(INSTANCE.blurbFontSize * sizeScalar);
+            tex.fontSize = (int)((float)INSTANCE.blurbFontSize * sizeScalar);
             tex.alignment = TextAnchor.MiddleCenter;
             RectTransform rect = newBlurb.GetComponent<RectTransform>();
             int lengthScalar = (message.Length / 10);
-            float fontSizeScalar = (tex.fontSize / INSTANCE.blurbFontSize);
+            float fontSizeScalar = ((float)tex.fontSize / (float)INSTANCE.blurbFontSize);
             rect.sizeDelta = new Vector2(400 * (1 + lengthScalar) * fontSizeScalar, 150 * (1 + lengthScalar) * fontSizeScalar);
             //float idealTextPositionOffset = speaker.GetComponent<MeshFilter>() ? speaker.GetComponent<MeshFilter>().mesh.bounds.max.y * speaker.transform.lossyScale.y * 1.20f : 0;
             if (INSTANCE.blurbCamera)
