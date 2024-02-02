@@ -39,7 +39,7 @@ public class Janitor : AIBehaviour
             NextTask = currentTaskIndex >= Hextile.Tiles.Count - 1 ? Hextile.Tiles[0] : Hextile.Tiles[currentTaskIndex + 1];
             waypointCoordinates = NextTask.transform.position;
         }
-        else
+        else if(NextTask)
         {
             Debug.DrawLine(transform.position, NextTask.transform.position, Color.red);
         }     

@@ -65,8 +65,8 @@ public abstract class Weapon : Wieldable
     public float tempoChargeExponent = 3/4f;
     private bool tempoChargeONS = true;
     //private bool attackChargeONS = true;
-    public float TempoTargetCenter { get; private set; } = 0.974f;
-    public float TempoTargetWidth { get; private set; } = 0.05f;
+    public float TempoTargetCenter { get; private set; } = 0.984f;
+    public float TempoTargetWidth { get; private set; } = 0.03f;
 
 
     protected string lightSwingClip;

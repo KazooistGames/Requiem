@@ -55,7 +55,7 @@ public class _BlurbService : MonoBehaviour
             RectTransform rect = newBlurb.GetComponent<RectTransform>();
             int lengthScalar = (message.Length / 10);
             float fontSizeScalar = (tex.fontSize / INSTANCE.blurbFontSize);
-            rect.sizeDelta = new Vector2(150 * (1 + lengthScalar) * fontSizeScalar, 50 * (1 + lengthScalar) * fontSizeScalar);
+            rect.sizeDelta = new Vector2(400 * (1 + lengthScalar) * fontSizeScalar, 150 * (1 + lengthScalar) * fontSizeScalar);
             //float idealTextPositionOffset = speaker.GetComponent<MeshFilter>() ? speaker.GetComponent<MeshFilter>().mesh.bounds.max.y * speaker.transform.lossyScale.y * 1.20f : 0;
             if (INSTANCE.blurbCamera)
             {

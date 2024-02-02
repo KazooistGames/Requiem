@@ -18,6 +18,7 @@ public class Requiem_Arena : Requiem
     public Hextile CenterTile;
     public Landmark_Alter Alter;
     public Landmark_Well BloodWell;
+    public Landmark_Credits Credits;
     public Shade QuestGiver;
 
     public float TimeGateTimeLeft = 0;
@@ -58,6 +59,10 @@ public class Requiem_Arena : Requiem
         Chambers.Add(edgeOne.Extend(firstGateDirection));
         BloodWell = new GameObject().AddComponent<Landmark_Well>();
         BloodWell.AssignToTile(Chambers[0]);
+        Credits = new GameObject().AddComponent<Landmark_Credits>();
+        Credits.AssignToTile(Chambers[0]);
+        yield return null;
+        Credits.SetPositionOnTile(firstGateDirection);
 
         Hextile.HexPosition secondGateDirection = Hextile.RotateHexPosition(firstGateDirection, 2);
         Hextile edgeTwo = ArenaTiles[0][0].Edge(secondGateDirection);
