@@ -28,16 +28,12 @@ public class Revanent : AIBehaviour
     protected override void Start()
     {
         base.Start();
-        //footFlame = Instantiate(Requiem.SpiritFlameTemplate).GetComponent<_Flames>();
-        //footFlame.boundObject = gameObject;
-        //footFlame.gameObject.SetActive(true);
         entity.flames.gameObject.SetActive(true);
         entity.flames.FlamePresentationStyle = _Flames.FlameStyles.Soulless;
         Intelligence = 1.0f;
         tangoPeriodScalar = 1f;
         tangoStrafePauseFreq = 0f;
         tangoStrafeEnabled = true;
-        //martialReactiveAttack = true;
         meanderPauseFrequency = 0.75f;
         martialPreferredState = martialState.none;
         itemManagementSeekItems = true;
@@ -49,7 +45,6 @@ public class Revanent : AIBehaviour
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
         new GameObject().AddComponent<Shortsword>().PickupItem(entity);
         new GameObject().AddComponent<Shortsword>().PickupItem(entity);
-        entity.JustHit.AddListener(reactToBeingMadeWeak);
     }
 
     protected override void Update()
@@ -73,12 +68,16 @@ public class Revanent : AIBehaviour
             {
                 case Pattern.Dueling:
                     itemManagementNoSingles = false;
-                    itemManagementPreferredType = Entity.WieldMode.TwoHanders;
-                    if (entity.Posture == Entity.PostureStrength.Strong)
+                    itemManagementPreferredType = WieldMode.TwoHanders;
+                    if (entity.Posture == PostureStrength.Strong)
                     {
                         CurrentPattern = Pattern.Overpowering;
                         _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
                         _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
+                    }
+                    else if(entity.Posture == PostureStrength.Weak && (entity.leftStorage || entity.rightStorage))
+                    {
+                        CurrentPattern = Pattern.Kiting;
                     }
                     if ((mainWep.Action == Weapon.ActionAnim.Recovering || mainWep.Action == Weapon.ActionAnim.Recoiling) && dashingCooldownTimer >= 0.5f)
                     {
@@ -102,7 +101,7 @@ public class Revanent : AIBehaviour
                     break;
                 case Pattern.Kiting:
                     itemManagementNoSingles = true;
-                    itemManagementPreferredType = Entity.WieldMode.OneHanders;
+                    itemManagementPreferredType = WieldMode.OneHanders;
                     if(!entity.leftStorage && !entity.rightStorage && entity.backStorage)
                     {
                         CurrentPattern = Pattern.Dueling;
@@ -286,13 +285,6 @@ public class Revanent : AIBehaviour
         else
         {
             return !entity.Foe.Defending;
-        }
-    }
-    private void reactToBeingMadeWeak(float totalDamage)
-    {
-        if (totalDamage > entity.Poise && entity.Posture != PostureStrength.Weak)
-        {
-            CurrentPattern = Pattern.Kiting;
         }
     }
 }
