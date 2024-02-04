@@ -118,7 +118,7 @@ public class Janitor : AIBehaviour
             tipString = tips[Random.Range(0, tips.Count)];
         }
         float duration = Mathf.CeilToInt(1 + tipString.Length * 0.1f);
-        return _BlurbService.createBlurb(gameObject, tipString, new Color(1.0f, 1.0f, 0, 0.75f), duration, 0.8f);    
+        return _BlurbService.createBlurb(gameObject, tipString, new Color(1.0f, 0.75f, 0, 0.5f), duration, 0.8f);    
     }
 
 }
