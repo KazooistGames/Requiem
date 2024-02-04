@@ -63,7 +63,11 @@ public class Janitor : AIBehaviour
                 weapon.Telecommute(gameObject, 3.0f, (x) => Destroy(x.gameObject));
             }
         }
-        else if (other.GetComponent<Bone>())
+        else if (!other.GetComponent<Bone>())
+        {
+
+        }
+        else if (other.GetComponent<Bone>().Body.velocity.magnitude == 0)
         {
             other.GetComponent<Bone>().Collect(gameObject, 3.0f, (x) => Destroy(x.gameObject));
         }
@@ -86,7 +90,7 @@ public class Janitor : AIBehaviour
     {
         "You can heal between rituals\nat the bloodwell",
         "You can bleed your foes\nby dashing with your quick-attacks",
-        "Parrying a weakened foe\nwill disarm them",
+        "Time your blocks\nto parry foes",
         "Time your strong-attacks well\nand see them strike true",
     };
 

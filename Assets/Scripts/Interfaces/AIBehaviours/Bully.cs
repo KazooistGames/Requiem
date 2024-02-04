@@ -41,7 +41,7 @@ public class Bully : AIBehaviour
         {
 
         }
-        else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || dashingDesiredDirection != Vector3.zero)
+        else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || mainWep.Action == Weapon.ActionAnim.Guarding || dashingDesiredDirection != Vector3.zero)
         {
             dashingChargePeriod = 1f;
             dashingDesiredDirection = entity.Foe.transform.position - transform.position;
@@ -107,7 +107,17 @@ public class Bully : AIBehaviour
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
         }
     }
-
+    protected override void reactToFoeThrowing()
+    {
+        if (!checkMyWeaponInRange())
+        {
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
+        }
+        else
+        {
+            reactToIncomingAttack();
+        }
+    }
 
 
     /***** PRIVATE *****/

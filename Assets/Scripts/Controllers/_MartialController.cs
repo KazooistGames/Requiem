@@ -150,8 +150,11 @@ public class _MartialController : MonoBehaviour
 
     public static Weapon.ActionAnim Get_Next_Action(Weapon weapon)
     {
-        if (weapon == null) { return Weapon.ActionAnim.error; }
-        if (Weapon_Queues[weapon].Count > 0)
+        if (weapon ? !Weapon_Queues.ContainsKey(weapon) : true) 
+        { 
+            return Weapon.ActionAnim.error;  
+        }
+        else if (Weapon_Queues[weapon].Count > 0)
         {
             return Weapon_Queues[weapon].Peek().Action; 
         }

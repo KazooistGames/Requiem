@@ -100,7 +100,7 @@ public class Entity : MonoBehaviour
     public bool Staggered = false;
     protected float staggerPeriod = 0;
     protected float staggerTimer = 0;
-    private float STAGGER_BASE_TIME = 1 / 6f;
+    private float STAGGER_BASE_TIME = 1 / 4f;
 
     /********** DASHING **********/
     public Vector3 dashDirection = Vector3.zero;
@@ -597,6 +597,14 @@ public class Entity : MonoBehaviour
 
     public virtual void Die()
     {
+        if (MainHand)
+        {
+            _MartialController.Cancel_Actions(MainHand.GetComponent<Weapon>());
+        }
+        if (OffHand)
+        {
+            _MartialController.Cancel_Actions(OffHand.GetComponent<Weapon>());
+        }
         if (!requiemPlayer)
         {
             Requiem.KillCount++;
@@ -923,10 +931,17 @@ public class Entity : MonoBehaviour
         float impact = theirWeapon.Heft * theirWeapon.Tempo;
         if (theirWeapon.TrueStrike)
         {
-            Disarm();
             impact += Resolve;
+            if(theirWeapon.Wielder ? theirWeapon.Wielder.Posture == PostureStrength.Weak : false)
+            {
+                theirWeapon.Wielder.Disarm();
+            }
         }
-        if(theirWeapon.Action != ActionAnim.StrongAttack)
+        if (theirWeapon.Thrown)
+        {
+
+        }
+        else if(theirWeapon.Action != ActionAnim.StrongAttack)
         {
             theirWeapon.Wielder.alterPoise(-myWeapon.Heft / 4);
         }
@@ -992,7 +1007,6 @@ public class Entity : MonoBehaviour
         {
             foe.Damage(Resolve);
             foe.Stagger(Mathf.Sqrt(totalPower / Strength));
-            //foe.Disarm();
         }
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
@@ -1009,15 +1023,13 @@ public class Entity : MonoBehaviour
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
-            if (Dashing)
+            if (Dashing && myWeapon == Player.INSTANCE.HostWeapon)
             {
-                float duration = 3;
+                float duration = 4;
                 foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
+                foe.modSpeed[myWeapon.GetHashCode().ToString()] = -(Resolve/100);
             }
         }
-        
-
-
     }
 
     public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)

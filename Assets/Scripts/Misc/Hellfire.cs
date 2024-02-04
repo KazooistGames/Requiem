@@ -137,31 +137,14 @@ public class Hellfire : MonoBehaviour
     }
 
 
-    void OnParticleCollision(GameObject other)
-    {
-        //if (form == Form.Beam)
-        //{
-        //    List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
-        //    ParticlePhysicsExtensions.GetCollisionEvents(particles, other, collisionEvents);
-        //    float range = 0;
-        //    foreach (ParticleCollisionEvent colEvent in collisionEvents)
-        //    {
-        //        range += (colEvent.intersection - transform.position).magnitude;
-        //    }
-        //    range /= collisionEvents.Count;
-        //    if(range > beamRange)
-        //    {
-        //        beamRange = range;
-        //    }
-        //}
-    }
 
     /***** PUBLIC *****/
 
+
     /***** PROTECTED *****/
 
-    /***** PRIVATE *****/
 
+    /***** PRIVATE *****/
 
     private void idleFunction()
     {
@@ -265,7 +248,8 @@ public class Hellfire : MonoBehaviour
             ray.origin = transform.position;
             ray.direction = Wielder.LookDirection;
             Debug.DrawLine(ray.origin, ray.origin + ray.direction.normalized * 10, Color.white, 0.5f);
-            if (Physics.Raycast(ray, out hit, 10, 1 << Requiem.layerEntity, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
+            int hitMask = (1 << Requiem.layerEntity) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerWall);
+            if (Physics.Raycast(ray, out hit, 10, hitMask, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
             {
                 Entity foe = hit.collider.gameObject.GetComponent<Entity>();
                 if (foe ? foe.Allegiance != Wielder.Allegiance : false)

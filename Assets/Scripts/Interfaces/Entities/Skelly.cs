@@ -102,6 +102,14 @@ public class Skelly : Entity
         }
         else
         {
+            if (MainHand)
+            {
+                _MartialController.Cancel_Actions(MainHand.GetComponent<Weapon>());
+            }
+            if (OffHand)
+            {
+                _MartialController.Cancel_Actions(OffHand.GetComponent<Weapon>());
+            }
             Haste *= 1.5f;
             Strength *= 0.75f;
             Vitality = Strength;

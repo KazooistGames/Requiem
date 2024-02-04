@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Scoreboard : MonoBehaviour
 {
@@ -46,7 +47,7 @@ public class Scoreboard : MonoBehaviour
     {
         if (validEntitiesToScoreFromKilling.Contains(vanquishedEntity) && vanquishedEntity.Vitality < vanquishedEntity.Strength)
         {
-            Add_Score(vanquishedEntity.Strength);
+            Add_Score(GET_ENTITY_BASE_SCORE_VALUE(vanquishedEntity));
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
         }
     }
@@ -76,6 +77,31 @@ public class Scoreboard : MonoBehaviour
             KillMultiplier -= amountGulped / 100f;
             KillMultiplier = Mathf.Max(1, KillMultiplier);
         }
+    }
+
+    private static Dictionary<Type, int> DIC_ENTITY_BASE_VALUES = new Dictionary<Type, int>()
+    {
+        { typeof(Biter), 50 },
+        { typeof(Goon), 100 },
+        { typeof(Assassin), 200 },
+        { typeof(Sentinel), 500 },
+        { typeof(Bully), 800 },
+        { typeof(Revanent), 1000 },
+        { typeof(Nemesis), 2500 },
+    };
+
+    private static int GET_ENTITY_BASE_SCORE_VALUE(Entity entity)
+    {
+        Type foeType = entity.GetComponent<AIBehaviour>().GetType();
+        if (!DIC_ENTITY_BASE_VALUES.ContainsKey(foeType))
+        {
+            return (int)entity.Strength;
+        }
+        else
+        {
+            return DIC_ENTITY_BASE_VALUES[foeType];
+        }
+
     }
 
 

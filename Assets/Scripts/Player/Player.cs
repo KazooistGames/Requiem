@@ -399,7 +399,7 @@ public class Player : MonoBehaviour
         {
             Entity impaledFoe = HostWeapon.ImpaledObject.GetComponent<Entity>();
             Wieldable impaledObject = HostWeapon.ImpaledObject.GetComponent<Wieldable>();
-            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 0.5f);
+            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 0.25f);
             if (impaledFoe)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;

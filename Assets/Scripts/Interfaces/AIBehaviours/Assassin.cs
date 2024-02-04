@@ -56,16 +56,21 @@ public class Assassin : AIBehaviour
         }
         else if (Random.value <= Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
         }
-        else
+        else if(martialFoeEnteredRangeLatch || Random.value > 0.25f)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
+        }
+        else
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Aiming, 0.5f);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Throwing);
         }
     }
 
@@ -82,9 +87,9 @@ public class Assassin : AIBehaviour
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             dashingDesiredDirection = angleToVector(getAngle(disposition.normalized));
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -107,11 +112,6 @@ public class Assassin : AIBehaviour
         {
 
         }
-        //else if (_MartialController.Weapon_Actions.ContainsKey(mainWep) ? _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding : true)
-        //{
-        //    Vector3 disposition = entity.Foe.transform.position - transform.position;
-        //    dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized));
-        //}
         else
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
@@ -145,10 +145,60 @@ public class Assassin : AIBehaviour
             dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
         }
     }
-
+    protected override void SetTangoParameters()
+    {
+        if (mainWep || offWep)
+        {
+            Weapon wep = mainWep ? mainWep : offWep;
+            switch (martialCurrentState)
+            {
+                case martialState.none:
+                    tangoInnerRange = wep.Range * 1.0f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    break;
+                case martialState.attacking:
+                    tangoInnerRange = wep.Range * 0.75f;
+                    tangoOuterRange = wep.Range * 1f;
+                    break;
+                case martialState.defending:
+                    tangoInnerRange = wep.Range * 1.5f;
+                    tangoOuterRange = wep.Range * 2f;
+                    break;
+                case martialState.throwing:
+                    tangoInnerRange = wep.Range * 2.0f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    break;
+            }
+            pursueStoppingDistance = tangoOuterRange;
+        }
+        else
+        {
+            tangoInnerRange = entity.personalBox.radius * entity.scaleActual;
+            tangoOuterRange = sensorySightRangeScalar * sensoryBaseRange;
+        }
+    }
 
     /***** PRIVATE *****/
 
+    private bool timeoutCheckMyWeaponInRange()
+    {
+        if (!mainWep)
+        {
+            return false;
+        }
+        else if (checkMyWeaponInRange())
+        {
+            return true;
+        }
+        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
 
+        {
+            return _MartialController.Debounce_Timers[mainWep] > 2;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
 

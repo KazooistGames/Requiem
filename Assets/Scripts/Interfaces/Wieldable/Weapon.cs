@@ -65,8 +65,9 @@ public abstract class Weapon : Wieldable
     public float tempoChargeExponent = 3/4f;
     private bool tempoChargeONS = true;
     //private bool attackChargeONS = true;
-    public float TempoTargetCenter { get; private set; } = 0.984f;
-    public float TempoTargetWidth { get; private set; } = 0.03f;
+
+    public float TempoTargetCenter { get; private set; } = 0.974f;
+    public float TempoTargetWidth { get; private set; } = 0.05f;
 
 
     protected string lightSwingClip;
@@ -629,7 +630,11 @@ public abstract class Weapon : Wieldable
         float impactPower = weapon.Heft * (1 + weapon.Tempo);
         Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
         Vector3 disposition = foe.transform.position - origin;
-        Vector3 velocityChange = disposition.normalized * (impactPower / 40f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        Vector3 velocityChange = disposition.normalized * (impactPower / 30f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        if (weapon.TrueStrike)
+        {
+            velocityChange *= 2;
+        }
         foe.Shove(velocityChange);
     }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sentinel : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.0f;
+    private float CombatSpeed = 0.25f;
     private float Aggression = 0.5f;
 
     protected override void Awake()
@@ -51,12 +51,13 @@ public class Sentinel : AIBehaviour
         }
         else if (Random.value <= Aggression)
         {
-            dashingChargePeriod = 0.0f;
-            dashingDesiredDirection = -(entity.Foe.transform.position - transform.position);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);           
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);        
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
@@ -64,25 +65,17 @@ public class Sentinel : AIBehaviour
         }
         else
         {
+            dashingChargePeriod = 0.0f;
+            dashingDesiredDirection = -(entity.Foe.transform.position - transform.position);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);           
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
     }
 
     protected override void reactToFoeVulnerable()
     {
-        if (checkMyWeaponInRange())
-        {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
-        }
-        else if (Random.value < Aggression)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-        }
+        _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, checkMyWeaponInRange);
+        //_MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
     }
 
     protected override void reactToFoeChange()
@@ -105,8 +98,7 @@ public class Sentinel : AIBehaviour
         }
         else if (mainWep.Action == Weapon.ActionAnim.Idle || mainWep.Action == Weapon.ActionAnim.Recoiling)
         {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
         }
         else if(dashingCooldownTimer > 3)
         {
@@ -121,8 +113,7 @@ public class Sentinel : AIBehaviour
     {
         if (!checkMyWeaponInRange())
         {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
         }
         else
         {

@@ -103,7 +103,6 @@ public class Idol : Wieldable
         base.Update();
         if (mobEntity)
         {
-            //flames.SetFlameStyle(mobEntity.DashCharging ? _Flames.FlameStyles.Magic : _Flames.FlameStyles.Soulless); 
             activityLevel = ActivityLevel.Aggro;
         }
         else if (Wielder ? Wielder.requiemPlayer : false)
@@ -123,7 +122,7 @@ public class Idol : Wieldable
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        if (!Player.INSTANCE.Dead)
+        if (!Player.INSTANCE.Dead && Requiem_Arena.INSTANCE.Ritual < 10)
         {
             Scoreboard.Add_Score(500);
             SpawnAdds(Requiem_Arena.INSTANCE.Ritual);

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Entity;
 
 public class Revanent : AIBehaviour
 {
@@ -48,6 +49,7 @@ public class Revanent : AIBehaviour
         new GameObject().AddComponent<Greatsword>().PickupItem(entity);
         new GameObject().AddComponent<Shortsword>().PickupItem(entity);
         new GameObject().AddComponent<Shortsword>().PickupItem(entity);
+        entity.JustHit.AddListener(reactToBeingMadeWeak);
     }
 
     protected override void Update()
@@ -94,7 +96,7 @@ public class Revanent : AIBehaviour
                     }
                     else if (mainWep.Action == Weapon.ActionAnim.Guarding && dashingCooldownTimer >= 3f)
                     {
-                        dashingChargePeriod = 1.0f;
+                        dashingChargePeriod = 2.0f;
                         dashingDesiredDirection = entity.Foe.transform.position - transform.position;
                     }
                     break;
@@ -139,9 +141,11 @@ public class Revanent : AIBehaviour
         //} 
     }
 
-    /***** PUBLIC *****/
-    /***** PROTECTED *****/
 
+    /***** PUBLIC *****/
+
+
+    /***** PROTECTED *****/
     protected override void queueNextRoundOfActions(Weapon weapon)
     {
         if (weapon == mainWep)
@@ -284,6 +288,12 @@ public class Revanent : AIBehaviour
             return !entity.Foe.Defending;
         }
     }
-
+    private void reactToBeingMadeWeak(float totalDamage)
+    {
+        if (totalDamage > entity.Poise && entity.Posture != PostureStrength.Weak)
+        {
+            CurrentPattern = Pattern.Kiting;
+        }
+    }
 }
 

@@ -9,19 +9,21 @@ public class IdolSkully : Skully
     protected override void Awake()
     {
         base.Awake();
-        Strength = 300f;
-        Haste = 0.75f;
-        Resolve = 50;
+        Strength = 250f;
+        Haste = 1f;
+        Resolve = 20;
         BaseAcceleration = 8f;
         scaleScalar = 1.0f;
         berthScalar = 1.1f;
+
     }
 
     protected override void Start()
     {
         base.Start();
         gameObject.name = "IdolSkully";
-
+        flames.gameObject.SetActive(true);
+        flames.FlamePresentationStyle = _Flames.FlameStyles.Inferno;
     }
 
     protected override void Update()
@@ -48,8 +50,6 @@ public class IdolSkully : Skully
             _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.25f, _SoundService.Instance.DefaultAudioRange / 2);
         }
     }
-
-
 
 
     public override void Die()

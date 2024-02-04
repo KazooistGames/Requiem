@@ -12,7 +12,7 @@ public class Nemesis : AIBehaviour
     private float quickDashRecoveryTime = 1.5f;
 
     private float beamDelayPeriod = 2;
-    private float beamDuration = 4;
+    private float beamDuration = 5;
 
     private float beamDurationTimer = 0;
     private float beamDelayTimer = 0;
@@ -41,6 +41,8 @@ public class Nemesis : AIBehaviour
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensoryBaseRange = 2f;
+        sensorySightRangeScalar = 2f;
+        sensoryAudioRangeScalar = 2f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
@@ -59,45 +61,37 @@ public class Nemesis : AIBehaviour
     protected override void Update()
     {
         base.Update();
-        if (entity.Foe)
+
+        //BattleCycle = entity.Posture == Entity.PostureStrength.Weak ? Cycle.BeamCycle : Cycle.DashCycle;
+        switch (BattleCycle)
         {
-            //BattleCycle = entity.Posture == Entity.PostureStrength.Weak ? Cycle.BeamCycle : Cycle.DashCycle;
-            switch (BattleCycle)
-            {
-                case Cycle.DashCycle:
-                    dashCycleUpdates();
-                    break;
-                case Cycle.BeamCycle:
-                    beamCycleUpdates();
-                    break;
-            }
-            if (entity.Dashing)
-            {
-                tangoDeadbanded = false;
-                flames.particleLight.intensity = 8;
-            }
-            else
-            {
-                flames.particleLight.intensity = 5;
-            }
-            string key = "Beam!";
-            if (hellfire.form == Hellfire.Form.Beam)
-            {
-                entity.modSpeed[key] = -0.9f;
-                entity.modTurnSpeed[key] = -0.9f;
-            }
-            else
-            {
-                entity.modSpeed[key] = 0f;
-                entity.modTurnSpeed[key] = 0f;
-            }
+            case Cycle.DashCycle:
+                Vector3 disposition = entity.Foe ? entity.Foe.transform.position - transform.position : entity.LookDirection;
+                dashCycleUpdates(disposition);
+                break;
+            case Cycle.BeamCycle:
+                beamCycleUpdates();
+                break;
+        }
+        if (entity.Dashing)
+        {
+            tangoDeadbanded = false;
+            flames.particleLight.intensity = 8;
         }
         else
         {
-            beamDurationTimer = 0;
-            beamDelayTimer = 0;
-            hellfire.form = Hellfire.Form.Off;
             flames.particleLight.intensity = 5;
+        }
+        string key = "Beam!";
+        if (hellfire.form == Hellfire.Form.Beam)
+        {
+            entity.modSpeed[key] = -0.9f;
+            entity.modTurnSpeed[key] = -0.9f;
+        }
+        else
+        {
+            entity.modSpeed[key] = 0f;
+            entity.modTurnSpeed[key] = 0f;
         }
     }
 
@@ -127,34 +121,39 @@ public class Nemesis : AIBehaviour
     }
 
     /***** PRIVATE *****/
-    private void dashCycleUpdates()
+    private void dashCycleUpdates(Vector3 disposition)
     {
         beamDurationTimer = 0;
         beamDelayTimer = 0;
         hellfire.form = Hellfire.Form.Off;
+        flames.particleLight.intensity = 5;
 
-        Vector3 disposition = entity.Foe.transform.position - transform.position;
         bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
         bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
         bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
         if (finalDashTrigger)
         {
-
             dashingChargePeriod = 2f;
             dashingDesiredDirection = disposition;
             timeToRecoverFromDash = quickDashRecoveryTime;
         }
         else if (shortDashTrigger)
         {
-            dashingChargePeriod = 0.5f;
-            dashingDesiredDirection = disposition;
-            timeToRecoverFromDash = finalDashRecoveryTime;
+            if(Random.value > 0.1f)
+            {
+                dashingChargePeriod = 0.5f;
+                dashingDesiredDirection = disposition;
+                timeToRecoverFromDash = finalDashRecoveryTime;
+            }
+            else
+            {
+                BattleCycle = Cycle.BeamCycle;
+            }
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
             BattleCycle = Cycle.BeamCycle;
         }
-
     }
 
     private void beamCycleUpdates()
@@ -165,10 +164,6 @@ public class Nemesis : AIBehaviour
             beamONS = true;
             beamDelayTimer += Time.deltaTime;
             hellfire.form = Hellfire.Form.Preheat;
-            if (entity.Posture == Entity.PostureStrength.Strong)
-            {
-                BattleCycle = Cycle.DashCycle;
-            }
         }
         else if(beamDurationTimer < beamDuration)
         {
@@ -184,6 +179,7 @@ public class Nemesis : AIBehaviour
         {
             beamDelayTimer = 0;
             beamDurationTimer = 0;
+            BattleCycle = Cycle.DashCycle;
         }
     }
 
