@@ -131,7 +131,11 @@ public class Nemesis : AIBehaviour
         bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
         bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
         bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
-        if (finalDashTrigger)
+        if (!entity.Foe)
+        {
+
+        }
+        else if (finalDashTrigger)
         {
             dashingChargePeriod = 2f;
             dashingDesiredDirection = disposition;
@@ -145,7 +149,7 @@ public class Nemesis : AIBehaviour
                 dashingDesiredDirection = disposition;
                 timeToRecoverFromDash = finalDashRecoveryTime;
             }
-            else
+            else if(dashingDesiredDirection == Vector3.zero)
             {
                 BattleCycle = Cycle.BeamCycle;
             }
@@ -161,17 +165,17 @@ public class Nemesis : AIBehaviour
 
         if(beamDelayTimer < beamDelayPeriod)
         {
-            beamONS = true;
-            beamDelayTimer += Time.deltaTime;
-            hellfire.form = Hellfire.Form.Preheat;
-        }
-        else if(beamDurationTimer < beamDuration)
-        {
             if (beamONS)
             {
                 beamONS = false;
                 playGroan(0.5f);
             }
+
+            beamDelayTimer += Time.deltaTime;
+            hellfire.form = Hellfire.Form.Preheat;
+        }
+        else if(beamDurationTimer < beamDuration)
+        {
             beamDurationTimer += Time.deltaTime;
             hellfire.form = Hellfire.Form.Beam;
         }

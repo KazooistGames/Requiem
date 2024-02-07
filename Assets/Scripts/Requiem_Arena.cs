@@ -94,17 +94,19 @@ public class Requiem_Arena : Requiem
         randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
         SPAWN(typeof(Shade), typeof(Janitor), RAND_POS_IN_TILE(randomTile));
         Commissioned = true;
-
+        if (!idol)
+        {
+            idol = spawnIdol();
+        }
         yield return gameLoop();
     }
 
     protected IEnumerator gameLoop()
     {
         yield return new WaitUntil(() => Commissioned);
-        Torch.Toggle(true);
+        Torch.Toggle(false);
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(Chambers[0]);
         Player.INSTANCE.HostEntity.Vitality = 1;
-
         blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
         blurbIndicator.SetActive(false);
         blurbIndicator.GetComponent<Text>().text = "0:00";
@@ -114,30 +116,25 @@ public class Requiem_Arena : Requiem
         {
             StateOfGame = GameState.Liminal;
             Ritual++;
-            if(Ritual == 10)
-            {
-                foreach (Torch torch in FindObjectsOfType<Torch>())
-                {
-                    torch.Lit = false;
-                }
-            }
             Gates[0].OpenDoor();
-            yield return new WaitUntil(() => !Alter.Energized);
-            yield return new WaitUntil(() => Alter.Used && Alter.Energized);
-            if (!idol && Ritual >= 3)
+            Torch.Toggle(false);
+            if (!idol)
             {
                 idol = spawnIdol();
             }
+            yield return new WaitUntil(() => !Alter.Energized);
+            yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             Gates[0].CloseDoor();
-            if (Alter.DesiredOffering == Player.INSTANCE.HostEntity.gameObject)
-            {
-                StateOfGame = GameState.Wave;
-                yield return waveRoutine();
-            }
-            else if(idol ? Alter.DesiredOffering == idol.gameObject : false)
+            Torch.Toggle(true);
+            if(Ritual == 10)
             {
                 StateOfGame = GameState.Boss;
                 yield return bossRoutine();
+            }
+            else
+            {
+                StateOfGame = GameState.Wave;
+                yield return waveRoutine();
             }
         }
     }
@@ -216,7 +213,6 @@ public class Requiem_Arena : Requiem
 
     protected IEnumerator bossRoutine()
     {
-        List<GameObject> spawnedSkulls = new List<GameObject>();
         idol.BecomeMob();
         while (idol.mobEntity)
         {
@@ -236,20 +232,28 @@ public class Requiem_Arena : Requiem
         {
             Alter.DesiredOffering = Alter.TopStep;
         }
-        else if(Ritual % 10 == 0 && Ritual > 0)
+        else if(Ritual == 10)
         {
             Alter.DesiredOffering = idol.gameObject;
             Alter.PentagramLineColor = new Color(1, 0, 0.75f);
+            Alter.PentagramFlameStyle = _Flames.FlameStyles.Soulless;
+            idol.flames.FlamePresentationStyle = _Flames.FlameStyles.Soulless;
+            //idol.flames.emissionModule.enabled = false;
+        }
+        else
+        {
+            Alter.DesiredOffering = idol.gameObject;
+            Alter.PentagramLineColor = new Color(1, 0, 0);
             Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
             idol.flames.FlamePresentationStyle = _Flames.FlameStyles.Inferno;
             idol.flames.emissionModule.enabled = true;
         }
-        else if(Player.INSTANCE.HostEntity)
-        {
-            Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
-            Alter.PentagramLineColor = Color.red;
-            Alter.PentagramFlameStyle = _Flames.FlameStyles.Soulless;
-        }
+        //else if(Player.INSTANCE.HostEntity)
+        //{
+        //    Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
+        //    Alter.PentagramLineColor = Color.red;
+        //    Alter.PentagramFlameStyle = _Flames.FlameStyles.Soulless;
+        //}
     }
     private IEnumerator buildArenaLandmarks(List<List<Hextile>> arenaTileRings)
     {

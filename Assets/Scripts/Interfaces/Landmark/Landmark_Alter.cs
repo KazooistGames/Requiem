@@ -153,7 +153,7 @@ public class Landmark_Alter : Landmark
             Used = true;
             Color latchedColor = PentagramLineColor;
             yield return new WaitWhile(() => Energized);
-            //PentagramFlames.emissionModule.enabled = false;
+            PentagramFlames.emissionModule.enabled = false;
             PentagramFlames.shapeModule.radius = 0.0f;
             Used = false;
             float fadeOutTimer = 0;

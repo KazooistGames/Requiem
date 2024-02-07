@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sentinel : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.25f;
+    private float CombatSpeed = 0.1f;
     private float Aggression = 0.5f;
 
     protected override void Awake()

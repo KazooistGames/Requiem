@@ -534,7 +534,7 @@ public class Entity : MonoBehaviour
         }
         if (!silent)
         {
-            playCrunch(0.75f);
+            playCrunch(magnitude/50f);
         }
     }
 
@@ -1066,10 +1066,10 @@ public class Entity : MonoBehaviour
         return sound;
     }
 
-    private GameObject playCrunch(float pitch)
+    private GameObject playCrunch(float volume)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/crunch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
-        sound.transform.SetParent(transform);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/crunch", transform.position, 0.75f, volume, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        sound.transform.SetParent(head.transform);
         return sound;
     }
 

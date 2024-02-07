@@ -54,8 +54,9 @@ public class IdolSkully : Skully
 
     public override void Die()
     {
+        _SoundService.PlayAmbientSound(Requiem.deathSounds[UnityEngine.Random.Range(0, Requiem.deathSounds.Length)], transform.position, 0.5f, 0.5f).layer = gameObject.layer;
         base.Die();
-        Destroy(head);
+        //Destroy(head);
     }
 
     /***** PROTECTED *****/
