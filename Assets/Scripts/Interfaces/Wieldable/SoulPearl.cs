@@ -1,18 +1,21 @@
 
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
 
 public class SoulPearl : Wieldable
 {
+    public bool WillingToRematerialize = false;
     public Wieldable Phylactery;
     private _Flames spiritFlame;
     private SphereCollider physicsSphere;
 
-    private float timeWanderingSeconds = 0;
+    private float timeIdle = 0;
 
     public static float Awareness_Radius = 1.5f;
-    public static float Transition_Debounce = 3;
+    public static float Materialization_Debounce = 3;
+    public static float Wander_Debounce = 15;
 
     protected override void Start()
     {
@@ -29,36 +32,69 @@ public class SoulPearl : Wieldable
         spiritFlame.shapeModule.radius = 0.001f;
         spiritFlame.shapeModule.scale = Vector3.one * 0.001f;
         spiritFlame.SetFlameStyle(_Flames.FlameStyles.Soulless);
-        spiritFlame.particleLight.range /= 2;
-        spiritFlame.particleLight.intensity /= 2;
+        spiritFlame.particleLight.range = 0.25f;
+        spiritFlame.particleLight.intensity = 2;
         spiritFlame.boundObject = gameObject;
+        ParticleSystem.MainModule main = spiritFlame.GetComponent<ParticleSystem>().main;
+        main.simulationSpace = ParticleSystemSimulationSpace.Local;
     }
 
     protected override void Update()
     {
-        timeWanderingSeconds += Time.deltaTime;
-        if(timeWanderingSeconds > Transition_Debounce && !Telecommuting)
+        timeIdle += Time.deltaTime;
+        if (Telecommuting)
         {
-            if (!Player.INSTANCE)
-            {
 
-            }
-            else if (Phylactery)
+        }
+        else if (!Player.INSTANCE)
+        {
+
+        }
+        else if (timeIdle >= Wander_Debounce)
+        {
+            timeIdle = 0;
+            Vector3 target = Requiem.RAND_POS_IN_TILE(getRandomNeighborTile());
+            Telecommute(target, 0.25f, callback: null, enablePhysicsWhileInFlight: false, useScalarAsSpeed: true);
+        }
+        else if ((Player.INSTANCE.transform.position - transform.position).magnitude > Awareness_Radius)
+        {
+
+        }
+        else if (timeIdle < Materialization_Debounce)
+        {
+
+        }
+        else if (Phylactery)
+        {
+            Telecommute(Phylactery.gameObject, 0.5f, (x) => x.GetComponent<SoulPearl>().Rematerialize(), useScalarAsSpeed: true);
+        }
+        else
+        {
+            Weapon randomWeapon = FindObjectsOfType<Weapon>().FirstOrDefault(x => !x.Wielder && (x.transform.position - transform.position).magnitude <= Awareness_Radius);
+            if (randomWeapon)
             {
-                Telecommute(Phylactery.gameObject, 0.25f, (x) => x.GetComponent<SoulPearl>().Rematerialize(), useScalarAsSpeed: true);
-            }
-            else if ((Player.INSTANCE.transform.position - transform.position).magnitude <= Awareness_Radius)
-            {
-                Weapon randomWeapon = FindObjectsOfType<Weapon>().FirstOrDefault(x => !x.Wielder && (x.transform.position - transform.position).magnitude <= Awareness_Radius);
-                if (randomWeapon)
-                {
-                    Phylactery = randomWeapon;
-                    Telecommute(randomWeapon.gameObject, 0.5f, (x) => x.GetComponent<SoulPearl>().Rematerialize(), useScalarAsSpeed: true);;
-                }
+                Phylactery = randomWeapon; 
             }
         }
+        
 
     }
+
+
+    /***** PRIVATE *****/
+    private Hextile getClosestTile()
+    {
+        Hextile closest = Hextile.Tiles.OrderBy(x => (x.transform.position - transform.position).magnitude).First();
+        return closest;
+    }
+
+    private Hextile getRandomNeighborTile()
+    {
+        Hextile closest = getClosestTile();
+        Hextile randomNeighbor = closest.AdjacentTiles.Keys.ElementAt(Random.Range(0, closest.AdjacentTiles.Keys.Count));
+        return randomNeighbor;
+    }
+
     private void Rematerialize()
     {
         if (!Phylactery)

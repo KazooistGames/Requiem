@@ -276,7 +276,12 @@ public class Wieldable : MonoBehaviour
         }
     }
 
-    public void Telecommute(GameObject target, float telecommuteScalar, Action<Wieldable> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
+    public void Telecommute(GameObject target, float telecommuteScalar, Action<Wieldable> callback = null, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
+    {
+        StartCoroutine(telecommuteRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
+    }
+
+    public void Telecommute(Vector3 target, float telecommuteScalar, Action<Wieldable> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
     {
         StartCoroutine(telecommuteRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
@@ -433,6 +438,10 @@ public class Wieldable : MonoBehaviour
             Telecommuting = false;
             Body.useGravity = previousGravity;
             togglePhysicsBox(previousPhysicsBoxState);
+            if (callback != null)
+            {
+                callback(this);
+            }
         }
         while (Telecommuting && !Wielder && target)
         {
@@ -442,7 +451,6 @@ public class Wieldable : MonoBehaviour
                 Vector3 increment = totalDisposition.normalized * teleScalar * Time.deltaTime;
                 if (totalDisposition.magnitude <= increment.magnitude)
                 {
-                    callback(this);
                     cancelCommute();
                     yield break;
                 }
@@ -462,7 +470,6 @@ public class Wieldable : MonoBehaviour
                 transform.position = Vector3.Lerp(origin, target.transform.position, scale);
                 if (scale == 1)
                 {
-                    callback(this);
                     cancelCommute();
                     yield break;
                 }
@@ -472,6 +479,61 @@ public class Wieldable : MonoBehaviour
         cancelCommute();
         yield break;
     }
-
+    private IEnumerator telecommuteRoutine(Vector3 target, float teleScalar, Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
+    {
+        //telecommuteTarget = target;
+        Telecommuting = true;
+        float timer = 0.0f;
+        Vector3 origin = transform.position;
+        bool previousPhysicsBoxState = PhysicsBoxes.Count > 0 ? PhysicsBoxes[0].enabled : false;
+        bool previousGravity = Body.useGravity;
+        Body.useGravity = false;
+        togglePhysicsBox(enablePhysics);
+        void cancelCommute()
+        {
+            Telecommuting = false;
+            Body.useGravity = previousGravity;
+            togglePhysicsBox(previousPhysicsBoxState);
+            if (callback != null)
+            {
+                callback(this);
+            }
+        }
+        while (Telecommuting && !Wielder)
+        {
+            if (useScalarAsSpeed)
+            {
+                Vector3 totalDisposition = target - transform.position;
+                Vector3 increment = totalDisposition.normalized * teleScalar * Time.deltaTime;
+                if (totalDisposition.magnitude <= increment.magnitude)
+                {
+                    cancelCommute();
+                    yield break;
+                }
+                else
+                {
+                    transform.position += increment;
+                }
+            }
+            else
+            {
+                timer += Time.deltaTime;
+                float x = 2 * timer / teleScalar;
+                x = Mathf.Clamp(x, 0f, 2f);
+                float y = (Mathf.Pow(x, 2) - Mathf.Pow(x, 3) / 3);
+                float scale = (y) / 1.33f;
+                scale = Mathf.Clamp(scale, 0f, 1f);
+                transform.position = Vector3.Lerp(origin, target, scale);
+                if (scale == 1)
+                {
+                    cancelCommute();
+                    yield break;
+                }
+            }
+            yield return null;
+        }
+        cancelCommute();
+        yield break;
+    }
 
 }

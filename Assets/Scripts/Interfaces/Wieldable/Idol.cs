@@ -119,16 +119,6 @@ public class Idol : Wieldable
         }
     }
 
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        if (!Player.INSTANCE.Dead && Requiem_Arena.INSTANCE.Ritual < 10)
-        {
-            Scoreboard.Add_Score(500);
-            SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
-        }
-    }
-
     protected override void OnCollisionEnter(Collision collision)
     {
         base.OnCollisionEnter(collision);

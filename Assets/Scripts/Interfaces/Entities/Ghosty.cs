@@ -42,7 +42,7 @@ public class Ghosty : Entity
         {
 
         }
-        else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius && lifeTimer >= SoulPearl.Transition_Debounce)
+        else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius && lifeTimer >= SoulPearl.Materialization_Debounce)
         {
             Die();
         }

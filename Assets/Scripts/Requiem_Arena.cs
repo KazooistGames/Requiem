@@ -4,7 +4,6 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEditor.Experimental.GraphView;
 
 public class Requiem_Arena : Requiem
 {
@@ -152,7 +151,16 @@ public class Requiem_Arena : Requiem
             {
                 if (idol ? Alter.OfferingBox.bounds.Contains(idol.transform.position) : false)
                 {
-                    Alter.Consume(idol.gameObject);
+                    if (Player.INSTANCE.Dead )
+                    {
+
+                    }
+                    else if (INSTANCE.Ritual < 10)
+                    {
+                        Scoreboard.Add_Score(500);
+                        idol.SpawnAdds(INSTANCE.Ritual);
+                        Alter.Consume(idol.gameObject);
+                    }
                 }
                 int minutesLeft = (int)TimeGateTimeLeft / 60;
                 int secondsLeft = (int)TimeGateTimeLeft % 60;
