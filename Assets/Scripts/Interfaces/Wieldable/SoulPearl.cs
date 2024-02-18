@@ -32,11 +32,13 @@ public class SoulPearl : Wieldable
         spiritFlame.shapeModule.radius = 0.001f;
         spiritFlame.shapeModule.scale = Vector3.one * 0.001f;
         spiritFlame.SetFlameStyle(_Flames.FlameStyles.Soulless);
-        spiritFlame.particleLight.range = 0.25f;
-        spiritFlame.particleLight.intensity = 2;
+        spiritFlame.particleLight.range = 0.2f;
+        spiritFlame.particleLight.intensity = 1.5f;
         spiritFlame.boundObject = gameObject;
         ParticleSystem.MainModule main = spiritFlame.GetComponent<ParticleSystem>().main;
         main.simulationSpace = ParticleSystemSimulationSpace.Local;
+        main.startSize = 0.05f;
+        Wander_Debounce = Mathf.Lerp(10, 15, Random.value);
     }
 
     protected override void Update()
@@ -46,29 +48,14 @@ public class SoulPearl : Wieldable
         {
 
         }
-        else if (!Player.INSTANCE)
-        {
-
-        }
         else if (timeIdle >= Wander_Debounce)
         {
             timeIdle = 0;
+            Wander_Debounce = Mathf.Lerp(10, 15, Random.value);
             Vector3 target = Requiem.RAND_POS_IN_TILE(getRandomNeighborTile());
             Telecommute(target, 0.25f, callback: null, enablePhysicsWhileInFlight: false, useScalarAsSpeed: true);
         }
-        else if ((Player.INSTANCE.transform.position - transform.position).magnitude > Awareness_Radius)
-        {
-
-        }
-        else if (timeIdle < Materialization_Debounce)
-        {
-
-        }
-        else if (Phylactery)
-        {
-            Telecommute(Phylactery.gameObject, 0.5f, (x) => x.GetComponent<SoulPearl>().Rematerialize(), useScalarAsSpeed: true);
-        }
-        else
+        if(Phylactery)
         {
             Weapon randomWeapon = FindObjectsOfType<Weapon>().FirstOrDefault(x => !x.Wielder && (x.transform.position - transform.position).magnitude <= Awareness_Radius);
             if (randomWeapon)
@@ -80,6 +67,33 @@ public class SoulPearl : Wieldable
 
     }
 
+    /***** PUBLIC *****/
+    public void FlyToPhylactery() 
+    {
+        if (!Phylactery)
+        {
+            Rematerialize();
+        }
+        else if (timeIdle >= Materialization_Debounce)
+        {
+            Telecommute(Phylactery.gameObject, 0.5f, (x) => x.GetComponent<SoulPearl>().Rematerialize(), useScalarAsSpeed: true);
+        }
+    }
+    public void Rematerialize()
+    {
+        Entity newForm = new GameObject().AddComponent<Ghosty>();
+        newForm.gameObject.AddComponent<Goon>();
+        newForm.transform.position = transform.position;
+        if (Phylactery)
+        {
+            if (Phylactery.Wielder)
+            {
+                Phylactery.DropItem();
+            }
+            Phylactery.PickupItem(newForm);
+        }
+        Destroy(gameObject);
+    }
 
     /***** PRIVATE *****/
     private Hextile getClosestTile()
@@ -95,28 +109,5 @@ public class SoulPearl : Wieldable
         return randomNeighbor;
     }
 
-    private void Rematerialize()
-    {
-        if (!Phylactery)
-        {
 
-        }
-        else if (Phylactery.Wielder)
-        {
-            Phylactery = null;
-        }
-        else
-        {
-            Entity newForm = new GameObject().AddComponent<Ghosty>();
-            newForm.gameObject.AddComponent<Goon>();
-            newForm.transform.position = transform.position;
-            if (Phylactery.Wielder)
-            {
-                Phylactery.DropItem();
-            }
-            Phylactery.PickupItem(newForm);    
-            Destroy(gameObject);
-        }
-
-    }
 }

@@ -95,7 +95,8 @@ public class Idol : Wieldable
         StartCoroutine(banter());
         Body.mass = 3f;
         PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
-
+        EventPickedUp.AddListener(materializeSoulPearls);
+        //EventDropped.AddListener(dematerializeGhosts);
     }
 
     protected override void Update()
@@ -235,8 +236,8 @@ public class Idol : Wieldable
             yield return null;
         }
     }
-    /***** PUBLIC *****/
 
+    /***** PUBLIC *****/
     public List<GameObject> SpawnAdds(int count)
     {
         List<GameObject> skullies = new List<GameObject>();
@@ -258,6 +259,24 @@ public class Idol : Wieldable
         if (totalDamage > mobEntity.Poise && mobEntity.Posture != PostureStrength.Weak)
         {
             SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+        }
+    }
+
+    /***** PRIVATE *****/
+    private void materializeSoulPearls(Wieldable idol)
+    {
+        List<SoulPearl> pearls = FindObjectsOfType<SoulPearl>().ToList();
+        foreach (SoulPearl soulPearl in pearls)
+        {
+            soulPearl.FlyToPhylactery();
+        }
+    }
+    private void dematerializeGhosts(Wieldable idol)
+    {
+        List<Ghosty> ghosts = FindObjectsOfType<Ghosty>().ToList();
+        foreach (Ghosty ghosty in ghosts)
+        {
+            ghosty.Dematerialize();
         }
     }
 

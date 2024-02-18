@@ -67,10 +67,15 @@ public class Assassin : AIBehaviour
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
         }
-        else
+        else if(mainWep && offWep)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Aiming, 0.5f);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Throwing);
+        }
+        else
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
         }
     }
 

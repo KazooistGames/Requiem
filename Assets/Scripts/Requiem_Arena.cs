@@ -116,6 +116,7 @@ public class Requiem_Arena : Requiem
             StateOfGame = GameState.Liminal;
             Ritual++;
             Gates[0].OpenDoor();
+            spawnSoulPearls(5 + Ritual / 2);
             Torch.Toggle(false);
             if (!idol)
             {
@@ -124,6 +125,7 @@ public class Requiem_Arena : Requiem
             yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             Gates[0].CloseDoor();
+            removeSoulPearlsAndGhosts();
             Torch.Toggle(true);
             if(Ritual == 10)
             {
@@ -230,6 +232,29 @@ public class Requiem_Arena : Requiem
 
 
     /***** PRIVATE *****/
+    private void spawnSoulPearls(int count)
+    {
+        for(int i = 0; i < count; i++)
+        {
+            SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
+            int outerRingIndex = ArenaTiles.Count - 1;
+            pearl.transform.position = RAND_POS_IN_TILE(ArenaTiles[outerRingIndex][UnityEngine.Random.Range(0, ArenaTiles[outerRingIndex].Count)]);
+        }
+    }
+
+    private void removeSoulPearlsAndGhosts()
+    {
+        List<SoulPearl> pearls = FindObjectsOfType<SoulPearl>().ToList();
+        List<Ghosty> ghosts = FindObjectsOfType<Ghosty>().ToList();
+        foreach(SoulPearl soulPearl in pearls)
+        {
+            Destroy(soulPearl.gameObject);
+        }
+        foreach(Ghosty ghosty in ghosts)
+        {
+            Destroy(ghosty.gameObject);
+        }
+    }
     private void determineAlterOffering()
     {
         if (!Alter || !Player.INSTANCE)

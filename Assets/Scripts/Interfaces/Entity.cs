@@ -1068,8 +1068,12 @@ public class Entity : MonoBehaviour
 
     private GameObject playCrunch(float volume)
     {
+       
         GameObject sound = _SoundService.PlayAmbientSound("Audio/crunch", transform.position, 0.75f, volume, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
-        sound.transform.SetParent(head.transform);
+        if (head)
+        {
+            sound.transform.SetParent(head.transform);
+        }
         return sound;
     }
 

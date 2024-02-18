@@ -38,16 +38,16 @@ public class Ghosty : Entity
     {
         base.Update();
         lifeTimer += Time.deltaTime;
-        if (Player.INSTANCE ? !Player.INSTANCE.HostEntity : true)
-        {
+        //if (Player.INSTANCE ? !Player.INSTANCE.HostEntity : true)
+        //{
 
-        }
-        else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius && lifeTimer >= SoulPearl.Materialization_Debounce)
-        {
-            Die();
-        }
-        Aggressive = Foe || Poise != Strength;
-        Allegiance = Player.INSTANCE.HostEntity.Allegiance;
+        //}
+        //else if ((Player.INSTANCE.HostEntity.transform.position - transform.position).magnitude > SoulPearl.Awareness_Radius && lifeTimer >= SoulPearl.Materialization_Debounce)
+        //{
+        //    Die();
+        //}
+        //Aggressive = Foe || Poise != Strength;
+        //Allegiance = Player.INSTANCE.HostEntity.Allegiance;
     }
 
     protected override void FixedUpdate()
