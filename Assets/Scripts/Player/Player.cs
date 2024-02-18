@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    public bool RequiemAchieved = false;
+
     public Weapon HostWeapon;
     public static Player INSTANCE { get; private set; }
     public int BonesCollected = 0;
@@ -339,7 +341,7 @@ public class Player : MonoBehaviour
         {
             child.gameObject.SetActive(false);
         }
-        yield return new WaitUntil(() => Dead);
+        yield return new WaitUntil(() => Dead || RequiemAchieved);
         HUD.Curtains.gameObject.SetActive(true);
         fadeTimer = 0.0f;
         while (fadeTimer < fadePeriod)
@@ -353,6 +355,7 @@ public class Player : MonoBehaviour
         HUD.Curtains.color = new Color(0, 0, 0, 1);
         HUD.scoreTransforms[1].GetComponent<Text>().fontSize = 162;
         _BlurbService.Toggle_Blurbs(false);
+
         //Requiem.INSTANCE.Restart();
     }
 

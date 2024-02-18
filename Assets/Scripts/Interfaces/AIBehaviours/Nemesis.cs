@@ -45,7 +45,7 @@ public class Nemesis : AIBehaviour
         sensoryAudioRangeScalar = 2f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
-        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * Mathf.Lerp(0.3f, 0.5f, Random.value);
+        pursueStoppingDistance = Hextile.Radius;
         grabEnabled = false;
         dashingChargePeriod = 1f;
         hellfire = Instantiate(Resources.Load<GameObject>("Prefabs/Hellfire")).GetComponent<Hellfire>();
@@ -184,6 +184,7 @@ public class Nemesis : AIBehaviour
             beamDelayTimer = 0;
             beamDurationTimer = 0;
             BattleCycle = Cycle.DashCycle;
+            beamONS = true;
         }
     }
 

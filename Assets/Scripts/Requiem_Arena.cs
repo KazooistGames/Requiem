@@ -131,6 +131,8 @@ public class Requiem_Arena : Requiem
             {
                 StateOfGame = GameState.Boss;
                 yield return bossRoutine();
+                yield return new WaitForSeconds(10);
+                Player.INSTANCE.RequiemAchieved = true;
             }
             else
             {

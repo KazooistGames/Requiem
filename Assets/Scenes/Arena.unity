@@ -818,115 +818,6 @@ MonoBehaviour:
   Tempo: 0
   tempoChargePeriod: 1
   tempoChargeExponent: 0.75
---- !u!1 &669212773
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 669212775}
-  - component: {fileID: 669212774}
-  m_Layer: 0
-  m_Name: Greataxe (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &669212774
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669212773}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58e8ad87548be3047965ca70b4b24728, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EventDropped:
-    m_PersistentCalls:
-      m_Calls: []
-  EventPickedUp:
-    m_PersistentCalls:
-      m_Calls: []
-  EventThrown:
-    m_PersistentCalls:
-      m_Calls: []
-  Heft: 25
-  Idling: 1
-  Recoiling: 0
-  Wielder: {fileID: 0}
-  Allegiance: 0
-  Wielded: 0
-  MountTarget: {fileID: 0}
-  ImpaledObject: {fileID: 0}
-  PrimaryTrigger: 0
-  SecondaryTrigger: 0
-  TertiaryTrigger: 0
-  ThrowTrigger: 0
-  Anim: {fileID: 0}
-  Body: {fileID: 0}
-  HitBox: {fileID: 0}
-  PhysicsBoxes: []
-  Filter: {fileID: 0}
-  Renderer: {fileID: 0}
-  MostRecentWielder: {fileID: 0}
-  Telecommuting: 0
-  Thrown: 0
-  equipType: 0
-  Hitting:
-    m_PersistentCalls:
-      m_Calls: []
-  Clashing:
-    m_PersistentCalls:
-      m_Calls: []
-  Blocking:
-    m_PersistentCalls:
-      m_Calls: []
-  Parrying:
-    m_PersistentCalls:
-      m_Calls: []
-  GettingParried:
-    m_PersistentCalls:
-      m_Calls: []
-  Swinging:
-    m_PersistentCalls:
-      m_Calls: []
-  Rebuked:
-    m_PersistentCalls:
-      m_Calls: []
-  ChangingActionAnimations:
-    m_PersistentCalls:
-      m_Calls: []
-  Action: 0
-  Throwing: 0
-  Range: 0
-  Power: 0
-  BasePower: 0
-  TrueStrikeEnabled: 0
-  TrueStrike: 0
-  Tempo: 0
-  tempoChargePeriod: 0.5
-  tempoChargeExponent: 0.75
---- !u!4 &669212775
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669212773}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 18
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &747980606
 GameObject:
   m_ObjectHideFlags: 0
@@ -1178,6 +1069,7 @@ MonoBehaviour:
   Telecommuting: 0
   Thrown: 0
   equipType: 0
+  WillingToRematerialize: 0
   Phylactery: {fileID: 0}
 --- !u!4 &786075282
 Transform:
@@ -1765,115 +1657,6 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
---- !u!1 &1761540446
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1761540448}
-  - component: {fileID: 1761540447}
-  m_Layer: 0
-  m_Name: Greataxe (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1761540447
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1761540446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58e8ad87548be3047965ca70b4b24728, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EventDropped:
-    m_PersistentCalls:
-      m_Calls: []
-  EventPickedUp:
-    m_PersistentCalls:
-      m_Calls: []
-  EventThrown:
-    m_PersistentCalls:
-      m_Calls: []
-  Heft: 25
-  Idling: 1
-  Recoiling: 0
-  Wielder: {fileID: 0}
-  Allegiance: 0
-  Wielded: 0
-  MountTarget: {fileID: 0}
-  ImpaledObject: {fileID: 0}
-  PrimaryTrigger: 0
-  SecondaryTrigger: 0
-  TertiaryTrigger: 0
-  ThrowTrigger: 0
-  Anim: {fileID: 0}
-  Body: {fileID: 0}
-  HitBox: {fileID: 0}
-  PhysicsBoxes: []
-  Filter: {fileID: 0}
-  Renderer: {fileID: 0}
-  MostRecentWielder: {fileID: 0}
-  Telecommuting: 0
-  Thrown: 0
-  equipType: 0
-  Hitting:
-    m_PersistentCalls:
-      m_Calls: []
-  Clashing:
-    m_PersistentCalls:
-      m_Calls: []
-  Blocking:
-    m_PersistentCalls:
-      m_Calls: []
-  Parrying:
-    m_PersistentCalls:
-      m_Calls: []
-  GettingParried:
-    m_PersistentCalls:
-      m_Calls: []
-  Swinging:
-    m_PersistentCalls:
-      m_Calls: []
-  Rebuked:
-    m_PersistentCalls:
-      m_Calls: []
-  ChangingActionAnimations:
-    m_PersistentCalls:
-      m_Calls: []
-  Action: 0
-  Throwing: 0
-  Range: 0
-  Power: 0
-  BasePower: 0
-  TrueStrikeEnabled: 0
-  TrueStrike: 0
-  Tempo: 0
-  tempoChargePeriod: 0.5
-  tempoChargeExponent: 0.75
---- !u!4 &1761540448
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1761540446}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 17
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1776297670
 GameObject:
   m_ObjectHideFlags: 0
@@ -2820,6 +2603,7 @@ MonoBehaviour:
   CenterTile: {fileID: 0}
   Alter: {fileID: 0}
   BloodWell: {fileID: 0}
+  Credits: {fileID: 0}
   QuestGiver: {fileID: 0}
   TimeGateTimeLeft: 0
   Ritual: 0
