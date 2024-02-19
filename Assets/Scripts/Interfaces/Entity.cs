@@ -838,8 +838,8 @@ public class Entity : MonoBehaviour
         {
             float scaledVelocity = 0;
             float overChargeTimer = 0;
-            yield return new WaitUntil(() => DashCharging);
-            while ((DashCharging || scaledVelocity <= Min_Velocity_Of_Dash) && wieldMode != WieldMode.Burdened)
+            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened);
+            while (DashCharging || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
