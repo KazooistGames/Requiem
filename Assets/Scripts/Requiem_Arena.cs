@@ -118,6 +118,7 @@ public class Requiem_Arena : Requiem
             Gates[0].OpenDoor();
             spawnSoulPearls(5 + Ritual / 2);
             Torch.Toggle(false);
+            Janitor.INSTANCE.CollectEverything();
             if (!idol)
             {
                 idol = spawnIdol();
@@ -126,13 +127,10 @@ public class Requiem_Arena : Requiem
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             Gates[0].CloseDoor();
             removeSoulPearlsAndGhosts();
-            Torch.Toggle(true);
             if(Ritual == 10)
             {
-                StateOfGame = GameState.Boss;
-                yield return bossRoutine();
-                yield return new WaitForSeconds(10);
-                Player.INSTANCE.RequiemAchieved = true;
+                StateOfGame = GameState.Final;
+                yield return finalBoss();
             }
             else
             {
@@ -149,6 +147,7 @@ public class Requiem_Arena : Requiem
         TimeGateTimeLeft = RitualTimes[Ritual % 3];
         spawnedMobs = spawnMobs(TotalStrengthOfWave);
         blurbIndicator.SetActive(true);
+        Torch.Toggle(true);
         while (StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
         {
             if (!Paused)
@@ -220,22 +219,27 @@ public class Requiem_Arena : Requiem
         yield return null;
         Scoreboard.Wave_Completed_Rewards();
         BloodWell.UnGulp();
-
+        yield return new WaitForSeconds(1);
     }
 
-    protected IEnumerator bossRoutine()
+    protected IEnumerator finalBoss()
     {
         idol.BecomeMob();
         while (idol.mobEntity)
         {
             yield return null;
         }
+        Torch.Toggle(false);
+        yield return new WaitForSeconds(5);
+        Player.INSTANCE.RequiemAchieved = true;
+        yield return new WaitForSeconds(5);
     }
 
 
     /***** PRIVATE *****/
     private void spawnSoulPearls(int count)
     {
+        if(Ritual == 10) { return; }
         for(int i = 0; i < count; i++)
         {
             SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();

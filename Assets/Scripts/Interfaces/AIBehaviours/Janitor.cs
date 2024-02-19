@@ -8,6 +8,8 @@ public class Janitor : AIBehaviour
     public static Janitor INSTANCE;
     public Hextile NextTask;
 
+    public bool ContinualCollectionEnabled = false;
+
     protected SphereCollider CleanZone;
 
     protected override void Start()
@@ -50,7 +52,11 @@ public class Janitor : AIBehaviour
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        if (playerIsTooCloseToObj(other.gameObject))
+        if (!ContinualCollectionEnabled)
+        {
+
+        }
+        else if (playerIsTooCloseToObj(other.gameObject))
         {
 
         }
@@ -73,7 +79,30 @@ public class Janitor : AIBehaviour
         }
     }
 
+    /***** PUBLIC *****/
+    public void CollectEverything()
+    {
+        Weapon[] weapons = FindObjectsOfType<Weapon>();
+        foreach(Weapon weapon in weapons)
+        {
+            if (!weapon.Wielder && !weapon.ImpaledObject && weapon != Player.INSTANCE.HostWeapon)
+            {
+                weapon.Telecommute(gameObject, determineTelecommuteCollectionSeconds(weapon.gameObject), (x) => Destroy(x.gameObject));
+            }
+        }
+        Bone[] bones = FindObjectsOfType<Bone>();
+        foreach(Bone bone in bones)
+        {
+            bone.Collect(gameObject, determineTelecommuteCollectionSeconds(bone.gameObject), (x) => Destroy(x.gameObject));     
+        }
+    }
+
     /***** PRIVATE *****/
+    private float determineTelecommuteCollectionSeconds(GameObject obj)
+    {
+        float distance = (transform.position - obj.transform.position).magnitude;
+        return Mathf.Pow(distance, 0.75f);
+    }
     private bool playerIsTooCloseToObj(GameObject obj)
     {
         if (!Player.INSTANCE)

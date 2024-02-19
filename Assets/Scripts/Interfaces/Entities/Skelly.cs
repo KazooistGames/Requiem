@@ -12,7 +12,7 @@ public class Skelly : Entity
     protected GameObject leg1;
     protected GameObject leg2;
 
-    public float MutationChancePerRitual = 0.025f;
+    public float MutationChancePerRitual = 0.03f;
 
     protected override void Awake()
     {
@@ -23,7 +23,7 @@ public class Skelly : Entity
     {
         base.Start();
         createSkeleton();
-        Haste = 0.8f;
+        Haste = Mathf.Lerp(0.75f, 0.85f, UnityEngine.Random.value);
         gameObject.name = "Skelly";
         JustWounded.AddListener(CRUMBLE);
     }

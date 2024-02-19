@@ -40,6 +40,7 @@ public class Requiem: MonoBehaviour
         Liminal,
         Wave,
         Boss,
+        Final,
         Lobby,
     }
     public GameState StateOfGame = GameState.Liminal;

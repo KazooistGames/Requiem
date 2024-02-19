@@ -85,8 +85,8 @@ public class Nemesis : AIBehaviour
         string key = "Beam!";
         if (hellfire.form == Hellfire.Form.Beam)
         {
-            entity.modSpeed[key] = -0.9f;
-            entity.modTurnSpeed[key] = -0.9f;
+            entity.modSpeed[key] = -0.95f;
+            entity.modTurnSpeed[key] = -0.95f;
         }
         else
         {

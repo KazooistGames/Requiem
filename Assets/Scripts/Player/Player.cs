@@ -354,6 +354,13 @@ public class Player : MonoBehaviour
         }
         HUD.Curtains.color = new Color(0, 0, 0, 1);
         HUD.scoreTransforms[1].GetComponent<Text>().fontSize = 162;
+        if (RequiemAchieved)
+        {
+            foreach (Transform child in HUD.Curtains.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
         _BlurbService.Toggle_Blurbs(false);
 
         //Requiem.INSTANCE.Restart();
