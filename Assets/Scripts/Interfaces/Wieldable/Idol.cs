@@ -95,7 +95,8 @@ public class Idol : Wieldable
         StartCoroutine(banter());
         Body.mass = 3f;
         PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
-        EventPickedUp.AddListener(materializeSoulPearls);
+        //dematerializeGhosts(this);
+        //EventPickedUp.AddListener(materializeSoulPearls);
         //EventDropped.AddListener(dematerializeGhosts);
     }
 
@@ -263,21 +264,21 @@ public class Idol : Wieldable
     }
 
     /***** PRIVATE *****/
-    private void materializeSoulPearls(Wieldable idol)
-    {
-        List<SoulPearl> pearls = FindObjectsOfType<SoulPearl>().ToList();
-        foreach (SoulPearl soulPearl in pearls)
-        {
-            soulPearl.FlyToPhylactery();
-        }
-    }
-    private void dematerializeGhosts(Wieldable idol)
-    {
-        List<Ghosty> ghosts = FindObjectsOfType<Ghosty>().ToList();
-        foreach (Ghosty ghosty in ghosts)
-        {
-            ghosty.Dematerialize();
-        }
-    }
+    //private void materializeSoulPearls(Wieldable idol)
+    //{
+    //    List<SoulPearl> pearls = FindObjectsOfType<SoulPearl>().ToList();
+    //    foreach (SoulPearl soulPearl in pearls)
+    //    {
+    //        soulPearl.FlyToPhylactery();
+    //    }
+    //}
+    //private void dematerializeGhosts(Wieldable idol)
+    //{
+    //    List<Ghosty> ghosts = FindObjectsOfType<Ghosty>().ToList();
+    //    foreach (Ghosty ghosty in ghosts)
+    //    {
+    //        ghosty.Die();
+    //    }
+    //}
 
 }

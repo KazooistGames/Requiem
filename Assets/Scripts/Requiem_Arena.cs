@@ -111,12 +111,13 @@ public class Requiem_Arena : Requiem
         blurbIndicator.GetComponent<Text>().text = "0:00";
         StateOfGame = GameState.Lobby;
         yield return new WaitUntil(() => BloodWell.Volume == 0);
+        spawnSoulPearls(3);
         while (Player.INSTANCE.HostEntity)
         {
             StateOfGame = GameState.Liminal;
             Ritual++;
             Gates[0].OpenDoor();
-            spawnSoulPearls(5 + Ritual / 2);
+            dematerializeGhosts();
             Torch.Toggle(false);
             Janitor.INSTANCE.CollectEverything();
             if (!idol)
@@ -126,8 +127,8 @@ public class Requiem_Arena : Requiem
             yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
             Gates[0].CloseDoor();
-            removeSoulPearlsAndGhosts();
-            if(Ritual == 10)
+            materializeSoulPearls();
+            if (Ritual == 10)
             {
                 StateOfGame = GameState.Final;
                 yield return finalBoss();
@@ -430,6 +431,23 @@ public class Requiem_Arena : Requiem
         Hextile spawnTile = spawnCandidates[UnityEngine.Random.Range(0, spawnCandidates.Count)];
         newIdol.transform.position = RAND_POS_IN_TILE(spawnTile);
         return newIdol;
+    }
+
+    private void materializeSoulPearls()
+    {
+        List<SoulPearl> pearls = FindObjectsOfType<SoulPearl>().ToList();
+        foreach (SoulPearl soulPearl in pearls)
+        {
+            soulPearl.FlyToPhylactery();
+        }
+    }
+    private void dematerializeGhosts()
+    {
+        List<Ghosty> ghosts = FindObjectsOfType<Ghosty>().ToList();
+        foreach (Ghosty ghosty in ghosts)
+        {
+            ghosty.Die();
+        }
     }
 
 }

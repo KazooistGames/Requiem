@@ -21,8 +21,8 @@ public class Ghosty : Entity
     {
         base.Awake();
         anim = GetComponent<Animator>() == null ? gameObject.AddComponent<Animator>() : GetComponent<Animator>();
-        Strength = 100f;
-        Haste = 0.7f;
+        Strength = 50f;
+        Haste = 1f;
     }
 
     protected override void Start()
@@ -32,6 +32,8 @@ public class Ghosty : Entity
         gameObject.name = "Ghosty";
         JustVanquished.AddListener(Dematerialize);
         JustDisarmed.AddListener(Die);
+        Allegiance = Player.INSTANCE.Faction;
+        statBar.SetActive(false);
     }
 
     protected override void Update()
@@ -104,7 +106,7 @@ public class Ghosty : Entity
         if (backStorage)
         {
             backStorage.DropItem(yeet: true);
-        }   
+        }
     }
 
 }
