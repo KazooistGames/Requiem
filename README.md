@@ -24,6 +24,8 @@ You are a demon sealed away in its final resting place, a chamber of violence. N
 
 Score points by defeating enemies during a ritual.
 
+Drink from the well to restore your health to be released from the chamber. You can return to the well to restore health between rituals.
+
 Start the ritual by finding the idol, a flaming skull, then bring it to the center of the alter to start a ritual.
 You only have a set amount of time per ritual to defeat as many enemies as you can, so go fast!
 The rituals will become more difficult as time goes on. Every 3rd ritual includes a boss spawn at the end.
