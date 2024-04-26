@@ -1,12 +1,20 @@
-WASD movement
-hold SPACE to charge dash, release to dash
+WASD movement.
+
+hold SPACE to charge dash, release to dash.
+
 LMB for quick attack. Dashing while quick attacking applies a bleed.
-RMB for strong attack. Charge it up for more damage. Releasing right on the sweet spot unleashes a flaming "true strike"
+
+RMB for strong attack. Charge it up for more damage. Releasing right on the sweet spot unleashes a flaming "true strike".
+
 hold SHIFT to block. Time your blocks right as an enemy hits you to parry them.
-hold Q to aim, release to throw weapon. Press Q again to retrieve weapon
-Press E to yank chain after throwing weapon
-G to drop currently held item
-F to interact
+
+hold Q to aim, release to throw weapon. Press Q again to retrieve weapon.
+
+Press E to yank chain after throwing weapon.
+
+G to drop currently held item.
+
+F to interact.
 
 
 GOAL OF GAME:
