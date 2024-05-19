@@ -630,6 +630,11 @@ public class Entity : MonoBehaviour
             OffHand.DropItem();
         }
         JustVanquished.Invoke();
+        SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
+        pearl.transform.position = transform.position;
+        pearl.Telecommute(Requiem_Arena.INSTANCE.CenterTile.gameObject, 0.1f, (x) => Destroy(x.gameObject), false, true);
+        pearl.Body.useGravity = false;
+        //pearl.PhysicsBoxes[0].enabled = false;
         Destroy(gameObject);
     }
 

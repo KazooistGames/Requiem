@@ -85,7 +85,7 @@ public class Requiem: MonoBehaviour
             GameClock += Time.deltaTime;
             Time.timeScale = TimeScale;
             Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 

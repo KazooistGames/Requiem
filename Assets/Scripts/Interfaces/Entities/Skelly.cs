@@ -23,7 +23,8 @@ public class Skelly : Entity
     {
         base.Start();
         createSkeleton();
-        Haste = Mathf.Lerp(0.75f, 0.85f, UnityEngine.Random.value);
+        Haste = .5f;
+        Strength = 50f;
         gameObject.name = "Skelly";
         JustWounded.AddListener(CRUMBLE);
     }

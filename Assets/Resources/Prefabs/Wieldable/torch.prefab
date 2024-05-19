@@ -141,7 +141,6 @@ MonoBehaviour:
   EventThrown:
     m_PersistentCalls:
       m_Calls: []
-  ImpalingSomething: 0
   Heft: 25
   Idling: 1
   Recoiling: 0
@@ -149,6 +148,7 @@ MonoBehaviour:
   Allegiance: 0
   Wielded: 0
   MountTarget: {fileID: 0}
+  ImpaledObject: {fileID: 0}
   PrimaryTrigger: 0
   SecondaryTrigger: 0
   TertiaryTrigger: 0
@@ -5008,7 +5008,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1

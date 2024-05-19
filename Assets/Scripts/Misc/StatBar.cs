@@ -28,7 +28,7 @@ public class StatBar : MonoBehaviour
             updateFill();
             updateBorder();
             GetComponent<RectTransform>().sizeDelta = new Vector2(1.0f, 0.1f) * Mathf.Pow(Player.INSTANCE.Cam.Eyes.orthographicSize + 0.25f, 1.5f);
-            transform.eulerAngles = new Vector3(-45f, 90f - Player.INSTANCE.Cam.HorizonatalOffsetAngle, 0f);
+            transform.eulerAngles = new Vector3(-45f, -Player.INSTANCE.Cam.HorizonatalOffsetAngle, 0f);
             transform.localPosition = Vector3.up * Entity.Height * Host.heightScalar;       
         }
         else

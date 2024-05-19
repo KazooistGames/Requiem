@@ -425,6 +425,8 @@ public class Wieldable : MonoBehaviour
 
     private IEnumerator telecommuteRoutine(GameObject target, float teleScalar, Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
+        yield return null;
+        Body.velocity = Vector3.zero;
         telecommuteTarget = target;
         Telecommuting = true;
         float timer = 0.0f;
@@ -445,11 +447,14 @@ public class Wieldable : MonoBehaviour
         }
         while (Telecommuting && !Wielder && target)
         {
+            Vector3 total_disposition;
+            Vector3 increment;
             if (useScalarAsSpeed)
             {
-                Vector3 totalDisposition = target.transform.position - transform.position;
-                Vector3 increment = totalDisposition.normalized * teleScalar * Time.deltaTime;
-                if (totalDisposition.magnitude <= increment.magnitude)
+                total_disposition = target.transform.position - transform.position;
+                total_disposition.Scale(new Vector3(1, 0, 1));
+                increment = total_disposition.normalized * teleScalar * Time.deltaTime;
+                if (total_disposition.magnitude <= increment.magnitude)
                 {
                     cancelCommute();
                     yield break;
@@ -481,6 +486,8 @@ public class Wieldable : MonoBehaviour
     }
     private IEnumerator telecommuteRoutine(Vector3 target, float teleScalar, Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
+        yield return null;
+        Body.velocity = Vector3.zero;
         //telecommuteTarget = target;
         Telecommuting = true;
         float timer = 0.0f;
@@ -501,11 +508,14 @@ public class Wieldable : MonoBehaviour
         }
         while (Telecommuting && !Wielder)
         {
+            Vector3 total_disposition;
+            Vector3 increment;
             if (useScalarAsSpeed)
             {
-                Vector3 totalDisposition = target - transform.position;
-                Vector3 increment = totalDisposition.normalized * teleScalar * Time.deltaTime;
-                if (totalDisposition.magnitude <= increment.magnitude)
+                total_disposition = target - transform.position;
+                total_disposition.Scale(new Vector3(1, 0, 1));
+                increment = total_disposition.normalized * teleScalar * Time.deltaTime;
+                if (total_disposition.magnitude <= increment.magnitude)
                 {
                     cancelCommute();
                     yield break;

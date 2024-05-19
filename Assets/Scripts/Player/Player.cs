@@ -20,6 +20,8 @@ public class Player : MonoBehaviour
     public Keyboard CurrentKeyboard;
     public Mouse CurrentMouse;
 
+    public GameObject MouseIndicator;
+
     public bool Dead = false;
     public Entity.Loyalty Faction = Entity.Loyalty.neutral;
     public Entity HostEntity;
@@ -53,6 +55,7 @@ public class Player : MonoBehaviour
         gameObject.name = "Player";
         gameObject.tag = "Player";
         InitPlayerInGame();
+        MouseIndicator = Instantiate(Resources.Load<GameObject>("Prefabs/UX/Indicator"));
     }
 
     void Update()
@@ -76,7 +79,7 @@ public class Player : MonoBehaviour
         {
             if (HostEntity)
             {
-                inputCamera();
+                inputMouse();
                 inputMovement();
                 inputItemControls();
                 inputItemManagement();
@@ -125,42 +128,57 @@ public class Player : MonoBehaviour
 
     /***** PRIVATE *****/
 
-    private void inputCamera()
+    private void inputMouse()
     {
-        float differenceCap = 0f;
-        Vector2 cameraFlat = new Vector2(Cam.transform.forward.x, Cam.transform.forward.z).normalized;
-        Vector2 hostFlat = new Vector2(HostEntity.LookDirection.x, HostEntity.LookDirection.z).normalized;
-        float angleDifference = Vector2.SignedAngle(cameraFlat, hostFlat);
-        float spinSpeed = Mathf.Abs(angleDifference) >= differenceCap ? 60 : 30;
-        float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Entity.DefaultTurnSpeed, 1.0f, 0.25f);
-        float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
-        bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
-        Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
-        if (!Cam.LockPosition)
+        Vector2 mouse_screen_position = CurrentMouse.position.ReadValue();
+        Ray mouse_ray = Cam.Eyes.ScreenPointToRay(mouse_screen_position);
+        RaycastHit floor_ray_hit;
+        if (Physics.Raycast(mouse_ray, out floor_ray_hit, 100, 1 << Requiem.layerTile))
         {
-            Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 360) * Cam.ZoomSensitivity;
+            Vector3 mouse_world_position = floor_ray_hit.point;
+            mouse_world_position.y = Hextile.Thickness / 2;
+            //Debug.Log(mouse_world_position);
+            Debug.DrawLine(transform.position, mouse_world_position, Color.red, Time.deltaTime);
+            MouseIndicator.transform.position = mouse_world_position;
+            Vector3 newLookPosition = (mouse_world_position - transform.position);
+            newLookPosition.Scale(new Vector3(1, 0, 1));
+            newLookPosition.Normalize();
+            HostEntity.LookDirection = newLookPosition;
         }
-        if (differenceCap == 0)
-        {
+        //float differenceCap = 0f;
+        //Vector2 cameraFlat = new Vector2(Cam.transform.forward.x, Cam.transform.forward.z).normalized;
+        //Vector2 hostFlat = new Vector2(HostEntity.LookDirection.x, HostEntity.LookDirection.z).normalized;
+        //float angleDifference = Vector2.SignedAngle(cameraFlat, hostFlat);
+        //float spinSpeed = Mathf.Abs(angleDifference) >= differenceCap ? 60 : 30;
+        //float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Entity.DefaultTurnSpeed, 1.0f, 0.25f);
+        //float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
+        //bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
+        //Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
+        //if (!Cam.LockPosition)
+        //{
+        //    Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 360) * Cam.ZoomSensitivity;
+        //}
+        //if (differenceCap == 0)
+        //{
 
-            HostEntity.LookDirection = AIBehaviour.angleToVector(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
-            Cam.HorizonatalOffsetAngle += angleDifference / 5;
-        }
-        else
-        {
-            if (Mathf.Abs(angleDifference) < differenceCap || aligning)
-            {
-                HostEntity.LookDirection = AIBehaviour.angleToVector(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
-            }
-            if (Mathf.Abs(angleDifference) >= differenceCap && !aligning)
-            {
-                Cam.HorizonatalOffsetAngle -= spinSpeed * Time.deltaTime * CurrentMouse.delta.ReadValue().x;
-            }
-            if (Mathf.Abs(angleDifference) > differenceCap * 2)
-            {
-                Cam.HorizonatalOffsetAngle += angleDifference / 2;
-            }
-        }
+        //    HostEntity.LookDirection = AIBehaviour.angleToVector(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
+        //    Cam.HorizonatalOffsetAngle += angleDifference / 5;
+        //}
+        //else
+        //{
+        //    if (Mathf.Abs(angleDifference) < differenceCap || aligning)
+        //    {
+        //        HostEntity.LookDirection = AIBehaviour.angleToVector(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
+        //    }
+        //    if (Mathf.Abs(angleDifference) >= differenceCap && !aligning)
+        //    {
+        //        Cam.HorizonatalOffsetAngle -= spinSpeed * Time.deltaTime * CurrentMouse.delta.ReadValue().x;
+        //    }
+        //    if (Mathf.Abs(angleDifference) > differenceCap * 2)
+        //    {
+        //        Cam.HorizonatalOffsetAngle += angleDifference / 2;
+        //    }
+        //}
     }
 
     private void inputMovement()
@@ -168,7 +186,7 @@ public class Player : MonoBehaviour
         rawInput = new Vector3();
         rawInput.z = (CurrentKeyboard.wKey.isPressed ? 1 : 0) + (CurrentKeyboard.sKey.isPressed ? -1 : 0);
         rawInput.x = (CurrentKeyboard.aKey.isPressed ? -1 : 0) + (CurrentKeyboard.dKey.isPressed ? 1 : 0);
-        Direction = rawInput == Vector3.zero ? Vector3.zero : AIBehaviour.angleToVector(AIBehaviour.getAngle(rawInput) + 90 + Cam.HorizonatalOffsetAngle);
+        Direction = rawInput == Vector3.zero ? Vector3.zero : AIBehaviour.angleToVector(AIBehaviour.getAngle(rawInput) + Cam.HorizonatalOffsetAngle);
         Direction = Direction.normalized;
         if (Direction != lastDirection)
         {
@@ -301,6 +319,9 @@ public class Player : MonoBehaviour
         moon.range = 3f;
         moon.color = Color.Lerp(Color.white, Color.blue, 0.25f);
         moon.bounceIntensity = 0;
+        //moon.shadowStrength = 0.5f;
+        //moon.shadows = LightShadows.Soft;
+        //moon.shadowNearPlane = 0.03f;
         HUD = Instantiate(Resources.Load<GameObject>("Prefabs/UX/HUD")).GetComponent<PlayerHUD>();
         Cam = new GameObject().AddComponent<PlayerCamera>();
         Progression = gameObject.AddComponent<PlayerProgression>();

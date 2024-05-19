@@ -8,7 +8,7 @@ using System;
 public class Requiem_Arena : Requiem
 {
     public static new Requiem_Arena INSTANCE;
-    public static int RadiusOfArena = 2;
+    public static int RadiusOfArena = 1;
 
     public List<List<Hextile>> ArenaTiles = new List<List<Hextile>>();
     public List<Landmark_Gate> Gates;
@@ -57,27 +57,40 @@ public class Requiem_Arena : Requiem
         Gates[0].AssignToTile(edgeOne);
         Gates[0].SetPositionOnTile(firstGateDirection);
         Chambers.Add(edgeOne.Extend(firstGateDirection));
-        BloodWell = new GameObject().AddComponent<Landmark_Well>();
-        BloodWell.AssignToTile(Chambers[0]);
-        Credits = new GameObject().AddComponent<Landmark_Credits>();
-        Credits.AssignToTile(Chambers[0]);
         yield return null;
-        Credits.SetPositionOnTile(firstGateDirection);
 
-        Hextile.HexPosition secondGateDirection = Hextile.RotateHexPosition(firstGateDirection, 2);
+        Hextile.HexPosition secondGateDirection = Hextile.RotateHexPosition(firstGateDirection, -1);
         Hextile edgeTwo = ArenaTiles[0][0].Edge(secondGateDirection);
         Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
         Gates[1].AssignToTile(edgeTwo);
         Gates[1].SetPositionOnTile(secondGateDirection);  
         Chambers.Add(edgeTwo.Extend(secondGateDirection));
-
-        Hextile.HexPosition thirdGateDirection = Hextile.RotateHexPosition(secondGateDirection, 2);
+        yield return null;
+        Hextile.HexPosition thirdGateDirection = Hextile.RotateHexPosition(secondGateDirection, -2);
         Hextile edgeThree = ArenaTiles[0][0].Edge(thirdGateDirection);
         Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
         Gates[2].AssignToTile(edgeThree);
         Gates[2].SetPositionOnTile(thirdGateDirection);
         Chambers.Add(edgeThree.Extend(thirdGateDirection));
+        yield return null;
+        Hextile.HexPosition fourthGateDirection = Hextile.RotateHexPosition(thirdGateDirection, -1);
+        Hextile edgeFour = ArenaTiles[0][0].Edge(fourthGateDirection);
+        Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
+        Gates[3].AssignToTile(edgeFour);
+        Gates[3].SetPositionOnTile(fourthGateDirection);
+        Chambers.Add(edgeFour.Extend(fourthGateDirection));
         //yield return Hextile.DrawCircle(RadiusOfCrypt, ArenaTiles[0][0].Edge(startingDirection), startingDirection, CryptTiles);
+        yield return null;
+        /** BUILD BLOOD WELLS **/
+        BloodWell = new GameObject().AddComponent<Landmark_Well>();
+        BloodWell.AssignToTile(ArenaTiles[0][0].Edge((Hextile.HexPosition)2));
+        new GameObject().AddComponent<Landmark_Well>().AssignToTile(ArenaTiles[0][0].Edge((Hextile.HexPosition)5));
+
+        /** BUILD CREDITS **/
+        Credits = new GameObject().AddComponent<Landmark_Credits>();
+        Credits.AssignToTile(Chambers[0]);
+        yield return null;  
+        Credits.SetPositionOnTile(firstGateDirection);
 
         AllTilesInPlay.AddRange(ArenaTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
         //AllTilesInPlay.AddRange(CryptTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
@@ -104,14 +117,14 @@ public class Requiem_Arena : Requiem
     {
         yield return new WaitUntil(() => Commissioned);
         Torch.Toggle(false);
-        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(Chambers[0]);
+        Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(CenterTile);
         Player.INSTANCE.HostEntity.Vitality = 1;
         blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
         blurbIndicator.SetActive(false);
         blurbIndicator.GetComponent<Text>().text = "0:00";
         StateOfGame = GameState.Lobby;
-        yield return new WaitUntil(() => BloodWell.Volume == 0);
-        spawnSoulPearls(3);
+        yield return null;
+        //spawnSoulPearls(3);
         while (Player.INSTANCE.HostEntity)
         {
             StateOfGame = GameState.Liminal;
@@ -312,7 +325,7 @@ public class Requiem_Arena : Requiem
                         Hextile.HexPosition position = arenaTileRings[0][0].AdjacentTiles.First(x => x.Key == tile).Value;
                         if ((int)position % 2 == 0)
                         {
-                            new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
+                            //new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
                             new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                         }
                         else
@@ -427,7 +440,7 @@ public class Requiem_Arena : Requiem
     private Idol spawnIdol()
     {
         Idol newIdol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
-        List<Hextile> spawnCandidates = ArenaTiles[2].Where(x => x.Landmarks.FirstOrDefault(x => x.GetComponent<Landmark_Barrier>())).ToList();
+        List<Hextile> spawnCandidates = ArenaTiles[ArenaTiles.Count-1].Where(x => x.Landmarks.FirstOrDefault(x => x.GetComponent<Landmark_Barrier>())).ToList();
         Hextile spawnTile = spawnCandidates[UnityEngine.Random.Range(0, spawnCandidates.Count)];
         newIdol.transform.position = RAND_POS_IN_TILE(spawnTile);
         return newIdol;

@@ -21,15 +21,15 @@ public class PlayerCamera : MonoBehaviour
     public float CamHeight = 0.5f;
     public float CamHeightMin = 1f;
     public float CamHeightMax = 1.0f;
-    public float minFOV = 50f;
-    public float maxFOV = 70f;
+    public float minFOV = 15f;
+    public float maxFOV = 45f;
     public float minOrthoSize = 0.25f;
     public float maxOrthoSize = 1.25f;
     public float ZoomSensitivity = 3;
 
     public bool Orthographic = false;
 
-    public int RenderResolutionPixelWidth = 420;
+    public int RenderResolutionPixelWidth = 1920;
     private int pixelsHigh = 240;
 
 
@@ -46,9 +46,12 @@ public class PlayerCamera : MonoBehaviour
         Eyes.clearFlags = CameraClearFlags.Color;
         Eyes.backgroundColor = Color.black;
         Eyes.nearClipPlane = 0.01f;
-        Eyes.farClipPlane = 10f;
+        Eyes.farClipPlane = 100f;
         Eyes.fieldOfView = 0;
         _BlurbService.INSTANCE.blurbCamera = Eyes;
+        transform.position = new Vector3(0, 10.1f, -1.8f);
+        transform.eulerAngles = new Vector3(80f, 0, 0);
+        Eyes.fieldOfView = 30;
     }
 
  
@@ -63,22 +66,22 @@ public class PlayerCamera : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
-        {
-            VerticalAngle = Mathf.Clamp(VerticalAngle, VerticalAngleMin, VerticalAngleMax);
-            float scale = (VerticalAngle - VerticalAngleMin) / (VerticalAngleMax - VerticalAngleMin);
-            CamOffsetMag = Mathf.Lerp(camOffsetMin, camOffsetMax, scale);
-            CamHeight = Mathf.Lerp(CamHeightMin, CamHeightMax, scale);
-            Vector3 CameraFocus = Player.INSTANCE.HostEntity.transform.position + (Vector3.up * Entity.Scale * CamHeight);
-            float leg = CamOffsetMag * Mathf.Cos(DegToRad(VerticalAngle));
-            camOffsetActual = new Vector3(Mathf.Cos(DegToRad(HorizonatalOffsetAngle)) * leg, CamOffsetMag * Mathf.Sin(DegToRad(VerticalAngle)), Mathf.Sin(DegToRad(HorizonatalOffsetAngle)) * leg);
-            transform.position = Vector3.MoveTowards(transform.position, CameraFocus + camOffsetActual, CamRepoSpeed);
-            transform.LookAt(CameraFocus);
-            Vector3 temp = transform.localEulerAngles;
-            temp.x = temp.x * 0.95f;
-            transform.localEulerAngles = temp;
-        }
-        _BlurbService.INSTANCE.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
+        //if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
+        //{
+        //    VerticalAngle = Mathf.Clamp(VerticalAngle, VerticalAngleMin, VerticalAngleMax);
+        //    float scale = (VerticalAngle - VerticalAngleMin) / (VerticalAngleMax - VerticalAngleMin);
+        //    CamOffsetMag = Mathf.Lerp(camOffsetMin, camOffsetMax, scale);
+        //    CamHeight = Mathf.Lerp(CamHeightMin, CamHeightMax, scale);
+        //    Vector3 CameraFocus = Player.INSTANCE.HostEntity.transform.position + (Vector3.up * Entity.Scale * CamHeight);
+        //    float leg = CamOffsetMag * Mathf.Cos(DegToRad(VerticalAngle));
+        //    camOffsetActual = new Vector3(Mathf.Cos(DegToRad(HorizonatalOffsetAngle)) * leg, CamOffsetMag * Mathf.Sin(DegToRad(VerticalAngle)), Mathf.Sin(DegToRad(HorizonatalOffsetAngle)) * leg);
+        //    transform.position = Vector3.MoveTowards(transform.position, CameraFocus + camOffsetActual, CamRepoSpeed);
+        //    transform.LookAt(CameraFocus);
+        //    Vector3 temp = transform.localEulerAngles;
+        //    temp.x = temp.x * 0.95f;
+        //    transform.localEulerAngles = temp;
+        //}
+        //_BlurbService.INSTANCE.blurbScalar = 2 - Mathf.Exp(-CamOffsetMag / camOffsetMin);
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
