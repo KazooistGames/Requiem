@@ -216,7 +216,7 @@ public abstract class Weapon : Wieldable
                     attackONS = true;
                     modifyWielderSpeed(0);
                 }
-                else if (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack)
+                else if (Action == ActionAnim.QuickAttack)
                 {
                     if (attackONS)
                     {
@@ -227,14 +227,22 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
-                        if(Action == ActionAnim.QuickAttack)
-                        {
-                            playLightSwing();
-                        }
-                        else if(Action == ActionAnim.StrongAttack)
-                        {
-                            playHeavySwing();
-                        }
+                        playLightSwing();
+                    }
+                    //modifyWielderSpeed(heftSlowModifier, true);
+                }
+                else if (Action == ActionAnim.StrongAttack)
+                {
+                    if (attackONS)
+                    {
+                        playClashSoundONS = true;
+                        attackONS = false;
+                        alreadyHit = new List<GameObject>();
+                        HitBox.isTrigger = true;
+                        HitBox.enabled = true;
+                        HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
+                        Swinging.Invoke(this);
+                        playHeavySwing();
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
                 }
@@ -424,16 +432,19 @@ public abstract class Weapon : Wieldable
     {
         Blocker.Blocking.Invoke(Blocker, Attacker);
         Attacker.Clashing.Invoke(Attacker, Blocker);
-        APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: 0.5f);
+        float shove_scalar = 1;
         if (Attacker.Action == ActionAnim.StrongAttack)
         {
             float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
+            shove_scalar = 0.5f;
         }
         else
         {
             Attacker.playTink();
+            shove_scalar = 0.25f;
         }
+        APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: shove_scalar);
         if (Blocker.Wielder)
         {
             Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
@@ -486,7 +497,8 @@ public abstract class Weapon : Wieldable
         else if (!getObstructionBetweenEntities(foe, weapon.MostRecentWielder))
         {
             weapon.Hitting.Invoke(weapon, foe);
-            APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe);
+            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 1 : 0.5f;
+            APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe, shove_scalar);
             weapon.playSlap(foe.transform.position);
             weapon.FullCollisionONS(foe.gameObject);
             Weapon_Hit.Invoke(weapon);
@@ -520,7 +532,7 @@ public abstract class Weapon : Wieldable
         setHighlightColor(Color.black);
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
-        bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.25f : 0.5f) : true);
+        bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.0f : 0.25f) : true);
         if (cleanhit && !ImpaledObject)
         {
             StartCoroutine(ImpaleRoutine(collision.gameObject, contact.point));
@@ -627,7 +639,7 @@ public abstract class Weapon : Wieldable
     {
         if (!foe || !weapon.MostRecentWielder) { return; }
         float impactPower = weapon.Heft * (1 + weapon.Tempo);
-        Vector3 origin = (weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position);
+        Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position;
         Vector3 disposition = foe.transform.position - origin;
         Vector3 velocityChange = disposition.normalized * (impactPower / 30f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
         if (weapon.TrueStrike)

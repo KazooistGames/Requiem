@@ -634,12 +634,7 @@ public class Entity : MonoBehaviour
     }
 
 
-
-
     /*** PRIVATE ***/
-
-
-
     private void indicatorManagement()
     {
         if (indicator)

@@ -83,7 +83,7 @@ public class Struggler : Entity
         GameObject splatter = Instantiate(BLOOD_SPLATTER_PREFAB);
         splatter.transform.position = transform.position;
         splatter.transform.eulerAngles = new Vector3(45, UnityEngine.Random.value * 360f, 45);
-        splatter.GetComponent<Projector>().orthographicSize = Mathf.Lerp(0.05f, 0.70f, (damage / 100));
+        splatter.GetComponent<Projector>().orthographicSize = Mathf.Lerp(0.075f, 0.75f, (damage / 100));
     }
 
     private void createProfile()

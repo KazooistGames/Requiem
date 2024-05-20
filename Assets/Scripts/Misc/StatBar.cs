@@ -23,12 +23,12 @@ public class StatBar : MonoBehaviour
         canvas.enabled = Host ? Host.Foe && !Host.requiemPlayer : false;
         if (Host && Player.INSTANCE)
         {
-            transform.localScale = (Vector3.one + Vector3.one * Host.Strength/100f)/2;
+            transform.localScale = (Vector3.one + Vector3.one * Host.Strength/100f);
             canvas.worldCamera = Player.INSTANCE.Cam.Eyes;
             updateFill();
             updateBorder();
             GetComponent<RectTransform>().sizeDelta = new Vector2(1.0f, 0.1f) * Mathf.Pow(Player.INSTANCE.Cam.Eyes.orthographicSize + 0.25f, 1.5f);
-            //transform.eulerAngles = new Vector3(-45f, -Player.INSTANCE.Cam.HorizonatalOffsetAngle, 0f);
+            transform.eulerAngles = new Vector3(-45f, 0, 0f);
             transform.localPosition = Vector3.up * Entity.Height * Host.heightScalar;       
         }
         else
@@ -39,9 +39,7 @@ public class StatBar : MonoBehaviour
     }
 
 
-
     /***** PRIVATE *****/
-
     private void updateFill()
     {
         float hp = Host.Vitality / Host.Strength;

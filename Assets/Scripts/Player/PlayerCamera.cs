@@ -26,7 +26,7 @@ public class PlayerCamera : MonoBehaviour
         Eyes.fieldOfView = 0;
         _BlurbService.INSTANCE.blurbCamera = Eyes;
         transform.position = new Vector3(0, 10.1f, -1.8f);
-        transform.eulerAngles = new Vector3(80f, 0, 0);
+        transform.eulerAngles = new Vector3(75f, 0, 0);
         Eyes.fieldOfView = 30;
     }
 
@@ -67,17 +67,19 @@ public class PlayerCamera : MonoBehaviour
         return transversal_offset + vertical_offset;
     }
 
-
-    public Vector2 YSpan = new Vector2(5, 15);
-    public float MaxDistance = 5;
+    public Vector2 Y_Span = new Vector2(5, 10);
+    public Vector2 Y_DeadbandRange = new Vector2(1, 5);
     private float calc_vertical_offset()
     {
-        float return_value = Mathf.Lerp(YSpan.x, YSpan.y, get_cursor_disposition() / MaxDistance);
-        return Mathf.Clamp(return_value, YSpan.x, YSpan.y);
+        float cursor_dispo = get_cursor_disposition();
+        float deadband_span = Y_DeadbandRange.y - Y_DeadbandRange.x;
+        float y_scalar = Mathf.Clamp((get_cursor_disposition() - Y_DeadbandRange.x) / deadband_span, 0, 1);
+        float return_value = Mathf.Lerp(Y_Span.x, Y_Span.y, y_scalar);
+        return Mathf.Clamp(return_value, Y_Span.x, Y_Span.y);
     }
 
-    public Vector2 ZSpan = new Vector2(-0.5f, -1.5f);
-    public Vector2 homingSpan = new Vector2(0.20f, 0.5f);
+    public Vector2 ZSpan = new Vector2(-1.1f, -2.2f);
+    public Vector2 homingSpan = new Vector2(0.1f, 0.5f);
     private Vector3 calc_transversal_offset()
     {
         float player_position_weight = 2;
@@ -93,7 +95,7 @@ public class PlayerCamera : MonoBehaviour
 
         return Vector3.Lerp(unhomed_position, Vector3.zero, homing_weight) + pullback_offset;
     }
-
+        
     private float get_cursor_disposition()
     {
         if (!Player.INSTANCE) { return 0; }

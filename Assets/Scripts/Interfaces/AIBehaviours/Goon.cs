@@ -28,7 +28,8 @@ public class Goon : AIBehaviour
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
         martialPreferredState = martialState.attacking;
-        sensorySightRangeScalar = 1.0f;
+        sensorySightRangeScalar = 0.75f;
+        sensoryAudioRangeScalar = 0.5f;
         meanderPauseFrequency = 0.5f;
         tangoStrafePauseFreq = 0.5f;
         tangoStrafeEnabled = true;

@@ -79,7 +79,7 @@ public class Player : MonoBehaviour
         {
             if (HostEntity)
             {
-                inputMouse();
+                inputCamera();
                 inputMovement();
                 inputItemControls();
                 inputItemManagement();
@@ -128,12 +128,12 @@ public class Player : MonoBehaviour
 
     /***** PRIVATE *****/
 
-    private void inputMouse()
+    private void inputCamera()
     {
         Vector2 mouse_screen_position = CurrentMouse.position.ReadValue();
         Ray mouse_ray = Cam.Eyes.ScreenPointToRay(mouse_screen_position);
         RaycastHit floor_ray_hit;
-        if (Physics.Raycast(mouse_ray, out floor_ray_hit, 100, 1 << Requiem.layerTile))
+        if (Physics.Raycast(mouse_ray, out floor_ray_hit, 100, 1 << Requiem.layerTile, QueryTriggerInteraction.Ignore))
         {
             Vector3 mouse_world_position = floor_ray_hit.point;
             mouse_world_position.y = Hextile.Thickness / 2;
@@ -145,40 +145,6 @@ public class Player : MonoBehaviour
             newLookPosition.Normalize();
             HostEntity.LookDirection = newLookPosition;
         }
-        //float differenceCap = 0f;
-        //Vector2 cameraFlat = new Vector2(Cam.transform.forward.x, Cam.transform.forward.z).normalized;
-        //Vector2 hostFlat = new Vector2(HostEntity.LookDirection.x, HostEntity.LookDirection.z).normalized;
-        //float angleDifference = Vector2.SignedAngle(cameraFlat, hostFlat);
-        //float spinSpeed = Mathf.Abs(angleDifference) >= differenceCap ? 60 : 30;
-        //float hostScalar = Mathf.Lerp(HostEntity.TurnSpeed / Entity.DefaultTurnSpeed, 1.0f, 0.25f);
-        //float increment = Time.deltaTime * spinSpeed * hostScalar * mouseSpeedScalar;
-        //bool aligning = Mathf.Sign(CurrentMouse.delta.ReadValue().x) == Mathf.Sign(angleDifference);
-        //Cam.VerticalAngle -= (increment / 3 * CurrentMouse.delta.ReadValue().y);
-        //if (!Cam.LockPosition)
-        //{
-        //    Cam.Eyes.fieldOfView -= (CurrentMouse.scroll.ReadValue().y / 360) * Cam.ZoomSensitivity;
-        //}
-        //if (differenceCap == 0)
-        //{
-
-        //    HostEntity.LookDirection = AIBehaviour.angleToVector(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
-        //    Cam.HorizonatalOffsetAngle += angleDifference / 5;
-        //}
-        //else
-        //{
-        //    if (Mathf.Abs(angleDifference) < differenceCap || aligning)
-        //    {
-        //        HostEntity.LookDirection = AIBehaviour.angleToVector(AIBehaviour.getAngle(HostEntity.LookDirection) - increment * CurrentMouse.delta.ReadValue().x);
-        //    }
-        //    if (Mathf.Abs(angleDifference) >= differenceCap && !aligning)
-        //    {
-        //        Cam.HorizonatalOffsetAngle -= spinSpeed * Time.deltaTime * CurrentMouse.delta.ReadValue().x;
-        //    }
-        //    if (Mathf.Abs(angleDifference) > differenceCap * 2)
-        //    {
-        //        Cam.HorizonatalOffsetAngle += angleDifference / 2;
-        //    }
-        //}
     }
 
     private void inputMovement()
@@ -279,7 +245,26 @@ public class Player : MonoBehaviour
                 HostEntity.MainHand.DropItem();
             }
         }
+        else if (!HostWeapon)
+        {
+
+        }
+        else if (HostWeapon.Wielder != HostEntity && !HostWeapon.Thrown && !HostWeapon.Telecommuting)
+        {
+            if((yank_timer += Time.deltaTime) >= yank_delay)
+            {
+                yank_timer -= yank_delay;
+                if (CurrentMouse.leftButton.isPressed)
+                {
+                    yankWeapon();
+                }
+                recallWeapon();
+            }
+
+        }
     }
+    private float yank_timer = 0;
+    private float yank_delay = 0.20f;
 
     private void inputItemControls()
     {
@@ -407,7 +392,7 @@ public class Player : MonoBehaviour
             Vector3 disposition = HostWeapon.transform.position - transform.position; 
             HostWeapon.transform.LookAt(HostEntity.transform);
             HostWeapon.transform.Rotate(Vector3.Cross(disposition.normalized, Vector3.up), -90, Space.World);
-            float recallPeriod = Mathf.Min(disposition.magnitude/3, 0.5f);
+            float recallPeriod = Mathf.Min(disposition.magnitude/4f, 0.4f);
             HostWeapon.Telecommute(HostEntity.gameObject, recallPeriod, x => x.PickupItem(HostEntity));
         }
     }
@@ -430,7 +415,7 @@ public class Player : MonoBehaviour
         {
             Entity impaledFoe = HostWeapon.ImpaledObject.GetComponent<Entity>();
             Wieldable impaledObject = HostWeapon.ImpaledObject.GetComponent<Wieldable>();
-            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 0.25f);
+            float yankStrength = Mathf.Lerp(Entity.Min_Velocity_Of_Dash, Entity.Max_Velocity_Of_Dash, 1f);
             if (impaledFoe)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
@@ -440,7 +425,7 @@ public class Player : MonoBehaviour
             else if (impaledObject)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
-                impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, Entity.Min_Velocity_Of_Dash);
+                impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, yankStrength);
             }
             else
             {
