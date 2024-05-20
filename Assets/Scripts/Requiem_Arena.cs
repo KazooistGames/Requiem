@@ -79,7 +79,6 @@ public class Requiem_Arena : Requiem
         Gates[3].AssignToTile(edgeFour);
         Gates[3].SetPositionOnTile(fourthGateDirection);
         Chambers.Add(edgeFour.Extend(fourthGateDirection));
-        //yield return Hextile.DrawCircle(RadiusOfCrypt, ArenaTiles[0][0].Edge(startingDirection), startingDirection, CryptTiles);
         yield return null;
         /** BUILD BLOOD WELLS **/
         BloodWell = new GameObject().AddComponent<Landmark_Well>();
@@ -93,11 +92,9 @@ public class Requiem_Arena : Requiem
         Credits.SetPositionOnTile(firstGateDirection);
 
         AllTilesInPlay.AddRange(ArenaTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
-        //AllTilesInPlay.AddRange(CryptTiles.Aggregate(new List<Hextile>(), (x, result) => result.Concat(x).ToList()));
         AllTilesInPlay.AddRange(Chambers);
 
         yield return buildArenaLandmarks(ArenaTiles);
-        //yield return buildCryptLandmarks(CryptTiles);
 
         yield return new WaitForSeconds(0.5f);
 

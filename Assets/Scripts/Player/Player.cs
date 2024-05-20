@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
     public Keyboard CurrentKeyboard;
     public Mouse CurrentMouse;
 
-    public GameObject MouseIndicator;
+    public GameObject CursorIndicator;
 
     public bool Dead = false;
     public Entity.Loyalty Faction = Entity.Loyalty.neutral;
@@ -55,7 +55,7 @@ public class Player : MonoBehaviour
         gameObject.name = "Player";
         gameObject.tag = "Player";
         InitPlayerInGame();
-        MouseIndicator = Instantiate(Resources.Load<GameObject>("Prefabs/UX/Indicator"));
+        CursorIndicator = Instantiate(Resources.Load<GameObject>("Prefabs/UX/Indicator"));
     }
 
     void Update()
@@ -139,7 +139,7 @@ public class Player : MonoBehaviour
             mouse_world_position.y = Hextile.Thickness / 2;
             //Debug.Log(mouse_world_position);
             Debug.DrawLine(transform.position, mouse_world_position, Color.red, Time.deltaTime);
-            MouseIndicator.transform.position = mouse_world_position;
+            CursorIndicator.transform.position = mouse_world_position;
             Vector3 newLookPosition = (mouse_world_position - transform.position);
             newLookPosition.Scale(new Vector3(1, 0, 1));
             newLookPosition.Normalize();
@@ -186,7 +186,7 @@ public class Player : MonoBehaviour
         rawInput = new Vector3();
         rawInput.z = (CurrentKeyboard.wKey.isPressed ? 1 : 0) + (CurrentKeyboard.sKey.isPressed ? -1 : 0);
         rawInput.x = (CurrentKeyboard.aKey.isPressed ? -1 : 0) + (CurrentKeyboard.dKey.isPressed ? 1 : 0);
-        Direction = rawInput == Vector3.zero ? Vector3.zero : AIBehaviour.angleToVector(AIBehaviour.getAngle(rawInput) + Cam.HorizonatalOffsetAngle);
+        Direction = rawInput == Vector3.zero ? Vector3.zero : AIBehaviour.angleToVector(AIBehaviour.getAngle(rawInput));
         Direction = Direction.normalized;
         if (Direction != lastDirection)
         {
@@ -314,9 +314,9 @@ public class Player : MonoBehaviour
         interactBox.isTrigger = true;
         moon = new GameObject("moon").AddComponent<Light>();
         moon.transform.SetParent(transform);
-        moon.gameObject.transform.localPosition = new Vector3(0, 0.20f, 0.10f);
-        moon.intensity = 1f;
-        moon.range = 3f;
+        moon.gameObject.transform.localPosition = new Vector3(0, 0.50f, 0.10f);
+        moon.intensity = 1.5f;
+        moon.range = 5f;
         moon.color = Color.Lerp(Color.white, Color.blue, 0.25f);
         moon.bounceIntensity = 0;
         //moon.shadowStrength = 0.5f;
