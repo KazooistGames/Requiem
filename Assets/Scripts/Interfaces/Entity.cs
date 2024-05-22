@@ -108,7 +108,7 @@ public class Entity : MonoBehaviour
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
     protected bool CrashEnvironmentONS = true;
 
-    public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
+    public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
     public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
