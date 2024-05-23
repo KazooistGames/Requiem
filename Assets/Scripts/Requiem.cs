@@ -35,6 +35,9 @@ public class Requiem: MonoBehaviour
     public static int layerWall = 6;
     public static int layerInvisible = 3;
 
+    public float EnvironmentLightStrobePeriod = 10;
+    private Light environmentLight;
+
     public enum GameState
     {
         Liminal,
@@ -60,11 +63,14 @@ public class Requiem: MonoBehaviour
 
     protected virtual void Start()
     {
-        
         TimeScale = Time.timeScale;
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
         RenderSettings.ambientSkyColor = Color.black;
         GameClock = 0f;
+        environmentLight = new GameObject("Directional Light").AddComponent<Light>();
+        environmentLight.type = LightType.Directional;
+        environmentLight.intensity = 0.25f;
+        environmentLight.shadows = LightShadows.None;
     }
 
     protected virtual void Update()
@@ -87,6 +93,7 @@ public class Requiem: MonoBehaviour
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.None;
         }
+        update_environment_light();
     }
 
     void OnDestroy()
@@ -95,6 +102,16 @@ public class Requiem: MonoBehaviour
     }
 
     /* CUSTOM METHODS */
+
+    private void update_environment_light()
+    {
+        if (!environmentLight) { return; }
+        float time = Time.unscaledTime / EnvironmentLightStrobePeriod;
+        float redChannel = Mathf.Max(Mathf.Sin(time), Mathf.Cos(time + Mathf.PI / 2));
+        float greenChannel = Mathf.Max(Mathf.Sin(2*time + Mathf.PI / 2), Mathf.Cos(2 * time + Mathf.PI));
+        float blueChannel = Mathf.Max(Mathf.Sin(time + Mathf.PI / 2), Mathf.Cos(time + Mathf.PI));
+        environmentLight.color = new Color(redChannel, greenChannel, blueChannel);
+    }
 
     public static AudioClip getSound(string path)
     {
@@ -156,6 +173,7 @@ public class Requiem: MonoBehaviour
         Hextile randomTile = AllTilesInPlay[UnityEngine.Random.Range(0, AllTilesInPlay.Count)];
         return RAND_POS_IN_TILE(randomTile);
     }
+
 
 
 }

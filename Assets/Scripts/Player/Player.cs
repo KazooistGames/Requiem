@@ -300,8 +300,8 @@ public class Player : MonoBehaviour
         moon = new GameObject("moon").AddComponent<Light>();
         moon.transform.SetParent(transform);
         moon.gameObject.transform.localPosition = new Vector3(0, 0.50f, 0.10f);
-        moon.intensity = 1.5f;
-        moon.range = 5f;
+        moon.intensity = 1f;
+        moon.range = 3f;
         moon.color = Color.Lerp(Color.white, Color.blue, 0.25f);
         moon.bounceIntensity = 0;
         //moon.shadowStrength = 0.5f;
