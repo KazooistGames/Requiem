@@ -365,7 +365,7 @@ MonoBehaviour:
   GameClock: 0
   Paused: 0
   TimeScale: 0
-  EnvironmentLightStrobePeriod: 15
+  EnvironmentLightStrobePeriod: 12
   StateOfGame: 0
   Gates: []
   Chambers: []
