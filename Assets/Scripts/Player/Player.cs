@@ -254,10 +254,7 @@ public class Player : MonoBehaviour
             if((yank_timer += Time.deltaTime) >= yank_delay)
             {
                 yank_timer -= yank_delay;
-                if (CurrentMouse.leftButton.isPressed)
-                {
-                    yankWeapon();
-                }
+                yankWeapon();
                 recallWeapon();
             }
 

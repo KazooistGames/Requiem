@@ -68,7 +68,7 @@ public class PlayerCamera : MonoBehaviour
     }
 
     public Vector2 Y_Span = new Vector2(5, 10);
-    public Vector2 Y_DeadbandRange = new Vector2(1, 5);
+    public Vector2 Y_DeadbandRange = new Vector2(0.5f, 5);
     private float calc_vertical_offset()
     {
         float cursor_dispo = get_cursor_disposition();

@@ -860,7 +860,7 @@ public class Entity : MonoBehaviour
                 Shove(dashDirection.normalized * scaledVelocity, true);
                 if (FinalDash)
                 {
-                    Stagger(shoveRecoveryPeriod/2);
+                    //Stagger(shoveRecoveryPeriod/2);
                 }
                 playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
                 yield return new WaitWhile(() => Shoved);

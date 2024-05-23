@@ -316,16 +316,20 @@ public class Requiem_Arena : Requiem
                     Alter.AssignToTile(ring[0]);
                     BloodWell = new GameObject().AddComponent<Landmark_Bloodwell>();
                     BloodWell.AssignToTile(ring[0].Edge((Hextile.HexPosition)5));
-                    new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(ring[0]);
+                    Landmark_Barrier barrier = new GameObject().AddComponent<Landmark_Barrier>();
+                    barrier.InnerBarrierAttempts = 0;
+                    barrier.AssignToTile(ring[0]);
                     break;
                 case 1:
                     foreach (Hextile tile in ring)
                     {
                         Hextile.HexPosition position = arenaTileRings[0][0].AdjacentTiles.First(x => x.Key == tile).Value;
-                        if ((int)position % 2 == 0)
+                        if (tile.Landmarks.Find(x => x.GetComponent<Landmark_Bloodwell>()))
                         {
-                            //new GameObject().AddComponent<Landmark_Pillar>().AssignToTile(tile);
-                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
+                            Landmark_Barrier newBarrier = new GameObject().AddComponent<Landmark_Barrier>();
+                            newBarrier.InnerBarrierAttempts = 0;
+                            newBarrier.OuterBarrierAttempts = 4;
+                            newBarrier.AssignToTile(tile);
                         }
                         else
                         {
@@ -341,7 +345,8 @@ public class Requiem_Arena : Requiem
                         if (tile.Landmarks.Find(x=>x.GetComponent<Landmark_Bloodwell>()))
                         {
                             Landmark_Barrier newBarrier = new GameObject().AddComponent<Landmark_Barrier>();
-                            newBarrier.OuterBarriersOnWallsOnly = true;
+                            newBarrier.InnerBarrierAttempts = 0;
+                            newBarrier.OuterBarrierAttempts = 4;
                             newBarrier.AssignToTile(tile);
                         }
                         else

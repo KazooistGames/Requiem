@@ -10,8 +10,8 @@ public class Landmark_Barrier : Landmark
 
     public bool OuterBarriersOnWallsOnly = false;
 
-    private int InnerBarrierAttempts = 3;
-    private int OuterBarrierAttempts = 3;
+    public int InnerBarrierAttempts = 3;
+    public int OuterBarrierAttempts = 3;
 
     protected Dictionary<Hextile.HexPosition, GameObject> innerBarrierModels = new Dictionary<Hextile.HexPosition, GameObject>();
     protected Dictionary<Hextile.HexPosition, GameObject> outerBarrierModels = new Dictionary<Hextile.HexPosition, GameObject>();
@@ -28,10 +28,6 @@ public class Landmark_Barrier : Landmark
         if (BarrierModelTemplates.Count == 0)
         {
             BarrierModelTemplates = Resources.LoadAll<GameObject>("Prefabs/Barriers/").ToList();
-        }
-        if(Tile.Landmarks.Count > 1)
-        {
-            InnerBarrierAttempts = 0;
         }
         setupBarrierModels();
     }

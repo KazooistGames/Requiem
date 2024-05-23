@@ -111,7 +111,7 @@ public class Requiem: MonoBehaviour
         float greenChannel = Mathf.Max(Mathf.Sin(2*time + Mathf.PI / 2), Mathf.Cos(2 * time + Mathf.PI));
         float blueChannel = Mathf.Max(Mathf.Sin(time + Mathf.PI / 2), Mathf.Cos(time + Mathf.PI));
         environmentLight.color = new Color(redChannel, greenChannel, blueChannel);
-        environmentLight.intensity = Mathf.Lerp(0.25f, 0.5f, Mathf.Sin(time / 2.5f));
+        environmentLight.intensity = Mathf.Lerp(0.3f, 0.6f, (Mathf.Sin(time /4.5f) + 1)/2);
     }
 
     public static AudioClip getSound(string path)
