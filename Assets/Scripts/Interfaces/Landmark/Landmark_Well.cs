@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using static UnityEngine.EventSystems.EventTrigger;
 
-public class Landmark_Well : Landmark
+public class Landmark_Bloodwell : Landmark
 {
     public static UnityEvent<Entity, float> JustGulped = new UnityEvent<Entity, float>();
 

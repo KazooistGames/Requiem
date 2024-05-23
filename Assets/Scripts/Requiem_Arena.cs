@@ -16,7 +16,7 @@ public class Requiem_Arena : Requiem
 
     public Hextile CenterTile;
     public Landmark_Alter Alter;
-    public Landmark_Well BloodWell;
+    public Landmark_Bloodwell BloodWell;
     public Landmark_Credits Credits;
     public Shade QuestGiver;
 
@@ -80,10 +80,9 @@ public class Requiem_Arena : Requiem
         Gates[3].SetPositionOnTile(fourthGateDirection);
         Chambers.Add(edgeFour.Extend(fourthGateDirection));
         yield return null;
-        /** BUILD BLOOD WELLS **/
-        BloodWell = new GameObject().AddComponent<Landmark_Well>();
-        BloodWell.AssignToTile(ArenaTiles[0][0].Edge((Hextile.HexPosition)2));
-        new GameObject().AddComponent<Landmark_Well>().AssignToTile(ArenaTiles[0][0].Edge((Hextile.HexPosition)5));
+
+
+        //new GameObject().AddComponent<Landmark_Well>().AssignToTile(ArenaTiles[0][0].Edge((Hextile.HexPosition)5));
 
         /** BUILD CREDITS **/
         Credits = new GameObject().AddComponent<Landmark_Credits>();
@@ -101,7 +100,7 @@ public class Requiem_Arena : Requiem
         new GameObject().AddComponent<Player>();
         Hextile randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
         randomTile = ArenaTiles[ArenaTiles.Count - 1][UnityEngine.Random.Range(0, ArenaTiles[ArenaTiles.Count - 1].Count)];
-        SPAWN(typeof(Shade), typeof(Janitor), RAND_POS_IN_TILE(randomTile));
+        SPAWN(typeof(Shade), typeof(Haunt), CenterTile.transform.position);
         Commissioned = true;
         if (!idol)
         {
@@ -114,6 +113,7 @@ public class Requiem_Arena : Requiem
     {
         yield return new WaitUntil(() => Commissioned);
         Torch.Toggle(false);
+        Haunt.INSTANCE.TargetTile = CenterTile;
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(CenterTile);
         Player.INSTANCE.HostEntity.Vitality = 1;
         blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
@@ -121,7 +121,6 @@ public class Requiem_Arena : Requiem
         blurbIndicator.GetComponent<Text>().text = "0:00";
         StateOfGame = GameState.Lobby;
         yield return null;
-        //spawnSoulPearls(3);
         while (Player.INSTANCE.HostEntity)
         {
             StateOfGame = GameState.Liminal;
@@ -129,7 +128,7 @@ public class Requiem_Arena : Requiem
             Gates[0].OpenDoor();
             dematerializeGhosts();
             Torch.Toggle(false);
-            Janitor.INSTANCE.CollectEverything();
+            collect_everything(Haunt.INSTANCE.gameObject);
             if (!idol)
             {
                 idol = spawnIdol();
@@ -315,6 +314,9 @@ public class Requiem_Arena : Requiem
                 case 0:
                     Alter = new GameObject().AddComponent<Landmark_Alter>();
                     Alter.AssignToTile(ring[0]);
+                    BloodWell = new GameObject().AddComponent<Landmark_Bloodwell>();
+                    BloodWell.AssignToTile(ring[0].Edge((Hextile.HexPosition)5));
+                    new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(ring[0]);
                     break;
                 case 1:
                     foreach (Hextile tile in ring)
@@ -336,15 +338,15 @@ public class Requiem_Arena : Requiem
                 case 2:
                     foreach (Hextile tile in ring)
                     {
-                        if (tile.Landmarks.Count == 0)
-                        {
-                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
-                        }
-                        else
+                        if (tile.Landmarks.Find(x=>x.GetComponent<Landmark_Bloodwell>()))
                         {
                             Landmark_Barrier newBarrier = new GameObject().AddComponent<Landmark_Barrier>();
                             newBarrier.OuterBarriersOnWallsOnly = true;
                             newBarrier.AssignToTile(tile);
+                        }
+                        else
+                        {
+                            new GameObject().AddComponent<Landmark_Barrier>().AssignToTile(tile);
                         }
                         yield return new WaitForFixedUpdate();
                         yield return null;

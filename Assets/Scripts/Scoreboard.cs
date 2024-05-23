@@ -24,7 +24,7 @@ public class Scoreboard : MonoBehaviour
         SpeedBonus = 0; 
         validEntitiesToScoreFromKilling = new List<Entity>();
         Entity.EntityVanquished.AddListener(Score_Kill);
-        Landmark_Well.JustGulped.AddListener(PENALIZE_GULP);
+        Landmark_Bloodwell.JustGulped.AddListener(PENALIZE_GULP);
     }
 
     void Update()
@@ -35,7 +35,7 @@ public class Scoreboard : MonoBehaviour
     private void OnDestroy()
     {
         Entity.EntityVanquished.RemoveListener(Score_Kill);
-        Landmark_Well.JustGulped.RemoveListener(PENALIZE_GULP);
+        Landmark_Bloodwell.JustGulped.RemoveListener(PENALIZE_GULP);
     }
 
     /***** PUBLIC *****/

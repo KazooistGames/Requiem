@@ -15,6 +15,7 @@ public class AIBehaviour : MonoBehaviour
         passive,
         aggro,
         enthralled,
+        custom
     }
     public AIState State = AIState.none;
     public float stateRunTimer;
@@ -1269,6 +1270,8 @@ public class AIBehaviour : MonoBehaviour
                         {
                             State = AIState.none;
                         }
+                        break;
+                    case AIState.custom:
                         break;
                 }
             }
