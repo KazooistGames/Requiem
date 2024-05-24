@@ -6,6 +6,7 @@ using System;
 
 public class Scoreboard : MonoBehaviour
 {
+    public float Charge = 0;
 
     public static Scoreboard INSTANCE;
     public static float Score = 0;

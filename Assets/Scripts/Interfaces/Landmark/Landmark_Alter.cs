@@ -12,9 +12,9 @@ public class Landmark_Alter : Landmark
     public GameObject Podium;
 
     public static int StepCount = 3;
-    public static float StepHeight = 0.015f;
+    public static float StepHeight = 0.0175f;
     public static float AlterToTileRatio = 0.5f;
-    public static float StepIngressRatio = 0.85f;
+    public static float StepIngressRatio = 0.8f;
     public static float podiumScalar = 12;
     public float RitualDurationSeconds = 5;
 

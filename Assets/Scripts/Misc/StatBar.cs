@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class StatBar : MonoBehaviour
 {
     public Entity Host;
+
     private Canvas canvas;
     private RectTransform[] transforms;
 
@@ -23,13 +24,12 @@ public class StatBar : MonoBehaviour
         canvas.enabled = Host ? Host.Foe && !Host.requiemPlayer : false;
         if (Host && Player.INSTANCE)
         {
-            transform.localScale = (Vector3.one + Vector3.one * Host.Strength/100f);
+            update_fill();
+            update_border();
+            update_transform();
             canvas.worldCamera = Player.INSTANCE.Cam.Eyes;
-            updateFill();
-            updateBorder();
             GetComponent<RectTransform>().sizeDelta = new Vector2(1.0f, 0.1f) * Mathf.Pow(Player.INSTANCE.Cam.Eyes.orthographicSize + 0.25f, 1.5f);
-            transform.eulerAngles = new Vector3(-45f, 180, 0f);
-            transform.localPosition = Vector3.up * Entity.Height * Host.heightScalar;       
+   
         }
         else
         {
@@ -39,8 +39,17 @@ public class StatBar : MonoBehaviour
     }
 
 
+
+
     /***** PRIVATE *****/
-    private void updateFill()
+    protected virtual void update_transform()
+    {
+        transform.localScale = (Vector3.one + Vector3.one * Host.Strength / 100f);
+        transform.eulerAngles = new Vector3(-45f, 180, 0f);
+        transform.localPosition = Vector3.up * Entity.Height * Host.heightScalar;
+    }
+
+    protected virtual void update_fill()
     {
         float hp = Host.Vitality / Host.Strength;
         RectTransform fill = transforms[3];
@@ -50,7 +59,7 @@ public class StatBar : MonoBehaviour
         fill.GetComponent<Image>().color = (int)Host.Posture > -1 ? new Color(1, 0, 0, alphaValue) : new Color(1, 0, 0.75f, alphaValue);
     }
 
-    private void updateBorder()
+    protected virtual void update_border()
     {
         RectTransform border = transforms[1];
         RectTransform backdrop = transforms[2];

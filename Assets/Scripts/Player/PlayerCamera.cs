@@ -58,7 +58,7 @@ public class PlayerCamera : MonoBehaviour
         RenderTexture.ReleaseTemporary(buffer);
     }
 
-    public float MaxRange = 5;
+    public float MaxRange = 4;
     private Vector3 triangulateOptimalPosition()
     {
         Vector3 transversal_offset = calc_transversal_offset();
@@ -68,7 +68,7 @@ public class PlayerCamera : MonoBehaviour
     }
 
     public Vector2 Y_Span = new Vector2(5, 10);
-    public Vector2 Y_DeadbandRange = new Vector2(0.5f, 5);
+    public Vector2 Y_DeadbandRange = new Vector2(0.5f, 4);
     private float calc_vertical_offset()
     {
         float cursor_dispo = get_cursor_disposition();

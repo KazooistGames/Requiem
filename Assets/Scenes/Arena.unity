@@ -365,7 +365,7 @@ MonoBehaviour:
   GameClock: 0
   Paused: 0
   TimeScale: 0
-  EnvironmentLightStrobePeriod: 15
+  EnvironmentLightStrobePeriod: 30
   StateOfGame: 0
   Gates: []
   Chambers: []
@@ -438,3 +438,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 488971b86d070214db3e43c62458569e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Charge: 0

@@ -162,17 +162,19 @@ public class Requiem_Arena : Requiem
         {
             if (!Paused)
             {
-                if (idol ? Alter.OfferingBox.bounds.Contains(idol.transform.position) : false)
+                if (Alter.OfferingBox.bounds.Contains(idol.transform.position))
                 {
                     if (Player.INSTANCE.Dead )
                     {
 
                     }
-                    else if (INSTANCE.Ritual < 10)
+                    else if (idol.mobEntity)
                     {
-                        Scoreboard.Add_Score(500);
-                        idol.SpawnAdds(INSTANCE.Ritual);
-                        Alter.Consume(idol.gameObject);
+
+                    }
+                    else
+                    {
+                        idol.BecomeMob();
                     }
                 }
                 int minutesLeft = (int)TimeGateTimeLeft / 60;
@@ -365,7 +367,7 @@ public class Requiem_Arena : Requiem
 
     public Dictionary<Type, int> EntityStrengths = new Dictionary<Type, int>()
     {
-        { typeof(Skelly), 100 },
+        { typeof(Skelly), 50 },
         { typeof(Nephalim), 200 },
         { typeof(Skully), 25 },
         { typeof(Wraith), 250 },
@@ -374,9 +376,9 @@ public class Requiem_Arena : Requiem
     public Dictionary<Type, int> AIDifficulties = new Dictionary<Type, int>()
     {
         { typeof(Goon), 1 },
-        //{ typeof(Bully), 3 },
-        //{ typeof(Sentinel), 6 },
-        //{ typeof(Revanent), 9 },
+        { typeof(Bully), 3 },
+        { typeof(Sentinel), 6 },
+        { typeof(Revanent), 9 },
     };
     public Dictionary<Type, Type> AIEntityPairings = new Dictionary<Type, Type>()
     {

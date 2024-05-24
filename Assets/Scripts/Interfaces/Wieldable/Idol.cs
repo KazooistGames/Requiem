@@ -145,6 +145,7 @@ public class Idol : Wieldable
 
     public Entity BecomeMob()
     {
+        if (mobEntity) { return mobEntity; }
         if (Wielder)
         {
             Wielder.Interact.RemoveListener(PickupItem);

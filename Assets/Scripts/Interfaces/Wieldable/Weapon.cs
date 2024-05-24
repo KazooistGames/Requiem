@@ -437,7 +437,7 @@ public abstract class Weapon : Wieldable
         {
             float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
-            shove_scalar = 0.5f;
+            shove_scalar = 1f;
         }
         else
         {

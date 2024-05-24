@@ -41,8 +41,8 @@ public class Nemesis : AIBehaviour
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensoryBaseRange = 2f;
-        sensorySightRangeScalar = 2f;
-        sensoryAudioRangeScalar = 2f;
+        sensorySightRangeScalar = 1.5f;
+        sensoryAudioRangeScalar = 1.5f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = Hextile.Radius;
