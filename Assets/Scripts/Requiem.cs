@@ -107,11 +107,15 @@ public class Requiem: MonoBehaviour
     {
         if (!environmentLight) { return; }
         float time = Time.unscaledTime / EnvironmentLightStrobePeriod;
-        float redChannel = Mathf.Max(Mathf.Sin(time), Mathf.Cos(time + Mathf.PI / 2));
-        float greenChannel = Mathf.Max(Mathf.Sin(2*time + Mathf.PI / 2), Mathf.Cos(2 * time + Mathf.PI));
-        float blueChannel = Mathf.Max(Mathf.Sin(time + Mathf.PI / 2), Mathf.Cos(time + Mathf.PI));
-        environmentLight.color = new Color(redChannel, greenChannel, blueChannel);
-        environmentLight.intensity = Mathf.Lerp(0.25f, 0.5f, (Mathf.Sin(time /4.5f) + 1)/2);
+        float red_channel = Mathf.Max(Mathf.Sin(time), Mathf.Cos(time + Mathf.PI / 2));
+        float green_channel = Mathf.Max(Mathf.Sin(2*time + Mathf.PI / 2), Mathf.Cos(2 * time + Mathf.PI));
+        float blue_channel = Mathf.Max(Mathf.Sin(time + Mathf.PI / 2), Mathf.Cos(time + Mathf.PI));
+        environmentLight.color = new Color(red_channel, green_channel, blue_channel);
+        float intensity = Mathf.Lerp(0.25f, 0.5f, (Mathf.Sin(time / 4.5f) + 1) / 2);
+        environmentLight.intensity = intensity;
+        float x_angle = Mathf.Lerp(0f, -60f, (Mathf.Cos(time * 4.5f) + 1) / 2);
+        float z_angle = Mathf.Lerp(30f, -30f, (Mathf.Cos(time * 1.5f) + 1) / 2);
+        environmentLight.transform.eulerAngles = new Vector3(x_angle, 0, z_angle);
     }
 
     public static AudioClip getSound(string path)

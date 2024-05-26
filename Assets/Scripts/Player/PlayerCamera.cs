@@ -40,7 +40,7 @@ public class PlayerCamera : MonoBehaviour
         Eyes.fieldOfView = Mathf.Clamp(Eyes.fieldOfView, FOVSpan.x, FOVSpan.y);
     }
 
-    public float SpeedScalar = 2;
+    public float SpeedScalar = 3;
     void FixedUpdate()
     {
         Vector3 disposition = triangulateOptimalPosition() - transform.position;
@@ -67,7 +67,7 @@ public class PlayerCamera : MonoBehaviour
         return transversal_offset + vertical_offset;
     }
 
-    public Vector2 Y_Span = new Vector2(5, 10);
+    public Vector2 Y_Span = new Vector2(5, 8);
     public Vector2 Y_DeadbandRange = new Vector2(0.5f, 4);
     private float calc_vertical_offset()
     {

@@ -63,6 +63,7 @@ public abstract class Weapon : Wieldable
     public float tempoChargePeriod = 0.5f;
     public float tempoChargeExponent = 3/4f;
     private bool tempoChargeONS = true;
+    public float tempoChargeMin = 0.25f;
     //private bool attackChargeONS = true;
 
     public float TempoTargetCenter { get; private set; } = 0.974f;
@@ -199,12 +200,12 @@ public abstract class Weapon : Wieldable
                 else if (Action == ActionAnim.StrongWindup)
                 {
                     attackONS = true;
-                    modifyWielderSpeed(heftSlowModifier);
+                    modifyWielderSpeed(heftSlowModifier, true);
                 }
                 else if(Action == ActionAnim.StrongCoil)
                 {
                     attackONS = true;
-                    modifyWielderSpeed(heftSlowModifier / 2);
+                    modifyWielderSpeed(heftSlowModifier, true);
                 }
                 else if (Action == ActionAnim.QuickWindup)
                 {
@@ -273,10 +274,11 @@ public abstract class Weapon : Wieldable
                     HitBox.enabled = true;
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
-                bool availableToGuard = !((Action == ActionAnim.Recovering) || (Action == ActionAnim.QuickAttack) || (Action == ActionAnim.StrongAttack));
-                Anim.SetBool("primary", PrimaryTrigger && !Recoiling);
+                bool availableToGuard = !((Action == ActionAnim.QuickAttack) || (Action == ActionAnim.StrongAttack));
+                bool chargeSealIn = tempoCharge > 0 && tempoCharge < tempoChargeMin;
+                Anim.SetBool("primary", PrimaryTrigger && !Wielder.Staggered);
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
-                Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
+                Anim.SetBool("tertiary", (TertiaryTrigger || chargeSealIn) && !Recoiling && tempoCharge < 1);
                 Anim.SetBool("rebuked", Recoiling);
                 Anim.Update(0);
             }
@@ -883,6 +885,10 @@ public abstract class Weapon : Wieldable
             {
                 Wielder.alterPoise(0, impactful: false);
             }
+        }
+        else if (Action == ActionAnim.StrongWindup)
+        {
+            tempoCharge = 0.001f;
         }
         else if(Action != ActionAnim.StrongAttack)
         {

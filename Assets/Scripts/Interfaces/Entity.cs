@@ -249,7 +249,7 @@ public class Entity : MonoBehaviour
         }
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         berthActual = Berth * berthScalar;
-        if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod)
+        if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod && !DashCharging)
         {
             float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 3, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
@@ -302,12 +302,6 @@ public class Entity : MonoBehaviour
                 requiemPlayer.HostEntity = this;
             }
             Allegiance = requiemPlayer.Faction;
-            if (GetComponent<AIBehaviour>())
-            {
-                GetComponent<AIBehaviour>().Enthralled = true;
-                GetComponent<AIBehaviour>().enabled = !requiemPlayer;
-                GetComponent<AIBehaviour>().followVIP = requiemPlayer.HostEntity.gameObject;
-            }
         }
         if (!anim.runtimeAnimatorController)
         {
@@ -336,7 +330,7 @@ public class Entity : MonoBehaviour
         float baseSpeed = Haste * SpeedScalarGlobal;
         //modSpeed["flow"] = posture == Posture.Flow ? Resolve / 100 : 0;
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
-        modSpeed["staggered"] = Staggered ? Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 3) : 0;
+        modSpeed["staggered"] = Staggered ? Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 4) : 0;
         modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.35f, -0.35f, body.velocity.magnitude / baseSpeed) : 0;
         AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
         SpeedActual = Agility * SpeedScalarGlobal;
@@ -401,7 +395,7 @@ public class Entity : MonoBehaviour
             }
         }
 
-        if ((Shoved && !Dashing))
+        if ((Shoved && !Dashing) || Staggered)
         {
             body.freezeRotation = true;
         }
@@ -833,7 +827,7 @@ public class Entity : MonoBehaviour
         {
             float scaledVelocity = 0;
             float overChargeTimer = 0;
-            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened);
+            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened && Posture != PostureStrength.Weak);
             while (DashCharging || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
