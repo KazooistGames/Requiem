@@ -795,6 +795,7 @@ public class AIBehaviour : MonoBehaviour
     protected bool martialStateBouncing = true;
     protected bool martialAttackingONS = true;
     protected bool martialDefendingONS = true;
+    protected float martialRangeConstant = 0.25f;
     public UnityEvent martialFoeVulnerable = new UnityEvent();
     public UnityEvent martialFoeAttacking = new UnityEvent();
     public UnityEvent martialFoeDashing = new UnityEvent();    
@@ -826,7 +827,7 @@ public class AIBehaviour : MonoBehaviour
 
             bool inRange = disposition.magnitude <= Mathf.Max(mainWep ? mainWep.Range : 0.0f, offWep ? offWep.Range : 0.0f);
             float rangeBoost = 1.2f;
-            bool foeInRange = (matchupMain ? disposition.magnitude <= matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= matchupOff.Range * rangeBoost : false);
+            bool foeInRange = (matchupMain ? disposition.magnitude <= martialRangeConstant + matchupMain.Range * rangeBoost : false) || (matchupOff ? disposition.magnitude <= martialRangeConstant + matchupOff.Range * rangeBoost : false);
 
             bool foeAttacking = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickAttack : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickAttack : false);
             bool foeCoiling = (matchupMain ? matchupMain.Action == Weapon.ActionAnim.QuickCoil || matchupMain.Action == Weapon.ActionAnim.StrongCoil : false) || (matchupOff ? matchupOff.Action == Weapon.ActionAnim.QuickCoil || matchupOff.Action == Weapon.ActionAnim.StrongCoil : false);
@@ -873,7 +874,7 @@ public class AIBehaviour : MonoBehaviour
                 martialFoeVulnerableLatch = false;
             }
 
-            bool instantaneousReactiveDefend = (foeAttacking || foeWindingUp) && foeInRange && foeFacing;
+            bool instantaneousReactiveDefend = (foeAttacking || foeWindingUp || foeCoiling) && foeInRange && foeFacing;
             if (!martialFoeAttackingLatch && instantaneousReactiveDefend)
             {
                 martialFoeAttackingLatch = true;
@@ -1225,7 +1226,7 @@ public class AIBehaviour : MonoBehaviour
                         break;
                     case AIState.passive:
                         stateRunTimer = sensoryAlerted ? 0 : stateRunTimer;
-                        excitement = Mathf.Lerp(1, 0, stateRunTimer / 20);
+                        excitement = Mathf.Lerp(1, 0, stateRunTimer / 120);
                         entity.modSpeed["AIState"] = Mathf.Lerp(-0.75f, 0f, excitement);
                         behaviourParams[BehaviourType.patrol] = (!meanderPaused || excitement > 0, Intelligence);
                         behaviourParams[BehaviourType.meander] = (true, 1);

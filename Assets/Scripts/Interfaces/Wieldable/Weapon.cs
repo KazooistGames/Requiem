@@ -60,13 +60,12 @@ public abstract class Weapon : Wieldable
     public bool TrueStrike = false;
     public float Tempo;
     private float tempoCharge = 0;
-    public float tempoChargePeriod = 0.5f;
+    public float tempoChargePeriod = 1f;
     public float tempoChargeExponent = 3/4f;
     private bool tempoChargeONS = true;
     public float tempoChargeMin = 0.25f;
     //private bool attackChargeONS = true;
-
-    public float TempoTargetCenter { get; private set; } = 0.974f;
+    public float TempoTargetCenter { get; private set; } = 0.98f;
     public float TempoTargetWidth { get; private set; } = 0.05f;
 
 
@@ -200,7 +199,7 @@ public abstract class Weapon : Wieldable
                 else if (Action == ActionAnim.StrongWindup)
                 {
                     attackONS = true;
-                    modifyWielderSpeed(heftSlowModifier, true);
+                    modifyWielderSpeed(heftSlowModifier);
                 }
                 else if(Action == ActionAnim.StrongCoil)
                 {
@@ -275,10 +274,10 @@ public abstract class Weapon : Wieldable
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
                 bool availableToGuard = !((Action == ActionAnim.QuickAttack) || (Action == ActionAnim.StrongAttack));
-                bool chargeSealIn = tempoCharge > 0 && tempoCharge < tempoChargeMin;
+                bool chargeSealIn = false; //tempoCharge > 0 && tempoCharge < tempoChargeMin;
                 Anim.SetBool("primary", PrimaryTrigger && !Wielder.Staggered);
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
-                Anim.SetBool("tertiary", (TertiaryTrigger || chargeSealIn) && !Recoiling && tempoCharge < 1);
+                Anim.SetBool("tertiary", (TertiaryTrigger || chargeSealIn) && !Recoiling);
                 Anim.SetBool("rebuked", Recoiling);
                 Anim.Update(0);
             }
@@ -439,7 +438,7 @@ public abstract class Weapon : Wieldable
         {
             float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
-            shove_scalar = 1f;
+            shove_scalar = 0.5f;
         }
         else
         {
@@ -499,7 +498,7 @@ public abstract class Weapon : Wieldable
         else if (!getObstructionBetweenEntities(foe, weapon.MostRecentWielder))
         {
             weapon.Hitting.Invoke(weapon, foe);
-            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 1 : 0.5f;
+            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 0.5f : 0.25f;
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe, shove_scalar);
             weapon.playSlap(foe.transform.position);
             weapon.FullCollisionONS(foe.gameObject);
@@ -577,7 +576,7 @@ public abstract class Weapon : Wieldable
                 foe.JustVanquished.AddListener(ImpaleRelease);
                 foe.modSpeed[key] = -(Heft/foe.Strength);
                 //foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
-                yield return new WaitWhile(() => foe ? foe.Posture != Entity.PostureStrength.Strong : false);
+                yield return new WaitForSeconds(3);
                 if (foe)
                 {
                     ImpaleRelease();
@@ -641,9 +640,9 @@ public abstract class Weapon : Wieldable
     {
         if (!foe || !weapon.MostRecentWielder) { return; }
         float impactPower = weapon.Heft * (1 + weapon.Tempo);
-        Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.4f) : weapon.MostRecentWielder.transform.position;
-        Vector3 disposition = foe.transform.position - origin;
-        Vector3 velocityChange = disposition.normalized * (impactPower / 30f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.25f) : weapon.MostRecentWielder.transform.position;
+        Vector3 direction = foe.transform.position - origin;
+        Vector3 velocityChange = direction.normalized * (impactPower / 30f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
         if (weapon.TrueStrike)
         {
             velocityChange *= 2;

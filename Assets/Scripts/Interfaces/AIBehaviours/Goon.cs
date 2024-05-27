@@ -26,12 +26,11 @@ public class Goon : AIBehaviour
         createSpawnWeapon();
         Intelligence = 0.75f;
         tangoStrafeEnabled = true;
-        tangoStrafePauseFreq = 0.75f;
         martialPreferredState = martialState.attacking;
-        sensorySightRangeScalar = 0.75f;
-        sensoryAudioRangeScalar = 0.75f;
+        sensorySightRangeScalar = 0.5f;
+        sensoryAudioRangeScalar = 0.5f;
         meanderPauseFrequency = 0.5f;
-        tangoStrafePauseFreq = 0.5f;
+        tangoStrafePauseFreq = 0.75f;
         tangoStrafeEnabled = true;
         itemManagementSeekItems = true;
         itemManagementPreferredType = Entity.WieldMode.OneHanders;

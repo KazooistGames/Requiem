@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6123690551171606007}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4, z: 0}
+  m_LocalPosition: {x: 0, y: 0.186, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -663,15 +663,15 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 6
+    type: 17
     angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 0
-    donutRadius: 0.15
-    m_Position: {x: 0, y: -0.36, z: 0}
-    m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 1.1, y: 1.1, z: 1.1}
+    donutRadius: 0.05
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 90, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
     placementMode: 2
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -750,7 +750,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 0.01
+      value: 0.075
       mode: 0
       spread: 0
       speed:
@@ -3623,7 +3623,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     range: {x: 0, y: 1}
   CollisionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     type: 1
     collisionMode: 0
@@ -4917,6 +4917,7 @@ GameObject:
   - component: {fileID: 6064970226583268719}
   - component: {fileID: 7661045371188206112}
   - component: {fileID: 7976157581576396476}
+  - component: {fileID: 5809997004731381127}
   m_Layer: 8
   m_Name: Idol
   m_TagString: Bone
@@ -4933,7 +4934,7 @@ Transform:
   m_GameObject: {fileID: 7299579221141989809}
   m_LocalRotation: {x: -0.00000045430883, y: 0.56641304, z: 0.00000086139323, w: -0.82412153}
   m_LocalPosition: {x: 1.330698, y: 0.36562482, z: 1.9067068}
-  m_LocalScale: {x: 0.24, y: 0.24000026, z: 0.3200001}
+  m_LocalScale: {x: 0.5, y: 0.5000006, z: 0.6666669}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4804424416607799038}
@@ -5021,7 +5022,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7299579221141989809}
   serializedVersion: 2
-  m_Mass: 0.5
+  m_Mass: 5
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
@@ -5040,8 +5041,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.375, y: 0.4375, z: 0.3125}
-  m_Center: {x: 0, y: 0.28125, z: -0.03125}
+  m_Size: {x: 0.23823197, y: 0.05992936, z: 0.1755339}
+  m_Center: {x: 0.0062765554, y: 0.09246466, z: 0.037233036}
 --- !u!114 &7661045371188206112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5103,3 +5104,16 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.9, y: 0.1, z: 0.1}
   m_Center: {x: 0.00095850136, y: 0.4, z: -0.031249762}
+--- !u!65 &5809997004731381127
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7299579221141989809}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.336733, y: 0.24411947, z: 0.29688784}
+  m_Center: {x: 0.0012536938, y: 0.3707188, z: -0.02344395}

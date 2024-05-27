@@ -172,7 +172,6 @@ public class Idol : Wieldable
         transform.localScale /= Entity.Scale;
 
         mobEntity.JustVanquished.AddListener(BecomeItem);
-        mobEntity.FinalDashEnabled = true;
         mobEntity.JustWounded.AddListener((x) => SpawnAdds(1));
         mobEntity.JustHit.AddListener(spawnAddsIfDamageMakesWeak);
         return mobEntity;

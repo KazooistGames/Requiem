@@ -325,6 +325,12 @@ public class Hextile : MonoBehaviour
     }
 
 
+    public List<GameObject> DetectContainedObjects()
+    {
+        int objectMask = (1 << Requiem.layerTile) + (1 << Requiem.layerWall);
+        return Physics.OverlapSphere(transform.position, Radius, ~objectMask).Select(x=>x.gameObject).ToList();
+    }
+
     /* AUTO GENERATION OF MESH */
     public static void GenerateHexMesh()
     {

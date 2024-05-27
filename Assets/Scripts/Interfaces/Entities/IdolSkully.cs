@@ -14,7 +14,9 @@ public class IdolSkully : Skully
         Resolve = 20;
         BaseAcceleration = 8f;
         scaleScalar = 1.0f;
-        berthScalar = 1.1f;
+        berthScalar = 2f;
+        heightScalar = 1.0f;
+        FinalDashEnabled = true;
 
     }
 
@@ -24,6 +26,11 @@ public class IdolSkully : Skully
         gameObject.name = "IdolSkully";
         flames.gameObject.SetActive(true);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Inferno;
+        flames.shapeModule.scale = flames.shapeModule.scale * 2;
+        hurtBox.height = 1f;
+        FinalDashEnabled = true;
+        //statBar.SetActive(false);
+        mortality = Mortality.impervious;
     }
 
     protected override void Update()

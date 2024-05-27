@@ -1,7 +1,7 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'shelf_broken.blend'
 # Material Count: 3
 
-newmtl Material.001
+newmtl Material
 Ns 323.999994
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -22,7 +22,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl stone.002
+newmtl stone.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000

@@ -33,7 +33,8 @@ public class Ghosty : Entity
         JustVanquished.AddListener(Dematerialize);
         JustDisarmed.AddListener(Die);
         Allegiance = Player.INSTANCE.Faction;
-        statBar.SetActive(false);
+        //statBar.SetActive(false);
+        mortality = Mortality.fragile;
     }
 
     protected override void Update()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Tilemaps;
 
 public class Requiem_Arena : Requiem
 {
@@ -36,7 +37,26 @@ public class Requiem_Arena : Requiem
     protected override void Update()
     {
         base.Update();
+
+        if(!Commissioned) { return; } //logic meant for runtime after map is generated
+
         determineAlterOffering();
+        foreach (Hextile chamber in Chambers)
+        {
+            Landmark_Gate gate = Gates[Chambers.IndexOf(chamber)];
+            if (!gate)
+            {
+
+            }
+            else if(chamber.DetectContainedObjects().Count(x=>x.GetComponent<Entity>()) > 0)
+            {
+                gate.OpenDoor();
+            }
+            else
+            {
+                gate.CloseDoor();
+            }
+        }
     }
 
     /***** PUBLIC *****/
@@ -53,32 +73,38 @@ public class Requiem_Arena : Requiem
 
         Hextile.HexPosition firstGateDirection = (Hextile.HexPosition)1;
         Hextile edgeOne = ArenaTiles[0][0].Edge(firstGateDirection);
+        Chambers.Add(edgeOne.Extend(firstGateDirection));
+        yield return null;
         Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
         Gates[0].AssignToTile(edgeOne);
         Gates[0].SetPositionOnTile(firstGateDirection);
-        Chambers.Add(edgeOne.Extend(firstGateDirection));
         yield return null;
 
         Hextile.HexPosition secondGateDirection = Hextile.RotateHexPosition(firstGateDirection, -1);
         Hextile edgeTwo = ArenaTiles[0][0].Edge(secondGateDirection);
+        Chambers.Add(edgeTwo.Extend(secondGateDirection));
+        yield return null;
         Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
         Gates[1].AssignToTile(edgeTwo);
         Gates[1].SetPositionOnTile(secondGateDirection);  
-        Chambers.Add(edgeTwo.Extend(secondGateDirection));
         yield return null;
+
         Hextile.HexPosition thirdGateDirection = Hextile.RotateHexPosition(secondGateDirection, -2);
         Hextile edgeThree = ArenaTiles[0][0].Edge(thirdGateDirection);
+        Chambers.Add(edgeThree.Extend(thirdGateDirection));
+        yield return null;
         Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
         Gates[2].AssignToTile(edgeThree);
         Gates[2].SetPositionOnTile(thirdGateDirection);
-        Chambers.Add(edgeThree.Extend(thirdGateDirection));
         yield return null;
+
         Hextile.HexPosition fourthGateDirection = Hextile.RotateHexPosition(thirdGateDirection, -1);
         Hextile edgeFour = ArenaTiles[0][0].Edge(fourthGateDirection);
+        Chambers.Add(edgeFour.Extend(fourthGateDirection));
+        yield return null;
         Gates.Add(new GameObject().AddComponent<Landmark_Gate>());
         Gates[3].AssignToTile(edgeFour);
         Gates[3].SetPositionOnTile(fourthGateDirection);
-        Chambers.Add(edgeFour.Extend(fourthGateDirection));
         yield return null;
 
 
@@ -115,7 +141,7 @@ public class Requiem_Arena : Requiem
         Torch.Toggle(false);
         Haunt.INSTANCE.TargetTile = CenterTile;
         Player.INSTANCE.HostEntity.transform.position = RAND_POS_IN_TILE(CenterTile);
-        Player.INSTANCE.HostEntity.Vitality = 1;
+        //Player.INSTANCE.HostEntity.Vitality = 1;
         blurbIndicator = _BlurbService.createBlurb(Alter.TopStep, "Test", Color.red, sizeScalar: 3);
         blurbIndicator.SetActive(false);
         blurbIndicator.GetComponent<Text>().text = "0:00";
@@ -125,7 +151,7 @@ public class Requiem_Arena : Requiem
         {
             StateOfGame = GameState.Liminal;
             Ritual++;
-            Gates[0].OpenDoor();
+            //Gates[0].OpenDoor();
             dematerializeGhosts();
             Torch.Toggle(false);
             collect_everything(Haunt.INSTANCE.gameObject);
@@ -135,7 +161,7 @@ public class Requiem_Arena : Requiem
             }
             yield return new WaitUntil(() => !Alter.Energized);
             yield return new WaitUntil(() => Alter.Used && Alter.Energized);
-            Gates[0].CloseDoor();
+            //Gates[0].CloseDoor();
             materializeSoulPearls();
             if (Ritual == 10)
             {
@@ -156,9 +182,9 @@ public class Requiem_Arena : Requiem
         TotalStrengthOfWave = RitualStrengths[Ritual % 3];
         TimeGateTimeLeft = RitualTimes[Ritual % 3];
         spawnedMobs = spawnMobs(TotalStrengthOfWave);
-        blurbIndicator.SetActive(true);
+        //blurbIndicator.SetActive(true);
         Torch.Toggle(true);
-        while (StateOfGame == GameState.Wave && TimeGateTimeLeft > 0)
+        while (StateOfGame == GameState.Wave)
         {
             if (!Paused)
             {
@@ -192,7 +218,7 @@ public class Requiem_Arena : Requiem
                 TimeGateTimeLeft -= 1;
             }
         }
-        blurbIndicator.SetActive(false);
+        //blurbIndicator.SetActive(false);
         while (spawnedMobs.Count(x => x != null) != 0)
         {
             foreach (GameObject mob in spawnedMobs)
@@ -295,7 +321,7 @@ public class Requiem_Arena : Requiem
         {
             Alter.DesiredOffering = idol.gameObject;
             Alter.PentagramLineColor = new Color(1, 0, 0);
-            Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
+            Alter.PentagramFlameStyle = _Flames.FlameStyles.Soulless;
             idol.flames.FlamePresentationStyle = _Flames.FlameStyles.Inferno;
             idol.flames.emissionModule.enabled = true;
         }
@@ -390,9 +416,9 @@ public class Requiem_Arena : Requiem
     };
     public Dictionary<int, int> RitualStrengths = new Dictionary<int, int>()
     {
-        {1, 600 },
-        {2, 900 },
-        {0, 1200 },
+        {1, 300 },
+        {2, 500 },
+        {0, 800 },
     };
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
@@ -421,7 +447,7 @@ public class Requiem_Arena : Requiem
         WaveMobs = new List<GameObject>();
         int spawnIndex = 0;
         Hextile playerTile = Player.INSTANCE.HostEntity.TileLocation;
-        List<Hextile> viableSpawnTiles = ArenaTiles.Aggregate(new List<Hextile>(), (ring, result) => result.Concat(ring.Where(tile => tile != playerTile && !tile.AdjacentTiles.ContainsKey(playerTile)).ToList()).ToList());
+        List<Hextile> viableSpawnTiles = Chambers;
         while (strengthToSpawn > 0)
         {
             int strengthOfSpawnChunk = Mathf.Min(strengthToSpawn, EntityStrengths[AIEntityPairings[chosenAIsForWave[0]]]);
@@ -432,7 +458,9 @@ public class Requiem_Arena : Requiem
                 strengthToSpawn -= EntityStrengths[spawnedEntity];
                 strengthOfSpawnChunk -= EntityStrengths[spawnedEntity];
                 Hextile randomTile = viableSpawnTiles[UnityEngine.Random.Range(0, viableSpawnTiles.Count)];
-                WaveMobs.Add(SPAWN(spawnedEntity, spawnedAI, RAND_POS_IN_TILE(randomTile)));
+                Entity newMob = SPAWN(spawnedEntity, spawnedAI, RAND_POS_IN_TILE(randomTile)).GetComponent<Entity>();
+                newMob.Foe = Player.INSTANCE.HostEntity;
+                WaveMobs.Add(newMob.gameObject);
             }      
             spawnIndex++;
             if(spawnIndex >= chosenAIsForWave.Count)

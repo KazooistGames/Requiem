@@ -100,7 +100,7 @@ public class Entity : MonoBehaviour
     public bool Staggered = false;
     protected float staggerPeriod = 0;
     protected float staggerTimer = 0;
-    private float STAGGER_BASE_TIME = 1 / 4f;
+    private float STAGGER_BASE_TIME = 1 / 2f;
 
     /********** DASHING **********/
     public Vector3 dashDirection = Vector3.zero;
@@ -165,6 +165,13 @@ public class Entity : MonoBehaviour
     private float immortalityTimer = 0;
 
     public bool Defending = false;
+    public enum Mortality
+    {
+        impervious,
+        vulnerable,
+        fragile
+    }
+    public Mortality mortality = Mortality.impervious;
 
     //******************Functions*************************
     protected virtual void Awake()
@@ -499,7 +506,14 @@ public class Entity : MonoBehaviour
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
         if(impactful || Poise + value > 0)
         {
-            Poise += value;
+            if(mortality == Mortality.vulnerable)
+            {
+                Poise += value;
+            }
+            else if(mortality == Mortality.fragile)
+            {
+                Vitality = 0;
+            }
         }
         Poise = Mathf.Clamp(Poise, -1f, Strength);
         if (value * existingDelta >= 0)
@@ -524,7 +538,14 @@ public class Entity : MonoBehaviour
         {
             JustWounded.Invoke(magnitude);
             EntityWounded.Invoke(this, magnitude);
-            Vitality -= magnitude;
+            if (mortality == Mortality.vulnerable)
+            {
+                Vitality -= magnitude;
+            }
+            else if (mortality== Mortality.fragile)
+            {
+                Vitality = 0;
+            }
         }
         if (!silent)
         {
@@ -739,7 +760,7 @@ public class Entity : MonoBehaviour
             if ((crash || instantaneousCollision) && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
                 float impactRatio = Strength_Ratio(this, foe) * (actualMag / Max_Velocity_Of_Dash);
-                Vector3 ShoveVector = disposition.normalized * (impactRatio * Max_Velocity_Of_Dash);
+                Vector3 ShoveVector = dashDirection.normalized * (impactRatio * Max_Velocity_Of_Dash);
                 ShoveVector *= 0.75f;
                 foe.Shove(ShoveVector);
                 if(foe.Allegiance != Allegiance)
@@ -827,8 +848,8 @@ public class Entity : MonoBehaviour
         {
             float scaledVelocity = 0;
             float overChargeTimer = 0;
-            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened && Posture != PostureStrength.Weak);
-            while (DashCharging || scaledVelocity <= Min_Velocity_Of_Dash)
+            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened);
+            while ((DashCharging ) || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
@@ -920,11 +941,10 @@ public class Entity : MonoBehaviour
         float impact = theirWeapon.Heft * theirWeapon.Tempo;
         if (theirWeapon.TrueStrike)
         {
-            impact += Resolve;
-            if(theirWeapon.Wielder ? theirWeapon.Wielder.Posture == PostureStrength.Weak : false)
-            {
-                theirWeapon.Wielder.Disarm();
-            }
+            impact += theirWeapon.MostRecentWielder.Resolve;
+            Stagger(Mathf.Sqrt(impact / Strength));
+            alterPoise(-impact);
+            return;
         }
         if (theirWeapon.Thrown)
         {
@@ -932,20 +952,12 @@ public class Entity : MonoBehaviour
         }
         else if(theirWeapon.Action != ActionAnim.StrongAttack)
         {
-            theirWeapon.Wielder.alterPoise(-myWeapon.Heft / 4);
-        }
-        else if (Posture == PostureStrength.Weak)
-        {
-            Stagger(Mathf.Sqrt(impact / Strength));
+            theirWeapon.Wielder.Stagger(Mathf.Sqrt(impact / theirWeapon.Wielder.Strength));
         }
         else
         {
-            float poiseOverkill = impact - Poise;
+            Stagger(Mathf.Sqrt(impact / Strength));
             alterPoise(-impact);
-            if(poiseOverkill >= 0)
-            {
-                Stagger(Mathf.Sqrt(poiseOverkill / Strength));
-            }
         }
     }
 
@@ -977,14 +989,14 @@ public class Entity : MonoBehaviour
         if (myWeapon.TrueStrike)
         {
             theirWeapon.Wielder.alterPoise(-Resolve);
-            return;
         }
-        else if (Posture == PostureStrength.Weak)
+        else
         {
+            Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
             Disarm();
+            alterPoise(-myWeapon.Heft);
         }
-        Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
-        alterPoise(-myWeapon.Heft);     
+ 
     }
 
 
@@ -995,7 +1007,6 @@ public class Entity : MonoBehaviour
         if (myWeapon.TrueStrike)
         {
             foe.Damage(Resolve);
-            foe.Stagger(Mathf.Sqrt(totalPower / Strength));
         }
         float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
         if (myWeapon.Thrown)
@@ -1004,11 +1015,8 @@ public class Entity : MonoBehaviour
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
-            if (foe.Posture == PostureStrength.Weak)
-            {
-                float impact = myWeapon.Heft * vitalityDamage / totalPower;
-                foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
-            }
+            float impact = myWeapon.Heft * vitalityDamage / totalPower;
+            foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {

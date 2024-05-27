@@ -10,7 +10,7 @@ public class PlayerCamera : MonoBehaviour
 
     public Vector2 FOVSpan = new Vector2(15, 45);
 
-    public int RenderResolutionPixelWidth = 480;
+    public int RenderResolutionPixelWidth = 640;
     private int pixelsHigh = 240;
 
 

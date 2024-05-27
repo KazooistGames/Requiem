@@ -8,7 +8,7 @@ public class Bone : MonoBehaviour
 {
     public int Value = 20;
     public float pitchScalar = 1.0f;
-    public float NoiseImpulse = 0.015f;
+    public float NoiseImpulse = 0.0175f;
 
     public GameObject collectTarget;
     public bool Telecommuting = false;

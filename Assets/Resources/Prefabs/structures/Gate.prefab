@@ -282,6 +282,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: torch (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1247586716013791906, guid: 0b14517cb37587346832de294c39d76a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8246749210583567410, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: Lit
       value: 1
@@ -386,7 +390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1247586716013791906, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8246749210583567410, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: Lit
@@ -489,6 +493,10 @@ PrefabInstance:
     - target: {fileID: 1247586716013791906, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: m_Name
       value: torch (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1247586716013791906, guid: 0b14517cb37587346832de294c39d76a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8246749210583567410, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: Lit
@@ -594,7 +602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1247586716013791906, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8246749210583567410, guid: 0b14517cb37587346832de294c39d76a, type: 3}
       propertyPath: Lit

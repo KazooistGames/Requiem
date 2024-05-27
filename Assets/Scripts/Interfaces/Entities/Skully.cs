@@ -26,6 +26,7 @@ public class Skully : Entity
         gameObject.name = "Skully";
         hurtBox.height = 0.5f;
         hurtBox.center = Vector3.up * 0.275f;
+        mortality = Mortality.fragile;
     }
 
     protected override void Update()

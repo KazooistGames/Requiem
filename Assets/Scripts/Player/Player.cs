@@ -316,6 +316,7 @@ public class Player : MonoBehaviour
         HostEntity.requiemPlayer = this;
         HostEntity.FinalDashEnabled = true;
         HostEntity.JustLandedHit.AddListener(Scoreboard.Score_Hit);
+        HostEntity.mortality = Entity.Mortality.vulnerable;
         chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();
         chainRenderer.transform.SetParent(transform);
         chainRenderer.transform.localEulerAngles = Vector3.right * 90;
@@ -417,7 +418,7 @@ public class Player : MonoBehaviour
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
-                impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
+                //impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
             }
             else if (impaledObject)
             {

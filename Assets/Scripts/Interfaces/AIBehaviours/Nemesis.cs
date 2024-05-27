@@ -8,10 +8,10 @@ public class Nemesis : AIBehaviour
     public _Flames flames;
 
     private float timeToRecoverFromDash = 0;
-    private float finalDashRecoveryTime = 3;
-    private float quickDashRecoveryTime = 1.5f;
+    private float finalDashRecoveryTime = 5;
+    private float quickDashRecoveryTime = 1f;
 
-    private float beamDelayPeriod = 2;
+    private float beamDelayPeriod = 1;
     private float beamDuration = 5;
 
     private float beamDurationTimer = 0;
@@ -41,8 +41,8 @@ public class Nemesis : AIBehaviour
         dashingChargePeriod = 1.0f;
         grabDPS = 10f;
         sensoryBaseRange = 2f;
-        sensorySightRangeScalar = 1.5f;
-        sensoryAudioRangeScalar = 1.5f;
+        sensorySightRangeScalar = 1f;
+        sensoryAudioRangeScalar = 1f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = Hextile.Radius;
@@ -85,8 +85,8 @@ public class Nemesis : AIBehaviour
         string key = "Beam!";
         if (hellfire.form == Hellfire.Form.Beam)
         {
-            entity.modSpeed[key] = -0.95f;
-            entity.modTurnSpeed[key] = -0.95f;
+            entity.modSpeed[key] = -0.975f;
+            entity.modTurnSpeed[key] = -0.975f;
         }
         else
         {
@@ -128,7 +128,7 @@ public class Nemesis : AIBehaviour
         hellfire.form = Hellfire.Form.Off;
         flames.particleLight.intensity = 5;
 
-        bool inPosition = disposition.magnitude < pursueStoppingDistance || entity.DashCharging;
+        bool inPosition = disposition.magnitude < pursueStoppingDistance/2 || entity.DashCharging;
         bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
         bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
         if (!entity.Foe)
@@ -137,7 +137,7 @@ public class Nemesis : AIBehaviour
         }
         else if (finalDashTrigger)
         {
-            dashingChargePeriod = 2f;
+            dashingChargePeriod = 3f;
             dashingDesiredDirection = disposition;
             timeToRecoverFromDash = quickDashRecoveryTime;
         }
@@ -145,7 +145,7 @@ public class Nemesis : AIBehaviour
         {
             if(Random.value > 0.1f)
             {
-                dashingChargePeriod = 0.5f;
+                dashingChargePeriod = 1f;
                 dashingDesiredDirection = disposition;
                 timeToRecoverFromDash = finalDashRecoveryTime;
             }
