@@ -249,7 +249,7 @@ public class Player : MonoBehaviour
         {
 
         }
-        else if (HostWeapon.Wielder != HostEntity && !HostWeapon.Thrown && !HostWeapon.Telecommuting)
+        else if (HostWeapon.Wielder != HostEntity && !HostWeapon.Thrown && !HostWeapon.Telecommuting && !HostEntity.Staggered)
         {
             if((yank_timer += Time.deltaTime) >= yank_delay)
             {

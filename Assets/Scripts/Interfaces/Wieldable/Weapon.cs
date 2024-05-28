@@ -878,7 +878,7 @@ public abstract class Weapon : Wieldable
             {
                 float increment = (Time.deltaTime / tempoChargePeriod);
                 tempoCharge += increment;
-                Wielder.alterPoise(-increment * Heft / 2, impactful: false);
+                Wielder.alterPoise(-increment * Heft / 4, impactful: false);
             }
             else
             {

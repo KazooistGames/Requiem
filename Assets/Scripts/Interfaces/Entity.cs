@@ -118,7 +118,7 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
-    private static float POISE_REGEN_BASE_PERIOD = 2;
+    private static float POISE_REGEN_BASE_PERIOD = 5;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
@@ -509,10 +509,6 @@ public class Entity : MonoBehaviour
             if(mortality == Mortality.vulnerable)
             {
                 Poise += value;
-            }
-            else if(mortality == Mortality.fragile)
-            {
-                Vitality = 0;
             }
         }
         Poise = Mathf.Clamp(Poise, -1f, Strength);
@@ -1031,8 +1027,15 @@ public class Entity : MonoBehaviour
 
     public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
     {
-        if(immortalityTimer < 0.25f) { return 0; }
         JustHit.Invoke(totalPower);
+        if (immortalityTimer < 0.25f) { return 0; }
+        else if (mortality == Mortality.fragile)
+        {
+
+            Vitality = 0;
+            return Strength;
+        }
+
         float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
         float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
         if(poiseDamage != 0)

@@ -416,9 +416,9 @@ public class Requiem_Arena : Requiem
     };
     public Dictionary<int, int> RitualStrengths = new Dictionary<int, int>()
     {
-        {1, 300 },
-        {2, 500 },
-        {0, 800 },
+        {1, 600 },
+        {2, 900 },
+        {0, 1200 },
     };
     public Dictionary<int, int> RitualTimes = new Dictionary<int, int>()
     {
