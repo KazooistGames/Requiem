@@ -316,7 +316,7 @@ public class Player : MonoBehaviour
         HostEntity.requiemPlayer = this;
         HostEntity.FinalDashEnabled = true;
         HostEntity.JustLandedHit.AddListener(Scoreboard.Score_Hit);
-        HostEntity.mortality = Entity.Mortality.vulnerable;
+        //HostEntity.mortality = Entity.Mortality.vulnerable;
         chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();
         chainRenderer.transform.SetParent(transform);
         chainRenderer.transform.localEulerAngles = Vector3.right * 90;

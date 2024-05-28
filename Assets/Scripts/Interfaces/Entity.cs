@@ -118,7 +118,7 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
-    private static float POISE_REGEN_BASE_PERIOD = 5;
+    private static float POISE_REGEN_BASE_PERIOD = 10;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
@@ -404,20 +404,21 @@ public class Entity : MonoBehaviour
 
         if ((Shoved && !Dashing) || Staggered)
         {
-            body.freezeRotation = true;
+            //body.freezeRotation = true;
+            TurnSpeed = DefaultTurnSpeed * 0.05f;
         }
         else
         {
             TurnSpeed = modTurnSpeed.Values.Aggregate(DefaultTurnSpeed, (result, multiplier) => result *= (1 + multiplier));
-            LookDirection.y = 0;
-            float scaledY = transform.localEulerAngles.y;
-            float scaledTarget = 90 - AIBehaviour.getAngle(LookDirection);
-            scaledTarget = scaledTarget > 180 ? scaledTarget - 360 : scaledTarget;
-            float difference = (scaledTarget - scaledY);
-            float degMax = TurnSpeed * Time.fixedDeltaTime;
-            difference = Mathf.Clamp(Mathf.Abs(difference) >= 180 ? difference - (Mathf.Sign(difference) * 360) : difference, -1 * degMax, degMax);
-            transform.RotateAround(transform.position, Vector3.up, difference);
         }
+        LookDirection.y = 0;
+        float scaledY = transform.localEulerAngles.y;
+        float scaledTarget = 90 - AIBehaviour.getAngle(LookDirection);
+        scaledTarget = scaledTarget > 180 ? scaledTarget - 360 : scaledTarget;
+        float difference = (scaledTarget - scaledY);
+        float degMax = TurnSpeed * Time.fixedDeltaTime;
+        difference = Mathf.Clamp(Mathf.Abs(difference) >= 180 ? difference - (Mathf.Sign(difference) * 360) : difference, -1 * degMax, degMax);
+        transform.RotateAround(transform.position, Vector3.up, difference);
     }
 
     protected virtual void OnCollisionEnter(Collision collision)
@@ -507,6 +508,10 @@ public class Entity : MonoBehaviour
         if(impactful || Poise + value > 0)
         {
             if(mortality == Mortality.vulnerable)
+            {
+                Poise += value;
+            }
+            else
             {
                 Poise += value;
             }
