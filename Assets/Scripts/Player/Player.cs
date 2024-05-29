@@ -160,7 +160,7 @@ public class Player : MonoBehaviour
             lastDirection = Direction;
         }
         HostEntity.DashCharging = CurrentKeyboard.spaceKey.isPressed && !HostEntity.Dashing;
-        if (!HostEntity.Dashing)
+        if (!HostEntity.Dashing && HostEntity.DashCharging)
         {
             HostEntity.dashDirection = HostEntity.WalkDirection;
         }
@@ -261,7 +261,7 @@ public class Player : MonoBehaviour
         }
     }
     private float yank_timer = 0;
-    private float yank_delay = 0.25f;
+    private float yank_delay = 0.5f;
 
     private void inputItemControls()
     {
@@ -418,7 +418,7 @@ public class Player : MonoBehaviour
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
-                //impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
+                impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
             }
             else if (impaledObject)
             {

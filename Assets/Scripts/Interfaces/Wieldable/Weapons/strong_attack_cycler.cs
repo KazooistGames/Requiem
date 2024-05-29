@@ -23,17 +23,18 @@ public class strong_attack_cycler : MonoBehaviour
     void Update()
     {
         currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
-        if (currentAnimation.IsTag("Cycle"))
-        {
-            animationController.SetInteger("cycle", NextIndex);
-            ActiveIndex = NextIndex;
-        }
-        else
-        {
-            animationController.SetInteger("cycle", -1);
-            NextIndex = get_next_index(ActiveIndex);
-        }
-
+        NextIndex = wielder_is_dashing() ? 2 : 1;
+        animationController.SetInteger("cycle", NextIndex);
+        //if (currentAnimation.IsTag("Cycle"))
+        //{
+        //    animationController.SetInteger("cycle", NextIndex);
+        //    ActiveIndex = NextIndex;
+        //}
+        //else
+        //{
+        //    animationController.SetInteger("cycle", -1);
+        //    NextIndex = get_next_index(ActiveIndex);
+        //}
     }
 
     private int get_next_index(int current_index)
@@ -50,5 +51,22 @@ public class strong_attack_cycler : MonoBehaviour
     private void get_state_indices()
     {
 
+    }
+
+    private bool wielder_is_dashing()
+    {
+        Weapon weapon = GetComponent<Weapon>();
+        if (!weapon.Wielder)
+        {
+            return false;
+        }
+        else if (weapon.Wielder.Dashing || weapon.Wielder.DashCharging || weapon.Wielder.dashDirection != Vector3.zero)
+        {
+            return true;
+        }
+        else
+        {
+            return false;  
+        }
     }
 }

@@ -438,7 +438,7 @@ public abstract class Weapon : Wieldable
         {
             float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
-            shove_scalar = 0.5f;
+            shove_scalar = 1.0f;
         }
         else
         {
@@ -498,7 +498,7 @@ public abstract class Weapon : Wieldable
         else if (!getObstructionBetweenEntities(foe, weapon.MostRecentWielder))
         {
             weapon.Hitting.Invoke(weapon, foe);
-            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 0.5f : 0.25f;
+            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 1.0f : 0.25f;
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe, shove_scalar);
             weapon.playSlap(foe.transform.position);
             weapon.FullCollisionONS(foe.gameObject);

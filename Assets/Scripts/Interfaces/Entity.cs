@@ -100,7 +100,7 @@ public class Entity : MonoBehaviour
     public bool Staggered = false;
     protected float staggerPeriod = 0;
     protected float staggerTimer = 0;
-    private float STAGGER_BASE_TIME = 1 / 2f;
+    private float STAGGER_BASE_TIME = 1 / 4f;
 
     /********** DASHING **********/
     public Vector3 dashDirection = Vector3.zero;
@@ -761,8 +761,8 @@ public class Entity : MonoBehaviour
             if ((crash || instantaneousCollision) && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
             {
                 float impactRatio = Strength_Ratio(this, foe) * (actualMag / Max_Velocity_Of_Dash);
-                Vector3 ShoveVector = dashDirection.normalized * (impactRatio * Max_Velocity_Of_Dash);
-                ShoveVector *= 0.75f;
+                Vector3 shoveDirection = Vector3.Lerp(dashDirection.normalized, disposition, 0.5f);
+                Vector3 ShoveVector = shoveDirection * (impactRatio * Max_Velocity_Of_Dash) * 0.75f;
                 foe.Shove(ShoveVector);
                 if(foe.Allegiance != Allegiance)
                 {
@@ -971,17 +971,8 @@ public class Entity : MonoBehaviour
         float impact = theirWeapon.Heft * theirWeapon.Tempo;
         if (theirWeapon.TrueStrike)
         {
-            alterPoise(-theirWeapon.Heft);
-            Stagger(Mathf.Sqrt(theirWeapon.Heft / Strength));
-        }
-        else if(theirWeapon.Action == ActionAnim.StrongAttack)
-        {
-            float poiseOverkill = impact - Poise;
-            alterPoise(-impact);
-            if (poiseOverkill >= 0)
-            {
-                Stagger(Mathf.Sqrt(poiseOverkill / Strength));
-            }
+            //alterPoise(-theirWeapon.Heft);
+            Stagger(Mathf.Sqrt(impact / Strength));
         }
     }
 
@@ -991,10 +982,10 @@ public class Entity : MonoBehaviour
         {
             theirWeapon.Wielder.alterPoise(-Resolve);
         }
-        else
+        else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
-            Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
             Disarm();
+            Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
             alterPoise(-myWeapon.Heft);
         }
  
