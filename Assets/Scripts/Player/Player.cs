@@ -128,7 +128,8 @@ public class Player : MonoBehaviour
 
     /***** PRIVATE *****/
 
-    private float cursorSlideScalar = 1;
+    public float cursorSlideScalar = 50;
+    private Vector2 delta = Vector2.zero;
     private void inputCamera()
     {
 
@@ -138,9 +139,23 @@ public class Player : MonoBehaviour
             float z_sign = Mathf.Sign(HostEntity.body.velocity.z);
             float x_squared = Mathf.Pow(HostEntity.body.velocity.x, 2);
             float z_squared = Mathf.Pow(HostEntity.body.velocity.z, 2);
-            Vector2 delta = new Vector2(x_squared * x_sign, z_squared * z_sign) * cursorSlideScalar;
-            Vector2 newPosition = CurrentMouse.position.ReadValue() + delta;
-            CurrentMouse.WarpCursorPosition(newPosition);
+            delta += new Vector2(x_squared * x_sign, z_squared * z_sign) * cursorSlideScalar * Time.deltaTime; ;
+            float x_abs = Mathf.Abs(delta.x);
+            Vector2 increment = Vector2.zero;
+            if (x_abs >= 1)
+            {
+                float x_step = Mathf.Floor(x_abs) * x_sign;
+                increment.x = x_step;
+                delta.x -= x_step;
+            }
+            float y_abs = Mathf.Abs(delta.y);
+            if (y_abs >= 1)
+            {
+                float y_step = Mathf.Floor(y_abs) * z_sign;
+                increment.y = y_step;
+                delta.y -= y_step;
+            }
+            CurrentMouse.WarpCursorPosition(CurrentMouse.position.ReadValue() + increment);
         }
         Vector2 mouse_screen_position = CurrentMouse.position.ReadValue();
         Ray mouse_ray = Cam.Eyes.ScreenPointToRay(mouse_screen_position);

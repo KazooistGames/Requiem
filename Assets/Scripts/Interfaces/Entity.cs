@@ -171,7 +171,7 @@ public class Entity : MonoBehaviour
         vulnerable,
         fragile
     }
-    public Mortality mortality = Mortality.impervious;
+    public Mortality mortality = Mortality.vulnerable;
 
     //******************Functions*************************
     protected virtual void Awake()

@@ -21,7 +21,6 @@ public class StatBar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        canvas.enabled = Host ? Host.mortality == Entity.Mortality.vulnerable : false;
         if (Host && Player.INSTANCE)
         {
             canvas.worldCamera = Player.INSTANCE.Cam.Eyes;
@@ -35,7 +34,7 @@ public class StatBar : MonoBehaviour
         {
             Host = transform.parent.GetComponent<Entity>();
         }
-
+        canvas.enabled = Host ? Host.mortality == Entity.Mortality.vulnerable && Host.Foe : false;
     }
 
 

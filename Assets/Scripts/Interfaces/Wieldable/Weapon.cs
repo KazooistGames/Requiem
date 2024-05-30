@@ -204,7 +204,7 @@ public abstract class Weapon : Wieldable
                 else if(Action == ActionAnim.StrongCoil)
                 {
                     attackONS = true;
-                    modifyWielderSpeed(heftSlowModifier, true);
+                    modifyWielderSpeed(heftSlowModifier);
                 }
                 else if (Action == ActionAnim.QuickWindup)
                 {
