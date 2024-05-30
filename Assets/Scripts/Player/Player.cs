@@ -128,8 +128,20 @@ public class Player : MonoBehaviour
 
     /***** PRIVATE *****/
 
+    public float cursorSlideScalar = 2;
     private void inputCamera()
     {
+
+        if (HostEntity.Dashing)
+        {
+            float x_sign = Mathf.Sign(HostEntity.body.velocity.x);
+            float z_sign = Mathf.Sign(HostEntity.body.velocity.z);
+            float x_squared = Mathf.Pow(HostEntity.body.velocity.x, 2);
+            float z_squared = Mathf.Pow(HostEntity.body.velocity.z, 2);
+            Vector2 delta = new Vector2(x_squared * x_sign, z_squared * z_sign) * cursorSlideScalar;
+            Vector2 newPosition = CurrentMouse.position.ReadValue() + delta;
+            CurrentMouse.WarpCursorPosition(newPosition);
+        }
         Vector2 mouse_screen_position = CurrentMouse.position.ReadValue();
         Ray mouse_ray = Cam.Eyes.ScreenPointToRay(mouse_screen_position);
         RaycastHit floor_ray_hit;
@@ -261,7 +273,7 @@ public class Player : MonoBehaviour
         }
     }
     private float yank_timer = 0;
-    private float yank_delay = 0.5f;
+    private float yank_delay = 0.25f;
 
     private void inputItemControls()
     {

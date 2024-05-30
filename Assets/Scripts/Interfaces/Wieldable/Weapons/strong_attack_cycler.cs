@@ -19,12 +19,25 @@ public class strong_attack_cycler : MonoBehaviour
         else { animationController = GetComponent<Animator>(); }
     }
 
-
+    public float dashLingerPeriod = 0.25f;
+    private float dashLingerTimer = 0.0f;
     void Update()
     {
         currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
-        NextIndex = wielder_is_dashing() ? 2 : 1;
         animationController.SetInteger("cycle", NextIndex);
+        if (wielder_is_dashing())
+        {
+            NextIndex = 2;
+        }
+        else if(NextIndex == 2 && (dashLingerTimer += Time.deltaTime) < dashLingerPeriod)
+        {
+            NextIndex = 2;
+        }
+        else
+        {
+            dashLingerTimer = 0;
+            NextIndex = 1;
+        }
         //if (currentAnimation.IsTag("Cycle"))
         //{
         //    animationController.SetInteger("cycle", NextIndex);
@@ -60,7 +73,7 @@ public class strong_attack_cycler : MonoBehaviour
         {
             return false;
         }
-        else if (weapon.Wielder.Dashing || weapon.Wielder.DashCharging || weapon.Wielder.dashDirection != Vector3.zero)
+        else if (weapon.Wielder.Dashing || weapon.Wielder.dashDirection != Vector3.zero /*|| weapon.Wielder.DashCharging */)
         {
             return true;
         }

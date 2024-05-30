@@ -68,7 +68,8 @@ public class Torch : Wieldable
                 float BeginToFadeRange = Hextile.Radius * minFadeRange;
                 float CompletelyFadeRange = Hextile.Radius * maxFadeRange;
                 float poximityToPlayer = (Player.INSTANCE.transform.position - transform.position).magnitude;
-                proximityToPlayerScalar = Mathf.Lerp(1.0f, 0.0f, (poximityToPlayer - BeginToFadeRange) / (CompletelyFadeRange - BeginToFadeRange));
+                //proximityToPlayerScalar = Mathf.Lerp(1.0f, 0.0f, (poximityToPlayer - BeginToFadeRange) / (CompletelyFadeRange - BeginToFadeRange));
+                proximityToPlayerScalar = 1;
                 particles.enabled = proximityToPlayerScalar > 0.25f;
                 particlesSize.sizeMultiplier = Mathf.Lerp(0.0f, 1.0f, proximityToPlayerScalar);
                 particlesVelocity.yMultiplier = Mathf.Lerp(0.0f, 0.5f, proximityToPlayerScalar);
