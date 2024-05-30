@@ -128,7 +128,7 @@ public class Player : MonoBehaviour
 
     /***** PRIVATE *****/
 
-    public float cursorSlideScalar = 2;
+    private float cursorSlideScalar = 1;
     private void inputCamera()
     {
 
