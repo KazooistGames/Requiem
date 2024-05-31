@@ -6,9 +6,8 @@ using UnityEngine.InputSystem;
 public class PlayerCamera : MonoBehaviour
 {
     public Camera Eyes;
-    public bool LockPosition = true;
 
-    public Vector2 FOVSpan = new Vector2(15, 45);
+    //public Vector2 FOVSpan = new Vector2(15, 45);
 
     public int RenderResolutionPixelWidth = 640;
     private int pixelsHigh = 240;
@@ -27,7 +26,7 @@ public class PlayerCamera : MonoBehaviour
         _BlurbService.INSTANCE.blurbCamera = Eyes;
         transform.position = new Vector3(0, 10.1f, -1.8f);
         transform.eulerAngles = new Vector3(75f, 0, 0);
-        Eyes.fieldOfView = 30;
+        Eyes.fieldOfView = 15;
     }
 
  
@@ -37,10 +36,10 @@ public class PlayerCamera : MonoBehaviour
         RenderResolutionPixelWidth = Mathf.Max(RenderResolutionPixelWidth, 1);
         pixelsHigh = Mathf.RoundToInt(RenderResolutionPixelWidth * ratio);
         Eyes.tag = "MainCamera";
-        Eyes.fieldOfView = Mathf.Clamp(Eyes.fieldOfView, FOVSpan.x, FOVSpan.y);
+        //Eyes.fieldOfView = Mathf.Clamp(Eyes.fieldOfView, FOVSpan.x, FOVSpan.y);
     }
 
-    public float SpeedScalar = 3;
+    public float SpeedScalar = 5;
     void FixedUpdate()
     {
         Vector3 disposition = triangulateOptimalPosition() - transform.position;
@@ -67,7 +66,7 @@ public class PlayerCamera : MonoBehaviour
         return transversal_offset + vertical_offset;
     }
 
-    public Vector2 Y_Span = new Vector2(5, 8);
+    public Vector2 Y_Span = new Vector2(10, 16);
     public Vector2 Y_DeadbandRange = new Vector2(0.5f, 4);
     private float calc_vertical_offset()
     {
@@ -78,7 +77,7 @@ public class PlayerCamera : MonoBehaviour
         return Mathf.Clamp(return_value, Y_Span.x, Y_Span.y);
     }
 
-    public Vector2 ZSpan = new Vector2(-1.1f, -2.2f);
+    public Vector2 ZSpan = new Vector2(-2.5f, -4f);
     public Vector2 homingSpan = new Vector2(0.1f, 0.5f);
     private Vector3 calc_transversal_offset()
     {

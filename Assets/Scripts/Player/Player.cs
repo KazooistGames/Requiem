@@ -128,7 +128,8 @@ public class Player : MonoBehaviour
 
     /***** PRIVATE *****/
 
-    public float cursorSlideScalar = 50;
+    private float cursorSlideScalar = 75f;
+    private float power = 2.0f;
     private Vector2 delta = Vector2.zero;
     private void inputCamera()
     {
@@ -137,9 +138,9 @@ public class Player : MonoBehaviour
         {
             float x_sign = Mathf.Sign(HostEntity.body.velocity.x);
             float z_sign = Mathf.Sign(HostEntity.body.velocity.z);
-            float x_squared = Mathf.Pow(HostEntity.body.velocity.x, 2);
-            float z_squared = Mathf.Pow(HostEntity.body.velocity.z, 2);
-            delta += new Vector2(x_squared * x_sign, z_squared * z_sign) * cursorSlideScalar * Time.deltaTime; ;
+            float x_mag = Mathf.Pow(HostEntity.body.velocity.x, power);
+            float z_mag = Mathf.Pow(HostEntity.body.velocity.z, power);
+            delta += new Vector2(x_mag * x_sign, z_mag * z_sign) * cursorSlideScalar * Time.deltaTime; ;
             float x_abs = Mathf.Abs(delta.x);
             Vector2 increment = Vector2.zero;
             if (x_abs >= 1)
@@ -156,6 +157,10 @@ public class Player : MonoBehaviour
                 delta.y -= y_step;
             }
             CurrentMouse.WarpCursorPosition(CurrentMouse.position.ReadValue() + increment);
+        }
+        else
+        {
+            delta = Vector2.zero;
         }
         Vector2 mouse_screen_position = CurrentMouse.position.ReadValue();
         Ray mouse_ray = Cam.Eyes.ScreenPointToRay(mouse_screen_position);

@@ -24,7 +24,7 @@ public class Halberd : Weapon
         wHitBox.center = new Vector3(0, 0.5f, 0.15f);
         wHitBox.radius = 0.15f;
         wHitBox.height = 1.5f;
-        hitRadius = 0.05f;
+        hitRadius = 0.1f;
         defendRadius = 0.4f;
         Range = 0.52f;
         BasePower = 25f;
