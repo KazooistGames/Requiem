@@ -115,7 +115,7 @@ public class Entity : MonoBehaviour
     public float DashPower { get; private set; } = 0.0f;
 
     private static float DASH_CHARGE_TIME = 0.5f;
-    private static float CRASH_DAMAGE = 25f;
+    private static float CRASH_DAMAGE = 35f;
     private static float FINAL_DASH_RATIO = 2f;
 
     private static float POISE_REGEN_BASE_PERIOD = 10;
@@ -779,7 +779,7 @@ public class Entity : MonoBehaviour
                     }
                     else
                     {
-                        foe.Damage(damage);
+                        foe.applyDamageToPoiseThenVitality(damage);
                     }
                     JustLandedHit.Invoke(foe, damage);
                 }

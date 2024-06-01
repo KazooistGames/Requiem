@@ -8,7 +8,7 @@ public class Nemesis : AIBehaviour
     public _Flames flames;
 
     private float timeToRecoverFromDash = 0;
-    private float finalDashRecoveryTime = 5;
+    private float finalDashRecoveryTime = 3;
     private float quickDashRecoveryTime = 1f;
 
     private float beamDelayPeriod = 1;
