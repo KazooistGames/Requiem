@@ -19,7 +19,7 @@ public class strong_attack_cycler : MonoBehaviour
         else { animationController = GetComponent<Animator>(); }
     }
 
-    public float dashLingerPeriod = 0.25f;
+    public float dashLingerPeriod = 0.0f;
     private float dashLingerTimer = 0.0f;
     void Update()
     {
@@ -73,7 +73,7 @@ public class strong_attack_cycler : MonoBehaviour
         {
             return false;
         }
-        else if (weapon.Wielder.Dashing || weapon.Wielder.dashDirection != Vector3.zero /*|| weapon.Wielder.DashCharging */)
+        else if (weapon.Wielder.Dashing  /*|| weapon.Wielder.dashDirection != Vector3.zero || weapon.Wielder.DashCharging */)
         {
             return true;
         }

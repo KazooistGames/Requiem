@@ -628,7 +628,7 @@ public abstract class Weapon : Wieldable
         if (foe)
         {
             foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
-            foe.applyDamageToPoiseThenVitality(Power);
+            foe.Damage(Power);
             playSlap(transform.position);
         }
         ImpaleRelease();

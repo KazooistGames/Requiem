@@ -24,7 +24,7 @@ public class Goon : AIBehaviour
     {
         base.Start();
         createSpawnWeapon();
-        Intelligence = 0.75f;
+        Intelligence = 0.5f;
         tangoStrafeEnabled = true;
         martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 0.5f;
@@ -62,11 +62,15 @@ public class Goon : AIBehaviour
         }
         else if (UnityEngine.Random.value < Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);       
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
-        else if (entity.Poise / entity.Strength < Fear || entity.Posture == Entity.PostureStrength.Weak)
+        else if (UnityEngine.Random.value < Fear)
         {
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
@@ -86,11 +90,7 @@ public class Goon : AIBehaviour
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
         }
-        else if(UnityEngine.Random.value < Aggression)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed, timeoutCheckMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-        }
+
     }
 
     protected override void reactToFoeChange()
@@ -115,7 +115,7 @@ public class Goon : AIBehaviour
         {
 
         }
-        else if(entity.Posture == Entity.PostureStrength.Weak || UnityEngine.Random.value > Aggression)
+        else if(UnityEngine.Random.value > Aggression)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));

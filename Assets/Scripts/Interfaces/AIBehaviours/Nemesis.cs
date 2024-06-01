@@ -156,7 +156,7 @@ public class Nemesis : AIBehaviour
         }
         else if (entity.Posture == Entity.PostureStrength.Weak)
         {
-            BattleCycle = Cycle.BeamCycle;
+            //BattleCycle = Cycle.BeamCycle;
         }
     }
 

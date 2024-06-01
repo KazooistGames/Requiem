@@ -114,12 +114,12 @@ public class Entity : MonoBehaviour
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-    private static float DASH_CHARGE_TIME = 0.3f;
+    private static float DASH_CHARGE_TIME = 0.5f;
     private static float CRASH_DAMAGE = 25f;
     private static float FINAL_DASH_RATIO = 2f;
 
     private static float POISE_REGEN_BASE_PERIOD = 10;
-    private static float POISE_RESTING_PERCENTAGE = 1f;
+    private static float POISE_RESTING_PERCENTAGE = 0f;
     private float poiseDebouncePeriod = 4f;
     private float poiseDebounceTimer = 0.0f;
 
@@ -236,7 +236,7 @@ public class Entity : MonoBehaviour
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         flames.gameObject.SetActive(false);
-        Poise = Strength;
+        Poise = Strength * POISE_RESTING_PERCENTAGE;
         StartCoroutine(routineDashHandler());
         JustPickedUpWieldable.AddListener(handleWeaponPickedUp);
     }
@@ -550,7 +550,8 @@ public class Entity : MonoBehaviour
         }
         if (!silent)
         {
-            playCrunch(magnitude/50f);
+            alterPoise(magnitude / 4);
+            playCrunch(magnitude/40f);
         }
     }
 
@@ -604,7 +605,7 @@ public class Entity : MonoBehaviour
         {
             Posture = PostureStrength.Strong;
         }
-        else if (Posture != PostureStrength.Weak)
+        else if (Posture != PostureStrength.Strong)
         {
             Posture = PostureStrength.Normal;
 
@@ -778,7 +779,7 @@ public class Entity : MonoBehaviour
                     }
                     else
                     {
-                        foe.applyDamageToPoiseThenVitality(damage);
+                        foe.Damage(damage);
                     }
                     JustLandedHit.Invoke(foe, damage);
                 }
@@ -809,7 +810,7 @@ public class Entity : MonoBehaviour
             {
                 float impactToFoe = Strength_Ratio(this, otherEntity) * velocityRatio / 2;
                 otherEntity.Shove(-collision.relativeVelocity.normalized * impactToFoe);
-                otherEntity.applyDamageToPoiseThenVitality(impactToFoe * CRASH_DAMAGE);
+                //otherEntity.applyDamageToPoiseThenVitality(impactToFoe * CRASH_DAMAGE);
                 float impactToSelf = Strength_Ratio(otherEntity, this) * velocityRatio / 2;
                 Shove(collision.relativeVelocity.normalized * impactToSelf);
                 applyDamageToPoiseThenVitality(impactToSelf * CRASH_DAMAGE);
@@ -994,31 +995,34 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
-        float totalPower = myWeapon.Power + (myWeapon.Heft * myWeapon.Tempo);
+        float totalPower = myWeapon.Power;
         JustLandedHit.Invoke(foe, totalPower);
         if (myWeapon.TrueStrike)
         {
-            foe.Damage(Resolve);
+            totalPower += Resolve;
         }
-        float vitalityDamage = foe.applyDamageToPoiseThenVitality(totalPower);
+
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
-            float impact = myWeapon.Heft * vitalityDamage / totalPower;
-            foe.Stagger(Mathf.Sqrt(vitalityDamage / Strength));
+            float impact = (myWeapon.Heft * myWeapon.Tempo);
+            totalPower += impact;
+            foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
-            if (Dashing && myWeapon == Player.INSTANCE.HostWeapon)
-            {
-                float duration = 4;
-                foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
-                foe.modSpeed[myWeapon.GetHashCode().ToString()] = -(Resolve/100);
-            }
+            alterPoise(totalPower/2);
+            //if (Dashing && myWeapon == Player.INSTANCE.HostWeapon)
+            //{
+            //    float duration = 4;
+            //    foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
+            //    foe.modSpeed[myWeapon.GetHashCode().ToString()] = -(Resolve/100);
+            //}
         }
+        foe.Damage(totalPower);
     }
 
     public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
@@ -1034,7 +1038,7 @@ public class Entity : MonoBehaviour
 
         float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
         float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
-        if(poiseDamage != 0)
+        if (poiseDamage != 0)
         {
             alterPoise(-poiseDamage);
         }
