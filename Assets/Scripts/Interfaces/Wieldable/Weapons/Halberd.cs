@@ -13,7 +13,7 @@ public class Halberd : Weapon
 
     protected override void Start()
     {
-        gameObject.AddComponent<strong_attack_cycler>();
+        gameObject.AddComponent<attack_cycler>();
         CapsuleCollider wHitBox = HitBox.GetComponent<CapsuleCollider>();
         gameObject.name = "Halberd";
         transform.localScale = new Vector3(1f, 1.0f, 1f);

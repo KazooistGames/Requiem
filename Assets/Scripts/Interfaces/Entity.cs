@@ -114,8 +114,8 @@ public class Entity : MonoBehaviour
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-    private static float DASH_CHARGE_TIME = 0.5f;
-    private static float CRASH_DAMAGE = 35f;
+    private static float DASH_CHARGE_TIME = 0.4f;
+    private static float CRASH_DAMAGE = 35f;   
     private static float FINAL_DASH_RATIO = 2f;
 
     private static float POISE_REGEN_BASE_PERIOD = 10;
@@ -550,7 +550,7 @@ public class Entity : MonoBehaviour
         }
         if (!silent)
         {
-            alterPoise(magnitude / 4);
+            alterPoise(magnitude / 2);
             playCrunch(magnitude/40f);
         }
     }
@@ -972,7 +972,7 @@ public class Entity : MonoBehaviour
         float impact = theirWeapon.Heft * theirWeapon.Tempo;
         if (theirWeapon.TrueStrike)
         {
-            //alterPoise(-theirWeapon.Heft);
+            alterPoise(theirWeapon.Power);
             Stagger(Mathf.Sqrt(impact / Strength));
         }
     }
@@ -987,7 +987,7 @@ public class Entity : MonoBehaviour
         {
             Disarm();
             Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
-            alterPoise(-myWeapon.Heft);
+            alterPoise(-Poise);
         }
  
     }
@@ -1005,6 +1005,7 @@ public class Entity : MonoBehaviour
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
+            alterPoise(totalPower);
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
@@ -1014,13 +1015,7 @@ public class Entity : MonoBehaviour
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
-            alterPoise(totalPower/2);
-            //if (Dashing && myWeapon == Player.INSTANCE.HostWeapon)
-            //{
-            //    float duration = 4;
-            //    foe.BleedingWounds[myWeapon.GetHashCode().ToString()] = (Resolve / duration, duration);
-            //    foe.modSpeed[myWeapon.GetHashCode().ToString()] = -(Resolve/100);
-            //}
+            alterPoise(totalPower);
         }
         foe.Damage(totalPower);
     }
