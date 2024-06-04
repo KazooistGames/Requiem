@@ -4,16 +4,22 @@ using UnityEngine;
 
 public class attack_cycler : MonoBehaviour
 {
-    public int Variants = 3;
 
-    public int ActiveIndex = 0;
-    public int NextIndex = 0;
-    public int PreviousIndex = 0;
+    public Cycle ActiveCycle = 0;
+    public Cycle NextCycle = 0;
+    public Cycle PreviousCycle = 0;
 
 
     private Animator animationController;
     private AnimatorStateInfo currentAnimation;
     private Weapon weapon;
+
+    public enum Cycle
+    {
+        Stab = 0,
+        Spear = 1,
+        Smash = 2,
+    }
 
     void Start()
     {
@@ -28,31 +34,21 @@ public class attack_cycler : MonoBehaviour
 
     void Update()
     {
-        PreviousIndex = ActiveIndex;
-        ActiveIndex = NextIndex;
+        PreviousCycle = ActiveCycle;
+        ActiveCycle = NextCycle;
         currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
-        animationController.SetInteger("cycle", ActiveIndex);
+        animationController.SetInteger("cycle", (int)ActiveCycle);
         if (wielder_is_dashing())
         {
-            NextIndex = 2;
+            NextCycle = Cycle.Smash;
             weapon.modPower["dashAttack"] = weapon.Wielder.Resolve;
         }
         else
         {
-            NextIndex = 1;
+            NextCycle = Cycle.Stab;
             weapon.modPower["dashAttack"] = 0;
         }
 
-    }
-
-    private int get_next_index(int current_index)
-    {
-        int next_index = current_index + 1;
-        if(next_index > Variants)
-        {
-            next_index = 1;
-        }
-        return next_index;
     }
 
 
@@ -75,7 +71,7 @@ public class attack_cycler : MonoBehaviour
 
     private void handle_weapon_hit(Weapon weapon, Entity foe)
     {
-        if(PreviousIndex == 2)
+        if(PreviousCycle == Cycle.Smash)
         {
             foe.Stagger(weapon.Power / foe.Strength);
         }

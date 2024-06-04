@@ -505,17 +505,18 @@ public class Entity : MonoBehaviour
     {
         if (immortalityTimer < 0.25f) { return; }
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
-        if(impactful || Poise + value > 0)
-        {
-            if(mortality == Mortality.vulnerable)
-            {
-                Poise += value;
-            }
-            else
-            {
-                Poise += value;
-            }
-        }
+        //if(impactful || Poise + value > 0)
+        //{
+        //    if(mortality == Mortality.vulnerable)
+        //    {
+        //        Poise += value;
+        //    }
+        //    else
+        //    {
+        //        Poise += value;
+        //    }
+        //}
+        Poise += value;
         Poise = Mathf.Clamp(Poise, -1f, Strength);
         if (value * existingDelta >= 0)
         {
@@ -779,7 +780,7 @@ public class Entity : MonoBehaviour
                     }
                     else
                     {
-                        foe.applyDamageToPoiseThenVitality(damage);
+                        foe.Damage(damage);
                     }
                     JustLandedHit.Invoke(foe, damage);
                 }
@@ -945,6 +946,7 @@ public class Entity : MonoBehaviour
         {
             impact += theirWeapon.MostRecentWielder.Resolve;
             Stagger(Mathf.Sqrt(impact / Strength));
+            Disarm();
             alterPoise(-impact);
             return;
         }
@@ -954,7 +956,7 @@ public class Entity : MonoBehaviour
         }
         else if(theirWeapon.Action != ActionAnim.StrongAttack)
         {
-            theirWeapon.Wielder.Stagger(Mathf.Sqrt(impact / theirWeapon.Wielder.Strength));
+            //theirWeapon.Wielder.Stagger(Mathf.Sqrt(impact / theirWeapon.Wielder.Strength));
         }
         else
         {
@@ -1009,13 +1011,17 @@ public class Entity : MonoBehaviour
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
-            float impact = (myWeapon.Heft * myWeapon.Tempo);
-            totalPower += impact;
-            foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
+            totalPower += myWeapon.Tempo;
+            foe.Stagger(Mathf.Sqrt(totalPower / foe.Strength));
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
             alterPoise(totalPower);
+            if (myWeapon.currentAnimation.IsName("Smash"))
+            {
+                float impact = totalPower + Poise;
+                foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
+            }
         }
         foe.Damage(totalPower);
     }

@@ -65,8 +65,8 @@ public abstract class Weapon : Wieldable
     private bool tempoChargeONS = true;
     public float tempoChargeMin = 0.25f;
     //private bool attackChargeONS = true;
-    public float TempoTargetCenter { get; private set; } = 0.98f;
-    public float TempoTargetWidth { get; private set; } = 0.05f;
+    public float TempoTargetCenter { get; private set; } = 0.5f;
+    public float TempoTargetWidth { get; private set; } = 1.0f;
 
 
     protected string lightSwingClip;
@@ -92,7 +92,6 @@ public abstract class Weapon : Wieldable
     protected Collider blade;
 
     protected _Flames flames;
-
 
 
     protected override void Awake()
@@ -242,6 +241,7 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
+                        Wielder.alterPoise(-Tempo * Wielder.Strength, impactful: false);
                         playHeavySwing();
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
@@ -866,8 +866,8 @@ public abstract class Weapon : Wieldable
     {
         Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, Wielder.Poise/Wielder.Strength);
         bool strong = Wielder ? Wielder.Posture != Entity.PostureStrength.Weak : false;
-        TrueStrike = TrueStrikeEnabled && strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f;
-        tempoChargePeriod = Heft / Wielder.Strength;
+        TrueStrike = TrueStrikeEnabled && strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f && Tempo > 0;
+        //tempoChargePeriod = Heft / Wielder.Strength;
         if (Action == ActionAnim.StrongCoil)
         {
             if (tempoChargeONS)
@@ -878,11 +878,11 @@ public abstract class Weapon : Wieldable
             {
                 float increment = (Time.deltaTime / tempoChargePeriod);
                 tempoCharge += increment;
-                Wielder.alterPoise(-increment * Heft / 4, impactful: false);
+                //Wielder.alterPoise(-increment * Heft / 4, impactful: false);
             }
             else
             {
-                Wielder.alterPoise(0, impactful: false);
+                //Wielder.alterPoise(0, impactful: false);
             }
         }
         else if (Action == ActionAnim.StrongWindup)

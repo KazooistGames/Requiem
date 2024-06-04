@@ -293,7 +293,7 @@ public class Player : MonoBehaviour
         }
     }
     private float yank_timer = 0;
-    private float yank_delay = 0.25f;
+    private float yank_delay = 0.3f;
 
     private void inputItemControls()
     {
@@ -450,18 +450,18 @@ public class Player : MonoBehaviour
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
-                impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
+                //impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
             }
             else if (impaledObject)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, yankStrength);
             }
-            else
-            {
-                Vector3 disposition = HostWeapon.transform.position - transform.position;
-                HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
-            }
+            //else
+            //{
+            //    Vector3 disposition = HostWeapon.transform.position - transform.position;
+            //    HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
+            //}
         }
         else
         {
