@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class attack_cycler : MonoBehaviour
+public class weapon_module_DashAttack : MonoBehaviour
 {
 
     public Cycle ActiveCycle = 0;
