@@ -42,7 +42,7 @@ public class Nemesis : AIBehaviour
         grabDPS = 10f;
         sensoryBaseRange = 2f;
         sensorySightRangeScalar = 1f;
-        sensoryAudioRangeScalar = 1f;
+        sensoryAudioRangeScalar = 0.75f;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = Hextile.Radius;
@@ -130,14 +130,14 @@ public class Nemesis : AIBehaviour
 
         bool inPosition = disposition.magnitude < pursueStoppingDistance/2 || entity.DashCharging;
         bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
-        bool finalDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
+        bool longDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
         if (!entity.Foe)
         {
 
         }
-        else if (finalDashTrigger)
+        else if (longDashTrigger)
         {
-            dashingChargePeriod = 3f;
+            dashingChargePeriod = finalDashRecoveryTime;
             dashingDesiredDirection = disposition;
             timeToRecoverFromDash = quickDashRecoveryTime;
         }
@@ -145,7 +145,7 @@ public class Nemesis : AIBehaviour
         {
             if(Random.value > 0.1f)
             {
-                dashingChargePeriod = 1f;
+                dashingChargePeriod = quickDashRecoveryTime;
                 dashingDesiredDirection = disposition;
                 timeToRecoverFromDash = finalDashRecoveryTime;
             }

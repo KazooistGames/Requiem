@@ -398,8 +398,6 @@ public class Player : MonoBehaviour
             }
         }
         _BlurbService.Toggle_Blurbs(false);
-
-        //Requiem.INSTANCE.Restart();
     }
 
     private void recallWeapon()

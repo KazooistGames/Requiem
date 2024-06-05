@@ -108,7 +108,7 @@ public class Entity : MonoBehaviour
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
     protected bool CrashEnvironmentONS = true;
 
-    public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
+    public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
     public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
@@ -118,9 +118,11 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 35f;   
     private static float FINAL_DASH_RATIO = 2f;
 
-    private static float POISE_REGEN_BASE_PERIOD = 10;
-    private static float POISE_RESTING_PERCENTAGE = 0f;
-    private float poiseDebouncePeriod = 4f;
+    private static float POISE_MAX_DEBOUNCE = 5;
+
+    private static float POISE_REGEN_BASE_PERIOD = 5;
+    private static float POISE_RESTING_PERCENTAGE = 1f;
+    private float poiseDebouncePeriod = 5f;
     private float poiseDebounceTimer = 0.0f;
 
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
@@ -138,7 +140,6 @@ public class Entity : MonoBehaviour
         Strong = 1,
     }
     public PostureStrength Posture = PostureStrength.Strong;
-
     public enum WieldMode
     {
         none,
@@ -258,7 +259,7 @@ public class Entity : MonoBehaviour
         berthActual = Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod && !DashCharging)
         {
-            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 3, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
+            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
@@ -521,8 +522,7 @@ public class Entity : MonoBehaviour
         if (value * existingDelta >= 0)
         {
             float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
-            float scalar = 5;
-            float newBounce = impactful ? scaledRatio * scalar : Time.deltaTime * 5;
+            float newBounce = impactful ? scaledRatio * POISE_MAX_DEBOUNCE : Time.deltaTime * 5;
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
             if (newBounce >= remainingBounce)
             {
@@ -551,7 +551,7 @@ public class Entity : MonoBehaviour
         }
         if (!silent)
         {
-            alterPoise(magnitude / 2);
+            //alterPoise(magnitude / 2);
             playCrunch(magnitude/40f);
         }
     }
@@ -606,7 +606,7 @@ public class Entity : MonoBehaviour
         {
             Posture = PostureStrength.Strong;
         }
-        else if (Posture != PostureStrength.Strong)
+        else if (Posture != PostureStrength.Weak)
         {
             Posture = PostureStrength.Normal;
 
@@ -776,11 +776,11 @@ public class Entity : MonoBehaviour
                     }
                     if (foe.requiemPlayer ? false : !foe.Foe)
                     {
-                        foe.Damage(damage);
+                        foe.applyDamageToPoiseThenVitality(damage);
                     }
                     else
                     {
-                        foe.Damage(damage);
+                        foe.applyDamageToPoiseThenVitality(damage);
                     }
                     JustLandedHit.Invoke(foe, damage);
                 }
@@ -841,7 +841,6 @@ public class Entity : MonoBehaviour
             }
         }
     }
-
 
 
     private IEnumerator routineDashHandler()
@@ -941,89 +940,80 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        float impact = theirWeapon.Heft * theirWeapon.Tempo;
-        if (theirWeapon.TrueStrike)
-        {
-            impact += theirWeapon.MostRecentWielder.Resolve;
-            Stagger(Mathf.Sqrt(impact / Strength));
-            Disarm();
-            alterPoise(-impact);
-            return;
-        }
+
         if (theirWeapon.Thrown)
         {
 
         }
-        else if(theirWeapon.Action != ActionAnim.StrongAttack)
+        else if(theirWeapon.Action == ActionAnim.StrongAttack)
         {
-            //theirWeapon.Wielder.Stagger(Mathf.Sqrt(impact / theirWeapon.Wielder.Strength));
-        }
-        else
-        {
+            float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
             Stagger(Mathf.Sqrt(impact / Strength));
             alterPoise(-impact);
+            if (theirWeapon.TrueStrike)
+            {
+                Disarm();
+            }
+        }
+        else if(theirWeapon.Action == ActionAnim.QuickAttack)
+        {
+            if (theirWeapon.currentAnimation.IsName("Smash"))
+            {
+                float damage = theirWeapon.Power + Resolve;
+                Stagger(Mathf.Sqrt(damage / Strength));
+            }
         }
     }
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (theirWeapon.Wielder)
-        {
-            theirWeapon.Wielder.alterPoise(-Resolve);
-        }
-        float impact = theirWeapon.Heft * theirWeapon.Tempo;
+
+        float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
         if (theirWeapon.TrueStrike)
         {
-            alterPoise(theirWeapon.Power);
-            Stagger(Mathf.Sqrt(impact / Strength));
+            //alterPoise(impact);
+            //Stagger(Mathf.Sqrt(impact / Strength));
+        }
+        else if (theirWeapon.Wielder)
+        {
+            theirWeapon.Wielder.Stagger(Resolve / 10);
         }
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (myWeapon.TrueStrike)
-        {
-            theirWeapon.Wielder.alterPoise(-Resolve);
-        }
-        else if (myWeapon.Action == ActionAnim.QuickAttack)
+        if (myWeapon.Action == ActionAnim.QuickAttack)
         {
             Disarm();
-            Stagger(Mathf.Sqrt(myWeapon.Heft / Strength));
             alterPoise(-Poise);
         }
  
     }
 
-
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float totalPower = myWeapon.Power;
         JustLandedHit.Invoke(foe, totalPower);
-        if (myWeapon.TrueStrike)
-        {
-            totalPower += Resolve;
-        }
-
         if (myWeapon.Thrown)
         {
+            totalPower += Resolve;
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
-            alterPoise(totalPower);
+            //alterPoise(totalPower);
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
-            totalPower += myWeapon.Tempo;
-            foe.Stagger(Mathf.Sqrt(totalPower / foe.Strength));
+            totalPower += Resolve;
+            float impact = totalPower + DashPower * Resolve;
+            foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
+            string bleed_key = GetHashCode().ToString() + "trueStrike";
+            float bleed_period = 5;
+            foe.BleedingWounds[bleed_key] = (myWeapon.Tempo * Strength / bleed_period, bleed_period);
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
-            alterPoise(totalPower);
-            if (myWeapon.currentAnimation.IsName("Smash"))
-            {
-                float impact = totalPower + Poise;
-                foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
-            }
+            //alterPoise(totalPower);
         }
-        foe.Damage(totalPower);
+        foe.applyDamageToPoiseThenVitality(totalPower);
     }
 
     public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
@@ -1045,7 +1035,7 @@ public class Entity : MonoBehaviour
         }
         if (vitalityDamage != 0)
         {
-            Damage(vitalityDamage, silent);
+            Damage(vitalityDamage);
         }
         return vitalityDamage;
     }

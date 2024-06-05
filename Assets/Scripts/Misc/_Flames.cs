@@ -33,14 +33,6 @@ public class _Flames : MonoBehaviour
 
     public GameObject boundObject;
 
-    //private float lightIntensityMin = 3f;
-    //private float lightIntensityMax = 5.0f;
-    //private float lightRangeMin = 0.5f;
-    //private float lightRangeMax = 0.8f;
-    //private float emissionOverTimeMin = 0;
-    //private float emissionOverTimeMax = 250;
-    //private float emissionOverDistanceMin = 0;
-    //private float emissionOverDistanceMax = 1000;
 
     private void Awake()
     {
@@ -51,6 +43,8 @@ public class _Flames : MonoBehaviour
         colorModule = particles.colorOverLifetime;
     }
 
+    const float max_emission_over_time = 3;
+    const float max_emission_over_distance = 3;
     private void Update()
     {
         if(FlamePresentationStyle != cachedFlameStye) 
@@ -62,6 +56,8 @@ public class _Flames : MonoBehaviour
             //setFlamePreset(FlameStyle);
             Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
             Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
+            emissionModule.rateOverTime = max_emission_over_time * PowerLevel;
+            emissionModule.rateOverDistanceMultiplier = max_emission_over_distance * PowerLevel;
             if (boundWeapon)
             {
                 emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.Action == Weapon.ActionAnim.Parrying;

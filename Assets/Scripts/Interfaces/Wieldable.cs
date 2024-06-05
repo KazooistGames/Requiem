@@ -238,7 +238,6 @@ public class Wieldable : MonoBehaviour
 
 
 
-
     public void DropItem(bool yeet = false, Vector3 direction = new Vector3(), float magnitude = 2)
     {
         if (Wielder)
@@ -369,6 +368,7 @@ public class Wieldable : MonoBehaviour
         yield break;
     }
 
+    protected float throwMagnitude = 5f;
     protected IEnumerator throwHandler()
     {
         while (true)
@@ -376,11 +376,13 @@ public class Wieldable : MonoBehaviour
             yield return new WaitUntil(() => Thrown && Wielder && equipType != EquipType.Burdensome);
             EventThrown.Invoke(this);
             setHighlightColor(Color.gray);
-            float magnitude = 2f * Wielder.Strength/Heft;
+            float magnitude = throwMagnitude;
             Vector3 direction = Wielder.LookDirection;
             direction.y = 0;
             DropItem(true, direction, magnitude);
             Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
+            yield return new WaitUntil(() => !Thrown);
+            Body.velocity = Vector3.zero;
             yield return new WaitWhile(() =>!Thrown);
             yield return new WaitUntil(() => Wielder);
         }

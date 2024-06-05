@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using static System.Collections.Specialized.BitVector32;
+
 
 public abstract class Weapon : Wieldable
 {
@@ -228,7 +228,7 @@ public abstract class Weapon : Wieldable
                         Swinging.Invoke(this);
                         playLightSwing();
                     }
-                    //modifyWielderSpeed(heftSlowModifier, true);
+                    modifyWielderSpeed(heftSlowModifier/2, true);
                 }
                 else if (Action == ActionAnim.StrongAttack)
                 {
@@ -261,6 +261,8 @@ public abstract class Weapon : Wieldable
                 else if (Action == ActionAnim.Aiming)
                 {
                     modifyWielderSpeed(heftSlowModifier);
+                    throwMagnitude = Mathf.Sqrt(Tempo)* Wielder.Strength / 10;
+                    flames.PowerLevel = 100 * Tempo;
                 }
                 else if (Action == ActionAnim.Throwing)
                 {
@@ -326,7 +328,6 @@ public abstract class Weapon : Wieldable
             playTink();
         }                    
         base.OnCollisionEnter(collision);
-
     }
 
     protected void OnTriggerStay(Collider other)
@@ -498,7 +499,7 @@ public abstract class Weapon : Wieldable
         else if (!getObstructionBetweenEntities(foe, weapon.MostRecentWielder))
         {
             weapon.Hitting.Invoke(weapon, foe);
-            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 1.0f : 0.25f;
+            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 0.5f : 0.25f;
             APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe, shove_scalar);
             weapon.playSlap(foe.transform.position);
             weapon.FullCollisionONS(foe.gameObject);
@@ -511,7 +512,6 @@ public abstract class Weapon : Wieldable
         }
         return false;      
     }
-
 
     private void resolveObstacleHit(GameObject obstacle)
     {
@@ -568,14 +568,15 @@ public abstract class Weapon : Wieldable
         {
             foe.EventAttemptPickup.AddListener(PickupItem);
             string key = "impaled" + gameObject.GetHashCode().ToString();
+            float bleed_period = 5;
             if (foe.Vitality > 0)
             {
                 togglePhysicsBox(false);
                 alreadyHit.Add(foe.gameObject);
                 foe.JustCrashed.AddListener(impale_doupleDipDamage);
                 foe.JustVanquished.AddListener(ImpaleRelease);
-                foe.modSpeed[key] = -(Heft/foe.Strength);
-                //foe.BleedingWounds[key] = (BasePower / 5, float.PositiveInfinity);
+                //foe.modSpeed[key] = -(Heft/foe.Strength);
+                foe.BleedingWounds[key] = (MostRecentWielder.Resolve / bleed_period, bleed_period);
                 yield return new WaitForSeconds(3);
                 if (foe)
                 {
@@ -593,7 +594,6 @@ public abstract class Weapon : Wieldable
             HitBox.enabled = true;
             GameObject impaledObject = collidedObject;
             yield return new WaitUntil(() => Wielder || !impaledObject);
-            //ImpalingSomething = false;
             togglePhysicsBox(!Wielder);
             yield break;
         }
@@ -609,14 +609,12 @@ public abstract class Weapon : Wieldable
             string key = "impaled" + gameObject.GetHashCode().ToString();
             foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
             foe.JustVanquished.RemoveListener(ImpaleRelease);
-            foe.modSpeed.Remove(key);
-            //foe.BleedingWounds.Remove(key);
+            //foe.modSpeed.Remove(key);
         }
         transform.SetParent(Requiem.INSTANCE.transform.parent, true);
         togglePhysicsBox(true);
         Body.isKinematic = false;
-        enabled = true;
-        //ImpalingSomething = false;        
+        enabled = true;    
         ImpaledObject = null;
         DropItem(yeet: false);
         playShing();
@@ -635,14 +633,13 @@ public abstract class Weapon : Wieldable
         DropItem(yeet: true, magnitude: 1);
     }
 
-
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float scalar = 1.0f)
     {
         if (!foe || !weapon.MostRecentWielder) { return; }
-        float impactPower = weapon.Heft * (1 + weapon.Tempo);
+        float impactPower = weapon.MostRecentWielder.Strength * (1 + weapon.Tempo);
         Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.25f) : weapon.MostRecentWielder.transform.position;
         Vector3 direction = foe.transform.position - origin;
-        Vector3 velocityChange = direction.normalized * (impactPower / 30f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
+        Vector3 velocityChange = direction.normalized * (impactPower / 50f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
         if (weapon.TrueStrike)
         {
             velocityChange *= 2;
@@ -728,7 +725,6 @@ public abstract class Weapon : Wieldable
             }
             MostRecentWielder.modTurnSpeed[heftSlowKey] =  Mathf.MoveTowards(MostRecentWielder.modTurnSpeed[heftSlowKey], lockRotation ? -0.95f : value, Time.deltaTime * HEFT_TURN_RAMP_SPEED);
             MostRecentWielder.modSpeed[heftSlowKey] = Mathf.MoveTowards(MostRecentWielder.modSpeed[heftSlowKey], value, Time.deltaTime * HEFT_SLOW_RAMP_SPEED);
-
         }
     }
 
@@ -864,11 +860,11 @@ public abstract class Weapon : Wieldable
 
     private void chargeTempo()
     {
-        Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, Wielder.Poise/Wielder.Strength);
+        Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
         bool strong = Wielder ? Wielder.Posture != Entity.PostureStrength.Weak : false;
         TrueStrike = TrueStrikeEnabled && strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f && Tempo > 0;
         //tempoChargePeriod = Heft / Wielder.Strength;
-        if (Action == ActionAnim.StrongCoil)
+        if (Action == ActionAnim.Aiming)
         {
             if (tempoChargeONS)
             {
@@ -885,11 +881,7 @@ public abstract class Weapon : Wieldable
                 //Wielder.alterPoise(0, impactful: false);
             }
         }
-        else if (Action == ActionAnim.StrongWindup)
-        {
-            tempoCharge = 0.001f;
-        }
-        else if(Action != ActionAnim.StrongAttack)
+        else if(!Thrown)
         {
             TrueStrike = false;
             tempoCharge = 0;
