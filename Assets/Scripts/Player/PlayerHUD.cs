@@ -151,19 +151,19 @@ public class PlayerHUD : MonoBehaviour
         {
 
         }
-        else if (Player.INSTANCE.HostWeapon.Action == Weapon.ActionAnim.Aiming || Player.INSTANCE.HostWeapon.Action == Weapon.ActionAnim.Throwing)
+        else if (Player.INSTANCE.HostWeapon.Tempo > 0)
         {
             fadeTransforms(tempoBarTransforms, 0.75f, 0.1f);
         }
-        else if(Player.INSTANCE.HostWeapon.Action != Weapon.ActionAnim.Aiming)
+        else if(Player.INSTANCE.HostWeapon.Tempo <= 0)
         {
             fadeTransforms(tempoBarTransforms, 0, 0.5f);
         }
         tempoBarTransforms[3].anchorMin = new Vector2(Player.INSTANCE.HostWeapon.Tempo, 1f);
         tempoBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostWeapon.Tempo, 1f);
-        tempoBarTransforms[1].anchorMin = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetCenter, 1f);
-        tempoBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetCenter, 1f);
-        tempoBarTransforms[1].sizeDelta = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
+        //tempoBarTransforms[1].anchorMin = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetCenter, 1f);
+        //tempoBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetCenter, 1f);
+        //tempoBarTransforms[1].sizeDelta = new Vector2(Player.INSTANCE.HostWeapon.TempoTargetWidth * tempoBarTransforms[0].sizeDelta.x, 25);
     }
 
     private void fadeTransforms(Transform[] transforms, float alphaValue, float periodSeconds)

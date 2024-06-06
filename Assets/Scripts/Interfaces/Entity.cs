@@ -957,11 +957,7 @@ public class Entity : MonoBehaviour
         }
         else if(theirWeapon.Action == ActionAnim.QuickAttack)
         {
-            if (theirWeapon.currentAnimation.IsName("Smash"))
-            {
-                float damage = theirWeapon.Power + Resolve;
-                Stagger(Mathf.Sqrt(damage / Strength));
-            }
+
         }
     }
 
@@ -969,14 +965,21 @@ public class Entity : MonoBehaviour
     {
 
         float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
-        if (theirWeapon.TrueStrike)
+        if (!theirWeapon.Wielder)
         {
-            //alterPoise(impact);
-            //Stagger(Mathf.Sqrt(impact / Strength));
+
         }
-        else if (theirWeapon.Wielder)
+        else if(theirWeapon.Action == ActionAnim.StrongAttack)
         {
-            theirWeapon.Wielder.Stagger(Resolve / 10);
+
+        }
+        else if (theirWeapon.TrueStrike)
+        {
+
+        }
+        else
+        {
+            theirWeapon.Wielder.Stagger(Resolve/theirWeapon.Wielder.Resolve);
         }
     }
 

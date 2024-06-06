@@ -58,16 +58,9 @@ public abstract class Weapon : Wieldable
 
     public bool TrueStrikeEnabled = false;
     public bool TrueStrike = false;
-    public float Tempo;
-    private float tempoCharge = 0;
-    public float tempoChargePeriod = 1f;
-    public float tempoChargeExponent = 3/4f;
-    private bool tempoChargeONS = true;
-    public float tempoChargeMin = 0.25f;
-    //private bool attackChargeONS = true;
-    public float TempoTargetCenter { get; private set; } = 0.5f;
-    public float TempoTargetWidth { get; private set; } = 1.0f;
 
+    //private bool attackChargeONS = true;
+    public float Tempo;
 
     protected string lightSwingClip;
     protected string heavySwingClip;
@@ -180,7 +173,6 @@ public abstract class Weapon : Wieldable
             }
             if (Wielded)
             {
-                chargeTempo();
                 if (Action == ActionAnim.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
@@ -192,7 +184,6 @@ public abstract class Weapon : Wieldable
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                     HitBox.enabled = false;
-                    TrueStrike = false;
                     modifyWielderSpeed(0);
                 }
                 else if (Action == ActionAnim.StrongWindup)
@@ -241,7 +232,6 @@ public abstract class Weapon : Wieldable
                         HitBox.enabled = true;
                         HitBox.GetComponent<CapsuleCollider>().radius = hitRadius;
                         Swinging.Invoke(this);
-                        Wielder.alterPoise(-Tempo * Wielder.Strength, impactful: false);
                         playHeavySwing();
                     }
                     modifyWielderSpeed(heftSlowModifier, true);
@@ -774,11 +764,22 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("Windup"))
         {
-            return ActionAnim.StrongWindup;
+            if (nextAnimation.IsTag("Guard"))
+            {
+                return ActionAnim.Parrying;
+            }
+            else
+            {
+                return ActionAnim.StrongWindup;
+            }
         }
         else if (currentAnimation.IsTag("StrongCoil"))
         {
-            if (nextAnimation.IsTag("StrongAttack"))
+            if (nextAnimation.IsTag("Guard"))
+            {
+                return ActionAnim.Parrying;
+            }
+            else if (nextAnimation.IsTag("StrongAttack"))
             {
                 return ActionAnim.StrongAttack;
             }
@@ -789,13 +790,20 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("QuickCoil"))
         {
-            return ActionAnim.QuickCoil;
+            if (nextAnimation.IsTag("Guard"))
+            {
+                return ActionAnim.Parrying;
+            }
+            else
+            {
+                return ActionAnim.QuickCoil;
+            }
         }
         else if (currentAnimation.IsTag("QuickAttack"))
         {
             if (nextAnimation.IsTag("Guard"))
             {
-                return ActionAnim.Recovering;
+                return ActionAnim.Parrying;
             }
             else if (nextAnimation.IsTag("Idle"))
             {
@@ -810,7 +818,7 @@ public abstract class Weapon : Wieldable
         {
             if (nextAnimation.IsTag("Guard"))
             {
-                return ActionAnim.Recovering;
+                return ActionAnim.Parrying;
             }
             else if (nextAnimation.IsTag("Idle"))
             {
@@ -846,7 +854,14 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("Aim"))
         {
-            return ActionAnim.Aiming;
+            if (nextAnimation.IsTag("Guard"))
+            {
+                return ActionAnim.Parrying;
+            }
+            else
+            {
+                return ActionAnim.Aiming;
+            }
         }
         else if (currentAnimation.IsTag("Throw"))
         {
@@ -856,47 +871,6 @@ public abstract class Weapon : Wieldable
         {
             return ActionAnim.error;
         }
-    }
-
-    private void chargeTempo()
-    {
-        Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
-        bool strong = Wielder ? Wielder.Posture != Entity.PostureStrength.Weak : false;
-        TrueStrike = TrueStrikeEnabled && strong && Mathf.Abs(TempoTargetCenter - Tempo) <= TempoTargetWidth / 2f && Tempo > 0;
-        //tempoChargePeriod = Heft / Wielder.Strength;
-        if (Action == ActionAnim.Aiming)
-        {
-            if (tempoChargeONS)
-            {
-                tempoChargeONS = false;
-            }
-            else if(tempoCharge < 1)
-            {
-                float increment = (Time.deltaTime / tempoChargePeriod);
-                tempoCharge += increment;
-                //Wielder.alterPoise(-increment * Heft / 4, impactful: false);
-            }
-            else
-            {
-                //Wielder.alterPoise(0, impactful: false);
-            }
-        }
-        else if(!Thrown)
-        {
-            TrueStrike = false;
-            tempoCharge = 0;
-            tempoChargeONS = true;
-        }
-    }
-
-    private float convertChargeToTempo(float charge)
-    {
-        float frequencyVariable = Mathf.PI * charge;
-        float frequencyConstant = Mathf.PI / 2;
-        float amplitudeScalar = 0.5f;
-        float amplitudeConstant = 0.5f;
-        float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
-        return 1 - function;
     }
 
     private void playClang(float pitchScalar = 2.0f)

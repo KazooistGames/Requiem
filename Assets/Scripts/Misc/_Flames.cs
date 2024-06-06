@@ -53,23 +53,37 @@ public class _Flames : MonoBehaviour
         }
         if (boundObject)
         {
-            //setFlamePreset(FlameStyle);
             Entity boundEntity = boundObject.gameObject.GetComponent<Entity>();
             Weapon boundWeapon = boundObject.gameObject.GetComponent<Weapon>();
             emissionModule.rateOverTime = max_emission_over_time * PowerLevel;
             emissionModule.rateOverDistanceMultiplier = max_emission_over_distance * PowerLevel;
             if (boundWeapon)
             {
-                emissionModule.enabled = boundWeapon.TrueStrike || boundWeapon.Action == Weapon.ActionAnim.Parrying;
-                if (boundWeapon.TrueStrike)
+                emissionModule.enabled = true;
+                if (boundWeapon.Action == Weapon.ActionAnim.Parrying)
                 {
-                    //SetFlameStyle(FlameStyles.Inferno);
-                    emissionModule.enabled = true;
+                    SetFlameStyle(FlameStyles.Soulless);
+                    PowerLevel = 50;
+                    particleLight.range = 0.5f;
+                    particleLight.intensity = 3;
                 }
-                else if (boundWeapon.Action == Weapon.ActionAnim.Parrying)
+                else if (boundWeapon.TrueStrike)
                 {
-                    //SetFlameStyle(FlameStyles.Inferno);
-                    emissionModule.enabled = true;
+                    SetFlameStyle(FlameStyles.Inferno);
+                    PowerLevel = 50;
+                    particleLight.range = 0.75f;
+                    particleLight.intensity = 5;
+                }
+                else if(boundWeapon.Tempo > 0)
+                {
+                    SetFlameStyle(FlameStyles.Magic);
+                    PowerLevel = 100 * boundWeapon.Tempo;
+                    particleLight.range = 0.75f;
+                    particleLight.intensity = 5;
+                }
+                else
+                {
+                    emissionModule.enabled = false;
                 }
             }
             else if (boundEntity)
@@ -86,6 +100,10 @@ public class _Flames : MonoBehaviour
     /***** PUBLIC *****/
     public void SetFlameStyle(FlameStyles preset)
     {
+        if(preset == cachedFlameStye)
+        {
+            return;
+        }
         if(gradients.Count == 0)
         {
             buildGradients();
@@ -107,6 +125,7 @@ public class _Flames : MonoBehaviour
                 flameGradient.mode = ParticleSystemGradientMode.TwoGradients;
                 flameGradient.gradientMin = gradients[0];
                 flameGradient.gradientMax = gradients[1];
+                particleLight.color = colors[0];
                 break;
         }
         colorModule.color = flameGradient;
