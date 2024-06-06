@@ -64,7 +64,6 @@ public class Player : MonoBehaviour
         if (HostWeapon)
         {
             updateChainlink();
-            HostWeapon.TrueStrikeEnabled = true;
         }
         else if (HostEntity ? HostEntity.MainHand : false)
         {
@@ -346,7 +345,7 @@ public class Player : MonoBehaviour
         HostEntity = new GameObject().AddComponent<Struggler>();
         HostEntity.transform.position = transform.position;
         HostEntity.requiemPlayer = this;
-        HostEntity.FinalDashEnabled = true;
+        //HostEntity.FinalDashEnabled = true;
         HostEntity.JustLandedHit.AddListener(Scoreboard.Score_Hit);
         //HostEntity.mortality = Entity.Mortality.vulnerable;
         chainRenderer = Instantiate(Resources.Load<GameObject>("Prefabs/chainRenderer")).GetComponent<LineRenderer>();

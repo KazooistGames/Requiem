@@ -246,7 +246,7 @@ public class Hellfire : MonoBehaviour
             RaycastHit hit;
             Ray ray = new Ray();
             ray.origin = transform.position;
-            ray.direction = Wielder.LookDirection;
+            ray.direction = -transform.right;
             Debug.DrawLine(ray.origin, ray.origin + ray.direction.normalized * 10, Color.white, 0.5f);
             int hitMask = (1 << Requiem.layerEntity) + (1 << Requiem.layerObstacle) + (1 << Requiem.layerWall);
             if (Physics.Raycast(ray, out hit, 10, hitMask, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
@@ -264,7 +264,7 @@ public class Hellfire : MonoBehaviour
     private GameObject playBeamSound(float pitch)
     {
         GameObject sound = _SoundService.PlayAmbientSound("Audio/wretch", transform.position, pitch, 1.5f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
-        sound.GetComponent<AudioSource>().time = 0.5f;
+        sound.GetComponent<AudioSource>().time = 0.3f;
         sound.transform.SetParent(transform);
         return sound;
     }

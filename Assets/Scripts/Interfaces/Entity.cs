@@ -114,7 +114,7 @@ public class Entity : MonoBehaviour
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-    private static float DASH_CHARGE_TIME = 0.4f;
+    private static float DASH_CHARGE_TIME = 0.3f;
     private static float CRASH_DAMAGE = 35f;   
     private static float FINAL_DASH_RATIO = 2f;
 
@@ -299,7 +299,15 @@ public class Entity : MonoBehaviour
                 else
                 {
                     BleedingWounds[key] = (BleedingWounds[key].Item1, BleedingWounds[key].Item2 - Time.deltaTime);
-                    Vitality -= BleedingWounds[key].Item1 * Time.deltaTime;
+                    float damageTick = BleedingWounds[key].Item1 * Time.deltaTime;
+                    if(Posture == PostureStrength.Weak)
+                    {
+                        Vitality -= damageTick;
+                    }
+                    else
+                    {
+                        alterPoise(-damageTick, false);
+                    }
                 }
             }
         }
@@ -947,7 +955,7 @@ public class Entity : MonoBehaviour
         }
         else if(theirWeapon.Action == ActionAnim.StrongAttack)
         {
-            float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
+            float impact = theirWeapon.Wielder.Strength * theirWeapon.Tempo;
             Stagger(Mathf.Sqrt(impact / Strength));
             alterPoise(-impact);
             if (theirWeapon.TrueStrike)
@@ -977,7 +985,7 @@ public class Entity : MonoBehaviour
         {
 
         }
-        else
+        else if (theirWeapon.Action == ActionAnim.QuickAttack)
         {
             theirWeapon.Wielder.Stagger(Resolve/theirWeapon.Wielder.Resolve);
         }
@@ -999,24 +1007,50 @@ public class Entity : MonoBehaviour
         JustLandedHit.Invoke(foe, totalPower);
         if (myWeapon.Thrown)
         {
-            totalPower += Resolve;
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
             //alterPoise(totalPower);
         }
         if (myWeapon.Action == ActionAnim.StrongAttack)
         {
-            totalPower += Resolve;
-            float impact = totalPower + DashPower * Resolve;
+            float impact = myWeapon.Tempo * Strength;
             foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
-            string bleed_key = GetHashCode().ToString() + "trueStrike";
-            float bleed_period = 5;
-            foe.BleedingWounds[bleed_key] = (myWeapon.Tempo * Strength / bleed_period, bleed_period);
+            foe.alterPoise(-impact);
+
         }
         else if (myWeapon.Action == ActionAnim.QuickAttack)
         {
             //alterPoise(totalPower);
+
         }
-        foe.applyDamageToPoiseThenVitality(totalPower);
+
+        if (myWeapon.Ripper)
+        {
+            string bleed_key = GetHashCode().ToString() + "ripper";
+            float bleed_period = 4;
+            float maxDamage = Resolve;
+            float increment = Resolve / bleed_period;
+            if (!foe.BleedingWounds.ContainsKey(bleed_key))
+            {
+                foe.BleedingWounds[bleed_key] = (increment, bleed_period);
+            }
+            else if (foe.BleedingWounds[bleed_key].Item1 < maxDamage)
+            {
+                foe.BleedingWounds[bleed_key] = (foe.BleedingWounds[bleed_key].Item1 + increment, bleed_period);
+            }
+            else
+            {
+                foe.BleedingWounds[bleed_key] = (foe.BleedingWounds[bleed_key].Item1, bleed_period);
+            }
+
+        }
+        if (myWeapon.TrueStrike)
+        {
+            foe.Damage(totalPower);
+        }
+        else
+        {
+            foe.applyDamageToPoiseThenVitality(totalPower);
+        }
     }
 
     public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
@@ -1034,11 +1068,11 @@ public class Entity : MonoBehaviour
         float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
         if (poiseDamage != 0)
         {
-            alterPoise(-poiseDamage);
+            alterPoise(-poiseDamage, !silent);
         }
         if (vitalityDamage != 0)
         {
-            Damage(vitalityDamage);
+            Damage(vitalityDamage, silent);
         }
         return vitalityDamage;
     }

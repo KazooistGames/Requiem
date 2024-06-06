@@ -278,12 +278,12 @@ public class AIBehaviour : MonoBehaviour
                     tangoOuterRange = wep.Range * 1.0f;
                     break;
                 case martialState.defending:
-                    tangoInnerRange = wep.Range * 1.5f;
-                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    tangoInnerRange = wep.Range * 2.0f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
                     break;
                 case martialState.throwing:
                     tangoInnerRange = wep.Range * 2.0f;
-                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.75f;
                     break;
             }
             pursueStoppingDistance = tangoOuterRange;
@@ -294,6 +294,8 @@ public class AIBehaviour : MonoBehaviour
             tangoOuterRange = sensorySightRangeScalar * sensoryBaseRange;
         }
     }
+
+
     protected bool checkMyWeaponInRange()
     {
         if (!this)
@@ -302,8 +304,9 @@ public class AIBehaviour : MonoBehaviour
         }
         else if (mainWep && entity.Foe)
         {
+            float rangeBoost = 1.2f;
             float disposition = (entity.Foe.transform.position - transform.position).magnitude;
-            return disposition <= mainWep.Range;
+            return disposition <= mainWep.Range * rangeBoost;
         }
         else
         {

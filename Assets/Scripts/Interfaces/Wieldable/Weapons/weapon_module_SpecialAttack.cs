@@ -26,15 +26,35 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     void Update()
     {
-        UPDATE_DASHATTACK();
+        currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
+        animationController.SetBool("Dash", wielder_is_dashing());
+        UPDATE_TRUESTRIKE();
         UPDATE_TEMPO();
+        UPDATE_RIPPER();
     }
 
-    private void UPDATE_DASHATTACK()
+    private void UPDATE_RIPPER()
     {
-        currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
-        weapon.TrueStrike = weapon.currentAnimation.IsName("Thrust Coil") || weapon.currentAnimation.IsName("Thrust");
-        animationController.SetBool("Dash", wielder_is_dashing());
+        if (weapon.currentAnimation.IsName("Slash") || weapon.currentAnimation.IsName("backhandSlash"))
+        {
+            weapon.Ripper = true;
+        }
+        else
+        {
+            weapon.Ripper = false;
+        }
+    }
+
+    private void UPDATE_TRUESTRIKE()
+    {
+        if(weapon.currentAnimation.IsName("Thrust Coil") || weapon.currentAnimation.IsName("Thrust"))
+        {
+            weapon.TrueStrike = true;
+        }
+        else
+        {
+            weapon.TrueStrike = false;
+        }
     }
 
     private void UPDATE_TEMPO()
@@ -70,7 +90,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         {
             return false;
         }
-        else if (weapon.Wielder.Dashing)
+        else if (weapon.Wielder.dashDirection != Vector3.zero || weapon.Wielder.DashCharging)
         {
             return true;
         }

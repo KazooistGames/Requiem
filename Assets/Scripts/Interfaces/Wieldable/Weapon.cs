@@ -56,8 +56,9 @@ public abstract class Weapon : Wieldable
 
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
 
-    public bool TrueStrikeEnabled = false;
     public bool TrueStrike = false;
+
+    public bool Ripper = false;
 
     //private bool attackChargeONS = true;
     public float Tempo;
@@ -159,6 +160,7 @@ public abstract class Weapon : Wieldable
         }
         if (Wielder)
         {
+            modPower["wielderResolve"] = Wielder.Posture == Entity.PostureStrength.Strong ? Wielder.Resolve : 0;
             Action = getActionFromCurrentAnimationState();
             if (actionPreviouslyAnimated != Action)
             {
@@ -166,7 +168,7 @@ public abstract class Weapon : Wieldable
             }
             actionPreviouslyAnimated = Action;
             togglePhysicsBox(false);
-            heftSlowModifier = -Heft / Wielder.Strength;
+            heftSlowModifier = - 1.5f * Heft / Wielder.Strength;
             if (transform.parent != Wielder.transform)
             {
                 transform.SetParent(Wielder.transform, true);
@@ -238,7 +240,7 @@ public abstract class Weapon : Wieldable
                 }
                 else if (Action == ActionAnim.Recovering)
                 {
-                    modifyWielderSpeed(0);
+                    modifyWielderSpeed(heftSlowModifier / 2);
                     alreadyHit = new List<GameObject>();
                     attackONS = true;
                 }
@@ -558,15 +560,13 @@ public abstract class Weapon : Wieldable
         {
             foe.EventAttemptPickup.AddListener(PickupItem);
             string key = "impaled" + gameObject.GetHashCode().ToString();
-            float bleed_period = 5;
             if (foe.Vitality > 0)
             {
                 togglePhysicsBox(false);
                 alreadyHit.Add(foe.gameObject);
                 foe.JustCrashed.AddListener(impale_doupleDipDamage);
                 foe.JustVanquished.AddListener(ImpaleRelease);
-                //foe.modSpeed[key] = -(Heft/foe.Strength);
-                foe.BleedingWounds[key] = (MostRecentWielder.Resolve / bleed_period, bleed_period);
+                foe.modSpeed[key] = -(Heft / foe.Strength);
                 yield return new WaitForSeconds(3);
                 if (foe)
                 {
@@ -599,7 +599,7 @@ public abstract class Weapon : Wieldable
             string key = "impaled" + gameObject.GetHashCode().ToString();
             foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
             foe.JustVanquished.RemoveListener(ImpaleRelease);
-            //foe.modSpeed.Remove(key);
+            foe.modSpeed.Remove(key);
         }
         transform.SetParent(Requiem.INSTANCE.transform.parent, true);
         togglePhysicsBox(true);
