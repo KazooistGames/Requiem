@@ -56,9 +56,6 @@ public abstract class Weapon : Wieldable
 
     public Dictionary<string, float> modPower = new Dictionary<string, float>();
 
-    public bool TrueStrike = false;
-
-    public bool Ripper = false;
 
     //private bool attackChargeONS = true;
     public float Tempo;
@@ -87,6 +84,30 @@ public abstract class Weapon : Wieldable
 
     protected _Flames flames;
 
+    public enum SpecialAttacks
+    {
+        Truestrike,
+        Bleed,
+        Hamstring,
+        Pierce,
+        Clobber,
+        Disarm,
+        Combo,
+        Knockback,
+        Charge
+    }
+    public Dictionary<SpecialAttacks, bool> Specials = new Dictionary<SpecialAttacks, bool>()
+    { 
+        {SpecialAttacks.Truestrike, false },
+        {SpecialAttacks.Bleed, false },
+        {SpecialAttacks.Hamstring, false },
+        {SpecialAttacks.Pierce, false },
+        {SpecialAttacks.Clobber, false },
+        {SpecialAttacks.Disarm, false },
+        {SpecialAttacks.Combo, false },
+        {SpecialAttacks.Knockback, false },
+        {SpecialAttacks.Charge, false },
+    };
 
     protected override void Awake()
     {
@@ -253,7 +274,7 @@ public abstract class Weapon : Wieldable
                 else if (Action == ActionAnim.Aiming)
                 {
                     modifyWielderSpeed(heftSlowModifier);
-                    throwMagnitude = Mathf.Sqrt(Tempo)* Wielder.Strength / 10;
+                    throwMagnitude = Wielder.Strength / 20;
                     flames.PowerLevel = 100 * Tempo;
                 }
                 else if (Action == ActionAnim.Throwing)
@@ -426,20 +447,17 @@ public abstract class Weapon : Wieldable
     {
         Blocker.Blocking.Invoke(Blocker, Attacker);
         Attacker.Clashing.Invoke(Attacker, Blocker);
-        float shove_scalar = 1;
         if (Attacker.Action == ActionAnim.StrongAttack)
         {
-            float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
+            float scalar = Attacker.Specials[SpecialAttacks.Truestrike] ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
-            shove_scalar = 1.0f;
         }
         else
         {
             Attacker.playTink();
-            shove_scalar = 0.25f;
         }
-        APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, scalar: shove_scalar);
-        if (Blocker.Wielder)
+        APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.75f);
+        if (Blocker.Wielder && !Attacker.Specials[SpecialAttacks.Pierce])
         {
             Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
         }
@@ -459,7 +477,7 @@ public abstract class Weapon : Wieldable
         }
         if (Attacker.Action == ActionAnim.StrongAttack)
         {
-            float scalar = Attacker.TrueStrike ? 0.5f : 2 - Attacker.Tempo;
+            float scalar = Attacker.Specials[SpecialAttacks.Truestrike] ? 0.5f : 2 - Attacker.Tempo;
             Attacker.playClang(scalar);
         }
         else
@@ -484,15 +502,14 @@ public abstract class Weapon : Wieldable
     private static bool RESOLVE_HIT(Weapon weapon, Entity foe)
     {
         if(foe.Allegiance == weapon.Allegiance) {  return false; }
-        if (testBlockBetweenEntities(foe, weapon.MostRecentWielder))
+        if (testBlockBetweenEntities(foe, weapon.MostRecentWielder) && !weapon.Specials[SpecialAttacks.Pierce])
         {
             RESOLVE_BLOCK(weapon, foe.MainHand.GetComponent<Weapon>());
         }
         else if (!getObstructionBetweenEntities(foe, weapon.MostRecentWielder))
         {
             weapon.Hitting.Invoke(weapon, foe);
-            float shove_scalar = weapon.Action == ActionAnim.StrongAttack ? 0.5f : 0.25f;
-            APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe, shove_scalar);
+            APPLY_WEAPON_SHOVE_TO_FOE(weapon, foe);
             weapon.playSlap(foe.transform.position);
             weapon.FullCollisionONS(foe.gameObject);
             Weapon_Hit.Invoke(weapon);
@@ -507,15 +524,11 @@ public abstract class Weapon : Wieldable
 
     private void resolveObstacleHit(GameObject obstacle)
     {
-        if (Action == ActionAnim.StrongAttack)
+        if (Specials[SpecialAttacks.Charge])
         {
-            float scalar = TrueStrike ? 0.5f : 2 - Tempo;
-            playClang(scalar);
+            playClang(2 - Tempo);
         }
-        else
-        {
-            playTink();
-        }
+        playTink(Specials[SpecialAttacks.Truestrike] ? 0.5f : 1);
         alreadyHit.Add(obstacle);
     }
 
@@ -626,11 +639,16 @@ public abstract class Weapon : Wieldable
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float scalar = 1.0f)
     {
         if (!foe || !weapon.MostRecentWielder) { return; }
+        float impact = weapon.Specials[SpecialAttacks.Knockback] ? 1f : 0.25f;
+        if (weapon.Specials[SpecialAttacks.Charge])
+        {
+            impact += weapon.Tempo;
+        }
         float impactPower = weapon.MostRecentWielder.Strength * (1 + weapon.Tempo);
         Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.25f) : weapon.MostRecentWielder.transform.position;
         Vector3 direction = foe.transform.position - origin;
-        Vector3 velocityChange = direction.normalized * (impactPower / 50f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar;
-        if (weapon.TrueStrike)
+        Vector3 velocityChange = direction.normalized * (impactPower / 50f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar * impact;
+        if (weapon.Specials[SpecialAttacks.Truestrike])
         {
             velocityChange *= 2;
         }
@@ -656,7 +674,10 @@ public abstract class Weapon : Wieldable
 
     private static bool testBlockBetweenEntities(Entity target, Entity origin)
     {
-        if (target == null || origin == null) { return false; }
+        if (target == null || origin == null ) 
+        { 
+            return false; 
+        }
         float targetVsOriginAngle = Mathf.Abs(Vector3.Angle(target.LookDirection, origin.LookDirection));
         float marginFromHeadOn = 45;
         float differenceFromHeadOnAngle = 180 - targetVsOriginAngle;
@@ -894,12 +915,13 @@ public abstract class Weapon : Wieldable
         _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
     }
 
-    private void playTink()
+    private void playTink(float scalar = 1)
     {
         if (playClashSoundONS)
         {
             playClashSoundONS = false;
-            _SoundService.PlayAmbientSound(tinkClip, transform.position, tinkPitch + (tinkPitch * 0.25f) * (UnityEngine.Random.value - 0.5f), 0.25f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
+            float pitch = scalar * (tinkPitch + tinkPitch * 0.25f * (UnityEngine.Random.value - 0.5f));
+            _SoundService.PlayAmbientSound(tinkClip, transform.position, pitch, 0.25f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
         }  
     }
 

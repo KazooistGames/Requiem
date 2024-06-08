@@ -28,20 +28,59 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     {
         currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
         animationController.SetBool("Dash", wielder_is_dashing());
+        UPDATE_CHARGE();
         UPDATE_TRUESTRIKE();
-        UPDATE_TEMPO();
-        UPDATE_RIPPER();
+        UPDATE_PIERCE();
+        UPDATE_BLEED();
+        UPDATE_CLOBBER();
+        UPDATE_DISARM();
     }
 
-    private void UPDATE_RIPPER()
+    private void UPDATE_DISARM()
     {
-        if (weapon.currentAnimation.IsName("Slash") || weapon.currentAnimation.IsName("backhandSlash"))
+        if (weapon.Action == ActionAnim.Guarding)
         {
-            weapon.Ripper = true;
+            weapon.Specials[SpecialAttacks.Disarm] = true;
         }
         else
         {
-            weapon.Ripper = false;
+            weapon.Specials[SpecialAttacks.Disarm] = false;
+        }
+    }
+
+    private void UPDATE_CLOBBER()
+    {
+        if (weapon.Action == ActionAnim.StrongAttack)
+        {
+            weapon.Specials[SpecialAttacks.Clobber] = true;
+        }
+        else
+        {
+            weapon.Specials[SpecialAttacks.Clobber] = false;
+        }
+    }
+
+    private void UPDATE_BLEED()
+    {
+        if (weapon.currentAnimation.IsName("Slash") || weapon.currentAnimation.IsName("backhandSlash"))
+        {
+            weapon.Specials[SpecialAttacks.Bleed] = true;
+        }
+        else
+        {
+            weapon.Specials[SpecialAttacks.Bleed] = false;
+        }
+    }
+
+    private void UPDATE_PIERCE()
+    {
+        if (weapon.currentAnimation.IsName("Thrust"))
+        {
+            weapon.Specials[SpecialAttacks.Pierce] = true;
+        }
+        else
+        {
+            weapon.Specials[SpecialAttacks.Pierce] = false;
         }
     }
 
@@ -49,19 +88,31 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     {
         if(weapon.currentAnimation.IsName("Thrust Coil") || weapon.currentAnimation.IsName("Thrust"))
         {
-            weapon.TrueStrike = true;
+            weapon.Specials[SpecialAttacks.Truestrike] = true;
         }
         else
         {
-            weapon.TrueStrike = false;
+            weapon.Specials[SpecialAttacks.Truestrike] = false;
         }
+    }
+
+    private void UPDATE_CHARGE()
+    {
+        if (weapon.Action == ActionAnim.StrongCoil)
+        {
+            weapon.Specials[SpecialAttacks.Charge] = true;
+        }
+        else
+        {
+            weapon.Specials[SpecialAttacks.Charge] = false;
+        }
+        UPDATE_TEMPO();
     }
 
     private void UPDATE_TEMPO()
     {
         weapon.Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
-
-        if (weapon.Action == ActionAnim.StrongCoil || weapon.Action == ActionAnim.Aiming)
+        if (weapon.Specials[SpecialAttacks.Charge])
         {
             if (tempoChargeONS)
             {
@@ -73,7 +124,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
                 tempoCharge += increment;
             }
         }
-        else if (weapon.Thrown || weapon.Action == ActionAnim.StrongAttack)
+        else if (weapon.Thrown || weapon.Action == ActionAnim.StrongAttack || weapon.Action == ActionAnim.QuickAttack)
         {
 
         }

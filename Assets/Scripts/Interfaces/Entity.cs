@@ -948,44 +948,40 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-
-        if (theirWeapon.Thrown)
+        float impact = theirWeapon.Power;
+        if(theirWeapon.Specials[SpecialAttacks.Charge])
         {
-
+            impact += theirWeapon.Wielder.Strength * theirWeapon.Tempo;
         }
-        else if(theirWeapon.Action == ActionAnim.StrongAttack)
+        if (theirWeapon.Specials[SpecialAttacks.Clobber])
         {
-            float impact = theirWeapon.Wielder.Strength * theirWeapon.Tempo;
             Stagger(Mathf.Sqrt(impact / Strength));
-            alterPoise(-impact);
-            if (theirWeapon.TrueStrike)
-            {
-                Disarm();
-            }
         }
-        else if(theirWeapon.Action == ActionAnim.QuickAttack)
+        if (theirWeapon.Specials[SpecialAttacks.Disarm])
         {
-
+            Disarm(4);
+        }
+        if (myWeapon.Specials[SpecialAttacks.Disarm])
+        {
+            theirWeapon.Wielder.Disarm(4);
         }
     }
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-
-        float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
         if (!theirWeapon.Wielder)
         {
-
+            return;
         }
-        else if(theirWeapon.Action == ActionAnim.StrongAttack)
+        if(theirWeapon.Action == ActionAnim.StrongAttack)
         {
 
         }
-        else if (theirWeapon.TrueStrike)
+        if (theirWeapon.Specials[SpecialAttacks.Truestrike])
         {
 
         }
-        else if (theirWeapon.Action == ActionAnim.QuickAttack)
+        if (theirWeapon.Action == ActionAnim.QuickAttack)
         {
             theirWeapon.Wielder.Stagger(Resolve/theirWeapon.Wielder.Resolve);
         }
@@ -1004,26 +1000,16 @@ public class Entity : MonoBehaviour
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float totalPower = myWeapon.Power;
+        if (myWeapon.Specials[SpecialAttacks.Charge])
+        {
+            totalPower += Strength * myWeapon.Tempo;
+        }
         JustLandedHit.Invoke(foe, totalPower);
-        if (myWeapon.Thrown)
+        if (myWeapon.Specials[SpecialAttacks.Clobber])
         {
-            myWeapon.Hitting.RemoveListener(handleWeaponHit);
-            //alterPoise(totalPower);
+            foe.Stagger(Mathf.Sqrt(totalPower / foe.Strength));
         }
-        if (myWeapon.Action == ActionAnim.StrongAttack)
-        {
-            float impact = myWeapon.Tempo * Strength;
-            foe.Stagger(Mathf.Sqrt(impact / foe.Strength));
-            foe.alterPoise(-impact);
-
-        }
-        else if (myWeapon.Action == ActionAnim.QuickAttack)
-        {
-            //alterPoise(totalPower);
-
-        }
-
-        if (myWeapon.Ripper)
+        if (myWeapon.Specials[SpecialAttacks.Bleed])
         {
             string bleed_key = GetHashCode().ToString() + "ripper";
             float bleed_period = 4;
@@ -1041,15 +1027,18 @@ public class Entity : MonoBehaviour
             {
                 foe.BleedingWounds[bleed_key] = (foe.BleedingWounds[bleed_key].Item1, bleed_period);
             }
-
         }
-        if (myWeapon.TrueStrike)
+        if (myWeapon.Specials[SpecialAttacks.Truestrike])
         {
             foe.Damage(totalPower);
         }
         else
         {
             foe.applyDamageToPoiseThenVitality(totalPower);
+        }
+        if (myWeapon.Thrown)
+        {
+            myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
     }
 

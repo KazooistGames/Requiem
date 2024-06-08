@@ -67,7 +67,7 @@ public class _Flames : MonoBehaviour
                     particleLight.range = 0.5f;
                     particleLight.intensity = 3;
                 }
-                else if (boundWeapon.TrueStrike)
+                else if (boundWeapon.Specials[Weapon.SpecialAttacks.Truestrike])
                 {
                     SetFlameStyle(FlameStyles.Inferno);
                     PowerLevel = 50;

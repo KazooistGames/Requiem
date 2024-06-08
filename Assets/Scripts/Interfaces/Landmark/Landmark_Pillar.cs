@@ -12,11 +12,13 @@ public class Landmark_Pillar : Landmark
     private GameObject brokeTop;
     private GameObject brokeBottom;
 
+    public float HP = 500f;
+
 
     private void OnTriggerEnter(Collider other)
     {
         Weapon weapon = other.GetComponent<Weapon>();
-        if(weapon ? weapon.TrueStrike : false)
+        if(weapon ? weapon.Specials[Weapon.SpecialAttacks.Truestrike] : false)
         {
             body.isKinematic = true;
             model.GetComponent<MeshRenderer>().enabled = false;
