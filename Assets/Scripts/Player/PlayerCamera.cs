@@ -66,8 +66,8 @@ public class PlayerCamera : MonoBehaviour
         return transversal_offset + vertical_offset;
     }
 
-    public Vector2 Y_Span = new Vector2(10, 16);
-    public Vector2 Y_DeadbandRange = new Vector2(0.5f, 4);
+    public Vector2 Y_Span = new Vector2(8, 12);
+    public Vector2 Y_DeadbandRange = new Vector2(0.5f, 3);
     private float calc_vertical_offset()
     {
         float cursor_dispo = get_cursor_disposition();
@@ -77,7 +77,7 @@ public class PlayerCamera : MonoBehaviour
         return Mathf.Clamp(return_value, Y_Span.x, Y_Span.y);
     }
 
-    public Vector2 ZSpan = new Vector2(-2.5f, -4f);
+    public Vector2 ZSpan = new Vector2(-1.5f, -3f);
     public Vector2 homingSpan = new Vector2(0.1f, 0.5f);
     private Vector3 calc_transversal_offset()
     {
