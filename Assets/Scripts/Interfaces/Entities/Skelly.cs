@@ -27,6 +27,7 @@ public class Skelly : Entity
         Strength = 100f;
         gameObject.name = "Skelly";
         JustWounded.AddListener(CRUMBLE);
+        mortality = Mortality.fragile;
     }
 
     protected override void Update()
@@ -113,6 +114,7 @@ public class Skelly : Entity
             }
             Haste *= 1.5f;
             Strength *= 0.75f;
+            mortality = Mortality.fragile;
             Vitality = Strength;
             Poise = Strength;
             Destroy(GetComponent<AIBehaviour>());

@@ -39,7 +39,7 @@ public class PlayerCamera : MonoBehaviour
         //Eyes.fieldOfView = Mathf.Clamp(Eyes.fieldOfView, FOVSpan.x, FOVSpan.y);
     }
 
-    public float SpeedScalar = 5;
+    public float SpeedScalar = 8;
     void FixedUpdate()
     {
         Vector3 disposition = triangulateOptimalPosition() - transform.position;
@@ -57,7 +57,7 @@ public class PlayerCamera : MonoBehaviour
         RenderTexture.ReleaseTemporary(buffer);
     }
 
-    public float MaxRange = 4;
+    public float MaxRange = 3;
     private Vector3 triangulateOptimalPosition()
     {
         Vector3 transversal_offset = calc_transversal_offset();
@@ -77,7 +77,8 @@ public class PlayerCamera : MonoBehaviour
         return Mathf.Clamp(return_value, Y_Span.x, Y_Span.y);
     }
 
-    public Vector2 ZSpan = new Vector2(-1.5f, -3f);
+    public float zZero = -2.0f;
+    public Vector2 ZSpan = new Vector2(0f, -1.25f);
     public Vector2 homingSpan = new Vector2(0.1f, 0.5f);
     private Vector3 calc_transversal_offset()
     {
@@ -90,7 +91,9 @@ public class PlayerCamera : MonoBehaviour
         Vector3 unhomed_position = (weighted_player_position + weighted_cursor_position) / total_weight;
 
         float homing_weight = Mathf.Lerp(homingSpan.x, homingSpan.y, get_cursor_disposition() / MaxRange);
-        Vector3 pullback_offset = Vector3.forward * Mathf.Lerp(ZSpan.x, ZSpan.y, get_cursor_disposition() / MaxRange);
+
+        float z_offset = zZero + Mathf.Lerp(ZSpan.x, ZSpan.y, get_cursor_disposition() / MaxRange);
+        Vector3 pullback_offset = Vector3.forward * z_offset;
 
         return Vector3.Lerp(unhomed_position, Vector3.zero, homing_weight) + pullback_offset;
     }

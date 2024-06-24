@@ -548,13 +548,9 @@ public class Entity : MonoBehaviour
         {
             JustWounded.Invoke(magnitude);
             EntityWounded.Invoke(this, magnitude);
-            if (mortality == Mortality.vulnerable)
+            if (mortality != Mortality.impervious)
             {
                 Vitality -= magnitude;
-            }
-            else if (mortality== Mortality.fragile)
-            {
-                Vitality = 0;
             }
         }
         if (!silent)
@@ -949,61 +945,55 @@ public class Entity : MonoBehaviour
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
         float impact = theirWeapon.Power;
-        if(theirWeapon.Specials[SpecialAttacks.Charge])
-        {
-            impact += theirWeapon.Wielder.Strength * theirWeapon.Tempo;
-        }
+        impact += theirWeapon.Wielder.Strength * theirWeapon.Tempo;
+        
         if (theirWeapon.Specials[SpecialAttacks.Clobber])
         {
             Stagger(Mathf.Sqrt(impact / Strength));
         }
         if (theirWeapon.Specials[SpecialAttacks.Disarm])
         {
-            Disarm(4);
+            Disarm(3);
         }
         if (myWeapon.Specials[SpecialAttacks.Disarm])
         {
-            theirWeapon.Wielder.Disarm(4);
+            theirWeapon.Wielder.Disarm(3);
         }
     }
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (!theirWeapon.Wielder)
-        {
-            return;
-        }
-        if(theirWeapon.Action == ActionAnim.StrongAttack)
-        {
+        //if (!theirWeapon.Wielder)
+        //{
+        //    return;
+        //}
+        //if(theirWeapon.Action == ActionAnim.StrongAttack)
+        //{
 
-        }
-        if (theirWeapon.Specials[SpecialAttacks.Truestrike])
-        {
+        //}
+        //if (theirWeapon.Specials[SpecialAttacks.Truestrike])
+        //{
 
-        }
-        if (theirWeapon.Action == ActionAnim.QuickAttack)
-        {
-            theirWeapon.Wielder.Stagger(Resolve/theirWeapon.Wielder.Resolve);
-        }
+        //}
+        //if (theirWeapon.Action == ActionAnim.QuickAttack)
+        //{
+        //    theirWeapon.Wielder.Stagger(Resolve/theirWeapon.Wielder.Resolve);
+        //}
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
     {
-        if (myWeapon.Action == ActionAnim.QuickAttack)
-        {
-            Disarm();
-            alterPoise(-Poise);
-        }
- 
+        //if (myWeapon.Action == ActionAnim.QuickAttack)
+        //{
+        //    Disarm();
+        //    alterPoise(-Poise);
+        //}
     }
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
         float totalPower = myWeapon.Power;
-        if (myWeapon.Specials[SpecialAttacks.Charge])
-        {
-            totalPower += Strength * myWeapon.Tempo;
-        }
+        totalPower += Strength * myWeapon.Tempo;
         JustLandedHit.Invoke(foe, totalPower);
         if (myWeapon.Specials[SpecialAttacks.Clobber])
         {
@@ -1048,9 +1038,8 @@ public class Entity : MonoBehaviour
         if (immortalityTimer < 0.25f) { return 0; }
         else if (mortality == Mortality.fragile)
         {
-
-            Vitality = 0;
-            return Strength;
+            Damage(totalPower, silent);
+            return totalPower;
         }
 
         float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);

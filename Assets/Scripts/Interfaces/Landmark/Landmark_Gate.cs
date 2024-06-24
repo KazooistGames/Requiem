@@ -17,7 +17,7 @@ public class Landmark_Gate : Landmark
 
     private static float openPosition = -0.65f;
     private static float closedPosition = 0;
-    private static float openSpeed = 0.2f;
+    private static float openSpeed = 0.4f;
     private static float closeSpeed = 0.8f;
 
     private float doorPositionDesired = 0;

@@ -127,7 +127,7 @@ public class Goon : AIBehaviour
         if (!checkMyWeaponInRange() && UnityEngine.Random.value >= Aggression)
         {
             _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, CombatSpeed, () => !martialFoeThrowingLatch);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
         }
     }
 

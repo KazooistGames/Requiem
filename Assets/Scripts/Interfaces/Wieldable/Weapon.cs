@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -143,7 +144,7 @@ public abstract class Weapon : Wieldable
         swingPitch = 40 / Heft;
         clangClip = "Audio/Weapons/clang";
         clangPitch = 120 / Heft;
-        clangVolume = 0.075f;
+        clangVolume = 0.1f;
         tinkPitch = 50 / Heft;
         if(Heft == 0)
         {
@@ -181,7 +182,7 @@ public abstract class Weapon : Wieldable
         }
         if (Wielder)
         {
-            modPower["wielderResolve"] = Wielder.Posture == Entity.PostureStrength.Strong ? Wielder.Resolve : 0;
+            //modPower["wielderResolve"] = Wielder.Posture == Entity.PostureStrength.Strong ? Wielder.Resolve : 0;
             Action = getActionFromCurrentAnimationState();
             if (actionPreviouslyAnimated != Action)
             {
@@ -447,19 +448,22 @@ public abstract class Weapon : Wieldable
     {
         Blocker.Blocking.Invoke(Blocker, Attacker);
         Attacker.Clashing.Invoke(Attacker, Blocker);
-        if (Attacker.Action == ActionAnim.StrongAttack)
+        if (Attacker.Specials[SpecialAttacks.Truestrike])
         {
-            float scalar = Attacker.Specials[SpecialAttacks.Truestrike] ? 0.5f : 2 - Attacker.Tempo;
-            Attacker.playClang(scalar);
+            Attacker.playClang(2-Attacker.Tempo);
         }
         else
         {
             Attacker.playTink();
         }
-        APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.75f);
         if (Blocker.Wielder && !Attacker.Specials[SpecialAttacks.Pierce])
         {
+            APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.5f);
             Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
+        }
+        else
+        {
+            Attacker.itemCollisionONS(Blocker);
         }
     }
 
@@ -475,15 +479,16 @@ public abstract class Weapon : Wieldable
         {
             return;
         }
-        if (Attacker.Action == ActionAnim.StrongAttack)
+
+        if (Attacker.Specials[SpecialAttacks.Truestrike])
         {
-            float scalar = Attacker.Specials[SpecialAttacks.Truestrike] ? 0.5f : 2 - Attacker.Tempo;
-            Attacker.playClang(scalar);
+            Attacker.playClang(2 - Attacker.Tempo);
         }
         else
         {
             Attacker.playTink();
         }
+
         if (Defender.Action == ActionAnim.Parrying)
         {
             RESOLVE_PARRY(Attacker, Defender);
@@ -524,11 +529,7 @@ public abstract class Weapon : Wieldable
 
     private void resolveObstacleHit(GameObject obstacle)
     {
-        if (Specials[SpecialAttacks.Charge])
-        {
-            playClang(2 - Tempo);
-        }
-        playTink(Specials[SpecialAttacks.Truestrike] ? 0.5f : 1);
+        playTink();
         alreadyHit.Add(obstacle);
     }
 
@@ -636,19 +637,15 @@ public abstract class Weapon : Wieldable
         DropItem(yeet: true, magnitude: 1);
     }
 
-    private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float scalar = 1.0f)
+    private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float impactScalar = 1.0f)
     {
         if (!foe || !weapon.MostRecentWielder) { return; }
-        float impact = weapon.Specials[SpecialAttacks.Knockback] ? 1f : 0.25f;
-        if (weapon.Specials[SpecialAttacks.Charge])
-        {
-            impact += weapon.Tempo;
-        }
-        float impactPower = weapon.MostRecentWielder.Strength * (1 + weapon.Tempo);
-        Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.25f) : weapon.MostRecentWielder.transform.position;
+        impactScalar += weapon.Tempo;
+        Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.5f) : weapon.MostRecentWielder.transform.position;
         Vector3 direction = foe.transform.position - origin;
-        Vector3 velocityChange = direction.normalized * (impactPower / 50f) * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * scalar * impact;
-        if (weapon.Specials[SpecialAttacks.Truestrike])
+        direction.y = 0;
+        Vector3 velocityChange = direction.normalized * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * impactScalar;
+        if (weapon.Specials[SpecialAttacks.Knockback])
         {
             velocityChange *= 2;
         }
@@ -917,10 +914,11 @@ public abstract class Weapon : Wieldable
 
     private void playTink(float scalar = 1)
     {
+        scalar = scalar * (1f - Tempo / 1.5f);
         if (playClashSoundONS)
         {
             playClashSoundONS = false;
-            float pitch = scalar * (tinkPitch + tinkPitch * 0.25f * (UnityEngine.Random.value - 0.5f));
+            float pitch = scalar * (tinkPitch + tinkPitch * 0.25f * (UnityEngine.Random.value - 0.4f));
             _SoundService.PlayAmbientSound(tinkClip, transform.position, pitch, 0.25f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
         }  
     }

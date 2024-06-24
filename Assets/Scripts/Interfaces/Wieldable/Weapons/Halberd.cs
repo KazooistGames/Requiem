@@ -27,7 +27,7 @@ public class Halberd : Weapon
         hitRadius = 0.1f;
         defendRadius = 0.4f;
         Range = 0.52f;
-        BasePower = 20f;
+        BasePower = 25f;
         Heft = 50;
         equipType = EquipType.TwoHanded;
         base.Start();

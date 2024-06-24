@@ -130,7 +130,7 @@ public class Nemesis : AIBehaviour
 
         bool inPosition = disposition.magnitude < pursueStoppingDistance/2 || entity.DashCharging;
         bool shortDashTrigger = inPosition && dashingCooldownTimer > quickDashRecoveryTime;
-        bool longDashTrigger = dashingCooldownTimer > finalDashRecoveryTime;
+        bool longDashTrigger = inPosition && dashingCooldownTimer > finalDashRecoveryTime;
         if (!entity.Foe)
         {
 
