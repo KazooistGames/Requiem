@@ -115,7 +115,7 @@ public class Landmark_Bloodwell : Landmark
         while(volumeToGulp > 0 && Volume > 0)
         {
             Used = true;
-            if (!Requiem.INSTANCE.Paused)
+            if (!Requiem.Paused)
             {
                 if (!gulpSound)
                 {

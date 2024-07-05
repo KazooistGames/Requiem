@@ -1069,8 +1069,7 @@ public class AIBehaviour : MonoBehaviour
     public bool waypointCommanded = false;
     public bool waypointDeadbanded = false;
     public float waypointDeadbandingScalar = 2.0f;
-    public float waypointInnerlimit = Hextile.Radius;
-    public float waypointOuterLimit = Hextile.Radius * 2;
+    public float waypointOuterLimit = Hextile.Radius;
     protected void waypoint(BehaviourType key)
     {
         if (behaviourParams[key].Item1)
@@ -1174,7 +1173,7 @@ public class AIBehaviour : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         while (true)
         {
-            if (!Requiem.INSTANCE.Paused && enabled)
+            if (!Requiem.Paused && enabled)
             {
                 foreach (KeyValuePair<BehaviourType, behaviour> behaviour in behaviours)
                 {
@@ -1219,7 +1218,7 @@ public class AIBehaviour : MonoBehaviour
         bool leashed;
         while (true)
         {
-            if (!Requiem.INSTANCE.Paused && enabled)
+            if (!Requiem.Paused && enabled)
             {
                 disposition = entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero;
                 switch (State)

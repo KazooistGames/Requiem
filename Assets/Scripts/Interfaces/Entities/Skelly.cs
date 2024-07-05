@@ -86,7 +86,7 @@ public class Skelly : Entity
 
     public override void Die()
     {
-        if(!head || UnityEngine.Random.value > Requiem_Arena.INSTANCE.Ritual * MutationChancePerRitual)
+        if(!head || UnityEngine.Random.value >= 0.1f)
         {
             foreach (MeshFilter bone in bodyParts)
             {

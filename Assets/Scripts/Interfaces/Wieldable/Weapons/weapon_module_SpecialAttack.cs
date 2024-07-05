@@ -151,12 +151,9 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         }
     }
 
-
+    private bool tempoChargeONS = true;
     private float tempoCharge = 0;
     private float tempoChargePeriod = 1f;
-    private float tempoChargeExponent = 1 / 2f;
-    private bool tempoChargeONS = true;
-    private float tempoChargeMin = 0.25f;
     private float convertChargeToTempo(float charge)
     {
         float frequencyVariable = Mathf.PI * charge;

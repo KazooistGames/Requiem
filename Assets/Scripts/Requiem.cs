@@ -10,12 +10,9 @@ public class Requiem: MonoBehaviour
 {
     public static Requiem INSTANCE { get; private set; }
 
-    public List<Hextile> AllTilesInPlay = new List<Hextile>();
-
-    public bool Commissioned = false;
-    public float GameClock = 0;
-    public bool Paused = false;
-    public float TimeScale;
+    public static float GameClock = 0;
+    public static bool Paused = false;
+    public static float TimeScale;
     public static int KillCount = 0;
     public static int Score = 0;
 
@@ -35,7 +32,7 @@ public class Requiem: MonoBehaviour
     public static int layerWall = 6;
     public static int layerInvisible = 3;
 
-    public float EnvironmentLightStrobePeriod = 10;
+    public static float EnvironmentLightStrobePeriod = 10;
     private Light environmentLight;
 
     public enum GameState
@@ -51,7 +48,14 @@ public class Requiem: MonoBehaviour
     void Awake()
     {
         UnityEngine.Random.InitState((int)DateTime.UtcNow.Ticks);
-        INSTANCE = this;
+        if (INSTANCE)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            INSTANCE = this;
+        }
         gameObject.name = "REQUIEM";
         gameObject.layer = layerScript;
         Paused = false;
@@ -71,6 +75,7 @@ public class Requiem: MonoBehaviour
         environmentLight.type = LightType.Directional;
         environmentLight.intensity = 0.4f;
         environmentLight.shadows = LightShadows.None;
+        StartCoroutine(GAME_SCRIPT());
     }
 
     protected virtual void Update()
@@ -101,60 +106,20 @@ public class Requiem: MonoBehaviour
         StopAllCoroutines();
     }
 
-    /* CUSTOM METHODS */
 
-    private void update_environment_light()
+
+    private IEnumerator GAME_SCRIPT()
     {
-        if (!environmentLight) { return; }
-        float time = Time.unscaledTime / EnvironmentLightStrobePeriod;
-        float red_channel = Mathf.Max(Mathf.Sin(time), Mathf.Cos(time + Mathf.PI / 2));
-        float green_channel = Mathf.Max(Mathf.Sin(2*time + Mathf.PI / 2), Mathf.Cos(2 * time + Mathf.PI));
-        float blue_channel = Mathf.Max(Mathf.Sin(time + Mathf.PI / 2), Mathf.Cos(time + Mathf.PI));
-        environmentLight.color = new Color(red_channel, green_channel, blue_channel);
-        float intensity = Mathf.Lerp(0.25f, 0.5f, (Mathf.Sin(time / 4.5f) + 1) / 2);
-        environmentLight.intensity = intensity;
-        float x_angle = Mathf.Lerp(0f, -60f, (Mathf.Cos(time * 4.5f) + 1) / 2);
-        float z_angle = Mathf.Lerp(30f, -30f, (Mathf.Cos(time * 1.5f) + 1) / 2);
-        environmentLight.transform.eulerAngles = new Vector3(x_angle, 0, z_angle);
+        yield return null;
+        yield return new WaitUntil(() => Map.INSTANCE.Commissioned);
+        Waver.INSTANCE.StartWave(10, 5, 3, 3);
     }
 
+    /***** PUBLIC *****/
     public static AudioClip getSound(string path)
     {
         return Resources.Load<AudioClip>(path);
-    }    
-
-
-    /* SCENE SWITCH */
-
-    public void QuitGame()
-    {
-        Application.Quit();
     }
-
-    public void Restart()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-
-    /* LOAD */
-    private void loadSounds()
-    {
-        damageSounds = Resources.LoadAll<AudioClip>("Audio/damage/");
-        deathSounds = Resources.LoadAll<AudioClip>("Audio/death/");
-        boneSounds = Resources.LoadAll<AudioClip>("Audio/bones/");
-        ambienceSounds = Resources.LoadAll<AudioClip>("Audio/ambience");
-    }
-
-    private void loadMeshes()
-    {
-        foreach (GameObject obj in Resources.LoadAll<GameObject>("obj/weapons").ToList())
-        {
-            weaponMeshes[obj.name] = obj.GetComponentInChildren<MeshFilter>().sharedMesh;
-        };
-    }
-
-    /* UTILITY */
 
     public static GameObject SPAWN(Type entity, Type ai, Vector3 position)
     {
@@ -175,9 +140,53 @@ public class Requiem: MonoBehaviour
 
     public Vector3 RandomPositionInRandomTileInPlay()
     {
-        Hextile randomTile = AllTilesInPlay[UnityEngine.Random.Range(0, AllTilesInPlay.Count)];
+        Hextile randomTile = Map.INSTANCE.Tiles[UnityEngine.Random.Range(0, Map.INSTANCE.Tiles.Count)];
         return RAND_POS_IN_TILE(randomTile);
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    /***** PRIVATE *****/
+
+    private void update_environment_light()
+    {
+        if (!environmentLight) { return; }
+        float time = Time.unscaledTime / EnvironmentLightStrobePeriod;
+        float red_channel = Mathf.Max(Mathf.Sin(time), Mathf.Cos(time + Mathf.PI / 2));
+        float green_channel = Mathf.Max(Mathf.Sin(2*time + Mathf.PI / 2), Mathf.Cos(2 * time + Mathf.PI));
+        float blue_channel = Mathf.Max(Mathf.Sin(time + Mathf.PI / 2), Mathf.Cos(time + Mathf.PI));
+        environmentLight.color = new Color(red_channel, green_channel, blue_channel);
+        float intensity = Mathf.Lerp(0.25f, 0.5f, (Mathf.Sin(time / 4.5f) + 1) / 2);
+        environmentLight.intensity = intensity;
+        float x_angle = Mathf.Lerp(0f, -60f, (Mathf.Cos(time * 4.5f) + 1) / 2);
+        float z_angle = Mathf.Lerp(30f, -30f, (Mathf.Cos(time * 1.5f) + 1) / 2);
+        environmentLight.transform.eulerAngles = new Vector3(x_angle, 0, z_angle);
+    }
+
+
+    private void loadSounds()
+    {
+        damageSounds = Resources.LoadAll<AudioClip>("Audio/damage/");
+        deathSounds = Resources.LoadAll<AudioClip>("Audio/death/");
+        boneSounds = Resources.LoadAll<AudioClip>("Audio/bones/");
+        ambienceSounds = Resources.LoadAll<AudioClip>("Audio/ambience");
+    }
+
+    private void loadMeshes()
+    {
+        foreach (GameObject obj in Resources.LoadAll<GameObject>("obj/weapons").ToList())
+        {
+            weaponMeshes[obj.name] = obj.GetComponentInChildren<MeshFilter>().sharedMesh;
+        };
+    }
+
 
     protected void collect_everything(GameObject collectionTarget)
     {

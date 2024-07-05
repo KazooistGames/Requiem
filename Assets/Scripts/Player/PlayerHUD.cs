@@ -45,7 +45,7 @@ public class PlayerHUD : MonoBehaviour
         Text[] metrics = Info.GetComponentsInChildren<Text>();
         metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
         //metrics[2].text = "Kills:  " + Player.INSTANCE.BonesCollected.ToString();
-        metrics[1].text = "Time:   " + Requiem.INSTANCE.GameClock.ToString("0.00");
+        metrics[1].text = "Time:   " + Requiem.GameClock.ToString("0.00");
         metrics[2].enabled = false;
         updateStatBars();
         updateScore();
@@ -62,7 +62,7 @@ public class PlayerHUD : MonoBehaviour
             scoreTransforms[2].gameObject.SetActive(false);
             scoreTransforms[3].gameObject.SetActive(false);
         }
-        else if (Requiem.INSTANCE.Paused)
+        else if (Requiem.Paused)
         {
             PauseMenu.SetActive(true);
         }
@@ -140,8 +140,8 @@ public class PlayerHUD : MonoBehaviour
         scoreTransforms[1].GetComponent<Text>().text = Scoreboard.Score.ToString("0");
         scoreTransforms[2].GetComponent<Text>().text = "x " + Scoreboard.KillMultiplier.ToString("0.00");
         scoreTransforms[2].GetComponent<Text>().enabled = Scoreboard.KillMultiplier > 1;
-        scoreTransforms[3].GetComponent<Text>().text = Requiem_Arena.INSTANCE.Ritual <= 10 ? "Ritual " + Requiem_Arena.INSTANCE.Ritual.ToString() : "";
-        scoreTransforms[3].GetComponent<Text>().enabled = Requiem_Arena.INSTANCE.Ritual > 0;
+        //scoreTransforms[3].GetComponent<Text>().text = Requiem_Arena.INSTANCE.Ritual <= 10 ? "Ritual " + Requiem_Arena.INSTANCE.Ritual.ToString() : "";
+        //scoreTransforms[3].GetComponent<Text>().enabled = Requiem_Arena.INSTANCE.Ritual > 0;
     }
 
     private void updateTempoBar()

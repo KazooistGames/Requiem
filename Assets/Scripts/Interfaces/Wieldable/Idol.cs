@@ -259,7 +259,7 @@ public class Idol : Wieldable
     {
         if (totalDamage > mobEntity.Poise && mobEntity.Posture != PostureStrength.Weak)
         {
-            SpawnAdds(Requiem_Arena.INSTANCE.Ritual);
+            SpawnAdds(5);
         }
     }
 

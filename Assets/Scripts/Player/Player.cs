@@ -72,9 +72,9 @@ public class Player : MonoBehaviour
         }
         if (CurrentKeyboard.pKey.wasPressedThisFrame)
         {
-            Requiem.INSTANCE.Paused = !Requiem.INSTANCE.Paused;
+            Requiem.Paused = !Requiem.Paused;
         }
-        if (!Requiem.INSTANCE.Paused)
+        if (!Requiem.Paused)
         {
             if (HostEntity)
             {
