@@ -112,7 +112,7 @@ public class Requiem: MonoBehaviour
     {
         yield return null;
         yield return new WaitUntil(() => Map.INSTANCE.Commissioned);
-        Waver.StartWave(10, 5, 3, 3);
+        Waver.StartWave(10, 5, 3);
     }
 
     /***** PUBLIC *****/

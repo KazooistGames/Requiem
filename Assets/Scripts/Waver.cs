@@ -8,6 +8,11 @@ using UnityEngine.Events;
 
 public class Waver : MonoBehaviour
 {
+    public static List<GameObject> Mobs = new List<GameObject>();
+
+    public static int WaveCount = 0;
+    public static int MobCount = 0;
+
     public static UnityEvent Finished = new UnityEvent();
     public static UnityEvent Started = new UnityEvent();
 
@@ -16,6 +21,7 @@ public class Waver : MonoBehaviour
         Idle,
         Started,
         Finished,
+        Boss,
     }
     public static WaveStatus Status = WaveStatus.Idle;
 
@@ -27,16 +33,14 @@ public class Waver : MonoBehaviour
     private static int minPopulation = 3;
     private static int maxPopulation = 5;
 
-    private static Vector2 spawnPeriodRange = new Vector2(2, 5);
+    private static Vector2 spawnPeriodRange = new Vector2(3, 6);
     private static float spawnPeriod = 3;
     private static float spawnTimer = 0;
 
     private static float cooldownPeriod = 10f;
     private static float cooldownTimer = 0f;
 
-    private static List<GameObject> Mobs = new List<GameObject>();
-
-    public static int WaveCount = 0;
+   
     public void Start()
     {
 
@@ -67,6 +71,10 @@ public class Waver : MonoBehaviour
         {
             attempt_start(Time.deltaTime);
         }
+        else if(Status == WaveStatus.Boss)
+        {
+
+        }
         else if (check_wave_dead())
         {
             EndWave();
@@ -86,7 +94,12 @@ public class Waver : MonoBehaviour
 
     /***** PUBLIC *****/
 
-    public static void StartWave(int total_size, int max_population, int min_population, float spawn_period)
+    public static void StartBoss()
+    {
+        Status = WaveStatus.Boss;
+    }
+
+    public static void StartWave(int total_size, int max_population, int min_population)
     {
         if (total_size <= 0 || max_population <= 0 || min_population < 0 || spawnPeriod < 0)
         {
@@ -95,7 +108,6 @@ public class Waver : MonoBehaviour
         totalSize = total_size;
         maxPopulation = max_population;
         minPopulation = min_population;
-        spawnPeriod = spawn_period;
         ResetWave();
     }
 
@@ -134,7 +146,18 @@ public class Waver : MonoBehaviour
         if((cooldownTimer += time_passed) >= cooldownPeriod)
         {
             cooldownTimer -= cooldownPeriod;
-            ResetWave();
+            if(WaveCount == 10)
+            {
+                StartBoss();
+            }
+            else
+            {
+                int random_reinforcements = UnityEngine.Random.Range(0, (WaveCount % 10) * 2);
+                int total = 5 + random_reinforcements;
+                int max = Mathf.CeilToInt(total / 2);
+                int min = Mathf.FloorToInt(max / 2);
+                StartWave(total, max, min);
+            }
         }
     }
 
@@ -193,8 +216,10 @@ public class Waver : MonoBehaviour
             }
         }
         new_mob.transform.position = Spawnpoint.transform.position;
+        MobCount++;
         return new_mob;
     }
+
 
     private static int get_active_mob_count()
     {
