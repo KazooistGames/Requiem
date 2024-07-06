@@ -944,7 +944,7 @@ public class Entity : MonoBehaviour
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
         float impact = theirWeapon.Power;
-        impact += theirWeapon.Wielder.Strength * theirWeapon.Tempo;
+        impact += theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
         
         if (theirWeapon.Specials[SpecialAttacks.Clobber])
         {
@@ -956,37 +956,21 @@ public class Entity : MonoBehaviour
         }
         if (myWeapon.Specials[SpecialAttacks.Disarm])
         {
-            theirWeapon.Wielder.Disarm(3);
+            if (theirWeapon.Wielder)
+            {
+                theirWeapon.Wielder.Disarm(3);
+            }
         }
     }
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-        //if (!theirWeapon.Wielder)
-        //{
-        //    return;
-        //}
-        //if(theirWeapon.Action == ActionAnim.StrongAttack)
-        //{
 
-        //}
-        //if (theirWeapon.Specials[SpecialAttacks.Truestrike])
-        //{
-
-        //}
-        //if (theirWeapon.Action == ActionAnim.QuickAttack)
-        //{
-        //    theirWeapon.Wielder.Stagger(Resolve/theirWeapon.Wielder.Resolve);
-        //}
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
     {
-        //if (myWeapon.Action == ActionAnim.QuickAttack)
-        //{
-        //    Disarm();
-        //    alterPoise(-Poise);
-        //}
+
     }
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)

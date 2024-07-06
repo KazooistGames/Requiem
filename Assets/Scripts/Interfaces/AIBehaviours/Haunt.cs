@@ -14,7 +14,10 @@ public class Haunt : AIBehaviour
         base.Start();
         INSTANCE = this;
         Destroy(entity.indicator);
-    
+        State = AIState.custom;
+        waypointCommanded = true;
+        behaviourParams[BehaviourType.waypoint] = (true, 1.0f);
+        behaviourParams[BehaviourType.wallCrawl] = (false, 0);
     }
 
 

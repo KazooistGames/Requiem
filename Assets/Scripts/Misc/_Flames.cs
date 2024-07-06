@@ -165,7 +165,7 @@ public class _Flames : MonoBehaviour
         if (colors.Count == 0)
         {
             colors.Add(new Color(1.0f, 0.5f, 0.0f));
-            colors.Add(new Color(1.0f, 1.0f, 1.0f));
+            colors.Add(new Color(0.75f, 0.5f, 1f));
         }
         if (gradients.Count == 0)
         {

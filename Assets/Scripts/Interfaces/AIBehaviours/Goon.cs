@@ -7,9 +7,9 @@ using UnityEngine;
 public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
-    private float CombatSpeed = 0.5f;
-    private float Aggression = 0.5f;
-    private float Fear = 0.5f;
+    private static float CombatSpeed = 0.5f;
+    private static float Aggression = 0.5f;
+    private static float Fear = 0.5f;
 
     public static Type Standard_Weapon = typeof(Handaxe);
     public static Type Alternative_Weapon = null;
@@ -33,9 +33,8 @@ public class Goon : AIBehaviour
         tangoStrafePauseFreq = 0.75f;
         tangoStrafeEnabled = true;
         itemManagementSeekItems = true;
+        itemManagementDelayPeriod = 5;
         itemManagementPreferredType = Entity.WieldMode.OneHanders;
-        Aggression = UnityEngine.Random.value;
-        Fear = UnityEngine.Random.value;
     }
 
     protected override void Update()

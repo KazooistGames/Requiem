@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class Waver : MonoBehaviour
 {
     public static List<GameObject> Mobs = new List<GameObject>();
+    public static GameObject BossMob;
 
     public static int WaveCount = 0;
     public static int MobCount = 0;
@@ -26,7 +27,7 @@ public class Waver : MonoBehaviour
     public static WaveStatus Status = WaveStatus.Idle;
 
     public static Waver INSTANCE;
-    public static Haunt Spawnpoint;
+    public static Haunt HauntSpawn;
     public static float waveTimer = 0;
 
     private static int totalSize = 10;
@@ -37,7 +38,7 @@ public class Waver : MonoBehaviour
     private static float spawnPeriod = 3;
     private static float spawnTimer = 0;
 
-    private static float cooldownPeriod = 10f;
+    private static float cooldownPeriod = 3f;
     private static float cooldownTimer = 0f;
 
    
@@ -53,10 +54,11 @@ public class Waver : MonoBehaviour
             INSTANCE = this;
             GameObject new_spawnpoint = new GameObject();
             new_spawnpoint.AddComponent<Shade>();
-            Spawnpoint = new_spawnpoint.AddComponent<Haunt>();
-            Spawnpoint.State = AIBehaviour.AIState.custom;
-            Spawnpoint.waypointCommanded = true;
-            Spawnpoint.behaviourParams[AIBehaviour.BehaviourType.waypoint] = (true, 1.0f);
+            HauntSpawn = new_spawnpoint.AddComponent<Haunt>();
+            Light spawnLight = HauntSpawn.gameObject.AddComponent<Light>();
+            spawnLight.intensity = 5;
+            spawnLight.range = 0.5f;
+            spawnLight.color = new Color(0.75f, 0.5f, 1f);
             StartCoroutine(update_spawn_waypoint());
         }
     }
@@ -73,7 +75,14 @@ public class Waver : MonoBehaviour
         }
         else if(Status == WaveStatus.Boss)
         {
-
+            if (BossMob)
+            {
+                HauntSpawn.transform.position = BossMob.transform.position;
+            }
+            else
+            {
+                EndBoss();
+            }
         }
         else if (check_wave_dead())
         {
@@ -96,7 +105,19 @@ public class Waver : MonoBehaviour
 
     public static void StartBoss()
     {
+        WaveCount++;
+        HauntSpawn.GetComponent<Entity>().model.SetActive(false);
+        BossMob = new GameObject();
+        BossMob.transform.position = HauntSpawn.transform.position;
+        BossMob.AddComponent<Wraith>();
+        BossMob.AddComponent<Revanent>();
         Status = WaveStatus.Boss;
+    }
+
+    public static void EndBoss()
+    {
+        HauntSpawn.GetComponent<Entity>().model.SetActive(true);
+        Status = WaveStatus.Finished;
     }
 
     public static void StartWave(int total_size, int max_population, int min_population)
@@ -124,6 +145,7 @@ public class Waver : MonoBehaviour
     public static void EndWave()
     {
         Status = WaveStatus.Finished;
+        collect_everything(HauntSpawn.gameObject);
         Finished.Invoke();
     }
 
@@ -146,14 +168,15 @@ public class Waver : MonoBehaviour
         if((cooldownTimer += time_passed) >= cooldownPeriod)
         {
             cooldownTimer -= cooldownPeriod;
-            if(WaveCount == 10)
+            int boss_wave = 5;
+            if(WaveCount%boss_wave == 0)
             {
                 StartBoss();
             }
             else
             {
-                int random_reinforcements = UnityEngine.Random.Range(0, (WaveCount % 10) * 2);
-                int total = 5 + random_reinforcements;
+                int random_reinforcements = UnityEngine.Random.Range(0, WaveCount % boss_wave);
+                int total = 10 + random_reinforcements * 2;
                 int max = Mathf.CeilToInt(total / 2);
                 int min = Mathf.FloorToInt(max / 2);
                 StartWave(total, max, min);
@@ -215,7 +238,7 @@ public class Waver : MonoBehaviour
                 new_mob.AddComponent(component);
             }
         }
-        new_mob.transform.position = Spawnpoint.transform.position;
+        new_mob.transform.position = HauntSpawn.transform.position;
         MobCount++;
         return new_mob;
     }
@@ -244,9 +267,9 @@ public class Waver : MonoBehaviour
         yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y));
         while (true)
         {
-            Spawnpoint.waypointCoordinates = find_target_tile().transform.position;
-            Spawnpoint.waypointDeadbanded = false;
-            yield return new WaitUntil(() => Spawnpoint.waypointDeadbanded);
+            HauntSpawn.waypointCoordinates = Requiem.RAND_POS_IN_TILE(find_target_tile());
+            HauntSpawn.waypointDeadbanded = false;
+            yield return new WaitUntil(() => HauntSpawn.waypointDeadbanded);
             yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y));
         }
     }
@@ -266,9 +289,27 @@ public class Waver : MonoBehaviour
         }
         else
         {
-            Hextile playerTile = Player.INSTANCE.HostEntity.TileLocation;
-            int randomIndex = UnityEngine.Random.Range(0, playerTile.AdjacentTiles.Count);
-            return playerTile.AdjacentTiles.ElementAt(randomIndex).Key;
+            return Player.INSTANCE.HostEntity.TileLocation;
+        }
+    }
+
+    private static void collect_everything(GameObject collectionTarget)
+    {
+        Weapon[] weapons = FindObjectsOfType<Weapon>();
+        float telly_time;
+        foreach (Weapon weapon in weapons)
+        {
+            if (!weapon.Wielder && !weapon.ImpaledObject && weapon != Player.INSTANCE.HostWeapon)
+            {
+                telly_time = Mathf.Pow((collectionTarget.transform.position - weapon.gameObject.transform.position).magnitude, 0.75f);
+                weapon.Telecommute(collectionTarget, telly_time, (x) => Destroy(x.gameObject));
+            }
+        }
+        Bone[] bones = FindObjectsOfType<Bone>();
+        foreach (Bone bone in bones)
+        {
+            telly_time = Mathf.Pow((collectionTarget.transform.position - bone.gameObject.transform.position).magnitude, 0.75f);
+            bone.Collect(collectionTarget, telly_time, (x) => Destroy(x.gameObject));
         }
     }
 

@@ -71,7 +71,7 @@ public class Requiem_Arena : Requiem
             StateOfGame = GameState.Liminal;
             Ritual++;
             Torch.Toggle(false);
-            collect_everything(Haunt.INSTANCE.gameObject);
+            //collect_everything(Haunt.INSTANCE.gameObject);
             if (!idol)
             {
                 idol = spawnIdol();

@@ -110,10 +110,6 @@ public class AIBehaviour : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (Enthralled)
-        {
-            StateTransition(AIState.enthralled);
-        }
         stateRunTimer += Time.deltaTime;
         actualMovementAngle = actualMovementDirection != Vector3.zero ? getAngle(actualMovementDirection) % 360 : LookAngle;
         if (DesiredDirection != Vector3.zero)
@@ -202,7 +198,7 @@ public class AIBehaviour : MonoBehaviour
                 {
                     StateTransition(AIState.aggro);
                 }
-                else if (stateRunTimer > 5)
+                else if (stateRunTimer > 10)
                 {
                     StateTransition(RestingState);
                 }
@@ -1162,7 +1158,7 @@ public class AIBehaviour : MonoBehaviour
         {
             wallCrawlTimer = 0f;
             DeEnergize(key);
-            behaviourParams[key] = (true, 0);
+            //behaviourParams[key] = (true, 0);
         }
     }
 

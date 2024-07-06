@@ -188,24 +188,6 @@ public class Requiem: MonoBehaviour
     }
 
 
-    protected void collect_everything(GameObject collectionTarget)
-    {
-        Weapon[] weapons = FindObjectsOfType<Weapon>();
-        float telly_time;
-        foreach (Weapon weapon in weapons)
-        {
-            if (!weapon.Wielder && !weapon.ImpaledObject && weapon != Player.INSTANCE.HostWeapon)
-            {
-                telly_time = Mathf.Pow((collectionTarget.transform.position - weapon.gameObject.transform.position).magnitude, 0.75f);
-                weapon.Telecommute(collectionTarget, telly_time, (x) => Destroy(x.gameObject));
-            }
-        }
-        Bone[] bones = FindObjectsOfType<Bone>();
-        foreach (Bone bone in bones)
-        {
-            telly_time = Mathf.Pow((collectionTarget.transform.position - bone.gameObject.transform.position).magnitude, 0.75f);
-            bone.Collect(collectionTarget, telly_time, (x) => Destroy(x.gameObject));
-        }
-    }
+
 
 }

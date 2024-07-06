@@ -114,7 +114,7 @@ public class Skelly : Entity
             }
             Haste *= 1.5f;
             Strength *= 0.75f;
-            mortality = Mortality.fragile;
+            mortality = Mortality.vulnerable;
             Vitality = Strength;
             Poise = Strength;
             Destroy(GetComponent<AIBehaviour>());
