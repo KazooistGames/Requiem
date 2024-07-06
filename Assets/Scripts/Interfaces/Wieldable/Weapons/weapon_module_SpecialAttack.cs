@@ -27,7 +27,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     void Update()
     {
         currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
-        animationController.SetBool("Dash", wielder_is_dashing());
+        animationController.SetBool("Dash", check_wielder_dashing());
         UPDATE_CHARGE();
         UPDATE_TRUESTRIKE();
         UPDATE_PIERCE();
@@ -74,7 +74,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private void UPDATE_PIERCE()
     {
-        if (weapon.currentAnimation.IsName("Thrust"))
+        if (check_dash_attack())
         {
             weapon.Specials[SpecialAttacks.Pierce] = true;
         }
@@ -86,7 +86,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private void UPDATE_TRUESTRIKE()
     {
-        if(weapon.currentAnimation.IsName("Thrust Coil") || weapon.currentAnimation.IsName("Thrust"))
+        if(check_dash_attack())
         {
             weapon.Specials[SpecialAttacks.Truestrike] = true;
         }
@@ -111,7 +111,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private void UPDATE_TEMPO()
     {
-        weapon.Tempo = Mathf.Clamp(convertChargeToTempo(tempoCharge), 0, 1);
+        weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
         if (weapon.Specials[SpecialAttacks.Charge])
         {
             if (tempoChargeONS)
@@ -135,13 +135,20 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         }
     }
 
-    private bool wielder_is_dashing()
+    private bool check_dash_attack()
+    {
+        bool forehand = weapon.currentAnimation.IsName("DashCoil") || weapon.currentAnimation.IsName("DashSwing");
+        bool backhand = weapon.currentAnimation.IsName("backhandDashCoil") || weapon.currentAnimation.IsName("backhandDashSwing");
+        return forehand || backhand;
+    }
+
+    private bool check_wielder_dashing()
     {
         if (!weapon.Wielder)
         {
             return false;
         }
-        else if (weapon.Wielder.dashDirection != Vector3.zero || weapon.Wielder.DashCharging)
+        else if (weapon.Wielder.dashDirection != Vector3.zero)
         {
             return true;
         }
@@ -153,8 +160,8 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private bool tempoChargeONS = true;
     private float tempoCharge = 0;
-    private float tempoChargePeriod = 1f;
-    private float convertChargeToTempo(float charge)
+    private float tempoChargePeriod = 0.75f;
+    private float convert_charge_to_tempo(float charge)
     {
         float frequencyVariable = Mathf.PI * charge;
         float frequencyConstant = Mathf.PI / 2;

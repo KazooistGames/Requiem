@@ -115,7 +115,7 @@ public class Entity : MonoBehaviour
 
     private static float DASH_CHARGE_TIME = 0.3f;
     private static float CRASH_DAMAGE = 35f;   
-    private static float FINAL_DASH_RATIO = 2f;
+    private static float FINAL_DASH_RATIO = 1.5f;
 
     private static float POISE_MAX_DEBOUNCE = 5;
 
@@ -854,7 +854,7 @@ public class Entity : MonoBehaviour
             float scaledVelocity = 0;
             float overChargeTimer = 0;
             yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened);
-            while ((DashCharging ) || scaledVelocity <= Min_Velocity_Of_Dash)
+            while ((DashCharging && !FinalDash) || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
                 DashPower = Mathf.Clamp(DashPower + increment, 0, 1);
@@ -864,18 +864,20 @@ public class Entity : MonoBehaviour
                     if(overChargeTimer > DASH_CHARGE_TIME * FINAL_DASH_RATIO)
                     {
                         FinalDash = true;
+
                     }
                 }
                 scaledVelocity = Max_Velocity_Of_Dash * DashPower;
                 yield return null;
             }
             dashAlreadyHit = new List<GameObject>();
+            if (FinalDash)
+            {
+                scaledVelocity *= FINAL_DASH_RATIO;
+                dashDirection = LookDirection;
+            }
             if (dashDirection != Vector3.zero)
             {
-                if (FinalDash)
-                {
-                    scaledVelocity *= FINAL_DASH_RATIO;
-                }
                 Dashing = true;
                 Shove(dashDirection.normalized * scaledVelocity, true);
                 if (FinalDash)
