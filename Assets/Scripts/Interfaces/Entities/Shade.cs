@@ -12,7 +12,7 @@ public class Shade : Entity
     {
         base.Awake();
         Strength = 1f;
-        Haste = 0.8f;
+        Haste = 0.3f;
         BaseAcceleration = 4f;
     }
 

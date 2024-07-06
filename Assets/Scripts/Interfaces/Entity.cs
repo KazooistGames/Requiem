@@ -6,7 +6,6 @@ using UnityEngine.Events;
 using System;
 using static Weapon;
 using UnityEngine.TextCore.Text;
-using static PlayerProgression;
 
 public class Entity : MonoBehaviour
 {

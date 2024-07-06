@@ -52,7 +52,7 @@ public class Scoreboard : MonoBehaviour
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
             SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
             pearl.transform.position = vanquishedEntity.transform.position;
-            pearl.Telecommute(Map.INSTANCE.CenterTile.gameObject, 0.1f, (x) => Destroy(x.gameObject), false, true);
+            pearl.Telecommute(Map.CenterTile.gameObject, 0.1f, (x) => Destroy(x.gameObject), false, true);
             pearl.Body.useGravity = false;
         }
     }

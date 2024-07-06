@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
 
     public PlayerHUD HUD;
     public PlayerCamera Cam;
-    public PlayerProgression Progression;
     public Keyboard CurrentKeyboard;
     public Mouse CurrentMouse;
 
@@ -337,7 +336,6 @@ public class Player : MonoBehaviour
         //moon.shadowNearPlane = 0.03f;
         HUD = Instantiate(Resources.Load<GameObject>("Prefabs/UX/HUD")).GetComponent<PlayerHUD>();
         Cam = new GameObject().AddComponent<PlayerCamera>();
-        Progression = gameObject.AddComponent<PlayerProgression>();
         CurrentMouse = Mouse.current;
         CurrentKeyboard = Keyboard.current;
         listener = GetComponent<AudioListener>() ? GetComponent<AudioListener>() : gameObject.AddComponent<AudioListener>();

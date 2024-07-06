@@ -43,7 +43,7 @@ public class Requiem: MonoBehaviour
         Final,
         Lobby,
     }
-    public GameState StateOfGame = GameState.Liminal;
+    public static GameState StateOfGame = GameState.Liminal;
 
     void Awake()
     {
@@ -112,7 +112,7 @@ public class Requiem: MonoBehaviour
     {
         yield return null;
         yield return new WaitUntil(() => Map.INSTANCE.Commissioned);
-        Waver.INSTANCE.StartWave(10, 5, 3, 3);
+        Waver.StartWave(10, 5, 3, 3);
     }
 
     /***** PUBLIC *****/

@@ -1,24 +1,21 @@
 using System.Collections;
-using UnityEngine.UI;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using UnityEngine.Tilemaps;
 
 public class Map : MonoBehaviour
 {
     public static Map INSTANCE;
     public static int RadiusOfArena = 1;
 
-    public List<List<Hextile>> ArenaTiles = new List<List<Hextile>>();
-    public List<Landmark_Gate> Gates;
-    public List<Hextile> Chambers = new List<Hextile>();
+    public static List<List<Hextile>> ArenaTiles = new List<List<Hextile>>();
+    public static List<Landmark_Gate> Gates = new List<Landmark_Gate>();
+    public static List<Hextile> Chambers = new List<Hextile>();
 
-    public Hextile CenterTile;
-    public Landmark_Alter Alter;
-    public Landmark_Bloodwell BloodWell;
-    public Landmark_Credits Credits;
+    public static Hextile CenterTile;
+    public static Landmark_Alter Alter;
+    public static Landmark_Bloodwell BloodWell;
+    public static Landmark_Credits Credits;
 
     public bool Commissioned = false;
 

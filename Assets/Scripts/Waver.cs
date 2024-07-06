@@ -1,27 +1,45 @@
 using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 public class Waver : MonoBehaviour
 {
+    public static UnityEvent Finished = new UnityEvent();
+    public static UnityEvent Started = new UnityEvent();
+
+    public enum WaveStatus
+    {
+        Idle,
+        Started,
+        Finished,
+    }
+    public static WaveStatus Status = WaveStatus.Idle;
+
     public static Waver INSTANCE;
+    public static Haunt Spawnpoint;
+    public static float waveTimer = 0;
 
-    private int totalPopulation = 10;
-    private int minPopulation = 3;
-    private int maxPopulation = 5;
+    private static int totalSize = 10;
+    private static int minPopulation = 3;
+    private static int maxPopulation = 5;
 
-    private float spawnPeriod = 3;
-    private float spawnTimer = 0;
+    private static Vector2 spawnPeriodRange = new Vector2(2, 5);
+    private static float spawnPeriod = 3;
+    private static float spawnTimer = 0;
 
-    private List<GameObject> mobs = new List<GameObject>();
+    private static float cooldownPeriod = 10f;
+    private static float cooldownTimer = 0f;
 
-    public delegate List<Type> SpawnAlgorithm();
-    private SpawnAlgorithm spawnAlgorithm = null;
+    private static List<GameObject> Mobs = new List<GameObject>();
 
-
+    public static int WaveCount = 0;
     public void Start()
     {
+
         if (INSTANCE)
         {
             Destroy(this);
@@ -29,63 +47,110 @@ public class Waver : MonoBehaviour
         else
         {
             INSTANCE = this;
+            GameObject new_spawnpoint = new GameObject();
+            new_spawnpoint.AddComponent<Shade>();
+            Spawnpoint = new_spawnpoint.AddComponent<Haunt>();
+            Spawnpoint.State = AIBehaviour.AIState.custom;
+            Spawnpoint.waypointCommanded = true;
+            Spawnpoint.behaviourParams[AIBehaviour.BehaviourType.waypoint] = (true, 1.0f);
+            StartCoroutine(update_spawn_waypoint());
         }
-        create_mob();
     }
+
     public void Update()
     {
-        if ((spawnTimer += Time.deltaTime) >= spawnPeriod)
+        if(Status == WaveStatus.Idle)
         {
-            spawnTimer -= spawnPeriod;
-            wave_spawn();
+
         }
+        else if (Status == WaveStatus.Finished)
+        {
+            attempt_start(Time.deltaTime);
+        }
+        else if (check_wave_dead())
+        {
+            EndWave();
+        }
+        else
+        {
+            waveTimer += Time.deltaTime;
+            if ((spawnTimer += Time.deltaTime) >= spawnPeriod)
+            {
+                spawnTimer -= spawnPeriod;
+                spawnPeriod = UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y);
+                attempt_spawn();
+            }
+        }
+
     }
 
-     /***** PUBLIC *****/
+    /***** PUBLIC *****/
 
-    public void StartWave(int total_population, int max_population, int min_population, float spawn_period, SpawnAlgorithm spawn_algorithm = null)
+    public static void StartWave(int total_size, int max_population, int min_population, float spawn_period)
     {
-        if (total_population <= 0 || max_population <= 0 || min_population < 0 || spawnPeriod < 0)
+        if (total_size <= 0 || max_population <= 0 || min_population < 0 || spawnPeriod < 0)
         {
             return;
         }
-        totalPopulation = total_population;
+        totalSize = total_size;
         maxPopulation = max_population;
         minPopulation = min_population;
         spawnPeriod = spawn_period;
-        spawnAlgorithm = spawn_algorithm;
-        mobs = new List<GameObject>();
+        ResetWave();
     }
 
-    public void CancelWave()
+    public static void ResetWave()
     {
-        totalPopulation = 0;
-        maxPopulation = 0;
-        minPopulation = 0;
-        spawnPeriod = 0;
+        WaveCount++;
+        Mobs = new List<GameObject>();
+        waveTimer = 0;
+        cooldownTimer = 0;
+        Status = WaveStatus.Started;
+        Started.Invoke();
     }
 
-    public void KillWave()
+    public static void EndWave()
     {
-        foreach (GameObject mob in mobs)
+        Status = WaveStatus.Finished;
+        Finished.Invoke();
+    }
+
+    public static void KillWave()
+    {
+        foreach (GameObject mob in Mobs)
         {
             if (mob)
             {
                 Destroy(mob);
             }
         }
-        CancelWave();
+        EndWave();
     }
 
 
     /***** PRIVATE *****/
-    private void wave_spawn()
+    private static void attempt_start(float time_passed)
     {
-        if(get_active_mob_count() >= maxPopulation)
+        if((cooldownTimer += time_passed) >= cooldownPeriod)
+        {
+            cooldownTimer -= cooldownPeriod;
+            ResetWave();
+        }
+    }
+
+    private static bool check_wave_dead()
+    {
+        int dead_count = Mobs.Count(x => x == null);
+        return dead_count >= totalSize;
+    }
+
+    private static void attempt_spawn()
+    {
+        if (get_remaining_mob_count() <= 0)
         {
 
         }
-        else if (get_remaining_mob_count() <= 0)
+        else if(get_active_mob_count() >= maxPopulation)
         {
 
         }
@@ -101,18 +166,18 @@ public class Waver : MonoBehaviour
         }
     }
 
-    private List<GameObject> spawn_mobs(int population_size)
+    private static List<GameObject> spawn_mobs(int population_size)
     {
         List<GameObject> new_population = new List<GameObject> ();
         for (int i = 0; i < population_size; i++)
         {
             new_population.Add(create_mob());
         }
-        mobs.AddRange(new_population);
+        Mobs.AddRange(new_population);
         return new_population;
     }
 
-    private GameObject create_mob(List<Type> components = null)
+    private static GameObject create_mob(List<Type> components = null)
     {
         GameObject new_mob = new GameObject();
         if(components == null)
@@ -127,14 +192,14 @@ public class Waver : MonoBehaviour
                 new_mob.AddComponent(component);
             }
         }
-        new_mob.transform.position = transform.position;
+        new_mob.transform.position = Spawnpoint.transform.position;
         return new_mob;
     }
 
-    private int get_active_mob_count()
+    private static int get_active_mob_count()
     {
         int count = 0;
-        foreach(GameObject mob in mobs)
+        foreach(GameObject mob in Mobs)
         {
             if (mob != null)
             {
@@ -144,8 +209,42 @@ public class Waver : MonoBehaviour
         return count;
     }
 
-    private int get_remaining_mob_count()
+    private static int get_remaining_mob_count()
     {
-        return totalPopulation - mobs.Count;
+        return totalSize - Mobs.Count;
     }
+
+    private static IEnumerator update_spawn_waypoint()
+    {
+        yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y));
+        while (true)
+        {
+            Spawnpoint.waypointCoordinates = find_target_tile().transform.position;
+            Spawnpoint.waypointDeadbanded = false;
+            yield return new WaitUntil(() => Spawnpoint.waypointDeadbanded);
+            yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y));
+        }
+    }
+    private static Hextile find_target_tile()
+    {
+        if (!Player.INSTANCE)
+        {
+            return Map.CenterTile;
+        }
+        else if (!Player.INSTANCE.HostEntity)
+        {
+            return Map.CenterTile;
+        }
+        else if (!Player.INSTANCE.HostEntity.TileLocation)
+        {
+            return Map.CenterTile;
+        }
+        else
+        {
+            Hextile playerTile = Player.INSTANCE.HostEntity.TileLocation;
+            int randomIndex = UnityEngine.Random.Range(0, playerTile.AdjacentTiles.Count);
+            return playerTile.AdjacentTiles.ElementAt(randomIndex).Key;
+        }
+    }
+
 }
