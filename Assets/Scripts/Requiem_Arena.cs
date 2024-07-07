@@ -29,7 +29,7 @@ public class Requiem_Arena : Requiem
     {
         base.Update();
 
-        if(!Map.INSTANCE.Commissioned) { return; } //logic meant for runtime after map is generated
+        if(!Map.Commissioned) { return; } //logic meant for runtime after map is generated
 
         determineAlterOffering();
         foreach (Hextile chamber in Map.Chambers)

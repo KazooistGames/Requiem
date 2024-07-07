@@ -316,6 +316,7 @@ GameObject:
   - component: {fileID: 2128541368}
   - component: {fileID: 2128541369}
   - component: {fileID: 2128541370}
+  - component: {fileID: 2128541371}
   m_Layer: 0
   m_Name: REQUIEM
   m_TagString: Untagged
@@ -435,14 +436,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 108eaa0309713424eac72382ae86ee6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gates: []
-  Chambers: []
-  CenterTile: {fileID: 0}
-  Alter: {fileID: 0}
-  BloodWell: {fileID: 0}
-  Credits: {fileID: 0}
-  Commissioned: 0
-  Tiles: []
 --- !u!114 &2128541370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,9 +448,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad8af8dea9b56c542ae1174eb1e8d78d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Commissioned: 0
-  GameClock: 0
-  Paused: 0
-  TimeScale: 0
-  EnvironmentLightStrobePeriod: 10
-  StateOfGame: 0
+--- !u!114 &2128541371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62b9653505df7fd48ae54c06f32d1829, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

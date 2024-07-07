@@ -114,7 +114,7 @@ public class Entity : MonoBehaviour
     public float DashPower { get; private set; } = 0.0f;
 
     private static float DASH_CHARGE_TIME = 0.3f;
-    private static float CRASH_DAMAGE = 35f;   
+    private static float CRASH_DAMAGE = 25f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
     private static float POISE_MAX_DEBOUNCE = 5;
@@ -562,8 +562,9 @@ public class Entity : MonoBehaviour
 
     public void Stagger(float duration)
     {
+        float scalar = 1.5f;
         Staggered = true;
-        float totalDuration = STAGGER_BASE_TIME + duration;
+        float totalDuration = STAGGER_BASE_TIME + (duration * scalar);
         if (totalDuration > (staggerPeriod - staggerTimer))
         {
             staggerPeriod = STAGGER_BASE_TIME + totalDuration;

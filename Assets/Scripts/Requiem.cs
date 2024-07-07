@@ -47,7 +47,6 @@ public class Requiem: MonoBehaviour
 
     void Awake()
     {
-        UnityEngine.Random.InitState((int)DateTime.UtcNow.Ticks);
         if (INSTANCE)
         {
             Destroy(this);
@@ -56,6 +55,7 @@ public class Requiem: MonoBehaviour
         {
             INSTANCE = this;
         }
+        UnityEngine.Random.InitState((int)DateTime.UtcNow.Ticks);
         gameObject.name = "REQUIEM";
         gameObject.layer = layerScript;
         Paused = false;
@@ -111,8 +111,9 @@ public class Requiem: MonoBehaviour
     private IEnumerator GAME_SCRIPT()
     {
         yield return null;
-        yield return new WaitUntil(() => Map.INSTANCE.Commissioned);
-        Waver.StartWave(10, 5, 3);
+        yield return new WaitUntil(() => Map.Commissioned);
+        yield return new WaitUntil(() => Rituals.Nemesis);
+        Waver.StartWave(10, 5, 2);
     }
 
     /***** PUBLIC *****/
@@ -140,7 +141,7 @@ public class Requiem: MonoBehaviour
 
     public Vector3 RandomPositionInRandomTileInPlay()
     {
-        Hextile randomTile = Map.INSTANCE.Tiles[UnityEngine.Random.Range(0, Map.INSTANCE.Tiles.Count)];
+        Hextile randomTile = Map.Tiles[UnityEngine.Random.Range(0, Map.Tiles.Count)];
         return RAND_POS_IN_TILE(randomTile);
     }
 

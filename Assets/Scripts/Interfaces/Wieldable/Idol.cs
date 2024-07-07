@@ -17,7 +17,6 @@ public class Idol : Wieldable
 
     public Entity mobEntity;
 
-    private GameObject prompt;
     private GameObject currentBlurb;
 
     public enum ActivityLevel
@@ -91,7 +90,7 @@ public class Idol : Wieldable
         equipType = EquipType.Burdensome;
         pitchScalar = 0.6f;
         flames = GetComponentInChildren<_Flames>();
-        flames.SetFlameStyle(_Flames.FlameStyles.Soulless);
+        flames.SetFlameStyle(_Flames.FlameStyles.Inferno);
         StartCoroutine(banter());
         Body.mass = 3f;
         PhysicsBoxes.AddRange(GetComponents<Collider>().ToList());
@@ -103,6 +102,8 @@ public class Idol : Wieldable
     protected override void Update()
     {
         base.Update();
+        flames.emissionModule.enabled = true;
+        flames.SetFlameStyle(_Flames.FlameStyles.Magic);
         if (mobEntity)
         {
             activityLevel = ActivityLevel.Aggro;
@@ -111,7 +112,7 @@ public class Idol : Wieldable
         {
             activityLevel = ActivityLevel.Active;
         }
-        else if((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius)
+        else if((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius/1.5f)
         {
             activityLevel = ActivityLevel.Approached;
         }
@@ -146,9 +147,9 @@ public class Idol : Wieldable
     public Entity BecomeMob()
     {
         if (mobEntity) { return mobEntity; }
-        if (Wielder)
+        if (MostRecentWielder)
         {
-            Wielder.Interact.RemoveListener(PickupItem);
+            MostRecentWielder.Interact.RemoveListener(PickupItem);
         }
         DropItem();
         togglePhysicsBox(false);
@@ -203,7 +204,6 @@ public class Idol : Wieldable
                     {
                         Destroy(currentBlurb);
                     }
-                    flames.emissionModule.enabled = false;
                     yield return new WaitWhile(() => activityLevel == ActivityLevel.Inert);
                     break;
                 case ActivityLevel.Approached:
@@ -211,7 +211,6 @@ public class Idol : Wieldable
                     {
                         Destroy(currentBlurb);
                     }
-                    flames.emissionModule.enabled = true;
                     SayShit(approachedMessages);
                     yield return new WaitWhile(() => activityLevel == ActivityLevel.Approached);
                     break;
@@ -220,7 +219,6 @@ public class Idol : Wieldable
                     {
                         Destroy(currentBlurb);
                     }
-                    flames.emissionModule.enabled = true;
                     SayShit(activeMessages);
                     yield return new WaitWhile(() => activityLevel == ActivityLevel.Active);
                     break;
@@ -229,7 +227,6 @@ public class Idol : Wieldable
                     {
                         Destroy(currentBlurb);
                     }
-                    flames.emissionModule.enabled = true;
                     SayShit(aggroMessages);
                     yield return new WaitWhile(() => activityLevel == ActivityLevel.Aggro);
                     break;
@@ -247,7 +244,7 @@ public class Idol : Wieldable
             Entity entity;
             entity = Requiem.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
             entity.Poise = entity.Strength;
-            Vector3 randomOffset = new Vector3(UnityEngine.Random.value - 0.5f, 0, UnityEngine.Random.value - 0.5f) * 0.1f;
+            Vector3 randomOffset = new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f) * 0.1f;
             entity.transform.position += randomOffset;
             entity.Shoved = false;
             skullies.Add(entity.gameObject);

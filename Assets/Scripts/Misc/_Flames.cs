@@ -16,6 +16,7 @@ public class _Flames : MonoBehaviour
     public ParticleSystem.EmissionModule emissionModule;
     public ParticleSystem.ShapeModule shapeModule;
     public ParticleSystem.ColorOverLifetimeModule colorModule;
+    public ParticleSystem.LightsModule lightsModule;
 
     public float PowerLevel = 100f;
 
@@ -33,6 +34,7 @@ public class _Flames : MonoBehaviour
 
     public GameObject boundObject;
 
+    private Flicker light_flicker;
 
     private void Awake()
     {
@@ -41,6 +43,9 @@ public class _Flames : MonoBehaviour
         emissionModule = particles.emission;
         shapeModule = particles.shape;
         colorModule = particles.colorOverLifetime;
+        lightsModule = particles.lights;
+        lightsModule.enabled = false;
+        light_flicker = GetComponent<Flicker>() ? GetComponent<Flicker>() : gameObject.AddComponent<Flicker>();
     }
 
     const float max_emission_over_time = 3;
@@ -64,22 +69,22 @@ public class _Flames : MonoBehaviour
                 {
                     SetFlameStyle(FlameStyles.Soulless);
                     PowerLevel = 50;
-                    particleLight.range = 0.5f;
-                    particleLight.intensity = 3;
+                    //particleLight.range = 0.5f;
+                    //particleLight.intensity = 3;
                 }
                 else if (boundWeapon.Specials[Weapon.SpecialAttacks.Truestrike])
                 {
                     SetFlameStyle(FlameStyles.Inferno);
                     PowerLevel = 50;
-                    particleLight.range = 0.75f;
-                    particleLight.intensity = 5;
+                    //particleLight.range = 0.75f;
+                    //particleLight.intensity = 5;
                 }
                 else if(boundWeapon.Tempo > 0)
                 {
                     SetFlameStyle(FlameStyles.Magic);
                     PowerLevel = 100 * boundWeapon.Tempo;
-                    particleLight.range = 0.75f;
-                    particleLight.intensity = 5;
+                    //particleLight.range = 0.75f;
+                    //particleLight.intensity = 5;
                 }
                 else
                 {
@@ -94,7 +99,8 @@ public class _Flames : MonoBehaviour
             {
                 emissionModule.enabled = true;
             }
-        }    
+        }
+        light_flicker.Flicking = emissionModule.enabled;
     }
 
     /***** PUBLIC *****/

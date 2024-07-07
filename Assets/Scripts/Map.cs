@@ -17,9 +17,9 @@ public class Map : MonoBehaviour
     public static Landmark_Bloodwell BloodWell;
     public static Landmark_Credits Credits;
 
-    public bool Commissioned = false;
+    public static bool Commissioned = false;
 
-    public List<Hextile> Tiles = new List<Hextile>();
+    public static List<Hextile> Tiles = new List<Hextile>();
 
     void Start()
     {
