@@ -116,12 +116,13 @@ public class Landmark_Alter : Landmark
         {
             float drawTimer = 0.0f;
             float timerRatio;
+            PentagramFlames.light_flicker.totalScalar = 0.5f;
             Used = false;
-            PentagramFlames.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
+            PentagramFlames.transform.localPosition = Vector3.zero + Vector3.up * pentagramHeight;
             PentagramFlames.emissionModule.enabled = true;
             yield return new WaitUntil(() => Energized);
             PentagramFlames.emissionModule.enabled = true;
-            PentagramFlames.shapeModule.position = points[0];
+            PentagramFlames.transform.localPosition = points[0];
             while (drawTimer < RitualDurationSeconds)
             {
                 PentagramLines.enabled = true;
@@ -143,12 +144,12 @@ public class Landmark_Alter : Landmark
                 }
                 PentagramLines.positionCount = positions.Count;
                 PentagramLines.SetPositions(positions.ToArray());
-                PentagramFlames.shapeModule.position = drawTimer == 0 ? Vector3.zero + Vector3.up * pentagramHeight : positions[positions.Count - 1];
+                PentagramFlames.transform.localPosition = drawTimer == 0 ? Vector3.zero + Vector3.up * pentagramHeight : positions[positions.Count - 1];
                 drawTimer += Energized ? Time.deltaTime : -Time.deltaTime;
                 drawTimer = Mathf.Clamp(drawTimer, 0, RitualDurationSeconds);
                 yield return null;
             }
-            PentagramFlames.shapeModule.position = Vector3.zero + Vector3.up * pentagramHeight;
+            PentagramFlames.transform.localPosition = Vector3.zero + Vector3.up * pentagramHeight;
             PentagramFlames.shapeModule.radius = 0.75f;
             Used = true;
             Color latchedColor = PentagramLineColor;

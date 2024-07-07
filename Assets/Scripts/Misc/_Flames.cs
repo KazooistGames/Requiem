@@ -34,7 +34,7 @@ public class _Flames : MonoBehaviour
 
     public GameObject boundObject;
 
-    private Flicker light_flicker;
+    public Flicker light_flicker;
 
     private void Awake()
     {

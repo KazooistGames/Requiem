@@ -290,7 +290,32 @@ public class AIBehaviour : MonoBehaviour
             tangoOuterRange = sensorySightRangeScalar * sensoryBaseRange;
         }
     }
-
+    protected bool checkTheirWeaponInRange()
+    {
+        if (!this)
+        {
+            return false;
+        }
+        else if (!entity.Foe)
+        {
+            return false;
+        }
+        else if (!entity.Foe.MainHand)
+        {
+            return false;
+        }
+        else if (!entity.Foe.MainHand.GetComponent<Weapon>())
+        {
+            return false;
+        }
+        else
+        {
+            Weapon main_wep = entity.Foe.MainHand.GetComponent<Weapon>();
+            float rangeBoost = 1.1f;
+            float disposition = (entity.Foe.transform.position - transform.position).magnitude;
+            return disposition <= main_wep.Range * rangeBoost;
+        }
+    }
 
     protected bool checkMyWeaponInRange()
     {

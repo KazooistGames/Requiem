@@ -136,10 +136,10 @@ public class Bully : AIBehaviour
         {
             return true;
         }
-        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
+        else if (_MartialController.Timers.ContainsKey(mainWep))
 
         {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
+            return _MartialController.Timers[mainWep] > CombatSpeed * 4;
         }
         else
         {

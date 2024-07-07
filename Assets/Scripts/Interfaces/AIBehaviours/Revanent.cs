@@ -278,7 +278,7 @@ public class Revanent : AIBehaviour
         {
             return true;
         }
-        else if (_MartialController.Debounce_Timers[mainWep] > 2)
+        else if (_MartialController.Timers[mainWep] > 2)
         {
             return true;
         }

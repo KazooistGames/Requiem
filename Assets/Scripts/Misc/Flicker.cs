@@ -8,10 +8,17 @@ using UnityEngine;
 public class Flicker : MonoBehaviour
 {
     public bool Flicking = true;
+
+    public float totalScalar = 1;
+
     public float maxIntensity = 10;
     public float minIntensity = 5f;
+    public float unscaledIntensity;
+
     public float maxLightRange = 0.75f;
     public float minLightRange = 0.5f;
+    public float unscaledRange;
+
     public float flickerRate = 0.025f;
     private Light light_source;
 
@@ -37,14 +44,16 @@ public class Flicker : MonoBehaviour
             float incrementRange = (maxLightRange - minLightRange) / 10f;
             if (Flicking)
             {
-                light_source.intensity = Mathf.Clamp(Mathf.Lerp(minIntensity, maxIntensity, UnityEngine.Random.value), Mathf.Max(light_source.intensity - incrementIntensity, minIntensity), Mathf.Min(light_source.intensity + incrementIntensity, maxIntensity));
-                light_source.range = Mathf.Clamp(Mathf.Lerp(minLightRange, maxLightRange, UnityEngine.Random.value), Mathf.Max(light_source.range - incrementRange, minLightRange), Mathf.Min(light_source.range + incrementRange, maxLightRange));
+                unscaledIntensity = Mathf.Clamp(Mathf.Lerp(minIntensity, maxIntensity, UnityEngine.Random.value), Mathf.Max(unscaledIntensity - incrementIntensity, minIntensity), Mathf.Min(unscaledIntensity + incrementIntensity, maxIntensity));
+                unscaledRange = Mathf.Clamp(Mathf.Lerp(minLightRange, maxLightRange, UnityEngine.Random.value), Mathf.Max(unscaledRange - incrementRange, minLightRange), Mathf.Min(unscaledRange + incrementRange, maxLightRange));
             }
             else
             {
-                light_source.intensity = Mathf.MoveTowards(light_source.intensity, 0, incrementIntensity);
-                light_source.range = Mathf.MoveTowards(light_source.range, 0, incrementRange);
+                unscaledIntensity = Mathf.MoveTowards(unscaledIntensity, 0, incrementIntensity);
+                unscaledRange = Mathf.MoveTowards(unscaledRange, 0, incrementRange);
             }
+            light_source.intensity = unscaledIntensity * totalScalar;
+            light_source.range = unscaledRange * totalScalar;
             yield return new WaitForSecondsRealtime(flickerRate);
         }
     }

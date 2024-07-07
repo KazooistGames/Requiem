@@ -32,9 +32,8 @@ public class SoulPearl : Wieldable
         spiritFlame.shapeModule.radius = 0.001f;
         spiritFlame.shapeModule.scale = Vector3.one * 0.001f;
         spiritFlame.SetFlameStyle(_Flames.FlameStyles.Soulless);
-        spiritFlame.particleLight.range = 0.2f;
-        spiritFlame.particleLight.intensity = 1.5f;
         spiritFlame.boundObject = gameObject;
+        spiritFlame.light_flicker.totalScalar = 0.5f;
         ParticleSystem.MainModule main = spiritFlame.GetComponent<ParticleSystem>().main;
         main.simulationSpace = ParticleSystemSimulationSpace.Local;
         main.startSize = 0.05f;

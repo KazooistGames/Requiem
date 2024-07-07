@@ -195,10 +195,10 @@ public class Assassin : AIBehaviour
         {
             return true;
         }
-        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
+        else if (_MartialController.Timers.ContainsKey(mainWep))
 
         {
-            return _MartialController.Debounce_Timers[mainWep] > 2;
+            return _MartialController.Timers[mainWep] > 2;
         }
         else
         {

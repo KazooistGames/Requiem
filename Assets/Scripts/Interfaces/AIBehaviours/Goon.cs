@@ -7,9 +7,10 @@ using UnityEngine;
 public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
+    private static float behaviour_mutation_phase = 0;
     private static float CombatSpeed = 0.5f;
-    private static float Aggression = 0.5f;
-    private static float Fear = 0.5f;
+    private static float Aggression = 1f;
+    private static float Fear = 1f;
 
     public static Type Standard_Weapon = typeof(Handaxe);
     public static Type Alternative_Weapon = null;
@@ -23,7 +24,8 @@ public class Goon : AIBehaviour
     protected override void Start()
     {
         base.Start();
-        createSpawnWeapon();
+        mutate_behaviour();
+        create_spawn_weapon();
         Intelligence = 0.5f;
         tangoStrafeEnabled = true;
         martialPreferredState = martialState.attacking;
@@ -59,38 +61,31 @@ public class Goon : AIBehaviour
         {
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
         }
-        else if (UnityEngine.Random.value < Aggression)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-        }
-        else if (UnityEngine.Random.value < Fear)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
-        }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, timeoutCheckMyWeaponInRange);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-        }      
+            float inhibition_rng = UnityEngine.Random.value;
+            if(inhibition_rng > Aggression)
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange, 3);
+            }
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 3);
+            int number_of_swings = Mathf.CeilToInt(Aggression * 4);
+            for(int i = 0; i < number_of_swings; i++)
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+            }
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            float guard_period = Mathf.Sqrt(Fear) * 4;
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+            if(inhibition_rng < Fear)
+            {
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+            }
+        } 
     }
 
-    protected override void reactToFoeVulnerable()
-    {
-        if (checkMyWeaponInRange())
-        {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
-        }
-
-    }
 
     protected override void reactToFoeChange()
     {
@@ -104,35 +99,31 @@ public class Goon : AIBehaviour
         }
     }
 
-    protected override void reactToIncomingAttack()
-    {
-        if(_MartialController.Get_Next_Action(mainWep) == Weapon.ActionAnim.Guarding) 
-        {
-            return;
-        }
-        else if(mainWep.Action != Weapon.ActionAnim.Idle && mainWep.Action != Weapon.ActionAnim.Recoiling)
-        {
-
-        }
-        else if(UnityEngine.Random.value > Aggression)
-        {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
-        }
-    }
-
-    protected override void reactToFoeThrowing()
-    {
-        if (!checkMyWeaponInRange() && UnityEngine.Random.value >= Aggression)
-        {
-            _MartialController.Override_Action(mainWep, mainWep.Action, CombatSpeed);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
-        }
-    }
 
 
     /***** PRIVATE *****/
-    private bool timeoutCheckMyWeaponInRange()
+    private bool timeoutCheckRange()
+    {
+        if (!mainWep)
+        {
+            return false;
+        }
+        else if (checkMyWeaponInRange() || checkTheirWeaponInRange())
+        {
+            return true;
+        }
+        else if (_MartialController.Timers.ContainsKey(mainWep))
+
+        {
+            return _MartialController.Timers[mainWep] > CombatSpeed * 4;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool timeout_check_my_range()
     {
         if (!mainWep)
         {
@@ -142,10 +133,10 @@ public class Goon : AIBehaviour
         {
             return true;
         }
-        else if (_MartialController.Debounce_Timers.ContainsKey(mainWep))
+        else if (_MartialController.Timers.ContainsKey(mainWep))
 
         {
-            return _MartialController.Debounce_Timers[mainWep] > CombatSpeed * 4;
+            return _MartialController.Timers[mainWep] > CombatSpeed * 4;
         }
         else
         {
@@ -153,7 +144,9 @@ public class Goon : AIBehaviour
         }
     }
 
-    private void createSpawnWeapon()
+
+
+    private void create_spawn_weapon()
     {
         if (UnityEngine.Random.value <= Alternative_Weapon_Frequency && Alternative_Weapon != null)
         {
@@ -165,6 +158,13 @@ public class Goon : AIBehaviour
         }
     }
 
+    private static void mutate_behaviour()
+    {
+        float step_size = Mathf.PI / 60;
+        behaviour_mutation_phase += step_size;
+        Aggression = 0.5f + Mathf.Sin(behaviour_mutation_phase)/2;
+        Fear = 0.5f + Mathf.Cos(behaviour_mutation_phase*2)/2;
+    }
 
 }
 
