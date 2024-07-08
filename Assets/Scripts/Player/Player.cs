@@ -154,7 +154,12 @@ public class Player : MonoBehaviour
                 increment.y = y_step;
                 delta.y -= y_step;
             }
-            CurrentMouse.WarpCursorPosition(CurrentMouse.position.ReadValue() + increment);
+
+            if(increment.magnitude > 3)
+            {
+                increment = Vector2.ClampMagnitude(increment, 10);
+                CurrentMouse.WarpCursorPosition(CurrentMouse.position.ReadValue() + increment);
+            }
         }
         else
         {
@@ -292,11 +297,19 @@ public class Player : MonoBehaviour
         }
         else if (HostWeapon.Wielder != HostEntity && !HostWeapon.Thrown && !HostWeapon.Telecommuting && !HostEntity.Staggered)
         {
-            if((yank_timer += Time.deltaTime) >= yank_delay)
+            if ((yank_timer += Time.deltaTime) < yank_delay)
             {
-                yank_timer -= yank_delay;
+
+            }
+            else if (CurrentMouse.leftButton.wasPressedThisFrame)
+            {
                 yankWeapon();
+                yank_timer = 0;
+            }
+            else if (CurrentMouse.rightButton.isPressed)
+            {
                 recallWeapon();
+                yank_timer = 0;
             }
 
         }
@@ -463,11 +476,12 @@ public class Player : MonoBehaviour
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, yankStrength);
             }
-            //else
-            //{
-            //    Vector3 disposition = HostWeapon.transform.position - transform.position;
-            //    HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
-            //}
+            else
+            {
+                Vector3 disposition = HostWeapon.transform.position - transform.position;
+                disposition.y = 0;
+                HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
+            }
         }
         else
         {

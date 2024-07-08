@@ -93,9 +93,8 @@ public abstract class Weapon : Wieldable
         Pierce,
         Clobber,
         Disarm,
-        Combo,
         Knockback,
-        Charge,
+        Sunder,
     }
     public Dictionary<SpecialAttacks, bool> Specials = new Dictionary<SpecialAttacks, bool>()
     { 
@@ -105,9 +104,8 @@ public abstract class Weapon : Wieldable
         {SpecialAttacks.Pierce, false },
         {SpecialAttacks.Clobber, false },
         {SpecialAttacks.Disarm, false },
-        {SpecialAttacks.Combo, false },
         {SpecialAttacks.Knockback, false },
-        {SpecialAttacks.Charge, false },
+        {SpecialAttacks.Sunder, false },
     };
 
     protected override void Awake()
@@ -645,10 +643,7 @@ public abstract class Weapon : Wieldable
         Vector3 direction = foe.transform.position - origin;
         direction.y = 0;
         Vector3 velocityChange = direction.normalized * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * impactScalar;
-        if (weapon.Specials[SpecialAttacks.Knockback])
-        {
-            velocityChange *= 3;
-        }
+
         foe.Shove(velocityChange);
     }
 

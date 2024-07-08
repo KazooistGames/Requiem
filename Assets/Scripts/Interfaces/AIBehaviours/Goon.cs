@@ -8,13 +8,13 @@ public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
     private static float behaviour_mutation_phase = 0;
-    private static float CombatSpeed = 0.5f;
+    private static float CombatSpeed = 1f;
     private static float Aggression = 1f;
     private static float Fear = 1f;
 
     public static Type Standard_Weapon = typeof(Handaxe);
     public static Type Alternative_Weapon = null;
-    public static float Alternative_Weapon_Frequency = 0.25f;
+    public static float Alternative_Weapon_Frequency = 0.20f;
 
     protected override void Awake()
     {
@@ -77,11 +77,11 @@ public class Goon : AIBehaviour
             }
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
             float guard_period = Mathf.Sqrt(Fear) * 4;
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, guard_period);
             if(inhibition_rng < Fear)
             {
                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
+                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, guard_period);
             }
         } 
     }

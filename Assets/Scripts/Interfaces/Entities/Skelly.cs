@@ -12,7 +12,7 @@ public class Skelly : Entity
     protected GameObject leg1;
     protected GameObject leg2;
 
-    public float MutationChancePerRitual = 0.03f;
+    //public float MutationChancePerRitual = 0.03f;
 
     protected override void Awake()
     {
@@ -23,7 +23,7 @@ public class Skelly : Entity
     {
         base.Start();
         createSkeleton();
-        Haste = .5f;
+        Haste = 0.5f;
         Strength = 100f;
         gameObject.name = "Skelly";
         JustWounded.AddListener(CRUMBLE);
@@ -112,9 +112,9 @@ public class Skelly : Entity
             {
                 _MartialController.Cancel_Actions(OffHand.GetComponent<Weapon>());
             }
-            Haste = 1.0f;
+            Haste = 0.75f;
             Strength = 100;
-            Resolve = 20;
+            Resolve = 10;
             mortality = Mortality.vulnerable;
             Vitality = Strength;
             Poise = Strength;

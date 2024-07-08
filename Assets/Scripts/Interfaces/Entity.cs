@@ -107,12 +107,12 @@ public class Entity : MonoBehaviour
     protected bool CrashEnvironmentONS = true;
 
     public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
-    public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 1.5f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-    private static float DASH_CHARGE_TIME = 0.3f;
+    private static float DASH_CHARGE_TIME = 0.4f;
     private static float CRASH_DAMAGE = 25f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
@@ -750,7 +750,7 @@ public class Entity : MonoBehaviour
             {
                 actualMag = collision.relativeVelocity.magnitude;
             }
-            if ((crash || instantaneousCollision) && Vector3.Dot(disposition.normalized, -dashDirection) <= -0.25f)
+            if ((crash || instantaneousCollision) && Vector3.Dot(disposition.normalized, -dashDirection.normalized) <= -0.25f)
             {
                 float impactRatio = Strength_Ratio(this, foe) * (actualMag / Max_Velocity_Of_Dash);
                 Vector3 shoveDirection = Vector3.Lerp(dashDirection.normalized, disposition, 0.5f);
@@ -759,6 +759,7 @@ public class Entity : MonoBehaviour
                 if(foe.Allegiance != Allegiance)
                 {
                     foe.JustCrashed.Invoke();
+                    foe.Dashing = false;
                     apply_bounce(collision, 0.5f);
                     float damage = CRASH_DAMAGE * impactRatio;
                     if (FinalDash)
@@ -793,7 +794,7 @@ public class Entity : MonoBehaviour
         }
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
-        bool cleanHit = dot > 0.5f;
+        bool cleanHit = dot > 0.25f;
         if (cleanHit)
         {
             Entity otherEntity = collision.gameObject.GetComponent<Entity>();
@@ -802,13 +803,13 @@ public class Entity : MonoBehaviour
             {
                 float impactToFoe = Strength_Ratio(this, otherEntity) * velocityRatio / 2;
                 otherEntity.Shove(-collision.relativeVelocity.normalized * impactToFoe);
-                apply_bounce(collision);
-                float impactToSelf = Strength_Ratio(otherEntity, this) * velocityRatio / 2;
-                applyDamageToPoiseThenVitality(impactToSelf * CRASH_DAMAGE);
-                JustCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
+
+                apply_crash_damage(velocityRatio);
+                apply_bounce(collision);
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
+                JustCrashed.Invoke();
             }
             else if (CrashEnvironmentONS && !otherEntity)
             {
@@ -817,15 +818,15 @@ public class Entity : MonoBehaviour
                 {
                     landmark.Impacted();
                 }
+                CrashEnvironmentONS = false;
+
                 if (!Dashing)
                 {
-                    applyDamageToPoiseThenVitality(velocityRatio * CRASH_DAMAGE);
-                    JustCrashed.Invoke();
-                    Stagger(velocityRatio);
+                    apply_crash_damage(velocityRatio);
                 }
                 apply_bounce(collision);
-                CrashEnvironmentONS = false;
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
+                JustCrashed.Invoke();
             }
         }
     }
@@ -839,6 +840,15 @@ public class Entity : MonoBehaviour
         }
     }
 
+    private void apply_crash_damage(float impact)
+    {
+        if(impact > 0.5f)
+        {
+            Stagger(impact);
+        }
+        applyDamageToPoiseThenVitality(impact * CRASH_DAMAGE);
+    }
+
     private IEnumerator routineDashHandler()
     {
         string key = "dash";
@@ -846,7 +856,8 @@ public class Entity : MonoBehaviour
         {
             float scaledVelocity = 0;
             float overChargeTimer = 0;
-            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened);
+            yield return new WaitUntil(() => DashCharging && wieldMode != WieldMode.Burdened && !Shoved);
+            Vector3 cached_dash_direction = Vector3.zero;
             while ((DashCharging && !FinalDash) || scaledVelocity <= Min_Velocity_Of_Dash)
             {
                 float increment = Time.deltaTime * Haste / DASH_CHARGE_TIME;
@@ -860,19 +871,24 @@ public class Entity : MonoBehaviour
                     }
                 }
                 scaledVelocity = Max_Velocity_Of_Dash * DashPower;
+                if(dashDirection != Vector3.zero)
+                {
+                    cached_dash_direction = dashDirection;
+                }
                 yield return null;
             }
             dashAlreadyHit = new List<GameObject>();
             if (FinalDash)
             {
                 scaledVelocity *= FINAL_DASH_RATIO;
-                dashDirection = LookDirection;
+                cached_dash_direction = LookDirection;
             }
-            if (dashDirection != Vector3.zero)
+            if (cached_dash_direction != Vector3.zero)
             {
+                dashDirection = cached_dash_direction;
                 DashCharging = false;
                 Dashing = true;
-                Shove(dashDirection.normalized * scaledVelocity, true);
+                Shove(cached_dash_direction.normalized * scaledVelocity, true);
                 if (FinalDash)
                 {
                     float scaledY = transform.localEulerAngles.y;
@@ -943,21 +959,27 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
-        alterPoise(-impact);
+        //float impact = Strength_Ratio(theirWeapon.MostRecentWielder, this) * theirWeapon.Tempo;
+        //float totalPower = theirWeapon.Power + impact;
+        if (theirWeapon.Specials[SpecialAttacks.Knockback])
+        {
+            Vector3 disposition = transform.position - theirWeapon.MostRecentWielder.transform.position;
+            disposition.y = 0;
+            Shove(disposition.normalized * Strength_Ratio(theirWeapon.MostRecentWielder, this) * theirWeapon.Tempo * Max_Velocity_Of_Dash);
+        }
+        if (theirWeapon.Specials[SpecialAttacks.Sunder])
+        {
+            alterPoise(-theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo);
+        }
         if (theirWeapon.Specials[SpecialAttacks.Clobber])
         {
-            Stagger(Mathf.Sqrt((theirWeapon.Power + impact) / Strength));
-        }
-        if (theirWeapon.Specials[SpecialAttacks.Disarm])
-        {
-            Disarm(3);
+            Stagger(Strength_Ratio(theirWeapon.MostRecentWielder, this) * theirWeapon.Tempo);
         }
         if (myWeapon.Specials[SpecialAttacks.Disarm])
         {
             if (theirWeapon.Wielder)
             {
-                theirWeapon.Wielder.Disarm(3);
+                theirWeapon.Wielder.Disarm(2);
             }
         }
     }
@@ -974,45 +996,42 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponHit(Weapon myWeapon, Entity foe)
     {
-        float totalPower = myWeapon.Power;
-        totalPower += Strength * myWeapon.Tempo;
-        JustLandedHit.Invoke(foe, totalPower);
+        if (myWeapon.Specials[SpecialAttacks.Sunder])
+        {
+            foe.applyDamageToPoiseThenVitality(myWeapon.Tempo * Strength);
+        }
+        if (myWeapon.Specials[SpecialAttacks.Knockback])
+        {
+            Vector3 disposition = foe.transform.position - transform.position;
+            disposition.y = 0;
+            foe.Shove(disposition.normalized * Strength_Ratio(this, foe) * myWeapon.Tempo * Max_Velocity_Of_Dash);
+        }
         if (myWeapon.Specials[SpecialAttacks.Clobber])
         {
-            foe.Stagger(Mathf.Sqrt(totalPower / foe.Strength));
+            foe.Stagger(Strength_Ratio(this, foe) * myWeapon.Tempo);
         }
         if (myWeapon.Specials[SpecialAttacks.Bleed])
         {
             string bleed_key = GetHashCode().ToString() + "ripper";
-            float bleed_period = 4;
-            float maxDamage = Resolve;
-            float increment = Resolve / bleed_period;
-            if (!foe.BleedingWounds.ContainsKey(bleed_key))
-            {
-                foe.BleedingWounds[bleed_key] = (increment, bleed_period);
-            }
-            else if (foe.BleedingWounds[bleed_key].Item1 < maxDamage)
-            {
-                foe.BleedingWounds[bleed_key] = (foe.BleedingWounds[bleed_key].Item1 + increment, bleed_period);
-            }
-            else
-            {
-                foe.BleedingWounds[bleed_key] = (foe.BleedingWounds[bleed_key].Item1, bleed_period);
-            }
+            float bleed_period = 5;
+            float maxDamage = Strength * myWeapon.Tempo;
+            float increment = maxDamage / bleed_period;
+            foe.BleedingWounds[bleed_key] = (increment, bleed_period);  
         }
         if (myWeapon.Specials[SpecialAttacks.Truestrike])
         {
-            foe.Damage(totalPower);
+            foe.Damage(myWeapon.Power);
         }
         else
         {
-            foe.applyDamageToPoiseThenVitality(totalPower);
+            foe.applyDamageToPoiseThenVitality(myWeapon.Power);
         }
         foe.Damage(Resolve);
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
         }
+        JustLandedHit.Invoke(foe, myWeapon.Power);
     }
 
     public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
