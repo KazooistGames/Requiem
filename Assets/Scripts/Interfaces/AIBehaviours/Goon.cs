@@ -35,7 +35,7 @@ public class Goon : AIBehaviour
         tangoStrafePauseFreq = 0.75f;
         tangoStrafeEnabled = true;
         itemManagementSeekItems = true;
-        itemManagementDelayPeriod = 5;
+        itemManagementDelayPeriod = 3;
         itemManagementPreferredType = Entity.WieldMode.OneHanders;
     }
 

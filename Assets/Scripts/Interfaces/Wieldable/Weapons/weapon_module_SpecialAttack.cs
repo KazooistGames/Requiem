@@ -29,8 +29,9 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         animationController.SetBool("Dash", check_wielder_dashing());
 
         UPDATE_CHARGE();
-        UPDATE_TRUESTRIKE();
-        UPDATE_PIERCE();
+        //UPDATE_TRUESTRIKE();
+        //UPDATE_PIERCE();
+        UPDATE_KNOCKBACK();
         UPDATE_BLEED();
         UPDATE_CLOBBER();
         UPDATE_DISARM();
@@ -83,6 +84,17 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         else
         {
             weapon.Specials[SpecialAttacks.Pierce] = false;
+        }
+    }
+    private void UPDATE_KNOCKBACK()
+    {
+        if (check_dash_attack())
+        {
+            weapon.Specials[SpecialAttacks.Knockback] = true;
+        }
+        else
+        {
+            weapon.Specials[SpecialAttacks.Knockback] = false;
         }
     }
 
