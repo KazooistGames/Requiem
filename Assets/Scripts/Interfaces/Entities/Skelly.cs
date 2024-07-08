@@ -113,8 +113,8 @@ public class Skelly : Entity
                 _MartialController.Cancel_Actions(OffHand.GetComponent<Weapon>());
             }
             Haste = 1.0f;
-            Strength = 75;
-            Resolve = 25;
+            Strength = 100;
+            Resolve = 20;
             mortality = Mortality.vulnerable;
             Vitality = Strength;
             Poise = Strength;

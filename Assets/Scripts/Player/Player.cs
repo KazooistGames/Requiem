@@ -189,7 +189,18 @@ public class Player : MonoBehaviour
             HostEntity.WalkDirection = Direction;
             lastDirection = Direction;
         }
-        HostEntity.DashCharging = CurrentKeyboard.spaceKey.isPressed && !HostEntity.Dashing;
+        if (CurrentKeyboard.spaceKey.wasPressedThisFrame)
+        {
+            HostEntity.DashCharging = true;
+        }
+        else if (CurrentKeyboard.spaceKey.wasReleasedThisFrame)
+        {
+            HostEntity.DashCharging = false;
+        }
+        else if (HostEntity.Dashing)
+        {
+            //HostEntity.DashCharging = false;
+        }
         if (!HostEntity.Dashing && HostEntity.DashCharging)
         {
             HostEntity.dashDirection = HostEntity.WalkDirection;

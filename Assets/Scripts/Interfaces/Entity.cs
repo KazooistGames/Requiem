@@ -116,9 +116,8 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 25f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
-    private static float POISE_MAX_DEBOUNCE = 4;
-
-    private static float POISE_REGEN_BASE_PERIOD = 2;
+    private static float POISE_MAX_DEBOUNCE = 6;
+    private static float POISE_REGEN_BASE_PERIOD = 3;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 5f;
     private float poiseDebounceTimer = 0.0f;
@@ -259,7 +258,6 @@ public class Entity : MonoBehaviour
         {
             float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
             float increment = Time.deltaTime * Strength / scalingRegenRate;
-            //float increment = Time.deltaTime * Resolve;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
             if (Mathf.Abs(delta) <= increment)
@@ -516,7 +514,7 @@ public class Entity : MonoBehaviour
         if (value * existingDelta >= 0)
         {
             //float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
-            float scaledRatio = value / Mathf.Max(Resolve, 1);
+            float scaledRatio = Mathf.Abs(value) / Mathf.Max(Resolve, 1);
             float newBounce = impactful ? Mathf.Min(scaledRatio, POISE_MAX_DEBOUNCE) : Time.deltaTime * 5;
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
             if (newBounce >= remainingBounce)
@@ -823,6 +821,7 @@ public class Entity : MonoBehaviour
                 {
                     applyDamageToPoiseThenVitality(velocityRatio * CRASH_DAMAGE);
                     JustCrashed.Invoke();
+                    Stagger(velocityRatio);
                 }
                 apply_bounce(collision);
                 CrashEnvironmentONS = false;
@@ -871,6 +870,7 @@ public class Entity : MonoBehaviour
             }
             if (dashDirection != Vector3.zero)
             {
+                DashCharging = false;
                 Dashing = true;
                 Shove(dashDirection.normalized * scaledVelocity, true);
                 if (FinalDash)
@@ -943,12 +943,11 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponBlock(Weapon myWeapon, Weapon theirWeapon)
     {
-        float impact = theirWeapon.Power;
-        impact += theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
-        
+        float impact = theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo;
+        alterPoise(-impact);
         if (theirWeapon.Specials[SpecialAttacks.Clobber])
         {
-            Stagger(Mathf.Sqrt(impact / Strength));
+            Stagger(Mathf.Sqrt((theirWeapon.Power + impact) / Strength));
         }
         if (theirWeapon.Specials[SpecialAttacks.Disarm])
         {
