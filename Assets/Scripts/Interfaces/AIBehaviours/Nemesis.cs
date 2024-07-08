@@ -43,6 +43,7 @@ public class Nemesis : AIBehaviour
         sensoryBaseRange = 2f;
         sensorySightRangeScalar = 1f;
         sensoryAudioRangeScalar = 0.75f;
+        entity.Aggressive = false;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = Hextile.Radius;
@@ -54,7 +55,7 @@ public class Nemesis : AIBehaviour
         hellfire.transform.localEulerAngles = Vector3.up * 90;
         hellfire.transform.localScale = Vector3.one;
         hellfire.Wielder = entity;
-        entity.Foe = Player.INSTANCE.HostEntity;
+        //entity.Foe = Player.INSTANCE.HostEntity;
         playEvilLaugh(0.5f);
     }
 

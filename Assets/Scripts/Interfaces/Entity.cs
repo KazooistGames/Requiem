@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 using static Weapon;
-using UnityEngine.TextCore.Text;
 
 public class Entity : MonoBehaviour
 {
@@ -117,7 +116,7 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 25f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
-    private static float POISE_MAX_DEBOUNCE = 5;
+    private static float POISE_MAX_DEBOUNCE = 4;
 
     private static float POISE_REGEN_BASE_PERIOD = 5;
     private static float POISE_RESTING_PERCENTAGE = 1f;
@@ -258,8 +257,9 @@ public class Entity : MonoBehaviour
         berthActual = Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod && !DashCharging)
         {
-            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
-            float increment = Time.deltaTime * Strength / scalingRegenRate;
+            //float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
+            //float increment = Time.deltaTime * Strength / scalingRegenRate;
+            float increment = Time.deltaTime * Resolve;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
             if (Mathf.Abs(delta) <= increment)
@@ -341,9 +341,7 @@ public class Entity : MonoBehaviour
 
     protected virtual void FixedUpdate()
     {
-        //float baseSpeed = Mathf.Pow(Haste, 0.5f) * SpeedScalarGlobal;
         float baseSpeed = Haste * SpeedScalarGlobal;
-        //modSpeed["flow"] = posture == Posture.Flow ? Resolve / 100 : 0;
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
         modSpeed["staggered"] = Staggered ? Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 4) : 0;
         modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.35f, -0.35f, body.velocity.magnitude / baseSpeed) : 0;
@@ -513,17 +511,6 @@ public class Entity : MonoBehaviour
     {
         if (immortalityTimer < 0.25f) { return; }
         float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
-        //if(impactful || Poise + value > 0)
-        //{
-        //    if(mortality == Mortality.vulnerable)
-        //    {
-        //        Poise += value;
-        //    }
-        //    else
-        //    {
-        //        Poise += value;
-        //    }
-        //}
         Poise += value;
         Poise = Mathf.Clamp(Poise, -1f, Strength);
         if (value * existingDelta >= 0)
@@ -865,7 +852,6 @@ public class Entity : MonoBehaviour
                     if(overChargeTimer > DASH_CHARGE_TIME * FINAL_DASH_RATIO)
                     {
                         FinalDash = true;
-
                     }
                 }
                 scaledVelocity = Max_Velocity_Of_Dash * DashPower;
@@ -883,7 +869,12 @@ public class Entity : MonoBehaviour
                 Shove(dashDirection.normalized * scaledVelocity, true);
                 if (FinalDash)
                 {
-                    //Stagger(shoveRecoveryPeriod/2);
+                    float scaledY = transform.localEulerAngles.y;
+                    float scaledTarget = 90 - AIBehaviour.getAngle(LookDirection);
+                    scaledTarget = scaledTarget > 180 ? scaledTarget - 360 : scaledTarget;
+                    float difference = (scaledTarget - scaledY);
+                    difference = Mathf.Abs(difference) >= 180 ? difference - (Mathf.Sign(difference) * 360) : difference;
+                    transform.RotateAround(transform.position, Vector3.up, difference);
                 }
                 playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
                 yield return new WaitWhile(() => Shoved);

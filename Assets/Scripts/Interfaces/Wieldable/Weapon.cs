@@ -95,7 +95,7 @@ public abstract class Weapon : Wieldable
         Disarm,
         Combo,
         Knockback,
-        Charge
+        Charge,
     }
     public Dictionary<SpecialAttacks, bool> Specials = new Dictionary<SpecialAttacks, bool>()
     { 

@@ -8,7 +8,6 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 {
 
     private Animator animationController;
-    private AnimatorStateInfo currentAnimation;
     private Weapon weapon;
 
     void Start()
@@ -22,18 +21,21 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
             animationController = GetComponent<Animator>();
             weapon = GetComponent<Weapon>();
         }
+        StartCoroutine(tempo_routine());
     }
 
     void Update()
     {
-        currentAnimation = animationController.GetCurrentAnimatorStateInfo(0);
         animationController.SetBool("Dash", check_wielder_dashing());
+
         UPDATE_CHARGE();
         UPDATE_TRUESTRIKE();
         UPDATE_PIERCE();
         UPDATE_BLEED();
         UPDATE_CLOBBER();
         UPDATE_DISARM();
+
+        //UPDATE_TEMPO();
     }
 
     private void UPDATE_DISARM()
@@ -106,7 +108,6 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         {
             weapon.Specials[SpecialAttacks.Charge] = false;
         }
-        UPDATE_TEMPO();
     }
 
     private void UPDATE_TEMPO()
@@ -137,10 +138,9 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private bool check_dash_attack()
     {
-        bool forehand = weapon.currentAnimation.IsName("DashCoil") || weapon.currentAnimation.IsName("DashSwing");
-        bool backhand = weapon.currentAnimation.IsName("backhandDashCoil") || weapon.currentAnimation.IsName("backhandDashSwing");
-        return forehand || backhand;
+        return weapon.currentAnimation.IsName("backhandDashSwing") || weapon.currentAnimation.IsName("DashSwing"); ;
     }
+
 
     private bool check_wielder_dashing()
     {
@@ -148,7 +148,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         {
             return false;
         }
-        else if (weapon.Wielder.dashDirection != Vector3.zero)
+        else if (weapon.Wielder.dashDirection != Vector3.zero || weapon.Wielder.Dashing || weapon.Wielder.DashCharging)
         {
             return true;
         }
@@ -157,6 +157,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
             return false;  
         }
     }
+   
 
     private bool tempoChargeONS = true;
     private float tempoCharge = 0;
@@ -170,4 +171,53 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
         return 1 - function;
     }
+
+
+    private IEnumerator tempo_routine()
+    {
+        yield return null;
+        while (true)
+        {
+            yield return new WaitUntil(() => weapon.Specials[SpecialAttacks.Charge]);
+            if(weapon.Specials[SpecialAttacks.Charge])
+            {
+                while (weapon.Specials[SpecialAttacks.Charge])
+                {
+                    if (tempoChargeONS)
+                    {
+                        tempoChargeONS = false;
+                    }
+                    else if (tempoCharge < 1)
+                    {
+                        float increment = (Time.deltaTime / tempoChargePeriod);
+                        tempoCharge += increment;
+                    }
+                    weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+                    yield return null;
+                }
+                yield return new WaitUntil(() => weapon.Action == ActionAnim.Recovering || weapon.Action == ActionAnim.Recoiling);
+                tempoCharge = 0;
+                tempoChargeONS = true;
+                weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+            }
+            //else if (check_wielder_dashing())
+            //{
+            //    float scalar = 0.5f;
+            //    while (check_wielder_dashing())
+            //    {
+            //        if (weapon.Wielder.Dashing)
+            //        {
+            //            tempoCharge += Time.deltaTime / scalar;
+            //        }
+            //        weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+            //        yield return null;
+            //    }
+            //    yield return new WaitUntil(() => !check_dash_attack());
+            //    weapon.Tempo = 0;
+            //    tempoCharge = 0;
+            //}      
+        }
+    }
+
+
 }

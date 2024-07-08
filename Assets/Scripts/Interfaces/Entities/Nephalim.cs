@@ -20,6 +20,7 @@ public class Nephalim : Entity
         Haste = 1.0f;
         hoverScalar = 1.125f;
         scaleScalar = 1.20f;
+        mortality = Mortality.vulnerable;
     }
 
     protected override void Start()
