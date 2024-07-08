@@ -155,9 +155,9 @@ public class Player : MonoBehaviour
                 delta.y -= y_step;
             }
 
-            if(increment.magnitude > 3)
+            if(increment.magnitude >= 1)
             {
-                increment = Vector2.ClampMagnitude(increment, 10);
+                increment = Vector2.ClampMagnitude(increment, 5);
                 CurrentMouse.WarpCursorPosition(CurrentMouse.position.ReadValue() + increment);
             }
         }

@@ -241,7 +241,9 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
                 {
                     if (check_wielder_dashing())
                     {
-                        weapon.Tempo = weapon.Wielder.DashPower;
+                        float min_dash_power = Entity.Min_Velocity_Of_Dash / Entity.Max_Velocity_Of_Dash;
+                        float scaled_dash_power = (weapon.Wielder.DashPower - min_dash_power) / (1f-min_dash_power);
+                        weapon.Tempo = scaled_dash_power;
                     }
                     yield return null;
                 }

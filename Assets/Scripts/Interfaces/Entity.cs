@@ -113,7 +113,7 @@ public class Entity : MonoBehaviour
     public float DashPower { get; private set; } = 0.0f;
 
     private static float DASH_CHARGE_TIME = 0.4f;
-    private static float CRASH_DAMAGE = 25f;   
+    private static float CRASH_DAMAGE = 20f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
     private static float POISE_MAX_DEBOUNCE = 6;
@@ -759,7 +759,6 @@ public class Entity : MonoBehaviour
                 if(foe.Allegiance != Allegiance)
                 {
                     foe.JustCrashed.Invoke();
-                    foe.Dashing = false;
                     apply_bounce(collision, 0.5f);
                     float damage = CRASH_DAMAGE * impactRatio;
                     if (FinalDash)
@@ -805,8 +804,8 @@ public class Entity : MonoBehaviour
                 otherEntity.Shove(-collision.relativeVelocity.normalized * impactToFoe);
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
-
-                apply_crash_damage(velocityRatio);
+                otherEntity.apply_crash_damage(velocityRatio / 2);
+                apply_crash_damage(velocityRatio / 2);
                 apply_bounce(collision);
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
                 JustCrashed.Invoke();
@@ -842,10 +841,7 @@ public class Entity : MonoBehaviour
 
     private void apply_crash_damage(float impact)
     {
-        if(impact > 0.5f)
-        {
-            Stagger(impact);
-        }
+        Stagger(impact);
         applyDamageToPoiseThenVitality(impact * CRASH_DAMAGE);
     }
 
