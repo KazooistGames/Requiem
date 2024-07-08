@@ -114,7 +114,7 @@ public class Skelly : Entity
             }
             Haste = 1.0f;
             Strength = 75;
-            Resolve = 50;
+            Resolve = 25;
             mortality = Mortality.vulnerable;
             Vitality = Strength;
             Poise = Strength;

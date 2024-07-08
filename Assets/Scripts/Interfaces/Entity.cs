@@ -118,7 +118,7 @@ public class Entity : MonoBehaviour
 
     private static float POISE_MAX_DEBOUNCE = 4;
 
-    private static float POISE_REGEN_BASE_PERIOD = 5;
+    private static float POISE_REGEN_BASE_PERIOD = 2;
     private static float POISE_RESTING_PERCENTAGE = 1f;
     private float poiseDebouncePeriod = 5f;
     private float poiseDebounceTimer = 0.0f;
@@ -257,9 +257,9 @@ public class Entity : MonoBehaviour
         berthActual = Berth * berthScalar;
         if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod && !DashCharging)
         {
-            //float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
-            //float increment = Time.deltaTime * Strength / scalingRegenRate;
-            float increment = Time.deltaTime * Resolve;
+            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
+            float increment = Time.deltaTime * Strength / scalingRegenRate;
+            //float increment = Time.deltaTime * Resolve;
             float restingValue = POISE_RESTING_PERCENTAGE * Strength;
             float delta = Poise - restingValue;
             if (Mathf.Abs(delta) <= increment)
@@ -515,8 +515,9 @@ public class Entity : MonoBehaviour
         Poise = Mathf.Clamp(Poise, -1f, Strength);
         if (value * existingDelta >= 0)
         {
-            float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
-            float newBounce = impactful ? scaledRatio * POISE_MAX_DEBOUNCE : Time.deltaTime * 5;
+            //float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
+            float scaledRatio = value / Mathf.Max(Resolve, 1);
+            float newBounce = impactful ? Mathf.Min(scaledRatio, POISE_MAX_DEBOUNCE) : Time.deltaTime * 5;
             float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
             if (newBounce >= remainingBounce)
             {
@@ -760,6 +761,7 @@ public class Entity : MonoBehaviour
                 if(foe.Allegiance != Allegiance)
                 {
                     foe.JustCrashed.Invoke();
+                    apply_bounce(collision, 0.5f);
                     float damage = CRASH_DAMAGE * impactRatio;
                     if (FinalDash)
                     {
@@ -802,9 +804,8 @@ public class Entity : MonoBehaviour
             {
                 float impactToFoe = Strength_Ratio(this, otherEntity) * velocityRatio / 2;
                 otherEntity.Shove(-collision.relativeVelocity.normalized * impactToFoe);
-                //otherEntity.applyDamageToPoiseThenVitality(impactToFoe * CRASH_DAMAGE);
+                apply_bounce(collision);
                 float impactToSelf = Strength_Ratio(otherEntity, this) * velocityRatio / 2;
-                Shove(collision.relativeVelocity.normalized * impactToSelf);
                 applyDamageToPoiseThenVitality(impactToSelf * CRASH_DAMAGE);
                 JustCrashed.Invoke();
                 dashAlreadyHit.Add(otherEntity.gameObject);
@@ -820,19 +821,24 @@ public class Entity : MonoBehaviour
                 }
                 if (!Dashing)
                 {
-                    alterPoise(-velocityRatio * CRASH_DAMAGE);
-                    if(Posture == PostureStrength.Weak)
-                    {
-                        applyDamageToPoiseThenVitality(velocityRatio * CRASH_DAMAGE);
-                    }
+                    applyDamageToPoiseThenVitality(velocityRatio * CRASH_DAMAGE);
                     JustCrashed.Invoke();
                 }
+                apply_bounce(collision);
                 CrashEnvironmentONS = false;
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
             }
         }
     }
 
+    private void apply_bounce(Collision collision, float magnitude = 1)
+    {
+        if (collision != null)
+        {
+            body.velocity = Vector3.zero;
+            Shove(collision.GetContact(0).normal * magnitude);
+        }
+    }
 
     private IEnumerator routineDashHandler()
     {
@@ -1003,6 +1009,7 @@ public class Entity : MonoBehaviour
         {
             foe.applyDamageToPoiseThenVitality(totalPower);
         }
+        foe.Damage(Resolve);
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);

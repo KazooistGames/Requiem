@@ -458,7 +458,7 @@ public abstract class Weapon : Wieldable
         }
         if (Blocker.Wielder && !Attacker.Specials[SpecialAttacks.Pierce])
         {
-            APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.5f);
+            APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.75f);
             Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
         }
         else
@@ -647,7 +647,7 @@ public abstract class Weapon : Wieldable
         Vector3 velocityChange = direction.normalized * Entity.Strength_Ratio(weapon.MostRecentWielder, foe) * impactScalar;
         if (weapon.Specials[SpecialAttacks.Knockback])
         {
-            velocityChange *= 2;
+            velocityChange *= 3;
         }
         foe.Shove(velocityChange);
     }
