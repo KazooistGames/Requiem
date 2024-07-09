@@ -42,7 +42,7 @@ public class Nemesis : AIBehaviour
         grabDPS = 10f;
         sensoryBaseRange = 2f;
         sensorySightRangeScalar = 1f;
-        sensoryAudioRangeScalar = 0.75f;
+        sensoryAudioRangeScalar = 1f;
         entity.Aggressive = false;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;

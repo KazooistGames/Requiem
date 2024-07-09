@@ -90,13 +90,7 @@ public class Waver : MonoBehaviour
         }
         else
         {
-            waveTimer += Time.deltaTime;
-            if ((spawnTimer += Time.deltaTime) >= spawnPeriod)
-            {
-                spawnTimer -= spawnPeriod;
-                spawnPeriod = UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y);
-                attempt_spawn();
-            }
+            attempt_spawn();
         }
 
     }
@@ -192,6 +186,7 @@ public class Waver : MonoBehaviour
 
     private static void attempt_spawn()
     {
+        waveTimer += Time.deltaTime;
         if (get_remaining_mob_count() <= 0)
         {
 
@@ -200,15 +195,18 @@ public class Waver : MonoBehaviour
         {
 
         }
-        else if (get_active_mob_count() < minPopulation)
-        {
-            int population_deficit = minPopulation - get_active_mob_count();
-            int spawn_size = Mathf.Min(population_deficit, get_remaining_mob_count());
-            spawn_mobs(spawn_size);
-        }
-        else
-        {
+        else if((spawnTimer += Time.deltaTime) >= spawnPeriod)
+        {            
             spawn_mobs(1);
+            spawnTimer = 0;
+            if (get_active_mob_count() < minPopulation)
+            {
+                spawnPeriod = 1;
+            }
+            else
+            {
+                spawnPeriod = UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y);
+            }
         }
     }
 

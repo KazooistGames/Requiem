@@ -90,7 +90,6 @@ public abstract class Weapon : Wieldable
         Truestrike,
         Bleed,
         Hamstring,
-        Pierce,
         Clobber,
         Disarm,
         Knockback,
@@ -101,7 +100,6 @@ public abstract class Weapon : Wieldable
         {SpecialAttacks.Truestrike, false },
         {SpecialAttacks.Bleed, false },
         {SpecialAttacks.Hamstring, false },
-        {SpecialAttacks.Pierce, false },
         {SpecialAttacks.Clobber, false },
         {SpecialAttacks.Disarm, false },
         {SpecialAttacks.Knockback, false },
@@ -454,7 +452,7 @@ public abstract class Weapon : Wieldable
         {
             Attacker.playTink();
         }
-        if (Blocker.Wielder && !Attacker.Specials[SpecialAttacks.Pierce])
+        if (Blocker.Wielder)
         {
             APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.75f);
             Attacker.FullCollisionONS(Blocker.Wielder.gameObject);
@@ -505,7 +503,7 @@ public abstract class Weapon : Wieldable
     private static bool RESOLVE_HIT(Weapon weapon, Entity foe)
     {
         if(foe.Allegiance == weapon.Allegiance) {  return false; }
-        if (testBlockBetweenEntities(foe, weapon.MostRecentWielder) && !weapon.Specials[SpecialAttacks.Pierce])
+        if (testBlockBetweenEntities(foe, weapon.MostRecentWielder))
         {
             RESOLVE_BLOCK(weapon, foe.MainHand.GetComponent<Weapon>());
         }
@@ -737,17 +735,17 @@ public abstract class Weapon : Wieldable
         {
             return ActionAnim.Recoiling;
         }
+        else if(!currentAnimation.IsTag("Guard") && nextAnimation.IsTag("Guard"))
+        {
+            return ActionAnim.Parrying;
+        }
         else if (currentAnimation.IsTag("Sheath"))
         {
             return ActionAnim.Sheathed;
         }
         else if (currentAnimation.IsTag("Idle"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else if (nextAnimation.IsTag("Windup"))
+            if (nextAnimation.IsTag("Windup"))
             {
                 return ActionAnim.StrongWindup;
             }
@@ -777,22 +775,11 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("Windup"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else
-            {
-                return ActionAnim.StrongWindup;
-            }
+            return ActionAnim.StrongWindup;
         }
         else if (currentAnimation.IsTag("StrongCoil"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else if (nextAnimation.IsTag("StrongAttack"))
+            if (nextAnimation.IsTag("StrongAttack"))
             {
                 return ActionAnim.StrongAttack;
             }
@@ -803,22 +790,11 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("QuickCoil"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else
-            {
-                return ActionAnim.QuickCoil;
-            }
+            return ActionAnim.QuickCoil;
         }
         else if (currentAnimation.IsTag("QuickAttack"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else if (nextAnimation.IsTag("Idle"))
+            if (nextAnimation.IsTag("Idle"))
             {
                 return ActionAnim.Recovering;
             }
@@ -829,11 +805,7 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("StrongAttack"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else if (nextAnimation.IsTag("Idle"))
+            if (nextAnimation.IsTag("Idle"))
             {
                 return ActionAnim.Recovering;
             }
@@ -867,14 +839,7 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("Aim"))
         {
-            if (nextAnimation.IsTag("Guard"))
-            {
-                return ActionAnim.Parrying;
-            }
-            else
-            {
-                return ActionAnim.Aiming;
-            }
+            return ActionAnim.Aiming;
         }
         else if (currentAnimation.IsTag("Throw"))
         {

@@ -86,6 +86,7 @@ public class AIBehaviour : MonoBehaviour
         {
             behaviourParams[key] = (false, 0);
         }
+        behaviourParams[BehaviourType.wallCrawl] = (true, 0.5f);
         entity = GetComponent<Entity>();
     }
 
@@ -1129,14 +1130,12 @@ public class AIBehaviour : MonoBehaviour
             bool obstaclesPresent = false;
             Vector3 weightedAvoidVector = Vector3.zero;
             Vector3 outputDirection = Vector3.zero;
-            float outputWeight = 0f;
             int colliderCount = 0;
-            wallCrawlObstacles.RemoveAll(x => !x);
+            wallCrawlObstacles.RemoveAll(x => x == null);
             if (!wallCrawlAvoidFoe && entity.Foe)
             {
                 wallCrawlObstacles.RemoveAll(x => x.gameObject == entity.Foe.gameObject);
             }
-
             foreach (GameObject obstacle in wallCrawlObstacles)
             {
                 if (obstacle)
@@ -1164,20 +1163,13 @@ public class AIBehaviour : MonoBehaviour
             if (obstaclesPresent)
             {
                 wallCrawlTimer += ReflexRate;
-                float scalar = 1.5f;
-                outputWeight = TotalWeight * scalar * weightedAvoidVector.magnitude / colliderCount;        
                 outputDirection = weightedAvoidVector.normalized;
-                if (wallCrawlDrawRays)
-                {
-                    Debug.DrawRay(transform.position, weightedAvoidVector * outputWeight / TotalWeight * scalar, Color.blue, ReflexRate);
-                    Debug.Log(outputWeight / TotalWeight * scalar);
-                }
             }
             else
             {
                 wallCrawlTimer = 0f;
             }
-            Directives[key] = (outputDirection, outputWeight);
+            Directives[key] = (outputDirection, behaviourParams[key].Item2);
         }
         else
         {
@@ -1191,7 +1183,7 @@ public class AIBehaviour : MonoBehaviour
 
     private IEnumerator Think()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         while (true)
         {
             if (!Requiem.Paused && enabled)
@@ -1200,31 +1192,22 @@ public class AIBehaviour : MonoBehaviour
                 {
                     behaviour.Value(behaviour.Key);
                 }
-                Vector3 output = Vector3.zero;
-                Vector3 output2 = Vector3.zero;
-                List<Vector3> vectors = new List<Vector3>();
-                List<Vector3> vectors2 = new List<Vector3>();
+                Vector3 wallCrawlCorrection = Vector3.zero;
+                Vector3 weightedOutput = Vector3.zero;
                 foreach (BehaviourType key in Directives.Keys)
                 {
-                    Vector3 temp = Directives[key].Item1 * Directives[key].Item2;
-                    vectors.Add(temp);
                     if (key != BehaviourType.wallCrawl)
-                    {
-                        vectors2.Add(temp);
+                    {                    
+                        Vector3 temp = Directives[key].Item1 * Directives[key].Item2;
+                        weightedOutput += temp;
                     }
                 }
-                foreach (Vector3 target in vectors)
+                DesiredDirection = weightedOutput.normalized;
+                actualMovementDirection = calculatePathInDirection(weightedOutput);
+                if (Directives.ContainsKey(BehaviourType.wallCrawl))
                 {
-                    output += target;
+                    actualMovementDirection = Vector3.Lerp(actualMovementDirection, Directives[BehaviourType.wallCrawl].Item1, Directives[BehaviourType.wallCrawl].Item2);
                 }
-                foreach (Vector3 target in vectors2)
-                {
-                    output2 += target;
-                }
-                output = vectors.Count > 0 ? output / vectors.Count : Vector3.zero;
-                actualMovementDirection = output.normalized;
-                DesiredDirection = output2.normalized;
-                TotalWeight = 0;
                 TotalWeight = Directives.Aggregate(0.0f, (result, x) => result += (x.Key != BehaviourType.wallCrawl ? x.Value.Item2 : 0));
             }
             yield return new WaitForSecondsRealtime(ReflexRate);
@@ -1321,7 +1304,7 @@ public class AIBehaviour : MonoBehaviour
         }
         entity.modSpeed["AIState"] = 0;
         behaviourParams[BehaviourType.sensory] = (true, 0);
-        behaviourParams[BehaviourType.wallCrawl] = (true, 0);
+        behaviourParams[BehaviourType.wallCrawl] = (true, 0.5f);
         behaviourParams[BehaviourType.dashing] = (true, 0);
         behaviourParams[BehaviourType.itemManagement] = (true, 5);
         trackingTrailingEnabled = false;
@@ -1404,6 +1387,79 @@ public class AIBehaviour : MonoBehaviour
     }
 
 
+    private const int MAX_DIRECTION_SEARCH_ANGLE = 90;
+    private const int SEARCH_ANGLE_STEP_SIZE = 30;
+    private Vector3 calculatePathInDirection(Vector3 direction)
+    {
+        if (direction == Vector3.zero)
+        {
+            return Vector3.zero;
+        }
+        Debug.DrawLine(transform.position, transform.position + direction.normalized, Color.green, ReflexRate);
+        Debug.DrawLine(transform.position, waypointCoordinates, Color.red, ReflexRate);
+        if (getObstruction(direction))
+        {
+            Vector3 testVectorClockwise;
+            Vector3 testVectorCounterClockwise;
+            float degreeOffset = 0;
+            while (Mathf.Abs(degreeOffset) < MAX_DIRECTION_SEARCH_ANGLE)
+            {
+                degreeOffset += SEARCH_ANGLE_STEP_SIZE;
+                testVectorClockwise = RotateVectorByDegrees(direction, degreeOffset);
+                if (getObstruction(testVectorClockwise))
+                {
+                    testVectorCounterClockwise = RotateVectorByDegrees(direction, -degreeOffset);
+                    if (!getObstruction(testVectorCounterClockwise))
+                    {
+                        return testVectorCounterClockwise;
+                    }
+                }
+                else
+                {
+                    return testVectorClockwise;
+                }
+            }
+            return direction;
+        }
+        else
+        {        
+            return direction;
+        }
+    }
 
+    private bool getObstruction(Vector3 direction)
+    {
+        float NavRange = entity.personalBox.radius * 2 * entity.scaleActual;
+        Debug.DrawLine(transform.position, transform.position + direction.normalized * NavRange, Color.blue, ReflexRate);
+        int layer = (1 << Requiem.layerObstacle) + (1 << Requiem.layerWall);
+        RaycastHit hit = new RaycastHit();
+        if (entity.hurtBox)
+        {
+            Vector3 castDirection = transform.position + direction.normalized * NavRange;
+            Ray castRay = new Ray(origin: transform.position, direction: castDirection);
+            float radius = entity.hurtBox.radius * entity.scaleActual;
+            bool result = Physics.SphereCast(transform.position, radius, direction, out hit, NavRange, layer, QueryTriggerInteraction.Ignore);
+            if (result)
+            {
+                Debug.Log(hit.collider.gameObject);
+            }
+            return result;
+        }
+        else
+        {
+            bool result = Physics.Raycast(transform.position, direction, out hit, NavRange, layer, QueryTriggerInteraction.Ignore);
+            if (result)
+            {
+                Debug.Log(hit.collider.gameObject);
+            }
+            return result;
+        }
+    }
+
+    public static Vector3 RotateVectorByDegrees(Vector3 direction, float degreeOffset)
+    {
+        float direction_angle = getAngle(direction);
+        return angleToVector(direction_angle + degreeOffset);   
+    }
 
 }

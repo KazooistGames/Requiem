@@ -10,6 +10,8 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     private Animator animationController;
     private Weapon weapon;
 
+    private const float combo_tempo_increment = 1 / 4f;
+
     void Start()
     {
         if (!GetComponent<Weapon>()) 
@@ -22,7 +24,9 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
             weapon = GetComponent<Weapon>();
         }
         StartCoroutine(tempo_routine());
+        weapon.Hitting.AddListener(increment_combo_tempo);
     }
+
 
     void Update()
     {
@@ -53,7 +57,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     }
     private void UPDATE_DISARM()
     {
-        if (weapon.Action == ActionAnim.Guarding)
+        if (weapon.Action == ActionAnim.Parrying)
         {
             weapon.Specials[SpecialAttacks.Disarm] = true;
         }
@@ -87,17 +91,6 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         }
     }
 
-    private void UPDATE_PIERCE()
-    {
-        if (check_dash_attack())
-        {
-            weapon.Specials[SpecialAttacks.Pierce] = true;
-        }
-        else
-        {
-            weapon.Specials[SpecialAttacks.Pierce] = false;
-        }
-    }
     private void UPDATE_KNOCKBACK()
     {
         if (check_dash_attack())
@@ -122,43 +115,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         }
     }
 
-    //private void UPDATE_CHARGE()
-    //{
-    //    if (weapon.Action == ActionAnim.StrongCoil)
-    //    {
-    //        weapon.Specials[SpecialAttacks.Charge] = true;
-    //    }
-    //    else
-    //    {
-    //        weapon.Specials[SpecialAttacks.Charge] = false;
-    //    }
-    //}
 
-    //private void UPDATE_TEMPO()
-    //{
-    //    weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
-    //    if (weapon.Specials[SpecialAttacks.Charge])
-    //    {
-    //        if (tempoChargeONS)
-    //        {
-    //            tempoChargeONS = false;
-    //        }
-    //        else if (tempoCharge < 1)
-    //        {
-    //            float increment = (Time.deltaTime / tempoChargePeriod);
-    //            tempoCharge += increment;
-    //        }
-    //    }
-    //    else if (weapon.Thrown || weapon.Action == ActionAnim.StrongAttack || weapon.Action == ActionAnim.QuickAttack)
-    //    {
-
-    //    }
-    //    else
-    //    {
-    //        tempoCharge = 0;
-    //        tempoChargeONS = true;
-    //    }
-    //}
 
     private bool check_dash_attack()
     {
@@ -174,7 +131,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private bool check_quick_attack()
     {
-        return weapon.Action == ActionAnim.QuickAttack;
+        return weapon.Action == ActionAnim.QuickAttack && !check_dash_attack();
     }
 
     private bool check_wielder_dashing()
@@ -194,7 +151,6 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     }
    
 
-    private bool tempoChargeONS = true;
     private float tempoCharge = 0;
     private float tempoChargePeriod = 0.5f;
     private float convert_charge_to_tempo(float charge)
@@ -213,44 +169,68 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         yield return null;
         while (true)
         {
-            yield return new WaitUntil(() => weapon.Action == ActionAnim.StrongCoil || check_dash_attack());
-            if(weapon.Action == ActionAnim.StrongCoil)
+            yield return new WaitUntil(() => weapon.Action == ActionAnim.StrongCoil || check_wielder_dashing() || check_quick_attack());
+            weapon.Tempo = 0;
+            tempoCharge = 0;
+            if (weapon.Action == ActionAnim.StrongCoil)
             {
-                while (weapon.Action == ActionAnim.StrongCoil)
-                {
-                    if (tempoChargeONS)
-                    {
-                        tempoChargeONS = false;
-                    }
-                    else if (tempoCharge < 1)
-                    {
-                        float increment = (Time.deltaTime / tempoChargePeriod);
-                        tempoCharge += increment;
-                    }
-                    weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
-                    yield return null;
-                }
-                yield return new WaitUntil(() => !check_strong_attack());
-                tempoCharge = 0;
-                tempoChargeONS = true;
-                weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+                yield return tempo_charge_routine();
             }
-            else if (check_dash_attack())
+            else if (check_wielder_dashing())
             {
-                while (check_dash_attack())
-                {
-                    if (check_wielder_dashing())
-                    {
-                        float min_dash_power = Entity.Min_Velocity_Of_Dash / Entity.Max_Velocity_Of_Dash;
-                        float scaled_dash_power = (weapon.Wielder.DashPower - min_dash_power) / (1f-min_dash_power);
-                        weapon.Tempo = scaled_dash_power;
-                    }
-                    yield return null;
-                }
-                yield return new WaitUntil(() => !check_dash_attack());
-                weapon.Tempo = 0;
-                tempoCharge = 0;
+                yield return tempo_dash_routine();
             }
+            else if (check_quick_attack())
+            {
+                yield return tempo_combo_routine();
+            }
+            weapon.Tempo = 0;
+            tempoCharge = 0;
+        }
+    }
+
+    private IEnumerator tempo_dash_routine()
+    {
+        while (check_wielder_dashing())
+        {
+            float min_dash_power = Entity.Min_Velocity_Of_Dash / Entity.Max_Velocity_Of_Dash;
+            float scaled_dash_power = (weapon.Wielder.DashPower - min_dash_power) / (1f - min_dash_power);
+            tempoCharge = Mathf.Clamp(scaled_dash_power, 0, 1);
+            weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+            yield return null;
+        }
+        yield return new WaitUntil(() => !check_dash_attack());
+    }
+
+    private IEnumerator tempo_charge_routine()
+    {
+        while (weapon.Action == ActionAnim.StrongCoil)
+        {
+            if (tempoCharge < 1)
+            {
+                float increment = (Time.deltaTime / tempoChargePeriod);
+                tempoCharge += increment;
+            }
+            weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+            yield return null;
+        }
+        yield return new WaitUntil(() => !check_strong_attack());
+    }
+
+    private IEnumerator tempo_combo_routine()
+    {
+        while (!check_wielder_dashing() && weapon.Action != ActionAnim.StrongCoil)
+        {
+            weapon.Tempo = Mathf.Clamp(weapon.Tempo -= Time.deltaTime * combo_tempo_increment / 2, 0, 1);
+            yield return null;
+        }
+    }
+
+    private void increment_combo_tempo(Weapon weapon, Entity entity)
+    {
+        if (check_quick_attack())
+        {
+            weapon.Tempo += combo_tempo_increment;
         }
     }
 

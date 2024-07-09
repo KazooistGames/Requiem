@@ -79,7 +79,7 @@ public class Entity : MonoBehaviour
 
     public CapsuleCollider personalBox;
     public GameObject model;
-    protected CapsuleCollider hurtBox;
+    public CapsuleCollider hurtBox;
     public Rigidbody body;
     public Projector indicator;
     public GameObject statBar;
@@ -962,6 +962,7 @@ public class Entity : MonoBehaviour
             Vector3 disposition = transform.position - theirWeapon.MostRecentWielder.transform.position;
             disposition.y = 0;
             Shove(disposition.normalized * Strength_Ratio(theirWeapon.MostRecentWielder, this) * theirWeapon.Tempo * Max_Velocity_Of_Dash);
+            Dashing = false;
         }
         if (theirWeapon.Specials[SpecialAttacks.Sunder])
         {
@@ -982,7 +983,13 @@ public class Entity : MonoBehaviour
 
     private void handleWeaponParrying(Weapon myWeapon, Weapon theirWeapon)
     {
-
+        if (myWeapon.Specials[SpecialAttacks.Disarm])
+        {
+            if (theirWeapon.Wielder)
+            {
+                theirWeapon.Wielder.Disarm(2);
+            }
+        }
     }
 
     private void handleWeaponParried(Weapon myWeapon, Weapon theirWeapon)
@@ -1001,6 +1008,7 @@ public class Entity : MonoBehaviour
             Vector3 disposition = foe.transform.position - transform.position;
             disposition.y = 0;
             foe.Shove(disposition.normalized * Strength_Ratio(this, foe) * myWeapon.Tempo * Max_Velocity_Of_Dash);
+            Dashing = false;
         }
         if (myWeapon.Specials[SpecialAttacks.Clobber])
         {

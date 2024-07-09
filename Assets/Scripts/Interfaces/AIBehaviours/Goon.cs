@@ -8,7 +8,7 @@ public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
     private static float behaviour_mutation_phase = 0;
-    private static float CombatSpeed = 1f;
+    private static float CombatSpeed = 0.75f;
 
     public static float Aggression = 1f;
     public static float Fear = 1f;
@@ -31,7 +31,7 @@ public class Goon : AIBehaviour
         tangoStrafeEnabled = true;
         martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 0.75f;
-        sensoryAudioRangeScalar = 0.5f;
+        sensoryAudioRangeScalar = 0.75f;
         meanderPauseFrequency = 0.5f;
         tangoStrafePauseFreq = 0.75f;
         tangoStrafeEnabled = true;
@@ -69,20 +69,12 @@ public class Goon : AIBehaviour
             {
                 _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange, 3);
             }
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 3);
-            int number_of_swings = Mathf.CeilToInt(Aggression * 4);
-            for(int i = 0; i < number_of_swings; i++)
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            }
+            attack_cycle();
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-            float guard_period = Mathf.Sqrt(Fear) * 4;
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, guard_period);
-            if(inhibition_rng < Fear)
+            defend_cycle();
+            if (inhibition_rng < Fear)
             {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, guard_period);
+                defend_cycle();
             }
         } 
     }
@@ -93,6 +85,14 @@ public class Goon : AIBehaviour
         if (entity.Foe)
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            if (Aggression >= Fear)
+            {
+                attack_cycle();
+            }
+            else
+            {
+                defend_cycle();
+            }
         }
         else
         {
@@ -103,6 +103,25 @@ public class Goon : AIBehaviour
 
 
     /***** PRIVATE *****/
+
+
+    private void defend_cycle()
+    {
+        float guard_period = Mathf.Sqrt(Fear) * 4;
+        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, guard_period);
+        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+
+    }
+    private void attack_cycle()
+    {
+        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 3);
+        int number_of_swings = Mathf.CeilToInt(Aggression * 4);
+        for (int i = 0; i < number_of_swings; i++)
+        {
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, CombatSpeed);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
+        }
+    }
     private void create_spawn_weapon()
     {
         if (UnityEngine.Random.value <= Alternative_Weapon_Frequency && Alternative_Weapon != null)

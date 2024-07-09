@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     public SphereCollider interactBox;
     protected AudioListener listener;
     protected Light moon;
+    protected Light moon2;
 
     private Vector3 lastDirection = Vector3.zero;
 
@@ -301,14 +302,14 @@ public class Player : MonoBehaviour
             {
 
             }
-            else if (CurrentMouse.leftButton.wasPressedThisFrame)
+            else if (!HostWeapon.ImpaledObject || CurrentMouse.leftButton.wasPressedThisFrame)
             {
-                yankWeapon();
                 yank_timer = 0;
+                recallWeapon();
             }
             else if (CurrentMouse.rightButton.isPressed)
             {
-                recallWeapon();
+                yankWeapon();
                 yank_timer = 0;
             }
 
@@ -321,8 +322,8 @@ public class Player : MonoBehaviour
     {
         if (HostEntity.MainHand || HostEntity.OffHand)
         {
-            Wieldable mainWep = null;
-            Wieldable offWep = null;
+            Wieldable mainWep;
+            Wieldable offWep;
             if (HostEntity.MainHand)
             {
                 mainWep = HostEntity.MainHand;
@@ -351,10 +352,17 @@ public class Player : MonoBehaviour
         moon = new GameObject("moon").AddComponent<Light>();
         moon.transform.SetParent(transform);
         moon.gameObject.transform.localPosition = new Vector3(0, 0.25f, 0f);
-        moon.intensity = 2f;
+        moon.intensity = 1f;
         moon.range = 2f;
         moon.color = Color.Lerp(Color.white, Color.blue, 0.25f);
         moon.bounceIntensity = 0;
+        moon2 = new GameObject("moon2").AddComponent<Light>();
+        moon2.transform.SetParent(transform);
+        moon2.gameObject.transform.localPosition = new Vector3(0, 0.25f, 0f);
+        moon2.intensity = 1f;
+        moon2.range = 5f;
+        moon2.color = Color.Lerp(Color.white, Color.blue, 0.25f);
+        moon2.bounceIntensity = 0;
         //moon.shadowStrength = 0.5f;
         //moon.shadows = LightShadows.Soft;
         //moon.shadowNearPlane = 0.03f;

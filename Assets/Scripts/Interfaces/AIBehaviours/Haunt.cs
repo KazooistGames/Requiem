@@ -17,7 +17,7 @@ public class Haunt : AIBehaviour
         State = AIState.custom;
         waypointCommanded = true;
         behaviourParams[BehaviourType.waypoint] = (true, 1.0f);
-        behaviourParams[BehaviourType.wallCrawl] = (false, 0);
+        //behaviourParams[BehaviourType.wallCrawl] = (false, 0);
     }
 
 

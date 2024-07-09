@@ -65,6 +65,7 @@ public class _Flames : MonoBehaviour
             if (boundWeapon)
             {
                 emissionModule.enabled = true;
+                light_flicker.totalScalar = PowerLevel / 100;
                 if (boundWeapon.Action == Weapon.ActionAnim.Parrying)
                 {
                     SetFlameStyle(FlameStyles.Soulless);
