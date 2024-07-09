@@ -9,8 +9,9 @@ public class Goon : AIBehaviour
     //public float excitement = 0f;
     private static float behaviour_mutation_phase = 0;
     private static float CombatSpeed = 1f;
-    private static float Aggression = 1f;
-    private static float Fear = 1f;
+
+    public static float Aggression = 1f;
+    public static float Fear = 1f;
 
     public static Type Standard_Weapon = typeof(Handaxe);
     public static Type Alternative_Weapon = null;
@@ -26,7 +27,7 @@ public class Goon : AIBehaviour
         base.Start();
         mutate_behaviour();
         create_spawn_weapon();
-        Intelligence = 0.5f;
+        Intelligence = 1f;
         tangoStrafeEnabled = true;
         martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 0.75f;
@@ -102,50 +103,6 @@ public class Goon : AIBehaviour
 
 
     /***** PRIVATE *****/
-    private bool timeoutCheckRange()
-    {
-        if (!mainWep)
-        {
-            return false;
-        }
-        else if (checkMyWeaponInRange() || checkTheirWeaponInRange())
-        {
-            return true;
-        }
-        else if (_MartialController.Timers.ContainsKey(mainWep))
-
-        {
-            return _MartialController.Timers[mainWep] > CombatSpeed * 4;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    private bool timeout_check_my_range()
-    {
-        if (!mainWep)
-        {
-            return false;
-        }
-        else if (checkMyWeaponInRange())
-        {
-            return true;
-        }
-        else if (_MartialController.Timers.ContainsKey(mainWep))
-
-        {
-            return _MartialController.Timers[mainWep] > CombatSpeed * 4;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-
-
     private void create_spawn_weapon()
     {
         if (UnityEngine.Random.value <= Alternative_Weapon_Frequency && Alternative_Weapon != null)

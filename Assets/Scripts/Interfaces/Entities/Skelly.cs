@@ -12,6 +12,7 @@ public class Skelly : Entity
     protected GameObject leg1;
     protected GameObject leg2;
 
+
     //public float MutationChancePerRitual = 0.03f;
 
     protected override void Awake()

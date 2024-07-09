@@ -25,7 +25,6 @@ public class Bully : AIBehaviour
         sensoryFoeSpotted.AddListener(reactToFoeChange);
         sensoryFoeLost.AddListener(reactToFoeChange);
         entity.JustMadeWeak.AddListener(goDefensive);
-        _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
     protected override void Update()

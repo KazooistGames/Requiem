@@ -105,7 +105,7 @@ public class AIBehaviour : MonoBehaviour
         martialFoeThrowing.AddListener(reactToFoeThrowing);
         sensoryFoeSpotted.AddListener(reactToFoeChange);
         sensoryFoeLost.AddListener(reactToFoeChange);
-        _MartialController.INSTANCE.ClearedQueue.AddListener(queueNextRoundOfActions);
+        _MartialController.ClearedQueue.AddListener(queueNextRoundOfActions);
     }
 
     protected virtual void Update()

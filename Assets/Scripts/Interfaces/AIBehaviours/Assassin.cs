@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Assassin : AIBehaviour
 {
-    //public float excitement = 0f;
-    private float Aggression = 0.5f;
 
     protected override void Awake()
     {
@@ -15,8 +13,9 @@ public class Assassin : AIBehaviour
     protected override void Start()
     {
         base.Start();
+        new GameObject().AddComponent<Handaxe>().PickupItem(entity);        
         new GameObject().AddComponent<Handaxe>().PickupItem(entity);
-        Intelligence = 0.75f;
+        Intelligence = 1f;
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
         martialPreferredState = martialState.attacking;
@@ -54,28 +53,36 @@ public class Assassin : AIBehaviour
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
             _MartialController.Override_Action(offWep, Weapon.ActionAnim.Idle);
         }
-        else if (Random.value <= Aggression)
+        else if (Random.value <= Goon.Aggression)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized));
+            dashingChargePeriod = 0.5f;
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 1);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0, timeoutCheckMyWeaponInRange);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 1);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
+
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 4);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, 4);
+
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange, 4);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange, 4);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, interrupt: () => !checkMyWeaponInRange());
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack, interrupt: () => !checkMyWeaponInRange());
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0.5f, interrupt: () => !checkMyWeaponInRange());
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, interrupt: () => !checkMyWeaponInRange());
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack, interrupt: () => !checkMyWeaponInRange());
         }
-        else if(martialFoeEnteredRangeLatch || Random.value > 0.25f)
+        else if(Random.value <= Goon.Fear)
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
-        }
-        else if(mainWep && offWep)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Aiming, 0.5f);
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Throwing);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 3);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, 3);
         }
         else
         {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.0f));
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange, 3);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange, 3);
         }
     }
 
@@ -88,13 +95,13 @@ public class Assassin : AIBehaviour
             _MartialController.Override_Action(offWep, Weapon.ActionAnim.QuickCoil); 
             _MartialController.Override_Queue(offWep, Weapon.ActionAnim.QuickAttack);
         }
-        else if (Random.value < Aggression)
+        else if (Random.value < Goon.Aggression)
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             dashingDesiredDirection = angleToVector(getAngle(disposition.normalized));
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 2);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, timeoutCheckMyWeaponInRange);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 2);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
         }
     }
@@ -113,15 +120,12 @@ public class Assassin : AIBehaviour
 
     protected override void reactToIncomingAttack()
     {
-        if(dashingCooldownTimer < 0.5f)
-        {
-
-        }
-        else
+        if(dashingCooldownTimer >= 0.5f && !entity.DashCharging)
         {
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             float randomOffset = Mathf.Sign(Random.value - 0.5f) * 30;
-            dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized) + randomOffset);      
+            dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized) + randomOffset);
+            dashingChargePeriod = 0;
         }
     }
 
@@ -131,12 +135,12 @@ public class Assassin : AIBehaviour
         {
             return;
         }
-        else if (dashingCooldownTimer < 0.5f)
+        else if (dashingCooldownTimer >= 0.5f && !entity.DashCharging)
         {
-            dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
             dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
+            dashingChargePeriod = 0;
         }
     }
 
@@ -144,12 +148,13 @@ public class Assassin : AIBehaviour
     {
         if (dashingCooldownTimer > 0.5f)
         {
-            dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;
             float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 135;
             dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
+            dashingChargePeriod = 0;
         }
     }
+
     protected override void SetTangoParameters()
     {
         if (mainWep || offWep)
@@ -183,27 +188,5 @@ public class Assassin : AIBehaviour
         }
     }
 
-    /***** PRIVATE *****/
-
-    private bool timeoutCheckMyWeaponInRange()
-    {
-        if (!mainWep)
-        {
-            return false;
-        }
-        else if (checkMyWeaponInRange())
-        {
-            return true;
-        }
-        else if (_MartialController.Timers.ContainsKey(mainWep))
-
-        {
-            return _MartialController.Timers[mainWep] > 2;
-        }
-        else
-        {
-            return false;
-        }
-    }
 }
 

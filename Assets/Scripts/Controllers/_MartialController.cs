@@ -7,16 +7,17 @@ public class _MartialController : MonoBehaviour
 {
     public static _MartialController INSTANCE;
 
-    public UnityEvent<Weapon> ClearedQueue = new UnityEvent<Weapon>();
+    public static UnityEvent<Weapon> ClearedQueue = new UnityEvent<Weapon>();
 
-    public delegate bool Requisite();
+    public delegate bool Condition();
 
     public struct MartialJob
     {
         public Weapon.ActionAnim Action;
         public float Debounce;
-        public Requisite Prerequisite;
+        public Condition Prerequisite;
         public float Timeout;
+        public Condition Interrupt;
     }
 
     public static Dictionary<Weapon, UnityEvent> Weapon_Completed_Action { get; private set; } = new Dictionary<Weapon, UnityEvent>();
@@ -51,13 +52,19 @@ public class _MartialController : MonoBehaviour
             Weapon.ActionAnim desiredAction = kvp.Value.Action;
             float debounce = kvp.Value.Debounce;
             float timeout = kvp.Value.Timeout;
+            bool completedRequisite = kvp.Value.Prerequisite == null ? true : kvp.Value.Prerequisite();
+            bool interrupted = kvp.Value.Interrupt == null ? false : kvp.Value.Interrupt();
             if (weapon ? !weapon.Wielder : true)
+            {
+                KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
+            }
+            else if (interrupted)
             {
                 KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
             }
             else if (Timers[weapon] > 0)
             {
-                bool completedRequisite = kvp.Value.Prerequisite == null ? true : kvp.Value.Prerequisite();
+                
                 if (Timers[weapon] >= timeout && timeout > 0)
                 {
                     KEYS_TO_DEQUEUE_THIS_FRAME.Add(weapon);
@@ -101,10 +108,10 @@ public class _MartialController : MonoBehaviour
     }
 
     /***** PUBLIC *****/
-    public static void Queue_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null, float timeout = 0)
+    public static void Queue_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Condition requisite = null, float timeout = 0, Condition interrupt = null)
     {
         if(weapon == null) { return; }
-        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite, Timeout = timeout};
+        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite, Timeout = timeout, Interrupt = interrupt};
         if (!Weapon_Actions.ContainsKey(weapon))
         {
             createNewWeaponKey(weapon, newJob);
@@ -119,20 +126,20 @@ public class _MartialController : MonoBehaviour
         }
     }
 
-    public static void Override_Queue(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null, float timeout = 0)
+    public static void Override_Queue(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Condition requisite = null, float timeout = 0, Condition interrupt = null)
     {
         if(weapon == null) { return; }
         if (Weapon_Queues.ContainsKey(weapon))
         {
             Weapon_Queues[weapon].Clear();
         }
-        Queue_Action(weapon, action, debounce, requisite, timeout);
+        Queue_Action(weapon, action, debounce, requisite, timeout, interrupt);
     }
 
-    public static void Override_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Requisite requisite = null, float timeout = 0)
+    public static void Override_Action(Weapon weapon, Weapon.ActionAnim action, float debounce = 0, Condition requisite = null, float timeout = 0, Condition interrupt = null)
     {
         if (weapon == null) { return; }
-        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite, Timeout = timeout };
+        MartialJob newJob = new MartialJob() { Action = action, Debounce = debounce, Prerequisite = requisite, Timeout = timeout, Interrupt = interrupt };
         Weapon_Actions[weapon] = newJob;
         Timers[weapon] = 0;
     }
