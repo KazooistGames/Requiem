@@ -302,7 +302,7 @@ public class Player : MonoBehaviour
             {
 
             }
-            else if (!HostWeapon.ImpaledObject || CurrentMouse.leftButton.wasPressedThisFrame)
+            else if (!HostWeapon.ImpaledObject || CurrentMouse.leftButton.isPressed)
             {
                 yank_timer = 0;
                 recallWeapon();

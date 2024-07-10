@@ -136,8 +136,15 @@ public class Goon : AIBehaviour
 
     private static void mutate_behaviour()
     {
-        float step_size = Mathf.PI / 60;
-        behaviour_mutation_phase += step_size;
+        if(behaviour_mutation_phase == 0)
+        {
+            behaviour_mutation_phase = UnityEngine.Random.value * 2 * Mathf.PI;
+        }
+        else
+        {
+            float step_size = Mathf.PI / 60;
+            behaviour_mutation_phase += step_size;
+        }
         Aggression = 0.5f + Mathf.Sin(behaviour_mutation_phase)/2;
         Fear = 0.5f + Mathf.Cos(behaviour_mutation_phase*2)/2;
     }

@@ -765,13 +765,17 @@ public class Entity : MonoBehaviour
                     {
                         damage += Resolve;
                     }
-                    if (foe.requiemPlayer ? false : !foe.Foe)
+                    if (foe.requiemPlayer ? true : foe.Foe)
                     {
                         foe.applyDamageToPoiseThenVitality(damage);
                     }
+                    else if(foe.mortality == Mortality.fragile)
+                    {
+                        foe.Damage(foe.Strength);
+                    }
                     else
                     {
-                        foe.applyDamageToPoiseThenVitality(damage);
+                        foe.alterPoise(-foe.Strength);
                     }
                     JustLandedHit.Invoke(foe, damage);
                 }

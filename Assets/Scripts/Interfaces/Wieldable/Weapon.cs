@@ -291,6 +291,8 @@ public abstract class Weapon : Wieldable
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
                 Anim.SetBool("tertiary", (TertiaryTrigger || chargeSealIn) && !Recoiling);
                 Anim.SetBool("rebuked", Recoiling);
+                Anim.SetBool("rebuked", Recoiling);
+                Anim.SetBool("guard_ons", !currentAnimation.IsTag("Guard"));
                 Anim.Update(0);
             }
             else

@@ -169,12 +169,16 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         yield return null;
         while (true)
         {
-            yield return new WaitUntil(() => weapon.Action == ActionAnim.StrongCoil || check_wielder_dashing() || check_quick_attack());
+            yield return new WaitUntil(() => weapon.Action == ActionAnim.Guarding || weapon.Action == ActionAnim.StrongCoil || check_wielder_dashing() || check_quick_attack());
             weapon.Tempo = 0;
             tempoCharge = 0;
             if (weapon.Action == ActionAnim.StrongCoil)
             {
                 yield return tempo_charge_routine();
+            }
+            else if(weapon.Action == ActionAnim.Guarding)
+            {
+                yield return tempo_parry_routine();
             }
             else if (check_wielder_dashing())
             {
@@ -219,9 +223,20 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private IEnumerator tempo_combo_routine()
     {
-        while (!check_wielder_dashing() && weapon.Action != ActionAnim.StrongCoil)
+        while (!check_wielder_dashing() && weapon.Action != ActionAnim.StrongCoil && weapon.Action != ActionAnim.Guarding)
         {
             weapon.Tempo = Mathf.Clamp(weapon.Tempo -= Time.deltaTime * combo_tempo_increment / 2, 0, 1);
+            yield return null;
+        }
+    }
+
+    private IEnumerator tempo_parry_routine()
+    {
+        while(weapon.Action == ActionAnim.Guarding)
+        {
+            float period = 1 / 2f;
+            tempoCharge = Mathf.Clamp(tempoCharge + Time.deltaTime / period, 0, 1);
+            weapon.Tempo = 1 - convert_charge_to_tempo(tempoCharge);
             yield return null;
         }
     }
