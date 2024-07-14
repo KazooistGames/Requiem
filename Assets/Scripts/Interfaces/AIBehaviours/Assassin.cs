@@ -19,8 +19,8 @@ public class Assassin : AIBehaviour
         tangoStrafeEnabled = true;
         tangoStrafePauseFreq = 0.75f;
         martialPreferredState = martialState.attacking;
-        sensorySightRangeScalar = 0.75f;
-        sensoryAudioRangeScalar = 0.75f;
+        sensorySightRangeScalar = 1f;
+        sensoryAudioRangeScalar = 1f;
         meanderPauseFrequency = 0.5f;
         tangoStrafePauseFreq = 0.0f; 
         tangoStrafeEnabled = true;
@@ -51,30 +51,40 @@ public class Assassin : AIBehaviour
         }
         else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
-            _MartialController.Override_Action(offWep, Weapon.ActionAnim.Idle);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Idle);
+        }
+        else if(entity.Posture == Entity.PostureStrength.Weak)
+        {
+            int wait_period = 4;
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, wait_period);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, wait_period);
+        }
+        else if (checkTheirWeaponInRange())
+        {
+
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickAttack);
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0.5f);
+
+            _MartialController.Override_Action(offWep, Weapon.ActionAnim.Idle, 0.5f);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.QuickCoil);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
         }
         else 
         {
-            Vector3 disposition = entity.Foe.transform.position - transform.position;
-            dashingDesiredDirection = angleToVector(getAngle(disposition.normalized));
-            dashingChargePeriod = 0.5f;
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 1);
+
+            dashingDesiredDirection = entity.Foe.transform.position - transform.position;
+            dashingEvaluator = () => { return entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero; };
+            dashingChargePeriod = 1f;
+            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle, 0.5f);
+            _MartialController.Override_Action(offWep, Weapon.ActionAnim.Idle, 0.5f);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 2);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 2);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 1);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
-
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, 4);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Guarding, 4);
-
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange, 5);
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0, checkMyWeaponInRange, 5);
-
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, interrupt: () => !checkMyWeaponInRange());
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack, interrupt: () => !checkMyWeaponInRange());
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0.5f, interrupt: () => !checkMyWeaponInRange());
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickCoil, interrupt: () => !checkMyWeaponInRange());
-            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack, interrupt: () => !checkMyWeaponInRange());
+            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0.5f);
+            _MartialController.Queue_Action(offWep, Weapon.ActionAnim.Idle, 0.5f);
         }
     }
 

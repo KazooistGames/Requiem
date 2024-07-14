@@ -380,7 +380,15 @@ public class Entity : MonoBehaviour
             {
                 TileLocation = hoverHit.collider.gameObject.GetComponent<Landmark>().Tile;
             }
+            else
+            {
+                TileLocation = null;
+            }
             
+        }
+        else
+        {
+            TileLocation = null;
         }
         transform.position = new Vector3(transform.position.x, floorHeight, transform.position.z);
         float effectiveAccel = AccelerationActual;

@@ -286,13 +286,12 @@ public abstract class Weapon : Wieldable
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
                 }
                 bool availableToGuard = !((Action == ActionAnim.QuickAttack) || (Action == ActionAnim.StrongAttack));
-                bool chargeSealIn = false; //tempoCharge > 0 && tempoCharge < tempoChargeMin;
                 Anim.SetBool("primary", PrimaryTrigger && !Wielder.Staggered);
                 Anim.SetBool("secondary", SecondaryTrigger && availableToGuard && !Recoiling);
-                Anim.SetBool("tertiary", (TertiaryTrigger || chargeSealIn) && !Recoiling);
+                Anim.SetBool("tertiary", TertiaryTrigger && !Recoiling);
                 Anim.SetBool("rebuked", Recoiling);
                 Anim.SetBool("rebuked", Recoiling);
-                Anim.SetBool("guard_ons", !currentAnimation.IsTag("Guard"));
+
                 Anim.Update(0);
             }
             else
@@ -871,7 +870,7 @@ public abstract class Weapon : Wieldable
 
     private void playSlap(Vector3 position)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power + MostRecentWielder.Resolve, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
     }
 
     private void playTink(float scalar = 1)

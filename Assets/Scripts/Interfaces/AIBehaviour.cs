@@ -30,7 +30,7 @@ public class AIBehaviour : MonoBehaviour
     public float TotalWeight;
     public float LookAngle = 0;
 
-    protected Entity entity;
+    public Entity entity;
     protected Vector3 lastDirection = Vector3.zero;
 
     public float excitement = 0f;
@@ -917,6 +917,8 @@ public class AIBehaviour : MonoBehaviour
     protected float dashingChargePeriod = 0.0f;
     protected float dashingChargeTimer = 0.0f;
     protected Vector3 dashingDesiredDirection;
+    public delegate Vector3 dashingDirectionEvaluator();
+    public dashingDirectionEvaluator dashingEvaluator { get { return dashingEvaluator; } set { dashingDesiredDirection = value(); } }
     protected void dashing(BehaviourType key) 
     {
         if (behaviourParams[key].Item1)
@@ -925,6 +927,10 @@ public class AIBehaviour : MonoBehaviour
             if (dashCycle == null)
             {
                 dashCycle = StartCoroutine(dashingCycle());
+            }
+            else if(dashingEvaluator != null)
+            {
+                dashingDesiredDirection = dashingEvaluator();
             }
         }
         else
@@ -1329,6 +1335,7 @@ public class AIBehaviour : MonoBehaviour
             dashingCooldownTimer = 0;
             dashingChargeTimer = 0;
             dashingDesiredDirection = Vector3.zero;
+            dashingEvaluator = null;
             yield return null;
         }
     }
@@ -1395,8 +1402,12 @@ public class AIBehaviour : MonoBehaviour
         {
             return Vector3.zero;
         }
-        Debug.DrawLine(transform.position, transform.position + direction.normalized, Color.green, ReflexRate);
-        Debug.DrawLine(transform.position, waypointCoordinates, Color.red, ReflexRate);
+        if (wallCrawlDrawRays)
+        {
+            Debug.DrawLine(transform.position, transform.position + direction.normalized, Color.green, ReflexRate);
+            Debug.DrawLine(transform.position, waypointCoordinates, Color.red, ReflexRate);
+        }
+
         if (getObstruction(direction))
         {
             Vector3 testVectorClockwise;
@@ -1430,29 +1441,21 @@ public class AIBehaviour : MonoBehaviour
     private bool getObstruction(Vector3 direction)
     {
         float NavRange = entity.personalBox.radius * 2 * entity.scaleActual;
-        Debug.DrawLine(transform.position, transform.position + direction.normalized * NavRange, Color.blue, ReflexRate);
+        if (wallCrawlDrawRays)
+        {
+            Debug.DrawLine(transform.position, transform.position + direction.normalized * NavRange, Color.blue, ReflexRate);
+        }
         int layer = (1 << Requiem.layerObstacle) + (1 << Requiem.layerWall);
         RaycastHit hit = new RaycastHit();
         if (entity.hurtBox)
         {
             Vector3 castDirection = transform.position + direction.normalized * NavRange;
-            Ray castRay = new Ray(origin: transform.position, direction: castDirection);
             float radius = entity.hurtBox.radius * entity.scaleActual;
-            bool result = Physics.SphereCast(transform.position, radius, direction, out hit, NavRange, layer, QueryTriggerInteraction.Ignore);
-            if (result)
-            {
-                Debug.Log(hit.collider.gameObject);
-            }
-            return result;
+            return Physics.SphereCast(transform.position, radius, direction, out hit, NavRange, layer, QueryTriggerInteraction.Ignore);
         }
         else
         {
-            bool result = Physics.Raycast(transform.position, direction, out hit, NavRange, layer, QueryTriggerInteraction.Ignore);
-            if (result)
-            {
-                Debug.Log(hit.collider.gameObject);
-            }
-            return result;
+            return Physics.Raycast(transform.position, direction, NavRange, layer, QueryTriggerInteraction.Ignore);
         }
     }
 

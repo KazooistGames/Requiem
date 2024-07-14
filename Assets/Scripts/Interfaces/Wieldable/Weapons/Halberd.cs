@@ -10,6 +10,11 @@ public class Halberd : Weapon
         base.Awake();
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        Anim.SetBool("guard_ons", !currentAnimation.IsTag("Guard"));
+    }
 
     protected override void Start()
     {
@@ -27,7 +32,7 @@ public class Halberd : Weapon
         hitRadius = 0.1f;
         defendRadius = 0.4f;
         Range = 0.52f;
-        BasePower = 25f;
+        BasePower = 20f;
         Heft = 50;
         equipType = EquipType.TwoHanded;
         base.Start();

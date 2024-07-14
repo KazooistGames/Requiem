@@ -28,17 +28,19 @@ public class Waver : MonoBehaviour
 
     public static Waver INSTANCE;
     public static Haunt HauntSpawn;
+
     public static float waveTimer = 0;
 
-    private static int totalSize = 10;
-    private static int minPopulation = 3;
-    private static int maxPopulation = 5;
+    private static int totalSize;
+    private static int minPopulation;
+    private static int maxPopulation;
 
-    private static Vector2 spawnPeriodRange = new Vector2(3, 6);
+    private static Vector2 spawnPeriodRange = new Vector2(3, 5);
     private static float spawnPeriod = 3;
     private static float spawnTimer = 0;
+    private static float spawnCatchupPeriod = 0.5f;
 
-    private static float cooldownPeriod = 3f;
+    private static float cooldownPeriod = 10f;
     private static float cooldownTimer = 0f;
 
    
@@ -56,7 +58,7 @@ public class Waver : MonoBehaviour
             new_spawnpoint.AddComponent<Shade>();
             HauntSpawn = new_spawnpoint.AddComponent<Haunt>();
             Light spawnLight = HauntSpawn.gameObject.AddComponent<Light>();
-            spawnLight.intensity = 5;
+            spawnLight.intensity = 4;
             spawnLight.range = 0.5f;
             spawnLight.color = new Color(0.75f, 0.5f, 1f);
             StartCoroutine(update_spawn_waypoint());
@@ -92,7 +94,6 @@ public class Waver : MonoBehaviour
         {
             attempt_spawn();
         }
-
     }
 
     /***** PUBLIC *****/
@@ -171,8 +172,8 @@ public class Waver : MonoBehaviour
             {
                 int random_reinforcements = UnityEngine.Random.Range(0, WaveCount % boss_wave);
                 int total = 10 + random_reinforcements * 2;
-                int max = Mathf.CeilToInt(total / 2);
-                int min = Mathf.FloorToInt(max / 2);
+                int max = Mathf.RoundToInt(total / 2f);
+                int min = Mathf.RoundToInt(max / 2f);
                 StartWave(total, max, min);
             }
         }
@@ -187,6 +188,7 @@ public class Waver : MonoBehaviour
     private static void attempt_spawn()
     {
         waveTimer += Time.deltaTime;
+        spawnTimer += Time.deltaTime;
         if (get_remaining_mob_count() <= 0)
         {
 
@@ -195,13 +197,18 @@ public class Waver : MonoBehaviour
         {
 
         }
-        else if((spawnTimer += Time.deltaTime) >= spawnPeriod)
-        {            
-            spawn_mobs(1);
+        else if (!check_haunt_spawn_possible(HauntSpawn))
+        {
+
+        }
+        else if(spawnTimer >= spawnPeriod)
+        {
+            int amount_to_spawn = Mathf.Min(Mathf.FloorToInt(spawnTimer / spawnPeriod), minPopulation);
+            spawn_mobs(amount_to_spawn);
             spawnTimer = 0;
             if (get_active_mob_count() < minPopulation)
             {
-                spawnPeriod = 1;
+                spawnPeriod = spawnCatchupPeriod;
             }
             else
             {
@@ -236,7 +243,10 @@ public class Waver : MonoBehaviour
                 new_mob.AddComponent(component);
             }
         }
-        new_mob.transform.position = HauntSpawn.transform.position;
+        float random_x = (UnityEngine.Random.value - 0.5f);
+        float random_z = (UnityEngine.Random.value - 0.5f);
+        Vector3 random_offset = new Vector3(random_x, 0, random_z).normalized * 0.01f;
+        new_mob.transform.position = HauntSpawn.transform.position + random_offset;
         MobCount++;
         return new_mob;
     }
@@ -267,8 +277,7 @@ public class Waver : MonoBehaviour
         {
             HauntSpawn.waypointCoordinates = Requiem.RAND_POS_IN_TILE(find_target_tile());
             HauntSpawn.waypointDeadbanded = false;
-            yield return new WaitUntil(() => HauntSpawn.waypointDeadbanded);
-            yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y) * 2);
         }
     }
     private static Hextile find_target_tile()
@@ -285,9 +294,15 @@ public class Waver : MonoBehaviour
         {
             return Map.CenterTile;
         }
-        else
+        else if(UnityEngine.Random.value > 0.5f)
         {
             return Player.INSTANCE.HostEntity.TileLocation;
+        }
+        else
+        {
+            List<Hextile> candidates = Player.INSTANCE.HostEntity.TileLocation.AdjacentTiles.Keys.ToList();
+            int randomIndex = UnityEngine.Random.Range(0, candidates.Count - 1);
+            return candidates[randomIndex];
         }
     }
 
@@ -308,6 +323,27 @@ public class Waver : MonoBehaviour
         {
             telly_time = Mathf.Pow((collectionTarget.transform.position - bone.gameObject.transform.position).magnitude, 0.75f);
             bone.Collect(collectionTarget, telly_time, (x) => Destroy(x.gameObject));
+        }
+    }
+
+    private static bool check_haunt_spawn_possible(Haunt haunt)
+    {
+        if (!haunt)
+        {
+            return false;
+
+        }
+        else if (!haunt.entity.TileLocation)
+        {
+            return false;
+        }
+        else if (Physics.OverlapSphere(haunt.transform.position, haunt.entity.hurtBox.radius * haunt.entity.scaleActual).Count(x=> x.gameObject.layer == Requiem.layerObstacle) > 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
 

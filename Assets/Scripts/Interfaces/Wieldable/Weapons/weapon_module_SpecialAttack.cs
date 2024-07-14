@@ -25,6 +25,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         }
         StartCoroutine(tempo_routine());
         weapon.Hitting.AddListener(increment_combo_tempo);
+        weapon.Clashing.AddListener(increment_combo_tempo);
     }
 
 
@@ -242,6 +243,13 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     }
 
     private void increment_combo_tempo(Weapon weapon, Entity entity)
+    {
+        if (check_quick_attack())
+        {
+            weapon.Tempo += combo_tempo_increment;
+        }
+    }
+    private void increment_combo_tempo(Weapon weapon, Weapon foe_weapon)
     {
         if (check_quick_attack())
         {
