@@ -56,11 +56,10 @@ public class Assassin : AIBehaviour
         }
         else if(entity.Posture == Entity.PostureStrength.Weak)
         {
-            int wait_period = 4;
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, wait_period);
-            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, wait_period);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 2);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 2);
         }
-        else if (checkTheirWeaponInRange())
+        else if (checkMyWeaponInRange())
         {
 
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.QuickCoil);
@@ -73,14 +72,13 @@ public class Assassin : AIBehaviour
         }
         else 
         {
-
             dashingDesiredDirection = entity.Foe.transform.position - transform.position;
             dashingEvaluator = () => { return entity.Foe ? entity.Foe.transform.position - transform.position : Vector3.zero; };
             dashingChargePeriod = 1f;
             _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle, 0.5f);
             _MartialController.Override_Action(offWep, Weapon.ActionAnim.Idle, 0.5f);
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 2);
-            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 2);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 1);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.QuickCoil, 0, checkMyWeaponInRange, 1);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
             _MartialController.Queue_Action(offWep, Weapon.ActionAnim.QuickAttack);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, 0.5f);
@@ -121,6 +119,11 @@ public class Assassin : AIBehaviour
             dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized) + randomOffset);
             dashingChargePeriod = 0;
         }
+        else
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 1);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 1);
+        }
     }
 
     protected override void reactToFoeThrowing()
@@ -135,6 +138,11 @@ public class Assassin : AIBehaviour
             float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
             dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
             dashingChargePeriod = 0;
+        }
+        else
+        {
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 2);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 2);
         }
     }
 

@@ -170,7 +170,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         yield return null;
         while (true)
         {
-            yield return new WaitUntil(() => weapon.Action == ActionAnim.Guarding || weapon.Action == ActionAnim.StrongCoil || check_wielder_dashing() || check_quick_attack());
+            yield return new WaitUntil(() => weapon.Action == ActionAnim.Guarding || weapon.Action == ActionAnim.StrongCoil || check_dash_attack() || check_quick_attack());
             weapon.Tempo = 0;
             tempoCharge = 0;
             if (weapon.Action == ActionAnim.StrongCoil)
@@ -181,7 +181,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
             {
                 yield return tempo_parry_routine();
             }
-            else if (check_wielder_dashing())
+            else if (check_dash_attack())
             {
                 yield return tempo_dash_routine();
             }
@@ -196,15 +196,16 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private IEnumerator tempo_dash_routine()
     {
-        while (check_wielder_dashing())
+        Vector3 origin = weapon.MostRecentWielder.transform.position;
+        float distance = 0;
+        yield return new WaitUntil(() => weapon.MostRecentWielder.Dashing || !check_dash_attack());
+        while (check_dash_attack() && weapon.MostRecentWielder.Dashing)
         {
-            float min_dash_power = Entity.Min_Velocity_Of_Dash / Entity.Max_Velocity_Of_Dash;
-            float scaled_dash_power = (weapon.Wielder.DashPower - min_dash_power) / (1f - min_dash_power);
-            tempoCharge = Mathf.Clamp(scaled_dash_power, 0, 1);
-            weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
+            distance = Mathf.Max(distance, (origin - weapon.MostRecentWielder.transform.position).magnitude);
+            weapon.Tempo = Mathf.Clamp(distance, 0, 1);
             yield return null;
         }
-        yield return new WaitUntil(() => !check_dash_attack());
+        yield return new WaitUntil(() => !check_dash_attack() || weapon.MostRecentWielder.DashCharging);
     }
 
     private IEnumerator tempo_charge_routine()
@@ -253,7 +254,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     {
         if (check_quick_attack())
         {
-            weapon.Tempo += combo_tempo_increment;
+            weapon.Tempo += combo_tempo_increment/2;
         }
     }
 

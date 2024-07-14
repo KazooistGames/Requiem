@@ -918,7 +918,7 @@ public class AIBehaviour : MonoBehaviour
     protected float dashingChargeTimer = 0.0f;
     protected Vector3 dashingDesiredDirection;
     public delegate Vector3 dashingDirectionEvaluator();
-    public dashingDirectionEvaluator dashingEvaluator { get { return dashingEvaluator; } set { dashingDesiredDirection = value(); } }
+    public dashingDirectionEvaluator dashingEvaluator;
     protected void dashing(BehaviourType key) 
     {
         if (behaviourParams[key].Item1)
