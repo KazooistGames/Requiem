@@ -106,13 +106,13 @@ public class Entity : MonoBehaviour
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
     protected bool CrashEnvironmentONS = true;
 
-    public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
-    public static float Min_Velocity_Of_Dash { get; private set; } = 1.5f;
+    public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
+    public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
     public float DashPower { get; private set; } = 0.0f;
 
-    private static float DASH_CHARGE_TIME = 0.4f;
+    private static float DASH_CHARGE_TIME = 0.3f;
     private static float CRASH_DAMAGE = 20f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
