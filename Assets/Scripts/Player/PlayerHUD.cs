@@ -38,6 +38,8 @@ public class PlayerHUD : MonoBehaviour
         tempoBarTransforms[1].sizeDelta = new Vector2(40, 25);
         tempoBarTransforms[1].anchoredPosition = new Vector2(0, -11);
     }
+
+
     void Update()
     {
         Player.INSTANCE.mouseSpeedScalar = MouseSlider.value;
@@ -72,6 +74,8 @@ public class PlayerHUD : MonoBehaviour
         }
 
     }
+
+
     /***** PUBLIC *****/
     public Text setIndicatorOnHUD(string key, string text)
     {
@@ -90,6 +94,7 @@ public class PlayerHUD : MonoBehaviour
     }
 
     /***** PROTECTED *****/
+
    
     /***** PRIVATE *****/
     private void updateIndicators()
