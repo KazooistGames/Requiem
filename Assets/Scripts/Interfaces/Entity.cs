@@ -23,7 +23,7 @@ public class Entity : MonoBehaviour
     public float Agility;
     public float Poise;
 
-    public static float SpeedScalarGlobal { get; private set; } = 1.0f;
+    public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
     public static float Berth { get; private set; } = 0.225f;
     public static float Height { get; private set; } = 1.25f;
@@ -106,7 +106,7 @@ public class Entity : MonoBehaviour
     private List<GameObject> dashAlreadyHit = new List<GameObject>();
     protected bool CrashEnvironmentONS = true;
 
-    public static float Max_Velocity_Of_Dash { get; private set; } = 5.0f;
+    public static float Max_Velocity_Of_Dash { get; private set; } = 4.0f;
     public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;

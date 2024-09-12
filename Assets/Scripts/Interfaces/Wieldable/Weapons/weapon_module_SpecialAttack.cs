@@ -10,7 +10,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     private Animator animationController;
     private Weapon weapon;
 
-    private const float combo_tempo_increment = 1 / 4f;
+    private const float combo_tempo_increment = 1f;
 
     void Start()
     {
@@ -153,15 +153,17 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
    
 
     private float tempoCharge = 0;
-    private float tempoChargePeriod = 0.5f;
+    private float tempoChargePeriod = 0.75f;
     private float convert_charge_to_tempo(float charge)
     {
-        float frequencyVariable = Mathf.PI * charge;
-        float frequencyConstant = Mathf.PI / 2;
-        float amplitudeScalar = 0.5f;
-        float amplitudeConstant = 0.5f;
-        float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
-        return 1 - function;
+        //float frequencyVariable = Mathf.PI * charge;
+        //float frequencyConstant = Mathf.PI / 2;
+        //float amplitudeScalar = 0.5f;
+        //float amplitudeConstant = 0.5f;
+        //float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
+        //return 1 - function;
+
+        return 1 - Mathf.Pow((1 - charge), 2);
     }
 
 
@@ -199,7 +201,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         Vector3 origin = weapon.MostRecentWielder.transform.position;
         float distance = 0;
         yield return new WaitUntil(() => weapon.MostRecentWielder.Dashing || !check_dash_attack());
-        while (check_dash_attack() && weapon.MostRecentWielder.Dashing)
+        while (check_dash_attack() && weapon.MostRecentWielder.Dashing && weapon.Action != ActionAnim.QuickAttack)
         {
             distance = Mathf.Max(distance, (origin - weapon.MostRecentWielder.transform.position).magnitude);
             weapon.Tempo = Mathf.Clamp(distance, 0, 1);
@@ -212,11 +214,11 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     {
         while (weapon.Action == ActionAnim.StrongCoil)
         {
-            if (tempoCharge < 1)
-            {
-                float increment = (Time.deltaTime / tempoChargePeriod);
-                tempoCharge += increment;
-            }
+            //if (tempoCharge < 1)
+            //{
+            float increment = (Time.deltaTime / tempoChargePeriod);
+            tempoCharge += increment;
+            //}
             weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
             yield return null;
         }
@@ -227,7 +229,8 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     {
         while (!check_wielder_dashing() && weapon.Action != ActionAnim.StrongCoil && weapon.Action != ActionAnim.Guarding)
         {
-            weapon.Tempo = Mathf.Clamp(weapon.Tempo -= Time.deltaTime * combo_tempo_increment / 2, 0, 1);
+            float decrement = Time.deltaTime / 2;
+            weapon.Tempo = Mathf.Clamp(weapon.Tempo -= decrement, 0, 1);
             yield return null;
         }
     }
@@ -254,7 +257,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     {
         if (check_quick_attack())
         {
-            weapon.Tempo += combo_tempo_increment/2;
+            weapon.Tempo = 0;
         }
     }
 
