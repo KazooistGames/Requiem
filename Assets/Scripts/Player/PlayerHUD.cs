@@ -124,10 +124,10 @@ public class PlayerHUD : MonoBehaviour
 
         if (Player.INSTANCE ? Player.INSTANCE.HostEntity : false)
         {
-            statBarTransforms[1].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Poise / Player.INSTANCE.HostEntity.Strength, 1f);
+            statBarTransforms[1].anchorMax = new Vector2(1f, 1f);
             statBarTransforms[1].GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
             statBarTransforms[3].anchorMax = new Vector2(Player.INSTANCE.HostEntity.Vitality / Player.INSTANCE.HostEntity.Strength, 1f);
-            statBarTransforms[3].GetComponent<Image>().color = (int)Player.INSTANCE.HostEntity.Posture > -1 ? (Player.INSTANCE.HostEntity.Posture == Entity.PostureStrength.Strong ? new Color(1, 0, 0, 1.0f) : new Color(1, 0, 0, 0.5f)) : new Color(1, 0, 0.75f, 0.5f);
+            statBarTransforms[3].GetComponent<Image>().color = !Player.INSTANCE.HostEntity.Staggered ? new Color(1, 0, 0, 0.5f) : new Color(1, 0, 0.75f, 0.5f);
             if (Player.INSTANCE.HostWeapon)
             {
                 updateTempoBar();

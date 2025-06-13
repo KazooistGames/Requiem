@@ -14,14 +14,14 @@ public class Entity : MonoBehaviour
     public Player requiemPlayer;
 
     public float Strength = 100f;
-    public float Resolve = 10.0f;
+    //public float Resolve = 10.0f;
     public float Haste = 1.0f;
 
     public int Lvl = 0;
 
     public float Vitality;
     public float Agility;
-    public float Poise;
+    //public float Poise;
 
     public static float SpeedScalarGlobal { get; private set; } = 0.75f;
     public static float Scale { get; private set; } = 0.2f;
@@ -116,11 +116,11 @@ public class Entity : MonoBehaviour
     private static float CRASH_DAMAGE = 20f;   
     private static float FINAL_DASH_RATIO = 1.5f;
 
-    private static float POISE_MAX_DEBOUNCE = 6;
-    private static float POISE_REGEN_BASE_PERIOD = 3;
-    private static float POISE_RESTING_PERCENTAGE = 1f;
-    private float poiseDebouncePeriod = 5f;
-    private float poiseDebounceTimer = 0.0f;
+    //private static float POISE_MAX_DEBOUNCE = 6;
+    //private static float POISE_REGEN_BASE_PERIOD = 3;
+    //private static float POISE_RESTING_PERCENTAGE = 1f;
+    //private float poiseDebouncePeriod = 5f;
+    //private float poiseDebounceTimer = 0.0f;
 
     public Dictionary<string, (float, float)> BleedingWounds = new Dictionary<string, (float, float)>();
 
@@ -130,13 +130,13 @@ public class Entity : MonoBehaviour
     public bool FinalDashEnabled = false;
     public bool FinalDash = false;
 
-    public enum PostureStrength
-    {
-        Weak = -1,
-        Normal = 0,
-        Strong = 1,
-    }
-    public PostureStrength Posture = PostureStrength.Strong;
+    //public enum PostureStrength
+    //{
+    //    Weak = -1,
+    //    Normal = 0,
+    //    Strong = 1,
+    //}
+    //public PostureStrength Posture = PostureStrength.Strong;
     public enum WieldMode
     {
         none,
@@ -175,7 +175,7 @@ public class Entity : MonoBehaviour
     protected virtual void Awake()
     {
         Strength = 100f;
-        Resolve = 10;
+        //Resolve = 10;
         Haste = 1.0f;
         BaseAcceleration = 8;
         hurtBox = gameObject.AddComponent<CapsuleCollider>();
@@ -234,7 +234,6 @@ public class Entity : MonoBehaviour
         flames.bindToObject(gameObject);
         flames.FlamePresentationStyle = _Flames.FlameStyles.Magic;
         flames.gameObject.SetActive(false);
-        Poise = Strength * POISE_RESTING_PERCENTAGE;
         StartCoroutine(routineDashHandler());
         JustPickedUpWieldable.AddListener(handleWeaponPickedUp);
     }
@@ -254,29 +253,9 @@ public class Entity : MonoBehaviour
         }
         body.mass = 10 * Mathf.Sqrt(Strength) * scaleActual;
         berthActual = Berth * berthScalar;
-        if ((poiseDebounceTimer += Time.deltaTime) >= poiseDebouncePeriod && !DashCharging)
-        {
-            float scalingRegenRate = Mathf.Lerp(POISE_REGEN_BASE_PERIOD * 2, POISE_REGEN_BASE_PERIOD, Vitality / Strength);
-            float increment = Time.deltaTime * Strength / scalingRegenRate;
-            float restingValue = POISE_RESTING_PERCENTAGE * Strength;
-            float delta = Poise - restingValue;
-            if (Mathf.Abs(delta) <= increment)
-            {
-                Poise = POISE_RESTING_PERCENTAGE * Strength;
-            }
-            else if (Poise > restingValue)
-            {
-                Poise -= increment;
-            }
-            else if (Poise < restingValue)
-            {
-                Poise += increment;
-            }
-        }  
+ 
         Vitality = Mathf.Clamp(Vitality, 0, Strength);
-        Poise = Mathf.Clamp(Poise, -1f, Strength);
         Agility = Mathf.Max(0, modSpeed.Values.Aggregate(Mathf.Sqrt(Haste), (result, multiplier) => result *= 1 + multiplier));
-        updatePosture();
         if (Vitality <= 0)
         {
             Physics.autoSimulation = false;
@@ -297,14 +276,7 @@ public class Entity : MonoBehaviour
                 {
                     BleedingWounds[key] = (BleedingWounds[key].Item1, BleedingWounds[key].Item2 - Time.deltaTime);
                     float damageTick = BleedingWounds[key].Item1 * Time.deltaTime;
-                    if(Posture == PostureStrength.Weak)
-                    {
-                        Vitality -= damageTick;
-                    }
-                    else
-                    {
-                        alterPoise(-damageTick, false);
-                    }
+                    Vitality -= damageTick;
                 }
             }
         }
@@ -519,26 +491,6 @@ public class Entity : MonoBehaviour
         }
     }
 
-    public void alterPoise(float value, bool impactful = true)
-    {
-        if (immortalityTimer < 0.25f) { return; }
-        float existingDelta = Poise - POISE_RESTING_PERCENTAGE * Strength;
-        Poise += value;
-        Poise = Mathf.Clamp(Poise, -1f, Strength);
-        if (value * existingDelta >= 0)
-        {
-            //float scaledRatio = Mathf.Sqrt(Mathf.Abs(value) / Strength);
-            float scaledRatio = Mathf.Abs(value) / Mathf.Max(Resolve, 1);
-            float newBounce = impactful ? Mathf.Min(scaledRatio, POISE_MAX_DEBOUNCE) : Time.deltaTime * 5;
-            float remainingBounce = poiseDebouncePeriod - poiseDebounceTimer;
-            if (newBounce >= remainingBounce)
-            {
-                poiseDebouncePeriod = newBounce;
-                poiseDebounceTimer = 0.0f;
-            }
-        }
-        updatePosture();
-    }
 
     public virtual void Damage(float magnitude, bool silent = false)
     {
@@ -547,14 +499,17 @@ public class Entity : MonoBehaviour
         {
             JustWounded.Invoke(magnitude);
             EntityWounded.Invoke(this, magnitude);
-            if (mortality != Mortality.impervious)
+            if (mortality == Mortality.vulnerable)
             {
                 Vitality -= magnitude;
+            }
+            else if(mortality == Mortality.fragile)
+            {
+                Vitality = 0;
             }
         }
         if (!silent)
         {
-            //alterPoise(magnitude / 2);
             playCrunch(magnitude/40f);
         }
     }
@@ -596,26 +551,7 @@ public class Entity : MonoBehaviour
     }
 
     /***** PROTECTED *****/
-    protected virtual void updatePosture()
-    {
-        if (Poise <= 0)
-        {
-            if(Posture != PostureStrength.Weak)
-            {
-                JustMadeWeak.Invoke();
-            }
-            Posture = PostureStrength.Weak;
-        }
-        else if(Poise >= Strength)
-        {
-            Posture = PostureStrength.Strong;
-        }
-        else if (Posture != PostureStrength.Weak)
-        {
-            Posture = PostureStrength.Normal;
 
-        }
-    }
 
     public virtual void Die()
     {
@@ -775,22 +711,6 @@ public class Entity : MonoBehaviour
                     foe.JustCrashed.Invoke();
                     apply_bounce(collision, 0.5f);
                     float damage = CRASH_DAMAGE * impactRatio;
-                    if (FinalDash)
-                    {
-                        damage += Resolve;
-                    }
-                    if (foe.requiemPlayer ? true : foe.Foe)
-                    {
-                        foe.applyDamageToPoiseThenVitality(damage);
-                    }
-                    else if(foe.mortality == Mortality.fragile)
-                    {
-                        foe.Damage(foe.Strength);
-                    }
-                    else
-                    {
-                        foe.alterPoise(-foe.Strength);
-                    }
                     JustLandedHit.Invoke(foe, damage);
                 }
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
@@ -860,7 +780,11 @@ public class Entity : MonoBehaviour
     private void apply_crash_damage(float impact)
     {
         Stagger(impact);
-        applyDamageToPoiseThenVitality(impact * CRASH_DAMAGE);
+
+        if (mortality != Mortality.impervious)
+        {
+            Damage(impact * CRASH_DAMAGE);
+        }
     }
 
     private IEnumerator routineDashHandler()
@@ -984,7 +908,7 @@ public class Entity : MonoBehaviour
         }
         if (theirWeapon.Specials[SpecialAttacks.Sunder])
         {
-            alterPoise(-theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo);
+            //alterPoise(-theirWeapon.MostRecentWielder.Strength * theirWeapon.Tempo);
         }
         if (theirWeapon.Specials[SpecialAttacks.Clobber])
         {
@@ -1019,7 +943,7 @@ public class Entity : MonoBehaviour
     {
         if (myWeapon.Specials[SpecialAttacks.Sunder])
         {
-            foe.applyDamageToPoiseThenVitality(myWeapon.Tempo * Strength);
+            //foe.applyDamageToPoiseThenVitality(myWeapon.Tempo * Strength);
         }
         if (myWeapon.Specials[SpecialAttacks.Knockback])
         {
@@ -1046,9 +970,9 @@ public class Entity : MonoBehaviour
         }
         else
         {
-            foe.applyDamageToPoiseThenVitality(myWeapon.Power);
+            //foe.applyDamageToPoiseThenVitality(myWeapon.Power);
+            foe.Damage(myWeapon.Power);
         }
-        foe.Damage(Resolve);
         if (myWeapon.Thrown)
         {
             myWeapon.Hitting.RemoveListener(handleWeaponHit);
@@ -1056,28 +980,28 @@ public class Entity : MonoBehaviour
         JustLandedHit.Invoke(foe, myWeapon.Power);
     }
 
-    public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
-    {
-        JustHit.Invoke(totalPower);
-        if (immortalityTimer < 0.25f) { return 0; }
-        else if (mortality == Mortality.fragile)
-        {
-            Damage(totalPower, silent);
-            return totalPower;
-        }
+    //public float applyDamageToPoiseThenVitality(float totalPower, bool silent = false)
+    //{
+    //    JustHit.Invoke(totalPower);
+    //    if (immortalityTimer < 0.25f) { return 0; }
+    //    else if (mortality == Mortality.fragile)
+    //    {
+    //        Damage(totalPower, silent);
+    //        return totalPower;
+    //    }
 
-        float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
-        float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
-        if (poiseDamage != 0)
-        {
-            alterPoise(-poiseDamage, !silent);
-        }
-        if (vitalityDamage != 0)
-        {
-            Damage(vitalityDamage, silent);
-        }
-        return vitalityDamage;
-    }
+    //    float poiseDamage = Posture == PostureStrength.Weak ? 0 : Mathf.Min(Poise, totalPower);
+    //    float vitalityDamage = Mathf.Max(0, totalPower - poiseDamage);
+    //    if (poiseDamage != 0)
+    //    {
+    //        alterPoise(-poiseDamage, !silent);
+    //    }
+    //    if (vitalityDamage != 0)
+    //    {
+    //        Damage(vitalityDamage, silent);
+    //    }
+    //    return vitalityDamage;
+    //}
 
     private GameObject playPunch(float pitch)
     {

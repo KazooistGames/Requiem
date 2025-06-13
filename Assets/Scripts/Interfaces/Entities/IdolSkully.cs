@@ -11,7 +11,7 @@ public class IdolSkully : Skully
         base.Awake();
         Strength = 300f;
         Haste = 0.25f;
-        Resolve = 20;
+        //Resolve = 20;
         BaseAcceleration = 8f;
         scaleScalar = 1.0f;
         berthScalar = 2f;

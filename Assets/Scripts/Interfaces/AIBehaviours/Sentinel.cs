@@ -59,10 +59,6 @@ public class Sentinel : AIBehaviour
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickCoil, 0);
             _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack);
         }
-        else if (entity.Posture == Entity.PostureStrength.Weak)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, getPausePeriod(min: 1.5f));
-        }
         else
         {
             dashingChargePeriod = 0.0f;
