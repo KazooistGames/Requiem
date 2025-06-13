@@ -254,7 +254,7 @@ public class Hellfire : MonoBehaviour
                 Entity foe = hit.collider.gameObject.GetComponent<Entity>();
                 if (foe ? foe.Allegiance != Wielder.Allegiance : false)
                 {
-                    foe.applyDamageToPoiseThenVitality(DPS * Time.fixedDeltaTime, silent: true);
+                    foe.Damage(DPS * Time.fixedDeltaTime, silent: true);
                     foe.body.AddForce(ray.direction.normalized * Thrust * Time.fixedDeltaTime, ForceMode.VelocityChange);
                 }
             }

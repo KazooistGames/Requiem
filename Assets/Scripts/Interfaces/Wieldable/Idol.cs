@@ -130,11 +130,10 @@ public class Idol : Wieldable
     protected override void OnCollisionEnter(Collision collision)
     {
         base.OnCollisionEnter(collision);
-
         _SoundService.PlayAmbientSound(Requiem.boneSounds[Random.Range(0, Requiem.boneSounds.Length)], transform.position, (0.5f + 0.5f * Random.value) * pitchScalar, 0.05f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
     }
 
-    protected virtual void OnDestroy()
+    protected override void OnDestroy()
     {
         StopAllCoroutines();
     }
@@ -184,7 +183,7 @@ public class Idol : Wieldable
 
         mobEntity.JustVanquished.AddListener(BecomeItem);
         mobEntity.JustWounded.AddListener((x) => SpawnAdds(1));
-        mobEntity.JustHit.AddListener(spawnAddsIfDamageMakesWeak);
+        //mobEntity.JustHit.AddListener(spawnAddsIfDamageMakesWeak);
         return mobEntity;
     }
 
@@ -253,7 +252,6 @@ public class Idol : Wieldable
         {
             Entity entity;
             entity = Requiem.SPAWN(typeof(Skully), typeof(Biter), transform.position).GetComponent<Entity>();
-            entity.Poise = entity.Strength;
             Vector3 randomOffset = new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f) * 0.1f;
             entity.transform.position += randomOffset;
             entity.Shoved = false;
@@ -262,13 +260,6 @@ public class Idol : Wieldable
         return skullies;
     }
 
-    private void spawnAddsIfDamageMakesWeak(float totalDamage)
-    {
-        if (totalDamage > mobEntity.Poise && mobEntity.Posture != PostureStrength.Weak)
-        {
-            SpawnAdds(5);
-        }
-    }
 
     /***** PRIVATE *****/
     //private void materializeSoulPearls(Wieldable idol)

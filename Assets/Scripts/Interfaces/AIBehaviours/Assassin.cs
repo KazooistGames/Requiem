@@ -54,11 +54,11 @@ public class Assassin : AIBehaviour
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
             _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Idle);
         }
-        else if(entity.Posture == Entity.PostureStrength.Weak)
-        {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 2);
-            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 2);
-        }
+        //else if(entity.Posture == Entity.PostureStrength.Weak)
+        //{
+        //    _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 2);
+        //    _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 2);
+        //}
         else if (checkMyWeaponInRange())
         {
 

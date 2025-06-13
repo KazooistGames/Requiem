@@ -115,10 +115,10 @@ public class Skelly : Entity
             }
             Haste = 0.5f;
             Strength = 100;
-            Resolve = 10;
+            //Resolve = 10;
             mortality = Mortality.vulnerable;
             Vitality = Strength;
-            Poise = Strength;
+            //Poise = Strength;
             Destroy(GetComponent<AIBehaviour>());
             gameObject.AddComponent<Assassin>();
             Debone(head);

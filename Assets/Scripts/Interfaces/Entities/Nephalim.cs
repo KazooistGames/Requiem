@@ -16,7 +16,7 @@ public class Nephalim : Entity
     {
         base.Awake();
         Strength = 250f;
-        Resolve = 20f;
+        //Resolve = 20f;
         Haste = 1.0f;
         hoverScalar = 1.125f;
         scaleScalar = 1.20f;

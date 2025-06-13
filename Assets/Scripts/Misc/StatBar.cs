@@ -56,16 +56,15 @@ public class StatBar : MonoBehaviour
         fill.anchoredPosition = new Vector2((1 - hp) / 2, fill.anchoredPosition.y);
         fill.sizeDelta = new Vector2(hp, fill.sizeDelta.y);
         float alphaValue = Host.BleedingWounds.Count > 0 ? 0.25f : 0.5f;
-        fill.GetComponent<Image>().color = (int)Host.Posture > -1 ? new Color(1, 0, 0, alphaValue) : new Color(1, 0, 0.75f, alphaValue);
+        fill.GetComponent<Image>().color = !Host.Staggered ? new Color(1, 0, 0, alphaValue) : new Color(1, 0, 0.75f, alphaValue);
     }
 
     protected virtual void update_border()
     {
         RectTransform border = transforms[1];
         RectTransform backdrop = transforms[2];
-        float poiseMeter = Host.Poise / Host.Strength;
-        border.anchoredPosition = new Vector2((1 - poiseMeter) / 2, border.anchoredPosition.y);
-        border.sizeDelta = new Vector2(poiseMeter, border.sizeDelta.y);
+        border.anchoredPosition = new Vector2(0, border.anchoredPosition.y);
+        border.sizeDelta = new Vector2(1, border.sizeDelta.y);
         //border.GetComponent<Image>().color = Host.posture >= Entity.Posture.Flow ? new Color(0.7f, 0.5f, 0) : new Color(0.6f, 0.5f, 0.3333f);
         border.GetComponent<Image>().color = new Color(0.6f, 0.5f, 0.3333f);
     }

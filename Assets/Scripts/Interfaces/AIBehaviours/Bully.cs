@@ -30,7 +30,7 @@ public class Bully : AIBehaviour
     protected override void Update()
     {
         base.Update();
-        float period = entity.Posture == Entity.PostureStrength.Weak ? 1 : 2;
+        float period = 2;
 
         if (dashingCooldownTimer < period || !entity.Foe)
         {
@@ -40,7 +40,7 @@ public class Bully : AIBehaviour
         {
 
         }
-        else if (entity.Posture == Entity.PostureStrength.Weak || mainWep.Action == Weapon.ActionAnim.StrongCoil || mainWep.Action == Weapon.ActionAnim.Guarding || dashingDesiredDirection != Vector3.zero)
+        else if (mainWep.Action == Weapon.ActionAnim.StrongCoil || mainWep.Action == Weapon.ActionAnim.Guarding || dashingDesiredDirection != Vector3.zero)
         {
             dashingChargePeriod = 1f;
             dashingDesiredDirection = entity.Foe.transform.position - transform.position;
@@ -61,10 +61,6 @@ public class Bully : AIBehaviour
         else if (!entity.Foe || !_MartialController.Weapon_Queues.ContainsKey(mainWep))
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
-        }
-        else if(entity.Posture == Entity.PostureStrength.Weak)
-        {
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.QuickAttack, requisite: () => entity.Posture != Entity.PostureStrength.Weak);
         }
         else if(checkMyWeaponInRange())
         {

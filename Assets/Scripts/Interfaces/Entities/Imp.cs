@@ -21,7 +21,7 @@ public class Imp : Entity
     {
         Haste = 1.0f;
         Strength = 150f;
-        Resolve = 20;
+        //Resolve = 20;
         base.Start();
         createSkeleton();
         gameObject.name = "Imp";

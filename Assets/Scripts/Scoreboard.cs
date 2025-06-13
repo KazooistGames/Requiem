@@ -50,10 +50,10 @@ public class Scoreboard : MonoBehaviour
         {
             Add_Score(GET_ENTITY_BASE_SCORE_VALUE(vanquishedEntity));
             validEntitiesToScoreFromKilling.Remove(vanquishedEntity);
-            SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
-            pearl.transform.position = vanquishedEntity.transform.position;
-            pearl.Telecommute(Map.CenterTile.gameObject, 0.1f, (x) => Destroy(x.gameObject), false, true);
-            pearl.Body.useGravity = false;
+            //SoulPearl pearl = new GameObject().AddComponent<SoulPearl>();
+            //pearl.transform.position = vanquishedEntity.transform.position;
+            //pearl.Telecommute(Map.CenterTile.gameObject, 0.1f, (x) => Destroy(x.gameObject), false, true);
+            //pearl.Body.useGravity = false;
         }
     }
 

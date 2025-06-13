@@ -870,7 +870,7 @@ public abstract class Weapon : Wieldable
 
     private void playSlap(Vector3 position)
     {
-        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power + MostRecentWielder.Resolve, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
     }
 
     private void playTink(float scalar = 1)

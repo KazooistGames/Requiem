@@ -64,18 +64,21 @@ public class Revanent : AIBehaviour
             {
                 queueNextRoundOfActions(mainWep);
             }
+
             switch (CurrentPattern)
             {
+
                 case Pattern.Dueling:
                     itemManagementNoSingles = false;
                     itemManagementPreferredType = WieldMode.TwoHanders;
-                    if (entity.Posture == PostureStrength.Strong)
+
+                    if (entity.Vitality >= entity.Foe.Vitality)
                     {
                         CurrentPattern = Pattern.Overpowering;
                         _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
                         _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
                     }
-                    else if(entity.Posture == PostureStrength.Weak && (entity.leftStorage || entity.rightStorage))
+                    else if(entity.Vitality <= 25)
                     {
                         CurrentPattern = Pattern.Kiting;
                     }
@@ -85,10 +88,18 @@ public class Revanent : AIBehaviour
                         dashingDesiredDirection = transform.position - entity.Foe.transform.position;
                     }
                     break;
+
                 case Pattern.Overpowering:
                     itemManagementNoSingles = false;
-                    itemManagementPreferredType = Entity.WieldMode.TwoHanders;
-                    if (mainWep.Action == Weapon.ActionAnim.StrongCoil && dashingCooldownTimer >= 1f)
+                    itemManagementPreferredType = WieldMode.TwoHanders;
+
+                    if (entity.Vitality < entity.Foe.Vitality)
+                    {
+                        CurrentPattern = Pattern.Kiting;
+                        _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Idle);
+                        _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle);
+                    }
+                    else if (mainWep.Action == Weapon.ActionAnim.StrongCoil && dashingCooldownTimer >= 1f)
                     {
                         dashingChargePeriod = 0.25f;
                         dashingDesiredDirection = entity.Foe.transform.position - transform.position;
@@ -99,6 +110,7 @@ public class Revanent : AIBehaviour
                         dashingDesiredDirection = entity.Foe.transform.position - transform.position;
                     }
                     break;
+
                 case Pattern.Kiting:
                     itemManagementNoSingles = true;
                     itemManagementPreferredType = WieldMode.OneHanders;
@@ -197,11 +209,7 @@ public class Revanent : AIBehaviour
 
     protected override void reactToIncomingDash()
     {
-        if(entity.Posture != Entity.PostureStrength.Weak)
-        {
-
-        }
-        else if (dashingCooldownTimer > 0.5f)
+        if (dashingCooldownTimer > 0.5f)
         {
             dashingChargePeriod = 0;
             Vector3 disposition = entity.Foe.transform.position - transform.position;

@@ -29,7 +29,7 @@ public class Rituals : MonoBehaviour
 
     }
 
-    protected virtual void OnDestroy()
+    protected void OnDestroy()
     {
         StopAllCoroutines();
     }
@@ -43,8 +43,12 @@ public class Rituals : MonoBehaviour
     {
         yield return null;
         yield return new WaitUntil(() => Map.Commissioned);
-        Idol = spawn_idol();
-        yield return null;
+
+        while( Idol == null){
+            Idol = spawn_idol();
+            yield return null;
+        }
+
         Map.Alter.DesiredOffering = Idol.gameObject;
         Map.Alter.PentagramLineColor = new Color(1, 0, 0);
         Map.Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
@@ -55,8 +59,16 @@ public class Rituals : MonoBehaviour
 
     private static Idol spawn_idol()
     {
+        if (Map.ArenaTiles.Count == 0)
+        {
+            return null;
+        }
+        List<Hextile> spawnCandidates = Map.ArenaTiles[Map.ArenaTiles.Count - 1].Where(x => x != null ? x.Landmarks.FirstOrDefault(x => x.GetComponent<Landmark_Barrier>()) : false ).ToList();
+        if(spawnCandidates.Count == 0)
+        {
+            return null;
+        }
         Idol newIdol = Instantiate(Resources.Load<GameObject>("Prefabs/Wieldable/Idol")).GetComponent<Idol>();
-        List<Hextile> spawnCandidates = Map.ArenaTiles[Map.ArenaTiles.Count - 1].Where(x => x.Landmarks.FirstOrDefault(x => x.GetComponent<Landmark_Barrier>())).ToList();
         Hextile spawnTile = spawnCandidates[Random.Range(0, spawnCandidates.Count)];
         newIdol.transform.position = Requiem.RAND_POS_IN_TILE(spawnTile);
         return newIdol;

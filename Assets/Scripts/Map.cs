@@ -34,6 +34,19 @@ public class Map : MonoBehaviour
         StartCoroutine(Build_Map());
     }
 
+
+    private void OnDestroy()
+    {
+        Tiles.Clear();
+        ArenaTiles.Clear();
+        Gates.Clear();
+        Chambers.Clear();
+        CenterTile = null;
+        Alter = null;
+        BloodWell = null;
+        Credits = null;
+        StopAllCoroutines();
+    }
     /***** PUBLIC *****/
 
     /***** PROTECTED *****/
