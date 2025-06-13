@@ -43,7 +43,7 @@ public class Nemesis : AIBehaviour
         sensoryBaseRange = 2f;
         sensorySightRangeScalar = 1f;
         sensoryAudioRangeScalar = 1f;
-        entity.Aggressive = false;
+        entity.Aggressive = true;
         meanderPauseFrequency = 0f;
         itemManagementSeekItems = false;
         pursueStoppingDistance = Hextile.Radius;

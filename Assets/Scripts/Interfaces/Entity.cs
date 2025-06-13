@@ -23,7 +23,7 @@ public class Entity : MonoBehaviour
     public float Agility;
     public float Poise;
 
-    public static float SpeedScalarGlobal { get; private set; } = 0.5f;
+    public static float SpeedScalarGlobal { get; private set; } = 0.75f;
     public static float Scale { get; private set; } = 0.2f;
     public static float Berth { get; private set; } = 0.225f;
     public static float Height { get; private set; } = 1.25f;
@@ -54,7 +54,7 @@ public class Entity : MonoBehaviour
     public Entity Foe;
     public bool Aggressive = true;
 
-    protected float BaseAcceleration = 8;
+    protected float BaseAcceleration = 6;
     public float SpeedActual { get; private set; } = 0f;
     public float AccelerationActual { get; private set; } = 0f;
     public Dictionary<string, float> modSpeed = new Dictionary<string, float>();
@@ -337,13 +337,19 @@ public class Entity : MonoBehaviour
         }
     }
 
+    private float calculate_acceleration()
+    {
+        float baseSpeed = Haste * SpeedScalarGlobal;
+        modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.5f, -0.5f, body.velocity.magnitude / baseSpeed) : 0;
+        return modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
+    }
+
     protected virtual void FixedUpdate()
     {
         float baseSpeed = Haste * SpeedScalarGlobal;
         modSpeed["dash"] = (DashPower > 0) ? Mathf.Lerp(-0.5f, -0.9f, DashPower) : 0;
         modSpeed["staggered"] = Staggered ? Mathf.Lerp(0, -1, (staggerPeriod - staggerTimer) * 4) : 0;
-        modAcceleration["nonlinear"] = baseSpeed > 0 ? Mathf.Lerp(0.35f, -0.35f, body.velocity.magnitude / baseSpeed) : 0;
-        AccelerationActual = modAcceleration.Values.Aggregate(BaseAcceleration, (result, multiplier) => result *= 1 + multiplier);
+        AccelerationActual = calculate_acceleration();
         SpeedActual = Agility * SpeedScalarGlobal;
         //hurtBox.radius = Shoved ? berthActual * 1f : berthActual;
         if (Shoved)

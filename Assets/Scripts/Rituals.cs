@@ -29,6 +29,10 @@ public class Rituals : MonoBehaviour
 
     }
 
+    protected virtual void OnDestroy()
+    {
+        StopAllCoroutines();
+    }
 
     /***** PUBLIC *****/
 

@@ -66,8 +66,8 @@ public class PlayerCamera : MonoBehaviour
         return transversal_offset + vertical_offset;
     }
 
-    public Vector2 Y_Span = new Vector2(8, 12);
-    public Vector2 Y_DeadbandRange = new Vector2(0.5f, 3);
+    public Vector2 Y_Span = new Vector2(8, 10);
+    public Vector2 Y_DeadbandRange = new Vector2(0.25f, 3);
     private float calc_vertical_offset()
     {
         float cursor_dispo = get_cursor_disposition();
@@ -78,8 +78,8 @@ public class PlayerCamera : MonoBehaviour
     }
 
     public float zZero = -2.0f;
-    public Vector2 ZSpan = new Vector2(0f, -1.25f);
-    public Vector2 homingSpan = new Vector2(0.1f, 0.5f);
+    public Vector2 ZSpan = new Vector2(-.1f, -0.75f);
+    public Vector2 homingSpan = new Vector2(0.1f, 0.25f);
     private Vector3 calc_transversal_offset()
     {
         float player_position_weight = 2;

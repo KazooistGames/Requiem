@@ -104,6 +104,7 @@ public class Idol : Wieldable
         base.Update();
         flames.emissionModule.enabled = true;
         flames.SetFlameStyle(_Flames.FlameStyles.Magic);
+
         if (mobEntity)
         {
             activityLevel = ActivityLevel.Aggro;
@@ -111,6 +112,10 @@ public class Idol : Wieldable
         else if (Wielder ? Wielder.requiemPlayer : false)
         {
             activityLevel = ActivityLevel.Active;
+        }
+        else if(Player.INSTANCE == null)
+        {
+            return;
         }
         else if((Player.INSTANCE.transform.position - transform.position).magnitude <= Hextile.Radius/1.5f)
         {
@@ -127,6 +132,11 @@ public class Idol : Wieldable
         base.OnCollisionEnter(collision);
 
         _SoundService.PlayAmbientSound(Requiem.boneSounds[Random.Range(0, Requiem.boneSounds.Length)], transform.position, (0.5f + 0.5f * Random.value) * pitchScalar, 0.05f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+    }
+
+    protected virtual void OnDestroy()
+    {
+        StopAllCoroutines();
     }
 
 
