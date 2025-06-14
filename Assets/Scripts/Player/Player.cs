@@ -94,12 +94,14 @@ public class Player : MonoBehaviour
         }
         Vector4 playerPosition = new Vector4(transform.position.x, transform.position.y, transform.position.z, 1);
         bloodSplatter.SetVector("_PlayerPosition", playerPosition);
+
     }
 
     void FixedUpdate()
     {
         if (HostEntity)
         {
+            HostEntity.Haste = HostEntity.MainHand ? 1.4f : 1.6f;
             transform.eulerAngles = HostEntity.transform.eulerAngles;
             if (transform.position == HostEntity.transform.position)
             {
@@ -195,7 +197,7 @@ public class Player : MonoBehaviour
             HostEntity.WalkDirection = Direction;
             lastDirection = Direction;
         }
-        if (CurrentKeyboard.spaceKey.wasPressedThisFrame)
+        if (CurrentKeyboard.spaceKey.wasPressedThisFrame && HostEntity.MainHand == null)
         {
             HostEntity.DashCharging = true;
         }
@@ -304,7 +306,10 @@ public class Player : MonoBehaviour
             }
             else
             {
-                yankWeapon();
+                if (CurrentMouse.rightButton.isPressed)
+                {
+                    yankWeapon();
+                }
                 recallWeapon();
                 yank_timer = 0;
             }
@@ -473,19 +478,22 @@ public class Player : MonoBehaviour
             if (impaledFoe)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
-                impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
+                HostEntity.StartCoroutine(HostEntity.dash_routine(disposition.normalized, Entity.Max_Velocity_Of_Dash * Entity.Strength_Ratio(impaledFoe, HostEntity)));
+                impaledFoe.Shove(-disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);         
+
                 //impaledFoe.Stagger(Entity.Strength_Ratio(HostEntity, impaledFoe));
             }
             else if (impaledObject)
             {
                 Vector3 disposition = HostWeapon.ImpaledObject.transform.position - transform.position;
                 impaledObject.DropItem(yeet: true, (Vector3.up / 2) - disposition.normalized, yankStrength);
+                        
             }
             else
             {
                 Vector3 disposition = HostWeapon.transform.position - transform.position;
                 disposition.y = 0;
-                HostEntity.Shove(disposition.normalized * Entity.Strength_Ratio(HostEntity, impaledFoe) * yankStrength);
+                HostEntity.StartCoroutine(HostEntity.dash_routine(disposition.normalized, Entity.Max_Velocity_Of_Dash));
             }
         }
         else

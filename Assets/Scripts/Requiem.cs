@@ -10,6 +10,8 @@ public class Requiem: MonoBehaviour
 {
     public static Requiem INSTANCE { get; private set; }
 
+    public static List<Waver> Wavers = new List<Waver>();
+
     public static float GameClock = 0;
     public static bool Paused = false;
     public static float TimeScale;
@@ -75,6 +77,7 @@ public class Requiem: MonoBehaviour
         environmentLight.type = LightType.Directional;
         environmentLight.intensity = 0.4f;
         environmentLight.shadows = LightShadows.None;
+        Wavers = GetComponents<Waver>().ToList();
         StartCoroutine(GAME_SCRIPT());
     }
 
@@ -100,22 +103,26 @@ public class Requiem: MonoBehaviour
         }
         update_environment_light();
 
-        foreach (Hextile chamber in Map.Chambers)
+        if(Map.Gates.Count == Map.Chambers.Count)
         {
-            Landmark_Gate gate = Map.Gates[Map.Chambers.IndexOf(chamber)];
-            if (!gate)
+            foreach (Hextile chamber in Map.Chambers)
             {
+                Landmark_Gate gate = Map.Gates[Map.Chambers.IndexOf(chamber)];
+                if (!gate)
+                {
 
-            }
-            else if (chamber.DetectContainedObjects().Count(x => x.GetComponent<Entity>()) > 0)
-            {
-                gate.OpenDoor();
-            }
-            else
-            {
-                gate.CloseDoor();
+                }
+                else if (chamber.DetectContainedObjects().Count(x => x.GetComponent<Entity>()) > 0)
+                {
+                    gate.OpenDoor();
+                }
+                else
+                {
+                    gate.CloseDoor();
+                }
             }
         }
+        
     }
 
     void OnDestroy()
@@ -130,7 +137,10 @@ public class Requiem: MonoBehaviour
         yield return null;
         yield return new WaitUntil(() => Map.Commissioned);
         yield return new WaitUntil(() => Map.Alter.Used);
-        Waver.paused = false;
+
+        foreach(Waver waver in Wavers){
+            waver.paused = false;
+        }
     }
 
     /***** PUBLIC *****/
@@ -145,6 +155,7 @@ public class Requiem: MonoBehaviour
         spawned.transform.position = position;
         spawned.AddComponent(entity);
         spawned.AddComponent(ai);
+        spawned.GetComponent<Entity>().Foe = Player.INSTANCE.HostEntity;
         return spawned;
     }
 

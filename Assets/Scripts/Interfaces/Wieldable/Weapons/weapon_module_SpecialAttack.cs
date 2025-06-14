@@ -172,10 +172,10 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         yield return null;
         while (true)
         {
-            yield return new WaitUntil(() => weapon.Action == ActionAnim.Guarding || weapon.Action == ActionAnim.StrongCoil || check_dash_attack() || check_quick_attack());
+            yield return new WaitUntil(() => weapon.Action == ActionAnim.Guarding || weapon.Action == ActionAnim.StrongCoil || check_dash_attack() || check_quick_attack() || weapon.Action == ActionAnim.Aiming);
             weapon.Tempo = 0;
             tempoCharge = 0;
-            if (weapon.Action == ActionAnim.StrongCoil)
+            if (weapon.Action == ActionAnim.StrongCoil || weapon.Action == ActionAnim.Aiming)
             {
                 yield return tempo_charge_routine();
             }
@@ -212,7 +212,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
 
     private IEnumerator tempo_charge_routine()
     {
-        while (weapon.Action == ActionAnim.StrongCoil)
+        while (weapon.Action == ActionAnim.StrongCoil || weapon.Action == ActionAnim.Aiming)
         {
             //if (tempoCharge < 1)
             //{
@@ -222,7 +222,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
             weapon.Tempo = Mathf.Clamp(convert_charge_to_tempo(tempoCharge), 0, 1);
             yield return null;
         }
-        yield return new WaitUntil(() => !check_strong_attack());
+        yield return new WaitUntil(() => !check_strong_attack() && !weapon.Thrown);
     }
 
     private IEnumerator tempo_combo_routine()

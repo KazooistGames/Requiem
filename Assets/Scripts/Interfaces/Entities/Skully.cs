@@ -11,7 +11,7 @@ public class Skully : Entity
         base.Awake();
         Strength = 25f;
         berthScalar = 0.80f;
-        Haste = 1.2f;
+        Haste = 1.25f;
         heightScalar = 0.4f;
     }
 
@@ -32,7 +32,7 @@ public class Skully : Entity
     protected override void Update()
     {
         base.Update();
-        BaseAcceleration = Dashing ? 6 : 3;
+        BaseAcceleration = Dashing ? 6 : 4;
     }
 
     protected override void FixedUpdate()

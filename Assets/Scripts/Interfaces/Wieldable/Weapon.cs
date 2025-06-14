@@ -266,12 +266,12 @@ public abstract class Weapon : Wieldable
                 {
                     HitBox.enabled = !nextAnimation.IsTag("Rebuked");
                     HitBox.GetComponent<CapsuleCollider>().radius = defendRadius;
-                    modifyWielderSpeed(heftSlowModifier / 2);
+                    modifyWielderSpeed(heftSlowModifier / 4);
                 }
                 else if (Action == ActionAnim.Aiming)
                 {
-                    modifyWielderSpeed(heftSlowModifier);
-                    throwMagnitude = Wielder.Strength / 20;
+                    modifyWielderSpeed(heftSlowModifier / 2.0f);
+                    throwMagnitude = 12 * Tempo;
                     flames.PowerLevel = 100 * Tempo;
                 }
                 else if (Action == ActionAnim.Throwing)
@@ -536,7 +536,7 @@ public abstract class Weapon : Wieldable
         setHighlightColor(Color.black);
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
-        bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > (foe ? 0.0f : 0.25f) : true);
+        bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > 0.0 : true);
         if (cleanhit && !ImpaledObject)
         {
             StartCoroutine(ImpaleRoutine(collision.gameObject, contact.point));

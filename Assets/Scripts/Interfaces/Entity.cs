@@ -110,7 +110,7 @@ public class Entity : MonoBehaviour
     public static float Min_Velocity_Of_Dash { get; private set; } = 2.0f;
     public bool DashCharging = false;
     public bool Dashing = false;
-    public float DashPower { get; private set; } = 0.0f;
+    public float DashPower { get; set; } = 0.0f;
 
     private static float DASH_CHARGE_TIME = 0.3f;
     private static float CRASH_DAMAGE = 20f;   
@@ -785,19 +785,28 @@ public class Entity : MonoBehaviour
         }
     }
 
-    //private void apply_crash_damage(float impact)
-    //{
-    //    Stagger(impact);
+    public IEnumerator dash_routine(Vector3 direction, float magnitude) 
+    {
+        string key = "dash";
+        dashDirection = direction;
+        DashCharging = false;
+        Dashing = true;
+        Shove(direction.normalized * magnitude, true);
+        float pitch_ratio = Mathf.Lerp(2.0f, 1.0f, magnitude/Max_Velocity_Of_Dash);
+        playWhoosh(FinalDash ? 0.5f : pitch_ratio);
 
-    //    if (mortality != Mortality.impervious)
-    //    {
-    //        Damage(impact * CRASH_DAMAGE);
-    //    }
-    //}
+        yield return new WaitWhile(() => Shoved);
+
+        FinalDash = false;
+        modSpeed[key] = 0.0f;
+        Dashing = false;
+        DashPower = 0.0f;
+        dashDirection = Vector3.zero;
+
+    }
 
     private IEnumerator routineDashHandler()
     {
-        string key = "dash";
         while (true)
         {
             float scaledVelocity = 0;
@@ -831,10 +840,10 @@ public class Entity : MonoBehaviour
             }
             if (cached_dash_direction != Vector3.zero)
             {
-                dashDirection = cached_dash_direction;
-                DashCharging = false;
-                Dashing = true;
-                Shove(cached_dash_direction.normalized * scaledVelocity, true);
+                //dashDirection = cached_dash_direction;
+                //DashCharging = false;
+                //Dashing = true;
+                //Shove(cached_dash_direction.normalized * scaledVelocity, true);
                 if (FinalDash)
                 {
                     float scaledY = transform.localEulerAngles.y;
@@ -844,15 +853,16 @@ public class Entity : MonoBehaviour
                     difference = Mathf.Abs(difference) >= 180 ? difference - (Mathf.Sign(difference) * 360) : difference;
                     transform.RotateAround(transform.position, Vector3.up, difference);
                 }
-                playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
-                yield return new WaitWhile(() => Shoved);
+                yield return dash_routine(cached_dash_direction, scaledVelocity);
+                //playWhoosh(FinalDash ? 0.5f : 2f - DashPower);
+                //yield return new WaitWhile(() => Shoved);
             }
-            yield return null;
-            FinalDash = false;
-            modSpeed[key] = 0.0f;
-            Dashing = false;
-            DashPower = 0.0f;
-            dashDirection = Vector3.zero;
+            //yield return null;
+            //FinalDash = false;
+            //modSpeed[key] = 0.0f;
+            //Dashing = false;
+            //DashPower = 0.0f;
+            //dashDirection = Vector3.zero;
         }
     }
 

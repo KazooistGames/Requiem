@@ -368,7 +368,7 @@ public class Wieldable : MonoBehaviour
         yield break;
     }
 
-    protected float throwMagnitude = 5f;
+    protected float throwMagnitude = 6f;
     protected IEnumerator throwHandler()
     {
         while (true)

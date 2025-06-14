@@ -8,47 +8,29 @@ using UnityEngine.Events;
 
 public class Waver : MonoBehaviour
 {
-    public static List<GameObject> Mobs = new List<GameObject>();
-    public static GameObject BossMob;
+    public List<GameObject> Mobs = new List<GameObject>();
 
-    public static int WaveCount = 0;
-    public static int MobCount = 0;
+    public Type entity_type = typeof(Skully);
+    public Type behaviour_type = typeof(Biter);
 
-    public static UnityEvent Finished = new UnityEvent();
-    public static UnityEvent Started = new UnityEvent();
+    public Vector2 population_range = new Vector2(1, 5);
+    public Vector2 group_size_range = new Vector2(1, 3);
+    public Vector2 spawn_period_range = new Vector2(8, 12);
 
-    public static Waver INSTANCE;
+    public bool paused = true;
 
-
-    public static bool paused = true;
-
-    public static float waveTimer = 0;
-
-    private static int minPopulation = 1;
-    private static int maxPopulation = 20;
-
-    private static float biter_period = 2;
-    private static float biter_timer = 0f;
+    private float spawn_period = 2;
+    private float spawn_timer = 0f;
 
 
-   
     public void Start()
     {
-
-        if (INSTANCE)
-        {
-            Destroy(INSTANCE);
-        }
-
-        INSTANCE = this;
-
         StartCoroutine(spawn_cycler());
-
     }
 
     public void Update()
     {
-        biter_timer += Time.deltaTime;
+        spawn_timer += Time.deltaTime;
     }
 
     /***** PUBLIC *****/
@@ -58,7 +40,7 @@ public class Waver : MonoBehaviour
     /***** PRIVATE *****/
     private IEnumerator spawn_cycler()
     {
-
+        paused = true;
         while (true)
         {
             yield return null;
@@ -70,9 +52,9 @@ public class Waver : MonoBehaviour
             }
             else if (reason_to_spawn())
             {
-                yield return spawn_biters();
-                biter_timer -= biter_period;
-                biter_period = UnityEngine.Random.Range(5, 8);
+                yield return spawn_mobs();
+                spawn_timer -= spawn_period;
+                spawn_period = UnityEngine.Random.Range(spawn_period_range.x, spawn_period_range.y);
             }
         }
 
@@ -84,15 +66,15 @@ public class Waver : MonoBehaviour
     {
         int total_living_mobs = get_active_mob_count();
 
-        if(total_living_mobs >= maxPopulation)
+        if(total_living_mobs >= population_range.y)
         {
             return false;
         }
-        else if (total_living_mobs < minPopulation)
+        else if (total_living_mobs < population_range.x)
         {
             return true;
         }
-        else if(biter_timer >= biter_period)
+        else if(spawn_timer >= spawn_period)
         {
             return true;
         }
@@ -100,10 +82,10 @@ public class Waver : MonoBehaviour
         return false;
     }
 
-    private IEnumerator spawn_biters()
+    private IEnumerator spawn_mobs()
     {
         yield return null;
-        int biter_group_size = Mathf.RoundToInt(UnityEngine.Random.Range(3, 5));
+        int biter_group_size = Mathf.RoundToInt(UnityEngine.Random.Range(group_size_range.x, group_size_range.y));
         Hextile biter_chamber = random_chamber();
 
         for (int i = 0; i < biter_group_size; i++)
@@ -115,7 +97,7 @@ public class Waver : MonoBehaviour
 
     }
 
-    private static int get_active_mob_count()
+    private int get_active_mob_count()
     {
         int count = 0;
         foreach(GameObject mob in Mobs)
