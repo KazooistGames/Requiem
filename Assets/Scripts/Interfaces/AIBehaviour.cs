@@ -709,24 +709,25 @@ public class AIBehaviour : MonoBehaviour
 
     //grab
     protected bool grabEnabled = false;
-    protected float grabSlowScalar = 0.5f;
+    protected float grabSlowScalar = 1.0f;
     public float grabDPS = 15f;
     protected Entity grabLastVictim;
     protected void grab(BehaviourType key)
     {
         if (behaviourParams[key].Item1 && entity.Foe && !entity.Staggered)
         {
-            grabLastVictim = entity.Foe;
-            Vector3 disposition = grabLastVictim.transform.position - transform.position;
+
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
             if (disposition.magnitude < entity.personalBox.radius * entity.scaleActual && !entity.Dashing)
             {
+                grabLastVictim = entity.Foe;
                 grabLastVictim.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = -(grabSlowScalar * Entity.Strength_Ratio(entity,entity.Foe));
                 if (grabEnabled)
                 {
-                    grabLastVictim.Damage(ReflexRate * behaviourParams[key].Item2 * grabDPS);
+                    //grabLastVictim.Damage(ReflexRate * behaviourParams[key].Item2 * grabDPS);
                 }
             }
-            else
+            else if(grabLastVictim)
             {
                 grabLastVictim.modSpeed["grabbed" + gameObject.GetHashCode().ToString()] = 0;
             }
@@ -1262,7 +1263,7 @@ public class AIBehaviour : MonoBehaviour
                     case AIState.seek:
                         behaviourParams[BehaviourType.patrol] = (true, 1);
                         behaviourParams[BehaviourType.meander] = (true, 1 - Intelligence);
-                        //entity.modSpeed["AIState"] = Mathf.Lerp(-1.0f, 0.0f, Intelligence);
+                        entity.modSpeed["AIState"] = Mathf.Lerp(-1.0f, 0.0f, Intelligence);
                         break;
                     case AIState.enthralled:
                         leashed = followRecall || (waypointCommanded && !waypointDeadbanded);

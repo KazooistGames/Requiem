@@ -302,14 +302,10 @@ public class Player : MonoBehaviour
             {
 
             }
-            else if (!HostWeapon.ImpaledObject || CurrentMouse.leftButton.isPressed)
-            {
-                yank_timer = 0;
-                recallWeapon();
-            }
-            else if (CurrentMouse.rightButton.isPressed)
+            else
             {
                 yankWeapon();
+                recallWeapon();
                 yank_timer = 0;
             }
 
@@ -465,10 +461,10 @@ public class Player : MonoBehaviour
         {
 
         }
-        else if (HostEntity.personalBox.bounds.Contains(HostWeapon.transform.position))
-        {
-            HostWeapon.PickupItem(HostEntity);
-        }
+        //else if (HostEntity.personalBox.bounds.Contains(HostWeapon.transform.position))
+        //{
+        //    HostWeapon.PickupItem(HostEntity);
+        //}
         else if (HostWeapon.ImpaledObject)
         {
             Entity impaledFoe = HostWeapon.ImpaledObject.GetComponent<Entity>();

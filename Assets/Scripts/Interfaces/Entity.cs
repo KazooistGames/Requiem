@@ -23,7 +23,7 @@ public class Entity : MonoBehaviour
     public float Agility;
     //public float Poise;
 
-    public static float SpeedScalarGlobal { get; private set; } = 0.75f;
+    public static float SpeedScalarGlobal { get; private set; } = 0.6f;
     public static float Scale { get; private set; } = 0.2f;
     public static float Berth { get; private set; } = 0.225f;
     public static float Height { get; private set; } = 1.25f;
@@ -494,7 +494,8 @@ public class Entity : MonoBehaviour
 
     public virtual void Damage(float magnitude, bool silent = false)
     {
-        if (immortalityTimer < 0.25f) { return; }
+        if (immortalityTimer < 0.25f || mortality == Mortality.impervious) { return; }
+
         if (magnitude > 0)
         {
             JustWounded.Invoke(magnitude);
@@ -517,7 +518,7 @@ public class Entity : MonoBehaviour
 
     public void Stagger(float duration)
     {
-        float scalar = 1.5f;
+        float scalar = 0.75f;
         Staggered = true;
         float totalDuration = STAGGER_BASE_TIME + (duration * scalar);
         if (totalDuration > (staggerPeriod - staggerTimer))
@@ -706,13 +707,17 @@ public class Entity : MonoBehaviour
                 Vector3 shoveDirection = Vector3.Lerp(dashDirection.normalized, disposition, 0.5f);
                 Vector3 ShoveVector = shoveDirection * (impactRatio * Max_Velocity_Of_Dash) * 0.75f;
                 foe.Shove(ShoveVector);
+
                 if(foe.Allegiance != Allegiance)
                 {
                     foe.JustCrashed.Invoke();
                     apply_bounce(collision, 0.5f);
                     float damage = CRASH_DAMAGE * impactRatio;
                     JustLandedHit.Invoke(foe, damage);
+                    foe.Stagger(Strength_Ratio(this, foe));
+
                 }
+
                 playPunch(Mathf.Max(1f - (impactRatio / 2), 0.5f));
             }
         }
@@ -742,8 +747,10 @@ public class Entity : MonoBehaviour
                 otherEntity.Shove(-collision.relativeVelocity.normalized * impactToFoe);
                 dashAlreadyHit.Add(otherEntity.gameObject);
                 otherEntity.dashAlreadyHit.Add(gameObject);
-                otherEntity.apply_crash_damage(velocityRatio / 2);
-                apply_crash_damage(velocityRatio / 2);
+                otherEntity.Stagger(Strength_Ratio(this, otherEntity));
+                otherEntity.Damage(CRASH_DAMAGE * velocityRatio / 2);
+                Stagger(Strength_Ratio(this, otherEntity));
+                Damage(CRASH_DAMAGE * velocityRatio / 2);
                 apply_bounce(collision);
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
                 JustCrashed.Invoke();
@@ -759,7 +766,8 @@ public class Entity : MonoBehaviour
 
                 if (!Dashing)
                 {
-                    apply_crash_damage(velocityRatio);
+                    Stagger(velocityRatio);
+                    Damage(CRASH_DAMAGE * velocityRatio);
                 }
                 apply_bounce(collision);
                 playPunch(Mathf.Max(1.25f - velocityRatio, 0.5f));
@@ -777,15 +785,15 @@ public class Entity : MonoBehaviour
         }
     }
 
-    private void apply_crash_damage(float impact)
-    {
-        Stagger(impact);
+    //private void apply_crash_damage(float impact)
+    //{
+    //    Stagger(impact);
 
-        if (mortality != Mortality.impervious)
-        {
-            Damage(impact * CRASH_DAMAGE);
-        }
-    }
+    //    if (mortality != Mortality.impervious)
+    //    {
+    //        Damage(impact * CRASH_DAMAGE);
+    //    }
+    //}
 
     private IEnumerator routineDashHandler()
     {

@@ -99,6 +99,23 @@ public class Requiem: MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
         update_environment_light();
+
+        foreach (Hextile chamber in Map.Chambers)
+        {
+            Landmark_Gate gate = Map.Gates[Map.Chambers.IndexOf(chamber)];
+            if (!gate)
+            {
+
+            }
+            else if (chamber.DetectContainedObjects().Count(x => x.GetComponent<Entity>()) > 0)
+            {
+                gate.OpenDoor();
+            }
+            else
+            {
+                gate.CloseDoor();
+            }
+        }
     }
 
     void OnDestroy()
@@ -112,8 +129,8 @@ public class Requiem: MonoBehaviour
     {
         yield return null;
         yield return new WaitUntil(() => Map.Commissioned);
-        yield return new WaitUntil(() => Rituals.Nemesis);
-        Waver.StartWave(10, 5, 2);
+        yield return new WaitUntil(() => Map.Alter.Used);
+        Waver.paused = false;
     }
 
     /***** PUBLIC *****/

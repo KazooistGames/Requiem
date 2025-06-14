@@ -6,9 +6,8 @@ using System.Linq;
 public class Rituals : MonoBehaviour
 {
     public static Rituals INSTANCE;
-    public static Idol Idol;
-    public static Entity Nemesis;
-
+    //public static Idol Idol;
+    //public static Entity Nemesis;
 
     void Start()
     {
@@ -43,17 +42,19 @@ public class Rituals : MonoBehaviour
     {
         yield return null;
         yield return new WaitUntil(() => Map.Commissioned);
+        yield return new WaitUntil(() => Player.INSTANCE.HostEntity);
 
-        while( Idol == null){
-            Idol = spawn_idol();
-            yield return null;
-        }
+        //while( Idol == null){
+        //    Idol = spawn_idol();
+        //    yield return null;
+        //}
 
-        Map.Alter.DesiredOffering = Idol.gameObject;
+        //Map.Alter.DesiredOffering = Idol.gameObject;
+        Map.Alter.DesiredOffering = Player.INSTANCE.HostEntity.gameObject;
         Map.Alter.PentagramLineColor = new Color(1, 0, 0);
-        Map.Alter.PentagramFlameStyle = _Flames.FlameStyles.Inferno;
-        yield return new WaitUntil(() => { Map.Alter.PentagramFlameStyle = Idol.flames.FlamePresentationStyle; return Map.Alter.Used; });
-        Nemesis = Idol.BecomeMob();
+        Map.Alter.PentagramFlameStyle = _Flames.FlameStyles.Magic;
+        yield return new WaitUntil(() => { return Map.Alter.Used; });
+        //Nemesis = Idol.BecomeMob();
         Map.Alter.DesiredOffering = Map.Alter.TopStep;
     }
 

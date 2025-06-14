@@ -17,31 +17,19 @@ public class Waver : MonoBehaviour
     public static UnityEvent Finished = new UnityEvent();
     public static UnityEvent Started = new UnityEvent();
 
-    public enum WaveStatus
-    {
-        Idle,
-        Started,
-        Finished,
-        Boss,
-    }
-    public static WaveStatus Status = WaveStatus.Idle;
-
     public static Waver INSTANCE;
-    public static Haunt HauntSpawn;
+
+
+    public static bool paused = true;
 
     public static float waveTimer = 0;
 
-    private static int totalSize;
-    private static int minPopulation;
-    private static int maxPopulation;
+    private static int minPopulation = 1;
+    private static int maxPopulation = 20;
 
-    private static Vector2 spawnPeriodRange = new Vector2(3, 5);
-    private static float spawnPeriod = 3;
-    private static float spawnTimer = 0;
-    private static float spawnCatchupPeriod = 0.5f;
+    private static float biter_period = 2;
+    private static float biter_timer = 0f;
 
-    private static float cooldownPeriod = 10f;
-    private static float cooldownTimer = 0f;
 
    
     public void Start()
@@ -49,208 +37,83 @@ public class Waver : MonoBehaviour
 
         if (INSTANCE)
         {
-            Destroy(this);
+            Destroy(INSTANCE);
         }
-        else
-        {
-            INSTANCE = this;
-            GameObject new_spawnpoint = new GameObject();
-            new_spawnpoint.AddComponent<Shade>();
-            HauntSpawn = new_spawnpoint.AddComponent<Haunt>();
-            Light spawnLight = HauntSpawn.gameObject.AddComponent<Light>();
-            spawnLight.intensity = 4;
-            spawnLight.range = 0.5f;
-            spawnLight.color = new Color(0.75f, 0.5f, 1f);
-            StartCoroutine(update_spawn_waypoint());
-        }
+
+        INSTANCE = this;
+
+        StartCoroutine(spawn_cycler());
+
     }
 
     public void Update()
     {
-        if(Status == WaveStatus.Idle)
-        {
-
-        }
-        else if (Status == WaveStatus.Finished)
-        {
-            attempt_start(Time.deltaTime);
-        }
-        else if(Status == WaveStatus.Boss)
-        {
-            if (BossMob)
-            {
-                HauntSpawn.transform.position = BossMob.transform.position;
-            }
-            else
-            {
-                EndBoss();
-            }
-        }
-        else if (check_wave_dead())
-        {
-            EndWave();
-        }
-        else
-        {
-            attempt_spawn();
-        }
+        biter_timer += Time.deltaTime;
     }
 
     /***** PUBLIC *****/
 
-    public static void StartBoss()
-    {
-        WaveCount++;
-        HauntSpawn.GetComponent<Entity>().model.SetActive(false);
-        BossMob = new GameObject();
-        BossMob.transform.position = HauntSpawn.transform.position;
-        BossMob.AddComponent<Wraith>();
-        BossMob.AddComponent<Revanent>();
-        Status = WaveStatus.Boss;
-    }
-
-    public static void EndBoss()
-    {
-        HauntSpawn.GetComponent<Entity>().model.SetActive(true);
-        Status = WaveStatus.Finished;
-    }
-
-    public static void StartWave(int total_size, int max_population, int min_population)
-    {
-        if (total_size <= 0 || max_population <= 0 || min_population < 0 || spawnPeriod < 0)
-        {
-            return;
-        }
-        totalSize = total_size;
-        maxPopulation = max_population;
-        minPopulation = min_population;
-        ResetWave();
-    }
-
-    public static void ResetWave()
-    {
-        WaveCount++;
-        Mobs = new List<GameObject>();
-        waveTimer = 0;
-        cooldownTimer = 0;
-        Status = WaveStatus.Started;
-        Started.Invoke();
-    }
-
-    public static void EndWave()
-    {
-        Status = WaveStatus.Finished;
-        collect_everything(HauntSpawn.gameObject);
-        Finished.Invoke();
-    }
-
-    public static void KillWave()
-    {
-        foreach (GameObject mob in Mobs)
-        {
-            if (mob)
-            {
-                Destroy(mob);
-            }
-        }
-        EndWave();
-    }
 
 
     /***** PRIVATE *****/
-    private static void attempt_start(float time_passed)
+    private IEnumerator spawn_cycler()
     {
-        if((cooldownTimer += time_passed) >= cooldownPeriod)
+
+        while (true)
         {
-            cooldownTimer -= cooldownPeriod;
-            int boss_wave = 5;
-            if(WaveCount%boss_wave == 0)
+            yield return null;
+            Mobs = Mobs.Where(x => x != null).ToList();
+
+            if (paused)
             {
-                StartBoss();
+
             }
-            else
+            else if (reason_to_spawn())
             {
-                int random_reinforcements = UnityEngine.Random.Range(0, WaveCount % boss_wave);
-                int total = 10 + random_reinforcements * 2;
-                int max = Mathf.RoundToInt(total / 2f);
-                int min = Mathf.RoundToInt(max / 2f);
-                StartWave(total, max, min);
-            }
-        }
-    }
-
-    private static bool check_wave_dead()
-    {
-        int dead_count = Mobs.Count(x => x == null);
-        return dead_count >= totalSize;
-    }
-
-    private static void attempt_spawn()
-    {
-        waveTimer += Time.deltaTime;
-        spawnTimer += Time.deltaTime;
-        if (get_remaining_mob_count() <= 0)
-        {
-
-        }
-        else if(get_active_mob_count() >= maxPopulation)
-        {
-
-        }
-        else if (!check_haunt_spawn_possible(HauntSpawn))
-        {
-
-        }
-        else if(spawnTimer >= spawnPeriod)
-        {
-            int amount_to_spawn = Mathf.Min(Mathf.FloorToInt(spawnTimer / spawnPeriod), minPopulation);
-            spawn_mobs(amount_to_spawn);
-            spawnTimer = 0;
-            if (get_active_mob_count() < minPopulation)
-            {
-                spawnPeriod = spawnCatchupPeriod;
-            }
-            else
-            {
-                spawnPeriod = UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y);
+                yield return spawn_biters();
+                biter_timer -= biter_period;
+                biter_period = UnityEngine.Random.Range(5, 8);
             }
         }
+
+
     }
 
-    private static List<GameObject> spawn_mobs(int population_size)
+
+    private bool reason_to_spawn()
     {
-        List<GameObject> new_population = new List<GameObject> ();
-        for (int i = 0; i < population_size; i++)
+        int total_living_mobs = get_active_mob_count();
+
+        if(total_living_mobs >= maxPopulation)
         {
-            new_population.Add(create_mob());
+            return false;
         }
-        Mobs.AddRange(new_population);
-        return new_population;
+        else if (total_living_mobs < minPopulation)
+        {
+            return true;
+        }
+        else if(biter_timer >= biter_period)
+        {
+            return true;
+        }
+
+        return false;
     }
 
-    private static GameObject create_mob(List<Type> components = null)
+    private IEnumerator spawn_biters()
     {
-        GameObject new_mob = new GameObject();
-        if(components == null)
-        {
-            new_mob.AddComponent<Skelly>();
-            new_mob.AddComponent<Goon>();
-        }
-        else
-        {
-            foreach(Type component in components)
-            {
-                new_mob.AddComponent(component);
-            }
-        }
-        float random_x = (UnityEngine.Random.value - 0.5f);
-        float random_z = (UnityEngine.Random.value - 0.5f);
-        Vector3 random_offset = new Vector3(random_x, 0, random_z).normalized * 0.01f;
-        new_mob.transform.position = HauntSpawn.transform.position + random_offset;
-        MobCount++;
-        return new_mob;
-    }
+        yield return null;
+        int biter_group_size = Mathf.RoundToInt(UnityEngine.Random.Range(3, 5));
+        Hextile biter_chamber = random_chamber();
 
+        for (int i = 0; i < biter_group_size; i++)
+        {
+            Vector3 random_spot_in_chamber = Requiem.RAND_POS_IN_TILE(biter_chamber);
+            Mobs.Add(Requiem.SPAWN(typeof(Skully), typeof(Biter), random_spot_in_chamber));
+            yield return null;
+        }
+
+    }
 
     private static int get_active_mob_count()
     {
@@ -265,46 +128,12 @@ public class Waver : MonoBehaviour
         return count;
     }
 
-    private static int get_remaining_mob_count()
+    private static Hextile random_chamber()
     {
-        return totalSize - Mobs.Count;
+        int random_index = Mathf.RoundToInt(UnityEngine.Random.Range(0, Map.Chambers.Count()));
+        return Map.Chambers[random_index];
     }
 
-    private static IEnumerator update_spawn_waypoint()
-    {
-        yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y));
-        while (true)
-        {
-            HauntSpawn.waypointCoordinates = Requiem.RAND_POS_IN_TILE(find_target_tile());
-            HauntSpawn.waypointDeadbanded = false;
-            yield return new WaitForSeconds(UnityEngine.Random.Range(spawnPeriodRange.x, spawnPeriodRange.y) * 2);
-        }
-    }
-    private static Hextile find_target_tile()
-    {
-        if (!Player.INSTANCE)
-        {
-            return Map.CenterTile;
-        }
-        else if (!Player.INSTANCE.HostEntity)
-        {
-            return Map.CenterTile;
-        }
-        else if (!Player.INSTANCE.HostEntity.TileLocation)
-        {
-            return Map.CenterTile;
-        }
-        else if(UnityEngine.Random.value > 0.5f)
-        {
-            return Player.INSTANCE.HostEntity.TileLocation;
-        }
-        else
-        {
-            List<Hextile> candidates = Player.INSTANCE.HostEntity.TileLocation.AdjacentTiles.Keys.ToList();
-            int randomIndex = UnityEngine.Random.Range(0, candidates.Count - 1);
-            return candidates[randomIndex];
-        }
-    }
 
     private static void collect_everything(GameObject collectionTarget)
     {
@@ -326,25 +155,6 @@ public class Waver : MonoBehaviour
         }
     }
 
-    private static bool check_haunt_spawn_possible(Haunt haunt)
-    {
-        if (!haunt)
-        {
-            return false;
 
-        }
-        else if (!haunt.entity.TileLocation)
-        {
-            return false;
-        }
-        else if (Physics.OverlapSphere(haunt.transform.position, haunt.entity.hurtBox.radius * haunt.entity.scaleActual).Count(x=> x.gameObject.layer == Requiem.layerObstacle) > 0)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
 
 }

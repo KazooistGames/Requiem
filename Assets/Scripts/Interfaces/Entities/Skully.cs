@@ -11,7 +11,7 @@ public class Skully : Entity
         base.Awake();
         Strength = 25f;
         berthScalar = 0.80f;
-        Haste = 1.25f;
+        Haste = 1.2f;
         heightScalar = 0.4f;
     }
 
