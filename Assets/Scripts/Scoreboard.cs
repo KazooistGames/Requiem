@@ -44,6 +44,7 @@ public class Scoreboard : MonoBehaviour
     {
         Score += baseScore * KillMultiplier;
     }
+
     public static void Score_Kill(Entity vanquishedEntity)
     {
         if (validEntitiesToScoreFromKilling.Contains(vanquishedEntity) && vanquishedEntity.Vitality < vanquishedEntity.Strength)

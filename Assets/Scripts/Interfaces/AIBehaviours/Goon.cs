@@ -8,7 +8,7 @@ public class Goon : AIBehaviour
 {
     //public float excitement = 0f;
     private static float behaviour_mutation_phase = 0;
-    private static float CombatSpeed = 0.75f;
+    private static float CombatSpeed = 0.5f;
 
     public static float Aggression = 1f;
     public static float Fear = 1f;
@@ -38,6 +38,7 @@ public class Goon : AIBehaviour
         itemManagementSeekItems = true;
         itemManagementDelayPeriod = 3;
         itemManagementPreferredType = Entity.WieldMode.OneHanders;
+        State = AIState.seek;
     }
 
     protected override void Update()
@@ -65,12 +66,12 @@ public class Goon : AIBehaviour
         else
         {
             float inhibition_rng = UnityEngine.Random.value;
-            if(inhibition_rng > Aggression)
-            {
-                _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange, 3);
-            }
+            //if(inhibition_rng > Aggression)
+            //{
+            //    _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed, checkMyWeaponInRange, 3);
+            //}
             attack_cycle();
-            _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+            //_MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
             defend_cycle();
             if (inhibition_rng < Fear)
             {
@@ -109,7 +110,7 @@ public class Goon : AIBehaviour
     {
         float guard_period = Mathf.Sqrt(Fear) * 4;
         _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Guarding, guard_period);
-        _MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
+        //_MartialController.Queue_Action(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
 
     }
     private void attack_cycle()

@@ -78,6 +78,25 @@ public class Requiem: MonoBehaviour
         environmentLight.intensity = 0.4f;
         environmentLight.shadows = LightShadows.None;
         Wavers = GetComponents<Waver>().ToList();
+        //for(int i = 0; i < Wavers.Count; i++)
+        //{
+        //    Waver waver = Wavers[i];
+        //    switch (i)
+        //    {
+        //        case 0:
+        //            waver.entity_type = typeof(Skully);
+        //            waver.behaviour_type = typeof(Biter);
+        //            break;
+        //        case 1:
+        //            waver.entity_type = typeof(Skelly);
+        //            waver.behaviour_type = typeof(Goon);
+        //            break;
+        //        default:
+        //            waver.entity_type = typeof(Skully);
+        //            waver.behaviour_type = typeof(Biter);
+        //            break;
+        //    }
+        //}
         StartCoroutine(GAME_SCRIPT());
     }
 

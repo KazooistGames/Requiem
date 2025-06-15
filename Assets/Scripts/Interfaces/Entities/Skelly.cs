@@ -24,7 +24,7 @@ public class Skelly : Entity
     {
         base.Start();
         createSkeleton();
-        Haste = 0.25f;
+        Haste = 0.5f;
         Strength = 100f;
         gameObject.name = "Skelly";
         JustWounded.AddListener(CRUMBLE);
@@ -74,20 +74,10 @@ public class Skelly : Entity
         }
     }
 
-    protected void Mutate()
-    {
-        Debone(head);
-
-        if (GetComponent<AIBehaviour>())
-        {
-            Destroy(GetComponent<AIBehaviour>());
-            gameObject.AddComponent<Assassin>();
-        }
-    }
 
     public override void Die()
     {
-        if(!head || UnityEngine.Random.value >= 0.1f)
+        if(!head || UnityEngine.Random.value >= 0.25f)
         {
             foreach (MeshFilter bone in bodyParts)
             {
@@ -113,16 +103,20 @@ public class Skelly : Entity
             {
                 _MartialController.Cancel_Actions(OffHand.GetComponent<Weapon>());
             }
-            Haste = 0.5f;
+            Haste = 1.0f;
             Strength = 100;
-            //Resolve = 10;
-            mortality = Mortality.vulnerable;
             Vitality = Strength;
-            //Poise = Strength;
             Destroy(GetComponent<AIBehaviour>());
             gameObject.AddComponent<Assassin>();
             Debone(head);
             head = null;
+
+            if (Foe)
+            {
+                Vector3 disposition = Foe.transform.position - transform.position;
+                Shove(-disposition.normalized * Min_Velocity_Of_Dash);
+            }
+
         }
     }
 

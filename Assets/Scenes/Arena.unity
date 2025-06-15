@@ -978,10 +978,11 @@ GameObject:
   - component: {fileID: 2128541366}
   - component: {fileID: 2128541365}
   - component: {fileID: 2128541367}
-  - component: {fileID: 2128541368}
   - component: {fileID: 2128541369}
   - component: {fileID: 2128541370}
   - component: {fileID: 2128541371}
+  - component: {fileID: 2128541372}
+  - component: {fileID: 2128541373}
   m_Layer: 0
   m_Name: REQUIEM
   m_TagString: Untagged
@@ -1074,18 +1075,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Charge: 0
---- !u!114 &2128541368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2128541354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 264751bbdb61e394b943a972b8a6cba6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2128541369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1122,3 +1111,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62b9653505df7fd48ae54c06f32d1829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2128541372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d301f3883cc947c4082a697af52e78ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Mobs: []
+  population_range: {x: 1, y: 5}
+  group_size_range: {x: 1, y: 3}
+  spawn_period_range: {x: 8, y: 12}
+  paused: 1
+--- !u!114 &2128541373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128541354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 559b28d4e4073fc4b85c6bd0befb70f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Mobs: []
+  population_range: {x: 1, y: 5}
+  group_size_range: {x: 1, y: 3}
+  spawn_period_range: {x: 8, y: 12}
+  paused: 1

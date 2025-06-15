@@ -163,7 +163,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
         //float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
         //return 1 - function;
 
-        return 1 - Mathf.Pow((1 - charge), 2);
+        return 1 - Mathf.Pow((1 - charge), 1.5f);
     }
 
 

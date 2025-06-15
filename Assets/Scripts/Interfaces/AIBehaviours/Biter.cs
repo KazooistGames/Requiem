@@ -24,7 +24,7 @@ public class Biter : AIBehaviour
         sensorySightRangeScalar = 1.0f;
         meanderPauseFrequency = 0.5f;
         itemManagementSeekItems = false;
-        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.25f;
+        pursueStoppingDistance = sensoryBaseRange * sensorySightRangeScalar * 0.20f;
         grabEnabled = true;
         dashingChargePeriod = 0.5f;
     }
