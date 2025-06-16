@@ -60,6 +60,7 @@ public class Nephalim : Entity
             if (bone && !bone.GetComponent<Rigidbody>())
             {
                 Debone(bone.gameObject);
+                bone.GetComponent<Bone>().Value = 10;
             }
         }
         head = null;

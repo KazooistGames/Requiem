@@ -61,8 +61,8 @@ public class PlayerHUD : MonoBehaviour
             StatBar.SetActive(false);
             MouseSlider.gameObject.SetActive(false);
             SoundSlider.gameObject.SetActive(false);
-            scoreTransforms[2].gameObject.SetActive(false);
-            scoreTransforms[3].gameObject.SetActive(false);
+            //scoreTransforms[2].gameObject.SetActive(false);
+            //scoreTransforms[3].gameObject.SetActive(false);
         }
         else if (Requiem.Paused)
         {
@@ -143,8 +143,8 @@ public class PlayerHUD : MonoBehaviour
     private void updateScore()
     {
         scoreTransforms[1].GetComponent<Text>().text = Scoreboard.Score.ToString("0");
-        scoreTransforms[2].GetComponent<Text>().text = "x " + Scoreboard.KillMultiplier.ToString("0.00");
-        scoreTransforms[2].GetComponent<Text>().enabled = Scoreboard.KillMultiplier > 1;
+        //scoreTransforms[2].GetComponent<Text>().text = "x " + Scoreboard.KillMultiplier.ToString("0.00");
+        //scoreTransforms[2].GetComponent<Text>().enabled = Scoreboard.KillMultiplier > 1;
         //scoreTransforms[3].GetComponent<Text>().text = Requiem_Arena.INSTANCE.Ritual <= 10 ? "Ritual " + Requiem_Arena.INSTANCE.Ritual.ToString() : "";
         //scoreTransforms[3].GetComponent<Text>().enabled = Requiem_Arena.INSTANCE.Ritual > 0;
     }

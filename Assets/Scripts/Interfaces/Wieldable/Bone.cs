@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Bone : MonoBehaviour
 {
-    public int Value = 20;
+    public int Value = 1;
     public float pitchScalar = 1.0f;
     public float NoiseImpulse = 0.0175f;
 
@@ -17,7 +17,7 @@ public class Bone : MonoBehaviour
     public Rigidbody Body;
 
     private bool allowCollect = false;
-    //private float allowCollectTimer = 0.0f;
+    private float allowCollectTimer = 0.0f;
 
     private static float FINAL_SCALE_AFTER_COLLECTION = 0.5f;
 
@@ -35,11 +35,11 @@ public class Bone : MonoBehaviour
         Body.mass = 0.25f;
     }
 
-    //protected void Update()
-    //{
-    //    allowCollectTimer += Time.deltaTime;
-    //    allowCollect = allowCollectTimer >= 0.75f;
-    //}
+    protected void Update()
+    {
+        allowCollectTimer += Time.deltaTime;
+        allowCollect = allowCollectTimer >= 0.75f;
+    }
 
     protected void OnDestroy()
     {
@@ -58,7 +58,7 @@ public class Bone : MonoBehaviour
     {
         if(other.gameObject == Player.INSTANCE.gameObject && allowCollect && !collectTarget)
         {
-            //Collect(Player.INSTANCE, 0.5f, Consume);
+            Collect(Player.INSTANCE.gameObject, 0.5f, Consume, true);
         }
     }
 
@@ -74,7 +74,7 @@ public class Bone : MonoBehaviour
     {
         if (bone.collectTarget) 
         {
-            //bone.collectTarget.BonesCollected += bone.Value;
+            Scoreboard.Score += bone.Value;
             bone.Rattle();
             Destroy(bone.gameObject);
         }

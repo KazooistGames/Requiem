@@ -156,14 +156,7 @@ public class weapon_module_SpecialAttacks : MonoBehaviour
     private float tempoChargePeriod = 0.75f;
     private float convert_charge_to_tempo(float charge)
     {
-        //float frequencyVariable = Mathf.PI * charge;
-        //float frequencyConstant = Mathf.PI / 2;
-        //float amplitudeScalar = 0.5f;
-        //float amplitudeConstant = 0.5f;
-        //float function = amplitudeScalar * Mathf.Sin(frequencyVariable + frequencyConstant) + amplitudeConstant;
-        //return 1 - function;
-
-        return 1 - Mathf.Pow((1 - charge), 1.5f);
+        return 1.0f - Mathf.Pow((1.0f - charge), 2.0f);
     }
 
 

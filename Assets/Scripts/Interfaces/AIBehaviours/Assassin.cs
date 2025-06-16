@@ -16,9 +16,6 @@ public class Assassin : AIBehaviour
         new GameObject().AddComponent<Handaxe>().PickupItem(entity);        
         new GameObject().AddComponent<Handaxe>().PickupItem(entity);
         Intelligence = 1f;
-        tangoStrafeEnabled = true;
-        tangoStrafePauseFreq = 0.75f;
-        martialPreferredState = martialState.attacking;
         sensorySightRangeScalar = 1f;
         sensoryAudioRangeScalar = 1f;
         meanderPauseFrequency = 0.5f;
@@ -73,8 +70,8 @@ public class Assassin : AIBehaviour
         }
         else 
         {
-            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 1);
-            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 1);
+            _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Guarding, 0.5f);
+            _MartialController.Override_Queue(offWep, Weapon.ActionAnim.Guarding, 0.5f);
         }
     }
 
@@ -135,17 +132,12 @@ public class Assassin : AIBehaviour
         {
             return;
         }
-        //else if (dashingCooldownTimer >= DASH_COOLDOWN && !entity.DashCharging)
-        //{
-        //    Vector3 disposition = entity.Foe.transform.position - transform.position;
-        //    float randomLeftRightOffset = Mathf.Sign(Random.value - 0.5f) * 90;
-        //    dashingDesiredDirection = angleToVector(getAngle(disposition.normalized) + randomLeftRightOffset);
-        //    dashingChargePeriod = 0;
-        //}
-        else
+        else if (dashingCooldownTimer >= DASH_COOLDOWN && !entity.DashCharging)
         {
-            _MartialController.Override_Action(mainWep, Weapon.ActionAnim.Guarding, 2);
-            _MartialController.Override_Action(offWep, Weapon.ActionAnim.Guarding, 2);
+            Vector3 disposition = entity.Foe.transform.position - transform.position;
+            float randomOffset = Mathf.Sign(Random.value - 0.5f) * 30;
+            dashingDesiredDirection = -angleToVector(getAngle(disposition.normalized) + randomOffset);
+            dashingChargePeriod = 0;
         }
     }
 
@@ -176,8 +168,8 @@ public class Assassin : AIBehaviour
                     tangoOuterRange = wep.Range * 1f;
                     break;
                 case martialState.defending:
-                    tangoInnerRange = wep.Range * 1.5f;
-                    tangoOuterRange = wep.Range * 2f;
+                    tangoInnerRange = wep.Range * 2.0f;
+                    tangoOuterRange = sensoryBaseRange * sensorySightRangeScalar * 0.5f;
                     break;
                 case martialState.throwing:
                     tangoInnerRange = wep.Range * 2.0f;

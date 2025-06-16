@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
         gameObject.tag = "Player";
         InitPlayerInGame();
         CursorIndicator = Instantiate(Resources.Load<GameObject>("Prefabs/UX/Indicator"));
+
     }
 
     void Update()
@@ -349,7 +350,7 @@ public class Player : MonoBehaviour
     {
         INSTANCE = this;   
         interactBox = GetComponent<SphereCollider>() ? GetComponent<SphereCollider>() : gameObject.AddComponent<SphereCollider>();
-        interactBox.radius = 0.3f;
+        interactBox.radius = 0.5f;
         interactBox.isTrigger = true;
         moon = new GameObject("moon").AddComponent<Light>();
         moon.transform.SetParent(transform);
@@ -385,6 +386,7 @@ public class Player : MonoBehaviour
         chainRenderer.transform.localEulerAngles = Vector3.right * 90;
         chainRenderer.startWidth = ChainlinkWidth;
         chainRenderer.endWidth = ChainlinkWidth;
+        //HostEntity.gameObject.AddComponent<collector>();
         StartCoroutine(FadeCurtains());
     }
 

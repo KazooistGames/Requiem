@@ -46,7 +46,9 @@ public class Map : MonoBehaviour
         BloodWell = null;
         Credits = null;
         StopAllCoroutines();
+        Commissioned = false;
     }
+
     /***** PUBLIC *****/
 
     /***** PROTECTED *****/
