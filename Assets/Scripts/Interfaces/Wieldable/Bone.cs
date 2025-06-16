@@ -8,7 +8,7 @@ public class Bone : MonoBehaviour
 {
     public int Value = 1;
     public float pitchScalar = 1.0f;
-    public float NoiseImpulse = 0.0175f;
+    public float NoiseImpulse = 0.02f;
 
     public GameObject collectTarget;
     public bool Telecommuting = false;
@@ -83,6 +83,7 @@ public class Bone : MonoBehaviour
 
     public void Collect(GameObject target, float telecommuteScalar, Action<Bone> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
     {
+        Rattle();
         StartCoroutine(collectRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
 

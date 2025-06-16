@@ -214,7 +214,7 @@ public abstract class Weapon : Wieldable
                 else if(Action == ActionAnim.StrongCoil)
                 {
                     attackONS = true;
-                    modifyWielderSpeed(heftSlowModifier);
+                    modifyWielderSpeed(heftSlowModifier / 2);
                 }
                 else if (Action == ActionAnim.QuickWindup)
                 {
@@ -791,7 +791,14 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("QuickCoil"))
         {
-            return ActionAnim.QuickCoil;
+            if (nextAnimation.IsTag("StrongCoil"))
+            {
+                return ActionAnim.StrongWindup;
+            }
+            else
+            {
+                return ActionAnim.QuickCoil;
+            }
         }
         else if (currentAnimation.IsTag("QuickAttack"))
         {

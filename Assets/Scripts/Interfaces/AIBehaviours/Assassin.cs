@@ -108,7 +108,7 @@ public class Assassin : AIBehaviour
 
     protected override void reactToIncomingAttack()
     {
-        if (_MartialController.Weapon_Actions.ContainsKey(mainWep) ? _MartialController.Weapon_Actions[mainWep].Action == Weapon.ActionAnim.Guarding : false)
+        if (mainWep ? mainWep.Action == Weapon.ActionAnim.Guarding : false)
         {
             return;
         }
