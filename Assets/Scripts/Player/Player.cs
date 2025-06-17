@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
     {
         if (HostEntity)
         {
-            HostEntity.Haste = HostEntity.MainHand ? 1.4f : 1.6f;
+            HostEntity.Haste = HostEntity.MainHand ? 1.25f : 1.5f;
             transform.eulerAngles = HostEntity.transform.eulerAngles;
             if (transform.position == HostEntity.transform.position)
             {

@@ -48,13 +48,13 @@ public class PlayerHUD : MonoBehaviour
         metrics[0].text = "fps:    " + (1 / Time.smoothDeltaTime).ToString("0");
         //metrics[2].text = "Kills:  " + Player.INSTANCE.BonesCollected.ToString();
         metrics[1].text = "Time:   " + Requiem.GameClock.ToString("0.00");
-        metrics[2].enabled = false;
         updateStatBars();
         updateScore();
         updateIndicators();
         if (Player.INSTANCE.Dead)
         {
             PauseMenu.GetComponent<Text>().text = "Dead..";
+            PauseMenu.GetComponent<Text>().color = new Color(0.5f, 0.1f, 0);
             PauseMenu.SetActive(true);
             QuitButton.gameObject.SetActive(Curtains.color.a == 1);
             TempoBar.SetActive(false);

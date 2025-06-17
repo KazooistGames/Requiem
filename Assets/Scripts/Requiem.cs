@@ -115,7 +115,10 @@ public class Requiem: MonoBehaviour
         }
         else
         {
-            GameClock += Time.deltaTime;
+            if (Map.Alter.Used)
+            {
+                GameClock += Time.deltaTime;
+            }
             Time.timeScale = TimeScale;
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.None;

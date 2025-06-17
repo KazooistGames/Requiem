@@ -13,8 +13,8 @@ public class Assassin : AIBehaviour
     protected override void Start()
     {
         base.Start();
-        new GameObject().AddComponent<Handaxe>().PickupItem(entity);        
-        new GameObject().AddComponent<Handaxe>().PickupItem(entity);
+        //new GameObject().AddComponent<Handaxe>().PickupItem(entity);        
+        //new GameObject().AddComponent<Handaxe>().PickupItem(entity);
         Intelligence = 1f;
         sensorySightRangeScalar = 1f;
         sensoryAudioRangeScalar = 1f;

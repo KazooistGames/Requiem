@@ -23,7 +23,7 @@ public class Entity : MonoBehaviour
     public float Agility;
     //public float Poise;
 
-    public static float SpeedScalarGlobal { get; private set; } = 0.6f;
+    public static float SpeedScalarGlobal { get; private set; } = 0.5f;
     public static float Scale { get; private set; } = 0.2f;
     public static float Berth { get; private set; } = 0.225f;
     public static float Height { get; private set; } = 1.25f;
