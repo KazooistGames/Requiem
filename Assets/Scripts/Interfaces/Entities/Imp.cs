@@ -46,7 +46,7 @@ public class Imp : Entity
     //CUSTOM FUNCTIONS!!!!!!!!!!!!!
     protected void CRUMBLE(float damage)
     {
-        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.5f, _SoundService.Instance.DefaultAudioRange / 2).layer = gameObject.layer;
+        _SoundService.PlayAmbientSound(Requiem.boneSounds[UnityEngine.Random.Range(0, Requiem.boneSounds.Length)], transform.position, 0.5f + 0.5f * UnityEngine.Random.value, 0.5f, _SoundService.INSTANCE.DefaultAudioRange / 2).layer = gameObject.layer;
     }
 
     private void createSkeleton()

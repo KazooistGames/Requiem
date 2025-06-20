@@ -1023,7 +1023,7 @@ public class Entity : MonoBehaviour
 
     private GameObject playPunch(float pitch)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/punch", transform.position, pitch, 1.0f, _SoundService.INSTANCE.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         sound.GetComponent<AudioSource>().time = 0.075f;
         sound.transform.SetParent(transform);
         return sound;
@@ -1041,7 +1041,7 @@ public class Entity : MonoBehaviour
     private GameObject playCrunch(float volume)
     {
        
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/crunch", transform.position, 0.75f, volume, _SoundService.Instance.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/crunch", transform.position, 0.75f, volume, _SoundService.INSTANCE.DefaultAudioRange / 2, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         if (head)
         {
             sound.transform.SetParent(head.transform);

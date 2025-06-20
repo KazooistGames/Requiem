@@ -95,6 +95,8 @@ public abstract class Weapon : Wieldable
         Knockback,
         Sunder,
     }
+
+
     public Dictionary<SpecialAttacks, bool> Specials = new Dictionary<SpecialAttacks, bool>()
     { 
         {SpecialAttacks.Truestrike, false },
@@ -105,6 +107,7 @@ public abstract class Weapon : Wieldable
         {SpecialAttacks.Knockback, false },
         {SpecialAttacks.Sunder, false },
     };
+
 
     protected override void Awake()
     {
@@ -124,13 +127,16 @@ public abstract class Weapon : Wieldable
         _MartialController.Queue_Action(this, ActionAnim.Idle);
     }
 
+
     protected override void Start()
     {
+
         base.Start();
         transform.localScale *= Entity.Scale;
         Anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animation/items/" + gameObject.name + "/" + gameObject.name +"Controller");
         Body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         HitBox.isTrigger = true;
+
         foreach(Collider box in PhysicsBoxes)
         {
             box.isTrigger = false;
@@ -142,18 +148,21 @@ public abstract class Weapon : Wieldable
         clangPitch = 120 / Heft;
         clangVolume = 0.1f;
         tinkPitch = 50 / Heft;
+
         if(Heft == 0)
         {
             Heft = BasePower;
         }
         heftSlowKey = "heft" + gameObject.GetHashCode().ToString();
         Mesh mesh = GetComponent<MeshFilter>().mesh;
+
         for (int i = 0; i < mesh.subMeshCount-1; i++)
         {
             BoxCollider box = gameObject.AddComponent<BoxCollider>();
             box.center = mesh.GetSubMesh(i).bounds.center;
             box.size = mesh.GetSubMesh(i).bounds.extents * 2;
             PhysicsBoxes.Add(box);
+
             if(i == 0)
             {
                 box.size = box.size * 0.75f;
@@ -168,18 +177,22 @@ public abstract class Weapon : Wieldable
         EventPickedUp.AddListener(x => flames.gameObject.SetActive(x.Wielder.requiemPlayer));
     }
 
+
     protected override void Update()
     {
         base.Update();
         Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+
         if (Action != ActionAnim.QuickAttack && Action != ActionAnim.StrongAttack)
         {
             playClashSoundONS = true;
         }
+
         if (Wielder)
         {
             //modPower["wielderResolve"] = Wielder.Posture == Entity.PostureStrength.Strong ? Wielder.Resolve : 0;
             Action = getActionFromCurrentAnimationState();
+
             if (actionPreviouslyAnimated != Action)
             {
                 ChangingActionAnimations.Invoke(Action, actionPreviouslyAnimated);
@@ -187,12 +200,15 @@ public abstract class Weapon : Wieldable
             actionPreviouslyAnimated = Action;
             togglePhysicsBox(false);
             heftSlowModifier = - 1.5f * Heft / Wielder.Strength;
+
             if (transform.parent != Wielder.transform)
             {
                 transform.SetParent(Wielder.transform, true);
             }
+
             if (Wielded)
             {
+
                 if (Action == ActionAnim.Recoiling)
                 {
                     alreadyHit = new List<GameObject>();
@@ -228,6 +244,7 @@ public abstract class Weapon : Wieldable
                 }
                 else if (Action == ActionAnim.QuickAttack)
                 {
+
                     if (attackONS)
                     {
                         playClashSoundONS = true;
@@ -243,6 +260,7 @@ public abstract class Weapon : Wieldable
                 }
                 else if (Action == ActionAnim.StrongAttack)
                 {
+
                     if (attackONS)
                     {
                         playClashSoundONS = true;
@@ -303,10 +321,12 @@ public abstract class Weapon : Wieldable
         }
         else
         {
+
             if (MostRecentWielder)
             {
                 modifyWielderSpeed(0);
             }
+
             if (!MountTarget)
             {
                 resetWeapon();
@@ -314,15 +334,19 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     protected override void OnCollisionEnter(Collision collision)
     {
         ContactPoint contact = collision.GetContact(0);
+
         if (Thrown)
         {
             Wieldable item = collision.gameObject.GetComponent<Wieldable>();
             Entity foe = collision.gameObject.GetComponent<Entity>();
+
             if (foe ? foe.Allegiance != MostRecentWielder.Allegiance : false)
             {
+
                 if (RESOLVE_HIT(this, foe))
                 {
                     checkImpale(collision);
@@ -341,27 +365,34 @@ public abstract class Weapon : Wieldable
         base.OnCollisionEnter(collision);
     }
 
+
     protected void OnTriggerStay(Collider other)
     {
         //base.OnTriggerEnter(other);
         Power = Mathf.Max(modPower.Values.Aggregate(BasePower, (result, increment) => result += increment), 0);
+
         if (other)
         {
+
             if (!alreadyHit.Contains(other.gameObject))
             {
                 Entity foe = other.gameObject.GetComponent<Entity>();
                 Weapon foeWeapon = other.gameObject.GetComponent<Weapon>();
                 bool obstacle = other.gameObject.layer == Requiem.layerObstacle || other.gameObject.layer == Requiem.layerWall;
+
                 if (foe || foeWeapon || obstacle)
                 {
+
                     if (foeWeapon ? foeWeapon.Allegiance != Allegiance : false)
                     {
+
                         if (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack)
                         {
                             RESOLVE_CLASH(this, foeWeapon);
                         }
                         else
                         {
+
                             if (foeWeapon.Wielder)
                             {
                                 FullCollisionONS(foeWeapon.Wielder.gameObject);
@@ -374,6 +405,7 @@ public abstract class Weapon : Wieldable
                     }
                     else if (foe && !other.isTrigger)
                     {
+
                         if (Action == ActionAnim.StrongAttack || Action == ActionAnim.QuickAttack)
                         {
                             RESOLVE_HIT(this, foe);
@@ -393,10 +425,12 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     protected override void OnTriggerExit(Collider other)
     {
         base.OnTriggerExit(other);
     }
+
 
     protected override void OnDestroy()
     {
@@ -415,6 +449,7 @@ public abstract class Weapon : Wieldable
     {
         yield return null;
         //playShing();
+
         if (ImpaledObject)
         {
             ImpaleRelease();
@@ -422,9 +457,11 @@ public abstract class Weapon : Wieldable
         yield return base.pickupHandler(newOwner);
     }
 
+
     /**********PRIVATE**************/
     private static void RESOLVE_PARRY(Weapon Attacker, Weapon Parrier)
     {
+
         if (Attacker.Wielder)
         {
 
@@ -441,10 +478,12 @@ public abstract class Weapon : Wieldable
         Attacker.FullCollisionONS(Parrier.Wielder.gameObject);
     }
 
+
     private static void RESOLVE_BLOCK(Weapon Attacker, Weapon Blocker)
     {
         Blocker.Blocking.Invoke(Blocker, Attacker);
         Attacker.Clashing.Invoke(Attacker, Blocker);
+
         if (Attacker.Specials[SpecialAttacks.Truestrike])
         {
             Attacker.playClang(2-Attacker.Tempo);
@@ -453,6 +492,7 @@ public abstract class Weapon : Wieldable
         {
             Attacker.playTink();
         }
+
         if (Blocker.Wielder)
         {
             APPLY_WEAPON_SHOVE_TO_FOE(Attacker, Blocker.Wielder, 0.75f);
@@ -464,14 +504,17 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     private static void RESOLVE_CLASH(Weapon Attacker, Weapon Defender)
     {
+
         if (!Defender.Wielder)
         {
             Attacker.itemCollisionONS(Defender);
             return;
         }
         GameObject obstruction = getObstructionBetweenEntities(Defender.Wielder, Attacker.MostRecentWielder);
+        
         if (obstruction ? obstruction != Defender.gameObject : false)
         {
             return;
@@ -501,9 +544,12 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     private static bool RESOLVE_HIT(Weapon weapon, Entity foe)
     {
+
         if(foe.Allegiance == weapon.Allegiance) {  return false; }
+       
         if (testBlockBetweenEntities(foe, weapon.MostRecentWielder))
         {
             RESOLVE_BLOCK(weapon, foe.MainHand.GetComponent<Weapon>());
@@ -521,14 +567,17 @@ public abstract class Weapon : Wieldable
         {
             weapon.FullCollisionONS(foe.gameObject);
         }
+
         return false;      
     }
+
 
     private void resolveObstacleHit(GameObject obstacle)
     {
         playTink();
         alreadyHit.Add(obstacle);
     }
+
 
     private void checkImpale(Collision collision)
     {
@@ -537,15 +586,18 @@ public abstract class Weapon : Wieldable
         ContactPoint contact = collision.GetContact(0);
         float dot = Vector3.Dot(contact.normal.normalized, collision.relativeVelocity.normalized);
         bool cleanhit = contact.thisCollider == blade && (collision.relativeVelocity.magnitude > 0 ? Mathf.Abs(dot) > 0.0 : true);
+
         if (cleanhit && !ImpaledObject)
         {
             StartCoroutine(ImpaleRoutine(collision.gameObject, contact.point));
         }
     }
 
+
     private IEnumerator ImpaleRoutine(GameObject collidedObject, Vector3 contactPoint)
     {
         Entity foe = collidedObject.GetComponent<Entity>();
+
         if (foe)
         {
             Hitting.Invoke(this, foe);
@@ -559,6 +611,7 @@ public abstract class Weapon : Wieldable
         Vector3 bladeLocation = transform.TransformPoint((blade as BoxCollider).center);
         Vector3 disposition = contactPoint - bladeLocation;
         Vector3 checkDisposition = contactPoint - MostRecentWielder.transform.position;
+
         if (Vector3.Dot(disposition, checkDisposition) > 0)
         {
             transform.position += disposition * 1.25f;
@@ -567,6 +620,7 @@ public abstract class Weapon : Wieldable
         {
             transform.position += disposition;
         }
+
         if (foe)
         {
             foe.EventAttemptPickup.AddListener(PickupItem);
@@ -598,13 +652,15 @@ public abstract class Weapon : Wieldable
             togglePhysicsBox(!Wielder);
             yield break;
         }
-    
     }
+
 
     public void ImpaleRelease()
     {
         if (!ImpaledObject) { return; }
-        Entity foe = ImpaledObject.GetComponent<Entity>();                                                                                                                                                                                   
+
+        Entity foe = ImpaledObject.GetComponent<Entity>();      
+        
         if (foe)
         {
             string key = "impaled" + gameObject.GetHashCode().ToString();
@@ -620,10 +676,12 @@ public abstract class Weapon : Wieldable
         DropItem(yeet: false);
         playShing();
     }
+
     
     private void impale_doupleDipDamage()
     {
         Entity foe = ImpaledObject.GetComponent<Entity>();
+
         if (foe)
         {
             foe.JustCrashed.RemoveListener(impale_doupleDipDamage);
@@ -634,8 +692,10 @@ public abstract class Weapon : Wieldable
         DropItem(yeet: true, magnitude: 1);
     }
 
+
     private static void APPLY_WEAPON_SHOVE_TO_FOE(Weapon weapon, Entity foe, float impactScalar = 1.0f)
     {
+
         if (!foe || !weapon.MostRecentWielder) { return; }
         impactScalar += weapon.Tempo;
         Vector3 origin = weapon.Wielder ? Vector3.Lerp(weapon.transform.position, weapon.Wielder.transform.position, 0.5f) : weapon.MostRecentWielder.transform.position;
@@ -646,11 +706,14 @@ public abstract class Weapon : Wieldable
         foe.Shove(velocityChange);
     }
 
+
     private void FullCollisionONS(GameObject obj)
     {
+
         if (obj)
         {
             alreadyHit.Add(obj);
+
             foreach(Transform transform in obj.transform)
             {
                 alreadyHit.Add(transform.gameObject);
@@ -658,13 +721,16 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     private void itemCollisionONS(Wieldable item)
     {
         alreadyHit.Add(item.gameObject);
     }
 
+
     private static bool testBlockBetweenEntities(Entity target, Entity origin)
     {
+
         if (target == null || origin == null ) 
         { 
             return false; 
@@ -672,27 +738,34 @@ public abstract class Weapon : Wieldable
         float targetVsOriginAngle = Mathf.Abs(Vector3.Angle(target.LookDirection, origin.LookDirection));
         float marginFromHeadOn = 45;
         float differenceFromHeadOnAngle = 180 - targetVsOriginAngle;
+
         return target.Defending && differenceFromHeadOnAngle <= marginFromHeadOn;
     }
 
+
     private static GameObject getObstructionBetweenEntities(Entity target, Entity origin)
     {
+
         if(!target || !origin) { return null; }
         Vector3 disposition = target.transform.position - origin.transform.position;
         disposition.y = 0;
         Vector3 rayStart = origin.transform.position;
         rayStart.y = target.transform.position.y + 0.3f * target.scaleActual;
         RaycastHit hit;
+
         if (Physics.Raycast(rayStart, disposition.normalized, out hit, disposition.magnitude, (1 << Requiem.layerWall) + (1 << Requiem.layerObstacle), QueryTriggerInteraction.Collide))
         {
             bool obstacle = !hit.collider.isTrigger && hit.collider.gameObject;
+
             if (obstacle)
             {
                 return hit.collider.gameObject;
             }
         }
+
         return null;
     }
+
 
     private void resetWeapon()
     {
@@ -703,24 +776,30 @@ public abstract class Weapon : Wieldable
         Anim.SetBool("secondary", false);
         Anim.SetBool("tertiary", false);
         Anim.SetBool("rebuked", false);
+
         if (MostRecentWielder)
         {
             modifyWielderSpeed(0);
         }
+
         if (!Thrown)
         {
 
         }
     }
 
+
     private void modifyWielderSpeed(float value, bool lockRotation = false)
     {
+
         if (MostRecentWielder)
         {
+
             if (!MostRecentWielder.modTurnSpeed.ContainsKey(heftSlowKey))
             {
                 MostRecentWielder.modTurnSpeed[heftSlowKey] = 0;
             }
+
             if (!MostRecentWielder.modSpeed.ContainsKey(heftSlowKey))
             {
                 MostRecentWielder.modSpeed[heftSlowKey] = 0;
@@ -730,8 +809,10 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     private ActionAnim getActionFromCurrentAnimationState()
     {
+
         if (currentAnimation.IsTag("Recoil") || nextAnimation.IsTag("Recoil"))
         {
             return ActionAnim.Recoiling;
@@ -746,6 +827,7 @@ public abstract class Weapon : Wieldable
         }
         else if (currentAnimation.IsTag("Idle"))
         {
+
             if (nextAnimation.IsTag("Windup"))
             {
                 return ActionAnim.StrongWindup;
@@ -859,8 +941,10 @@ public abstract class Weapon : Wieldable
         }
     }
 
+
     private void playClang(float pitchScalar = 2.0f)
     {
+
         if (playClashSoundONS)
         {
             playClashSoundONS = false;
@@ -869,16 +953,19 @@ public abstract class Weapon : Wieldable
         
     }
 
+
     public void playShing(float pichScalar = 1.0f)
     {
         GameObject sound = _SoundService.PlayAmbientSound("Audio/Weapons/shing", transform.position, pichScalar * 40 / Heft, 0.25f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
         sound.GetComponent<AudioSource>().time = 0.15f;
     }
 
+
     private void playSlap(Vector3 position)
     {
         _SoundService.PlayAmbientSound("Audio/Weapons/slap", position, Mathf.Pow(10f / Power, 0.75f), 0.20f, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
     }
+
 
     private void playTink(float scalar = 1)
     {
@@ -891,10 +978,13 @@ public abstract class Weapon : Wieldable
         }  
     }
 
+
     private void playLightSwing()
     {
         _SoundService.PlayAmbientSound(lightSwingClip, transform.position, swingPitch, 1.0f, soundSpawnCallback: sound => sound.layer = gameObject.layer);
     }
+
+
     private void playHeavySwing()
     {
         _SoundService.PlayAmbientSound(heavySwingClip, transform.position, swingPitch, 1.0f, soundSpawnCallback: sound => sound.layer = gameObject.layer);

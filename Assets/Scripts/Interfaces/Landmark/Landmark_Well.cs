@@ -155,7 +155,7 @@ public class Landmark_Bloodwell : Landmark
 
     private void playGulpSound(Entity benefactor)
     {
-        gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 0.8f, 0.8f, _SoundService.Instance.DefaultAudioRange / 4);
+        gulpSound = _SoundService.PlayAmbientSound("Audio/well/slurp", transform.position, 0.8f, 0.8f, _SoundService.INSTANCE.DefaultAudioRange / 4);
         gulpSound.GetComponent<AudioSource>().time = 1f;
         gulpSound.transform.SetParent(benefactor.transform);
     }

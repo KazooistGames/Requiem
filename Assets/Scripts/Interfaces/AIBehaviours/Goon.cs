@@ -73,14 +73,7 @@ public class Goon : AIBehaviour
         if (entity.Foe)
         {
             _MartialController.Override_Queue(mainWep, Weapon.ActionAnim.Idle, CombatSpeed);
-            if (0.5 >= UnityEngine.Random.value)
-            {
-                attack_cycle();
-            }
-            else
-            {
-                defend_cycle();
-            }
+            defend_cycle();
         }
         else
         {

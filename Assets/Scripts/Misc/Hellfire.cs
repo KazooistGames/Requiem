@@ -263,7 +263,7 @@ public class Hellfire : MonoBehaviour
 
     private GameObject playBeamSound(float pitch)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/wretch", transform.position, pitch, 1.5f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/wretch", transform.position, pitch, 1.5f, _SoundService.INSTANCE.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         sound.GetComponent<AudioSource>().time = 0.3f;
         sound.transform.SetParent(transform);
         return sound;

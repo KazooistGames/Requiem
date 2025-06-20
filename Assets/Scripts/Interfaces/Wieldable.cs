@@ -52,6 +52,7 @@ public class Wieldable : MonoBehaviour
     public AnimatorStateInfo nextAnimation;
 
     private GameObject blurbInteractPrompt;
+
     public enum EquipType
     {
         OneHanded = 1,
@@ -59,6 +60,7 @@ public class Wieldable : MonoBehaviour
         Burdensome = 3,
     }
     public EquipType equipType;
+
 
     protected virtual void Awake()
     {
@@ -69,12 +71,14 @@ public class Wieldable : MonoBehaviour
         gameObject.layer = Requiem.layerItem;
     }
 
+
     protected virtual void Start()
     {
         if (!defaultAnimController)
         {
             defaultAnimController = Resources.Load<RuntimeAnimatorController>("Animation/items/ItemDefault/ItemDefaultController");         
         }
+
         if (!defaultAnimController2H)
         {
             defaultAnimController2H = Resources.Load<RuntimeAnimatorController>("Animation/items/ItemDefault2H/ItemDefaultController2H");
@@ -84,14 +88,18 @@ public class Wieldable : MonoBehaviour
         blurbInteractPrompt.SetActive(false);
     }
 
+
     protected virtual void Update()
     {
         Recoiling = Wielder ? Wielder.Staggered : false;
+
         if (Wielder)
         {
             MostRecentWielder = Wielder;
+
             if (!Anim.runtimeAnimatorController)
             {
+
                 if (equipType == EquipType.OneHanded)
                 {
                     Anim.runtimeAnimatorController = defaultAnimController;
@@ -106,16 +114,19 @@ public class Wieldable : MonoBehaviour
             Wielded = Wielder.MainHand == this || Wielder.OffHand == this;
             currentAnimation = Anim.GetCurrentAnimatorStateInfo(0);
             nextAnimation = Anim.GetNextAnimatorStateInfo(0);
+
             if (Anim.enabled)
             {
                 Idling = currentAnimation.IsTag("Idle") && !Recoiling;
                 Anim.SetBool("throwTrigger", ThrowTrigger && !Recoiling && equipType != EquipType.Burdensome);
                 Anim.SetBool("wielded", Wielded);
+
                 if (equipType == EquipType.OneHanded)
                 {
                     Anim.SetBool("duelWielding", Wielder.MainHand && Wielder.OffHand);
                     Anim.SetBool("offHand", Wielder.rightStorage == this);
                 }
+
                 if (currentAnimation.IsTag("Throw"))
                 {
                     Thrown = true;
@@ -125,8 +136,10 @@ public class Wieldable : MonoBehaviour
             {
                 Anim.enabled = true;
             }
+
             if (equipType == EquipType.Burdensome)
             {
+
                 if (Wielded)
                 {
                     Wielder.wieldMode = Entity.WieldMode.Burdened;
@@ -144,8 +157,10 @@ public class Wieldable : MonoBehaviour
         }
     }
 
+
     protected virtual void OnCollisionEnter(Collision collision)
     {
+
         if (Thrown)
         {
             Thrown = false;
@@ -153,13 +168,16 @@ public class Wieldable : MonoBehaviour
         }
     }
 
+
     protected virtual void OnTriggerEnter(Collider other)
     {
         if (other)
         {
             Entity entity = other.gameObject.GetComponent<Entity>();
+
             if (entity && !Wielder && !Thrown && !MountTarget)
             {
+
                 if(equipType == EquipType.Burdensome)
                 {
                     entity.Interact.AddListener(PickupItem);
@@ -169,6 +187,7 @@ public class Wieldable : MonoBehaviour
                     entity.EventAttemptPickup.AddListener(PickupItem);
 
                 }
+
                 if (entity == Player.INSTANCE.HostEntity && (!Player.INSTANCE.HostWeapon || equipType == EquipType.Burdensome) && blurbInteractPrompt)
                 {
                     blurbInteractPrompt.GetComponent<Text>().text = equipType == EquipType.Burdensome ? "F" : "E";
@@ -178,11 +197,13 @@ public class Wieldable : MonoBehaviour
         }
     }
 
+
     protected virtual void OnTriggerExit(Collider other)
     {
         Entity entity = other.gameObject.GetComponent<Entity>();
         if (entity && !Wielder && !Thrown)
         {
+
             if (equipType == EquipType.Burdensome)
             {
                 entity.Interact.RemoveListener(PickupItem);
@@ -191,6 +212,7 @@ public class Wieldable : MonoBehaviour
             {
                 entity.EventAttemptPickup.RemoveListener(PickupItem);
             }
+
             if (entity == Player.INSTANCE.HostEntity && blurbInteractPrompt)
             {
                 blurbInteractPrompt.SetActive(false);
@@ -199,11 +221,13 @@ public class Wieldable : MonoBehaviour
         }
     }
 
+
     protected virtual void OnDestroy()
     {
         if (Wielder)
         {
             Wielder.modSpeed["heft" + gameObject.GetHashCode().ToString()] = 0;
+
             if (equipType == EquipType.Burdensome)
             {
                 Wielder.modSpeed.Remove("burdensome" + GetHashCode().ToString());
@@ -213,22 +237,26 @@ public class Wieldable : MonoBehaviour
         StopAllCoroutines();
     }
 
+
     /***** PUBLIC *****/
     public void Mount(GameObject obj, Vector3 localPosition)
     {
         StartCoroutine(mountHandler(obj, localPosition));
     }
 
+
     public void PickupItem(Entity newOwner)
     {
         StartCoroutine(pickupHandler(newOwner));
     }
+
 
     protected void setHighlightColor(Color highlight)
     {
         if (Renderer ? Renderer.sharedMaterial : false)
         {
             Color colorActual = Color.Lerp(Color.black, highlight, 0.1f);
+
             if (colorActual != Renderer.sharedMaterial.GetColor("_EmissionColor"))
             {
                 Renderer.sharedMaterial.SetColor("_EmissionColor", colorActual);
@@ -237,18 +265,19 @@ public class Wieldable : MonoBehaviour
     }
 
 
-
     public void DropItem(bool yeet = false, Vector3 direction = new Vector3(), float magnitude = 2)
     {
         if (Wielder)
         {
             Anim.enabled = false;
+
             if (HitBox)
             {
                 HitBox.enabled = false;
             }
             transform.SetParent(Wielder.transform.parent);
             Wielder.modSpeed["heft" + gameObject.GetHashCode().ToString()] = 0;
+
             if(equipType == EquipType.Burdensome)
             {
                 Wielder.modSpeed.Remove("burdensome" + GetHashCode().ToString());
@@ -268,6 +297,7 @@ public class Wieldable : MonoBehaviour
             Wielded = false;
             setHighlightColor(Color.black);
         }
+
         if (yeet)
         {
             direction = direction.magnitude == 0 ? new Vector3(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value, UnityEngine.Random.value - 0.5f).normalized : direction.normalized;
@@ -275,37 +305,45 @@ public class Wieldable : MonoBehaviour
         }
     }
 
+
     public void Telecommute(GameObject target, float telecommuteScalar, Action<Wieldable> callback = null, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
     {
         StartCoroutine(telecommuteRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
+
 
     public void Telecommute(Vector3 target, float telecommuteScalar, Action<Wieldable> callback, bool enablePhysicsWhileInFlight = false, bool useScalarAsSpeed = false)
     {
         StartCoroutine(telecommuteRoutine(target, telecommuteScalar, callback, enablePhysicsWhileInFlight, useScalarAsSpeed));
     }
 
+
     /***** PROTECTED *****/
     protected virtual IEnumerator pickupHandler(Entity newOwner)
     {
         blurbInteractPrompt.SetActive(false);
         Thrown = false;
+
         if (Wielder || !newOwner)
         {
             yield break;
         }
         Wielder = newOwner;
         Wielder.JustPickedUpWieldable.Invoke(this);
+
         if (!Wielder.leftStorage && !Wielder.rightStorage && !Wielder.backStorage)
         {
             Wielder.wieldMode = Entity.WieldMode.OneHanders;
         }
+
         if (equipType == EquipType.OneHanded)
         {
+
             if (Wielder.rightStorage && Wielder.leftStorage)
             {
                 Wielder.rightStorage.DropItem();
             }
+
             if (Wielder.leftStorage)
             {
                 Wielder.rightStorage = Wielder.leftStorage;
@@ -314,6 +352,7 @@ public class Wieldable : MonoBehaviour
         }
         else if (equipType == EquipType.TwoHanded)
         {
+
             if (Wielder.backStorage)
             {
                 Wielder.backStorage.DropItem();
@@ -327,6 +366,7 @@ public class Wieldable : MonoBehaviour
             Wielder.MainHand = this;
             togglePhysicsBox(false);
         }
+
         if (Body)
         {
             Body.isKinematic = true;
@@ -335,19 +375,13 @@ public class Wieldable : MonoBehaviour
         Allegiance = Wielder.Allegiance;
         transform.SetParent(Wielder.transform);
         Anim.enabled = true;
+
         if (gameObject.activeSelf)
         {
             Anim.Rebind();
             Anim.Update(0);
         }
-        //if (!Wielder.MainHand)
-        //{
-        //    Wielder.MainHand = this;
-        //    Wielded = true;
-        //    Anim.SetBool("wielded", true);
-        //    Anim.Update(0);
-        //    Wielder.wieldMode = equipType == EquipType.OneHanded ? Entity.WieldMode.OneHanders : Entity.WieldMode.TwoHanders;
-        //}
+
         if (Wielder.leftStorage ? Wielder.leftStorage == Wielder.rightStorage : false)
         {
             Wielder.rightStorage = null;
@@ -355,6 +389,7 @@ public class Wieldable : MonoBehaviour
 
         if (equipType == EquipType.Burdensome)
         {
+
             if (newOwner.wieldMode != Entity.WieldMode.Burdened)
             {
                 newOwner.Interact.RemoveListener(PickupItem);
@@ -365,12 +400,15 @@ public class Wieldable : MonoBehaviour
             newOwner.EventAttemptPickup.RemoveListener(PickupItem);
         }
         EventPickedUp.Invoke(this);
+
         yield break;
     }
+
 
     protected float throwMagnitude = 6f;
     protected IEnumerator throwHandler()
     {
+
         while (true)
         {
             yield return new WaitUntil(() => Thrown && Wielder && equipType != EquipType.Burdensome);
@@ -381,16 +419,21 @@ public class Wieldable : MonoBehaviour
             direction.y = 0;
             DropItem(true, direction, magnitude);
             Body.AddForce(direction * magnitude, ForceMode.VelocityChange);
+
             yield return new WaitUntil(() => !Thrown);
             Body.velocity = Vector3.zero;
-            yield return new WaitWhile(() =>!Thrown);
+
+            yield return new WaitWhile(() =>!Thrown); //incase deflected and thrown is reset by external actor
+
             yield return new WaitUntil(() => Wielder);
         }
     }
 
+
     protected void togglePhysicsBox(bool newValue)
     {
         PhysicsBoxes.RemoveAll(x => !x);
+
         if (PhysicsBoxes.Count > 0)
         {
             foreach (Collider box in PhysicsBoxes.Where(x => x))
@@ -399,6 +442,7 @@ public class Wieldable : MonoBehaviour
             }
         }
     }
+
 
     /***** PRIVATE *****/
     private IEnumerator mountHandler(GameObject mountedTo, Vector3 localPosition)
@@ -425,8 +469,10 @@ public class Wieldable : MonoBehaviour
         yield break;
     }
 
+
     private IEnumerator telecommuteRoutine(GameObject target, float teleScalar, Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
+
         yield return null;
         Body.velocity = Vector3.zero;
         telecommuteTarget = target;
@@ -437,25 +483,30 @@ public class Wieldable : MonoBehaviour
         bool previousGravity = Body.useGravity;
         Body.useGravity = false;
         togglePhysicsBox(enablePhysics);
+
         void cancelCommute()
         {
             Telecommuting = false;
             Body.useGravity = previousGravity;
             togglePhysicsBox(previousPhysicsBoxState);
+
             if (callback != null)
             {
                 callback(this);
             }
         }
+
         while (Telecommuting && !Wielder && target)
         {
             Vector3 total_disposition;
             Vector3 increment;
+
             if (useScalarAsSpeed)
             {
                 total_disposition = target.transform.position - transform.position;
                 total_disposition.Scale(new Vector3(1, 0, 1));
                 increment = total_disposition.normalized * teleScalar * Time.deltaTime;
+
                 if (total_disposition.magnitude <= increment.magnitude)
                 {
                     cancelCommute();
@@ -475,6 +526,7 @@ public class Wieldable : MonoBehaviour
                 float scale = (y) / 1.33f;
                 scale = Mathf.Clamp(scale, 0f, 1f);
                 transform.position = Vector3.Lerp(origin, target.transform.position, scale);
+
                 if (scale == 1)
                 {
                     cancelCommute();
@@ -484,10 +536,14 @@ public class Wieldable : MonoBehaviour
             yield return null;
         }
         cancelCommute();
+
         yield break;
     }
+
+
     private IEnumerator telecommuteRoutine(Vector3 target, float teleScalar, Action<Wieldable> callback, bool enablePhysics, bool useScalarAsSpeed)
     {
+
         yield return null;
         Body.velocity = Vector3.zero;
         //telecommuteTarget = target;
@@ -498,25 +554,30 @@ public class Wieldable : MonoBehaviour
         bool previousGravity = Body.useGravity;
         Body.useGravity = false;
         togglePhysicsBox(enablePhysics);
+
         void cancelCommute()
         {
             Telecommuting = false;
             Body.useGravity = previousGravity;
             togglePhysicsBox(previousPhysicsBoxState);
+
             if (callback != null)
             {
                 callback(this);
             }
         }
+
         while (Telecommuting && !Wielder)
         {
             Vector3 total_disposition;
             Vector3 increment;
+
             if (useScalarAsSpeed)
             {
                 total_disposition = target - transform.position;
                 total_disposition.Scale(new Vector3(1, 0, 1));
                 increment = total_disposition.normalized * teleScalar * Time.deltaTime;
+
                 if (total_disposition.magnitude <= increment.magnitude)
                 {
                     cancelCommute();
@@ -536,6 +597,7 @@ public class Wieldable : MonoBehaviour
                 float scale = (y) / 1.33f;
                 scale = Mathf.Clamp(scale, 0f, 1f);
                 transform.position = Vector3.Lerp(origin, target, scale);
+
                 if (scale == 1)
                 {
                     cancelCommute();
@@ -545,6 +607,7 @@ public class Wieldable : MonoBehaviour
             yield return null;
         }
         cancelCommute();
+
         yield break;
     }
 

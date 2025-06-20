@@ -187,14 +187,14 @@ public class Nemesis : AIBehaviour
 
     private GameObject playEvilLaugh(float pitch)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/ambience/ambience2", transform.position, pitch, 1.5f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/ambience/ambience2", transform.position, pitch, 1.5f, _SoundService.INSTANCE.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         sound.transform.SetParent(Player.INSTANCE.transform);
         return sound;
     }
 
     private GameObject playGroan(float pitch)
     {
-        GameObject sound = _SoundService.PlayAmbientSound("Audio/ambience/ambience1", transform.position, pitch, 1.0f, _SoundService.Instance.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
+        GameObject sound = _SoundService.PlayAmbientSound("Audio/ambience/ambience1", transform.position, pitch, 1.0f, _SoundService.INSTANCE.DefaultAudioRange, soundSpawnCallback: sound => sound.layer = Requiem.layerEntity);
         sound.transform.SetParent(transform);
         return sound;
     }
