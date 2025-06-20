@@ -20,7 +20,6 @@ F to interact.
 GOAL OF GAME:
 
 Requiem is a prototype of a dark-souls inspiried arcade game.
-You are a demon sealed away in its final resting place, a chamber of violence. Not a bad place for a demon.
 
 Score points by defeating enemies during a ritual.
 
